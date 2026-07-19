@@ -1,0 +1,17 @@
+M:\Marketplace\Marketplace.Infrastructure\bin\Debug\net8.0\Marketplace.Infrastructure.deps.json
+M:\Marketplace\Marketplace.Infrastructure\bin\Debug\net8.0\Marketplace.Infrastructure.runtimeconfig.json
+M:\Marketplace\Marketplace.Infrastructure\bin\Debug\net8.0\Marketplace.Infrastructure.dll
+M:\Marketplace\Marketplace.Infrastructure\bin\Debug\net8.0\Marketplace.Infrastructure.pdb
+M:\Marketplace\Marketplace.Infrastructure\bin\Debug\net8.0\Marketplace.Domain.dll
+M:\Marketplace\Marketplace.Infrastructure\bin\Debug\net8.0\Marketplace.Domain.pdb
+M:\Marketplace\Marketplace.Infrastructure\obj\Debug\net8.0\Marketplace.Infrastructure.csproj.AssemblyReference.cache
+M:\Marketplace\Marketplace.Infrastructure\obj\Debug\net8.0\Marketplace.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+M:\Marketplace\Marketplace.Infrastructure\obj\Debug\net8.0\Marketplace.Infrastructure.AssemblyInfoInputs.cache
+M:\Marketplace\Marketplace.Infrastructure\obj\Debug\net8.0\Marketplace.Infrastructure.AssemblyInfo.cs
+M:\Marketplace\Marketplace.Infrastructure\obj\Debug\net8.0\Marketplace.Infrastructure.csproj.CoreCompileInputs.cache
+M:\Marketplace\Marketplace.Infrastructure\obj\Debug\net8.0\Marketpl.6F2D58E5.Up2Date
+M:\Marketplace\Marketplace.Infrastructure\obj\Debug\net8.0\Marketplace.Infrastructure.dll
+M:\Marketplace\Marketplace.Infrastructure\obj\Debug\net8.0\refint\Marketplace.Infrastructure.dll
+M:\Marketplace\Marketplace.Infrastructure\obj\Debug\net8.0\Marketplace.Infrastructure.pdb
+M:\Marketplace\Marketplace.Infrastructure\obj\Debug\net8.0\Marketplace.Infrastructure.genruntimeconfig.cache
+M:\Marketplace\Marketplace.Infrastructure\obj\Debug\net8.0\ref\Marketplace.Infrastructure.dll
