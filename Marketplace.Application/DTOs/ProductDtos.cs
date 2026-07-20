@@ -10,7 +10,7 @@ public class ProductDto
     public decimal Price { get; set; }
     public int StockQuantity { get; set; }
     public string? ImageUrl { get; set; }
-    // CostPrice is intentionally excluded from public DTO
+    public string? VendorName { get; set; } // NEW
 }
 
 public class ProductCreateDto

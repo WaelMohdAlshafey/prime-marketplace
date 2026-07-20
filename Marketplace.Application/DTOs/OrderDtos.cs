@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 namespace Marketplace.Application.DTOs;
 
 // ============================================================
-// CREATE ORDER DTO
+// CREATE ORDER DTO (Full version)
 // ============================================================
 public class CreateOrderDto
 {

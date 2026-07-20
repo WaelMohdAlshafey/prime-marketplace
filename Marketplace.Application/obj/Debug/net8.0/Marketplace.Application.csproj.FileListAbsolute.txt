@@ -10,6 +10,7 @@ M:\Marketplace\Marketplace.Application\obj\Debug\net8.0\Marketplace.Application.
 M:\Marketplace\Marketplace.Application\obj\Debug\net8.0\Marketplace.Application.AssemblyInfoInputs.cache
 M:\Marketplace\Marketplace.Application\obj\Debug\net8.0\Marketplace.Application.AssemblyInfo.cs
 M:\Marketplace\Marketplace.Application\obj\Debug\net8.0\Marketplace.Application.csproj.CoreCompileInputs.cache
+M:\Marketplace\Marketplace.Application\obj\Debug\net8.0\Marketplace.Application.sourcelink.json
 M:\Marketplace\Marketplace.Application\obj\Debug\net8.0\Marketpl.A66CD6D4.Up2Date
 M:\Marketplace\Marketplace.Application\obj\Debug\net8.0\Marketplace.Application.dll
 M:\Marketplace\Marketplace.Application\obj\Debug\net8.0\refint\Marketplace.Application.dll

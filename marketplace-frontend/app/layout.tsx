@@ -1,15 +1,24 @@
 ﻿import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Cairo, Inter } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@/context/AuthContext';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
-const inter = Inter({ subsets: ['latin'] });
+const cairo = Cairo({
+    subsets: ['arabic'],
+    weight: ['300', '400', '500', '600', '700'],
+    variable: '--font-cairo',
+});
+
+const inter = Inter({
+    subsets: ['latin'],
+    variable: '--font-inter',
+});
 
 export const metadata: Metadata = {
-    title: 'Prime | Buy and Sell Products',
-    description: 'The best marketplace to buy and sell products online.',
+    title: 'Prime | سوق برايم ',
+    description: 'أفضل سوق للتسوق عبر الإنترنت - منتجات فاخرة، برامج، تجميل، أزياء',
 };
 
 export default function RootLayout({
@@ -18,11 +27,11 @@ export default function RootLayout({
     children: React.ReactNode;
 }) {
     return (
-        <html lang="en">
-            <body className={inter.className}>
+        <html lang="ar" dir="rtl" className={`${cairo.variable} ${inter.variable}`}>
+            <body className={cairo.className}>
                 <AuthProvider>
                     <Navbar />
-                    <main className="min-h-screen">{children}</main>
+                    <main className="min-h-screen bg-[#F8F9FA]">{children}</main>
                     <Footer />
                 </AuthProvider>
             </body>

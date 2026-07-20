@@ -158,6 +158,7 @@ M:\Marketplace\Marketplace.API\obj\Debug\net8.0\Marketplace.API.AssemblyInfo.cs
 M:\Marketplace\Marketplace.API\obj\Debug\net8.0\Marketplace.API.csproj.CoreCompileInputs.cache
 M:\Marketplace\Marketplace.API\obj\Debug\net8.0\Marketplace.API.MvcApplicationPartsAssemblyInfo.cs
 M:\Marketplace\Marketplace.API\obj\Debug\net8.0\Marketplace.API.MvcApplicationPartsAssemblyInfo.cache
+M:\Marketplace\Marketplace.API\obj\Debug\net8.0\Marketplace.API.sourcelink.json
 M:\Marketplace\Marketplace.API\obj\Debug\net8.0\rjimswa.dswa.cache.json
 M:\Marketplace\Marketplace.API\obj\Debug\net8.0\rjsmrazor.dswa.cache.json
 M:\Marketplace\Marketplace.API\obj\Debug\net8.0\rjsmcshtml.dswa.cache.json

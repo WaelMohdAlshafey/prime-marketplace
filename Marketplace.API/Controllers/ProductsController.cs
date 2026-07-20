@@ -19,9 +19,10 @@ public class ProductsController : ControllerBase
     }
 
     // ============================================================
-    // PUBLIC ENDPOINTS (No auth)
+    // PUBLIC ENDPOINTS (No authentication required)
     // ============================================================
 
+    // GET: api/products?page=1&pageSize=20
     [HttpGet]
     public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 20)
     {
@@ -29,6 +30,7 @@ public class ProductsController : ControllerBase
         return Ok(result);
     }
 
+    // GET: api/products/5
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
@@ -43,18 +45,29 @@ public class ProductsController : ControllerBase
         }
     }
 
+    // GET: api/products/category/{categoryName}?page=1&pageSize=20
+    [HttpGet("category/{categoryName}")]
+    public async Task<IActionResult> GetByCategory(string categoryName, [FromQuery] int page = 1, [FromQuery] int pageSize = 20)
+    {
+        var result = await _productService.GetProductsByCategoryAsync(categoryName, page, pageSize);
+        return Ok(result);
+    }
+
+    // GET: api/products/search?q=headphones&page=1&pageSize=20
     [HttpGet("search")]
     public async Task<IActionResult> Search([FromQuery] string q, [FromQuery] int page = 1, [FromQuery] int pageSize = 20)
     {
         if (string.IsNullOrWhiteSpace(q))
         {
-            var all = await _productService.GetProductsAsync(page, pageSize);
-            return Ok(all);
+            var allProducts = await _productService.GetProductsAsync(page, pageSize);
+            return Ok(allProducts);
         }
+
         var result = await _productService.SearchProductsAsync(q, page, pageSize);
         return Ok(result);
     }
 
+    // GET: api/products/filter?minPrice=10&maxPrice=100&vendorId=1&inStock=true
     [HttpGet("filter")]
     public async Task<IActionResult> GetFiltered(
         [FromQuery] string? q,
@@ -71,9 +84,10 @@ public class ProductsController : ControllerBase
     }
 
     // ============================================================
-    // VENDOR ENDPOINTS (Auth required)
+    // VENDOR ENDPOINTS (Authentication required)
     // ============================================================
 
+    // POST: api/products (with image upload)
     [HttpPost]
     [Authorize]
     public async Task<IActionResult> Create([FromForm] ProductCreateDto productDto, IFormFile? image)
@@ -109,7 +123,7 @@ public class ProductsController : ControllerBase
             Name = productDto.Name,
             Description = productDto.Description,
             Price = productDto.Price,
-            CostPrice = productDto.CostPrice, // NEW
+            CostPrice = productDto.CostPrice,
             StockQuantity = productDto.StockQuantity,
             VendorId = vendorId,
             IsActive = true,
@@ -121,6 +135,7 @@ public class ProductsController : ControllerBase
         return CreatedAtAction(nameof(GetAll), new { id = createdProduct.Id }, createdProduct);
     }
 
+    // GET: api/products/vendors/products?page=1&pageSize=20
     [HttpGet("vendors/products")]
     [Authorize]
     public async Task<IActionResult> GetMyProducts([FromQuery] int page = 1, [FromQuery] int pageSize = 20)
@@ -134,6 +149,7 @@ public class ProductsController : ControllerBase
         return Ok(result);
     }
 
+    // PUT: api/products/5 (with optional image upload)
     [HttpPut("{id}")]
     [Authorize]
     public async Task<IActionResult> Update(int id, [FromForm] ProductUpdateDto productDto, IFormFile? image)
@@ -173,7 +189,7 @@ public class ProductsController : ControllerBase
             CostPrice = productDto.CostPrice,
             StockQuantity = productDto.StockQuantity,
             IsActive = productDto.IsActive,
-            ImageUrl = newImageUrl ?? productDto.ExistingImageUrl // Keep old if no new image
+            ImageUrl = newImageUrl ?? productDto.ExistingImageUrl
         };
 
         try
@@ -187,6 +203,7 @@ public class ProductsController : ControllerBase
         }
     }
 
+    // DELETE: api/products/5
     [HttpDelete("{id}")]
     [Authorize]
     public async Task<IActionResult> Delete(int id)

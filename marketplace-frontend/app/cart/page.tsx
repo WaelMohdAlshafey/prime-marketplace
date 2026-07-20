@@ -8,6 +8,19 @@ import { useAuth } from '@/context/AuthContext';
 import { TrashIcon } from '@heroicons/react/24/outline';
 import { MARKETPLACE } from '@/constants/marketplace';
 
+// ============================================================
+// TYPES
+// ============================================================
+interface CheckoutError {
+    response?: {
+        data?: {
+            message?: string;
+            title?: string;
+        };
+    };
+    message?: string;
+}
+
 export default function CartPage() {
     const { user, isLoading } = useAuth();
     const router = useRouter();
@@ -61,6 +74,12 @@ export default function CartPage() {
         e.preventDefault();
         if (!user) return;
 
+        // Check if shipping address is filled
+        if (!checkoutData.shippingAddress.trim()) {
+            alert('⚠️ يرجى إدخال عنوان الشحن');
+            return;
+        }
+
         setCheckoutLoading(true);
         try {
             const response = await api.post('/api/Orders/checkout', checkoutData);
@@ -86,7 +105,7 @@ export default function CartPage() {
                     break;
                 case 'CashOnDelivery':
                     confirmationData = {
-                        deliveryConfirmation: checkoutData.deliveryInstructions || 'Awaiting delivery confirmation',
+                        deliveryConfirmation: checkoutData.deliveryInstructions || 'في انتظار تأكيد التوصيل',
                     };
                     break;
                 default:
@@ -95,11 +114,23 @@ export default function CartPage() {
 
             await api.post(`/api/Orders/${order.id}/confirm-payment`, confirmationData);
 
-            alert('🎉 Order placed and payment confirmed successfully!');
+            alert('🎉 تم الطلب والدفع بنجاح!');
             router.push(`/orders/${order.id}`);
-        } catch (error) {
+        } catch (error: unknown) {
             console.error('Checkout failed:', error);
-            alert('❌ Checkout failed. Please try again.');
+            // Extract the error message safely
+            let message = '❌ فشل الطلب. حاول مرة أخرى.';
+            if (error && typeof error === 'object' && 'response' in error) {
+                const err = error as CheckoutError;
+                if (err.response?.data?.message) {
+                    message = `⚠️ ${err.response.data.message}`;
+                } else if (err.response?.data?.title) {
+                    message = `⚠️ ${err.response.data.title}`;
+                } else if (err.message) {
+                    message = `⚠️ ${err.message}`;
+                }
+            }
+            alert(message);
         } finally {
             setCheckoutLoading(false);
         }
@@ -111,7 +142,7 @@ export default function CartPage() {
                 return (
                     <>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Card Number</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">رقم البطاقة</label>
                             <input
                                 type="text"
                                 required
@@ -123,7 +154,7 @@ export default function CartPage() {
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Expiry (MM/YY)</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">تاريخ الانتهاء (شهر/سنة)</label>
                                 <input
                                     type="text"
                                     required
@@ -151,12 +182,12 @@ export default function CartPage() {
             case 'MobileWallet':
                 return (
                     <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-                        <h3 className="font-semibold text-blue-800 mb-2">📱 Pay via Mobile Wallet</h3>
+                        <h3 className="font-semibold text-blue-800 mb-2">📱 الدفع عبر المحفظة الإلكترونية</h3>
                         <p className="text-sm text-gray-700 mb-3">
-                            Send payment to one of our official wallet numbers. We will confirm your payment manually.
+                            قم بتحويل المبلغ إلى أحد أرقام المحافظ الرسمية. سنقوم بتأكيد الدفع يدوياً.
                         </p>
                         <div className="space-y-2">
-                            <p className="text-sm font-medium text-gray-700">Our Wallet Numbers:</p>
+                            <p className="text-sm font-medium text-gray-700">أرقام المحفظة:</p>
                             {MARKETPLACE.mobileNumbers.map((num: string, idx: number) => (
                                 <div key={idx} className="flex items-center gap-2 bg-white p-2 rounded border border-gray-200">
                                     <span className="text-sm font-mono text-blue-600">{num}</span>
@@ -164,13 +195,13 @@ export default function CartPage() {
                                         onClick={() => navigator.clipboard.writeText(num)}
                                         className="text-xs text-blue-500 hover:text-blue-700 transition"
                                     >
-                                        📋 Copy
+                                        📋 نسخ
                                     </button>
                                 </div>
                             ))}
                         </div>
                         <div className="mt-3">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Your Phone Number (for confirmation)</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">رقم هاتفك (للتأكيد)</label>
                             <input
                                 type="tel"
                                 required
@@ -186,7 +217,7 @@ export default function CartPage() {
             case 'PayPal':
                 return (
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">PayPal Email</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">البريد الإلكتروني لـ PayPal</label>
                         <input
                             type="email"
                             required
@@ -201,9 +232,9 @@ export default function CartPage() {
             case 'CashOnDelivery':
                 return (
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Delivery Instructions</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">تعليمات التوصيل</label>
                         <textarea
-                            placeholder="Any special instructions for the delivery..."
+                            placeholder="أي تعليمات خاصة للتوصيل..."
                             value={checkoutData.deliveryInstructions}
                             onChange={(e) => setCheckoutData({ ...checkoutData, deliveryInstructions: e.target.value })}
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -229,16 +260,16 @@ export default function CartPage() {
         return (
             <div className="container mx-auto px-4 py-20 text-center">
                 <div className="text-6xl mb-4">🛒</div>
-                <h2 className="text-2xl font-bold text-gray-800">Your cart is empty</h2>
-                <p className="text-gray-500 mt-2">Start shopping to add items to your cart</p>
-                <a href="/" className="btn-primary inline-block mt-6">Browse Products</a>
+                <h2 className="text-2xl font-bold text-gray-800">سلتك فارغة</h2>
+                <p className="text-gray-500 mt-2">ابدأ التسوق لإضافة المنتجات إلى سلتك</p>
+                <a href="/" className="btn-primary inline-block mt-6">تصفح المنتجات</a>
             </div>
         );
     }
 
     return (
         <div className="container mx-auto px-4 py-12 max-w-4xl">
-            <h1 className="text-3xl font-bold text-gray-800 mb-8">🛍️ Your Cart</h1>
+            <h1 className="text-3xl font-bold text-gray-800 mb-8">🛍️ سلتك</h1>
 
             <div className="bg-white rounded-xl shadow-md overflow-hidden">
                 <div className="divide-y divide-gray-200">
@@ -247,8 +278,8 @@ export default function CartPage() {
                             <div>
                                 <h3 className="font-semibold text-gray-800">{item.productName}</h3>
                                 <p className="text-gray-500 text-sm">
-                                    ${item.unitPrice.toFixed(2)} × {item.quantity} =
-                                    <span className="font-semibold text-gray-700 ml-1">${item.subtotal.toFixed(2)}</span>
+                                    £{item.unitPrice.toFixed(2)} × {item.quantity} =
+                                    <span className="font-semibold text-gray-700 ml-1">£{item.subtotal.toFixed(2)}</span>
                                 </p>
                             </div>
                             <button
@@ -263,43 +294,42 @@ export default function CartPage() {
 
                 <div className="bg-gray-50 p-4 border-t border-gray-200 flex justify-between items-center">
                     <div>
-                        <p className="text-sm text-gray-500">{cart.totalItems} items</p>
-                        <p className="text-2xl font-bold text-gray-800">${cart.totalAmount.toFixed(2)}</p>
+                        <p className="text-sm text-gray-500">{cart.totalItems} منتج</p>
+                        <p className="text-2xl font-bold text-gray-800">£{cart.totalAmount.toFixed(2)}</p>
                     </div>
                 </div>
             </div>
 
             <form onSubmit={handleCheckout} className="mt-8 bg-white rounded-xl shadow-md p-6">
-                <h2 className="text-xl font-bold text-gray-800 mb-4">Checkout</h2>
+                <h2 className="text-xl font-bold text-gray-800 mb-4">إتمام الطلب</h2>
 
                 <div className="space-y-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Shipping Address</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">عنوان الشحن *</label>
                         <input
                             type="text"
                             required
                             value={checkoutData.shippingAddress}
                             onChange={(e) => setCheckoutData({ ...checkoutData, shippingAddress: e.target.value })}
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            placeholder="123 Main St, City, Country"
+                            placeholder="مثال: 123 شارع المعادي، القاهرة"
                         />
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Payment Method</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">طريقة الدفع</label>
                         <select
                             value={checkoutData.paymentMethod}
                             onChange={(e) => setCheckoutData({ ...checkoutData, paymentMethod: e.target.value })}
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
-                            <option value="CashOnDelivery">💵 Cash on Delivery</option>
-                            <option value="Card">💳 Credit/Debit Card</option>
+                            <option value="CashOnDelivery">💵 الدفع عند الاستلام</option>
+                            <option value="Card">💳 بطاقة ائتمان / خصم</option>
                             <option value="PayPal">💰 PayPal</option>
-                            <option value="MobileWallet">📱 Mobile Wallet</option>
+                            <option value="MobileWallet">📱 محفظة جوال</option>
                         </select>
                     </div>
 
-                    {/* Dynamic Payment Fields */}
                     {renderPaymentFields()}
 
                     <button
@@ -307,7 +337,7 @@ export default function CartPage() {
                         disabled={checkoutLoading}
                         className="w-full py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold rounded-lg hover:from-green-700 hover:to-emerald-700 transition disabled:opacity-50"
                     >
-                        {checkoutLoading ? 'Processing...' : '✅ Place Order & Pay'}
+                        {checkoutLoading ? 'جاري المعالجة...' : '✅ تأكيد الطلب والدفع'}
                     </button>
                 </div>
             </form>

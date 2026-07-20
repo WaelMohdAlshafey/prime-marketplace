@@ -13,9 +13,6 @@ export default function OrderDetail() {
     const [order, setOrder] = useState<Order | null>(null);
     const [loading, setLoading] = useState(true);
 
-    // ============================================================
-    // FIX: Move fetchOrder BEFORE useEffect
-    // ============================================================
     const fetchOrder = async () => {
         try {
             const response = await api.get<Order>(`/api/Orders/${id}`);
@@ -57,14 +54,14 @@ export default function OrderDetail() {
                 <div className="border-b border-gray-200 pb-4 mb-6">
                     <h1 className="text-3xl font-bold text-gray-800">🧾 Invoice</h1>
                     <p className="text-gray-500">Order #{order.id}</p>
-                    <p className="text-sm text-gray-400">{new Date(order.orderDate).toLocaleString()}</p>
+                    <p className="text-sm text-gray-400">{new Date(order.orderDate).toLocaleString('ar-EG')}</p>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 mb-6">
                     <div>
                         <p className="text-sm text-gray-500">Status</p>
                         <p className={`font-semibold ${order.status === 'Paid' ? 'text-green-600' : 'text-yellow-600'}`}>
-                            {order.status}
+                            {order.status === 'Paid' ? 'مدفوع' : 'معلق'}
                         </p>
                     </div>
                     <div>
@@ -76,7 +73,6 @@ export default function OrderDetail() {
                         <p className="font-semibold">{order.shippingAddress}</p>
                     </div>
 
-                    {/* Payment Details */}
                     {order.isPaymentConfirmed && (
                         <div className="col-span-2 bg-green-50 p-4 rounded-lg border border-green-200 mt-2">
                             <p className="text-sm font-semibold text-green-700">✅ Payment Confirmed</p>
@@ -93,7 +89,7 @@ export default function OrderDetail() {
                                 <p className="text-sm text-gray-600">PayPal: {order.payPalEmail}</p>
                             )}
                             {order.paymentConfirmedAt && (
-                                <p className="text-sm text-gray-600">Confirmed at: {new Date(order.paymentConfirmedAt).toLocaleString()}</p>
+                                <p className="text-sm text-gray-600">Confirmed at: {new Date(order.paymentConfirmedAt).toLocaleString('ar-EG')}</p>
                             )}
                         </div>
                     )}
@@ -104,12 +100,15 @@ export default function OrderDetail() {
                     {order.items.map((item) => (
                         <div key={item.productId} className="flex justify-between py-2 border-b border-gray-100">
                             <span>{item.productName} × {item.quantity}</span>
-                            <span className="font-medium">${item.subtotal.toFixed(2)}</span>
+                            {/* ============================================================
+                   CURRENCY FIX: Changed $ to £
+                   ============================================================ */}
+                            <span className="font-medium">£{item.subtotal.toFixed(2)}</span>
                         </div>
                     ))}
                     <div className="flex justify-between pt-4 text-xl font-bold">
                         <span>Total</span>
-                        <span>${order.totalAmount.toFixed(2)}</span>
+                        <span>£{order.totalAmount.toFixed(2)}</span>
                     </div>
                 </div>
 

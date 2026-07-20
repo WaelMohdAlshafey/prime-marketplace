@@ -1,69 +1,86 @@
 ﻿@import "tailwindcss";
 
 @theme {
-    /* You can add custom theme variables here if needed */
+    /* Custom theme variables */
 }
 
 @layer base {
     body {
-        background-color: #f9fafb;
-        color: #111827;
+        background-color: #F8F9FA;
+        color: #1F2937;
+        font-family: 'Cairo', 'Inter', sans-serif;
+        -webkit-font-smoothing: antialiased;
+        direction: rtl;
     }
 }
 
 @layer components {
+    /* Premium Background */
+    .bg-premium {
+        background-color: #F8F9FA;
+        background-image: radial-gradient(circle at 20% 50%, rgba(15, 92, 69, 0.03) 0%, transparent 50%), radial-gradient(circle at 80% 50%, rgba(15, 92, 69, 0.03) 0%, transparent 50%);
+    }
+
+    .bg-hero {
+        background: linear-gradient(135deg, #FDF7F2 0%, #F8F9FA 100%);
+    }
+
+    /* Premium Card */
+    .card-premium {
+        background: #FFFFFF;
+        border-radius: 20px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid rgba(0, 0, 0, 0.04);
+    }
+
+        .card-premium:hover {
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+            transform: translateY(-6px);
+        }
+
+    /* Premium Button */
     .btn-primary {
-        background-image: linear-gradient(to right, #2563eb, #4f46e5);
+        background: linear-gradient(135deg, #0F5C45 0%, #1A7A5C 100%);
         color: white;
         font-weight: 600;
-        padding: 0.5rem 1.5rem;
-        border-radius: 0.5rem;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        transition: all 0.2s;
+        padding: 0.75rem 2rem;
+        border-radius: 14px;
+        box-shadow: 0 4px 15px rgba(15, 92, 69, 0.25);
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        font-family: 'Cairo', sans-serif;
     }
 
         .btn-primary:hover {
-            background-image: linear-gradient(to right, #1d4ed8, #4338ca);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(15, 92, 69, 0.35);
         }
 
     .btn-secondary {
-        background-color: white;
-        color: #374151;
+        background: white;
+        color: #0F5C45;
         font-weight: 600;
-        padding: 0.5rem 1.5rem;
-        border-radius: 0.5rem;
-        border: 1px solid #d1d5db;
-        transition: all 0.2s;
+        padding: 0.75rem 2rem;
+        border-radius: 14px;
+        border: 2px solid #0F5C45;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        font-family: 'Cairo', sans-serif;
     }
 
         .btn-secondary:hover {
-            background-color: #f9fafb;
+            background: #0F5C45;
+            color: white;
         }
 
-    .card {
-        background-color: white;
-        border-radius: 0.75rem;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
-        transition: box-shadow 0.3s;
+    /* Shadows */
+    .shadow-soft {
+        box-shadow: 0 4px 20px rgba(15, 92, 69, 0.08);
     }
 
-        .card:hover {
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-        }
-
-    .input-field {
-        width: 100%;
-        padding: 0.5rem 1rem;
-        border: 1px solid #d1d5db;
-        border-radius: 0.5rem;
-        transition: all 0.2s;
+    .shadow-hover {
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.10);
     }
-
-        .input-field:focus {
-            outline: none;
-            ring: 2px solid #3b82f6;
-            border-color: transparent;
-        }
 }

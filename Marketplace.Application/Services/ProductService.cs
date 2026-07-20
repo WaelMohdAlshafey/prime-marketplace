@@ -19,6 +19,32 @@ public class ProductService : IProductService
     }
 
     // ============================================================
+    // PRIVATE HELPERS
+    // ============================================================
+
+    private static ProductDto MapToDto(Product product, string? vendorName = null)
+    {
+        return new ProductDto
+        {
+            Id = product.Id,
+            Name = product.Name,
+            Description = product.Description,
+            Price = product.Price,
+            StockQuantity = product.StockQuantity,
+            ImageUrl = product.ImageUrl,
+            VendorName = vendorName ?? "بائع"
+        };
+    }
+
+    private void ClearProductCaches(int vendorId)
+    {
+        _cache.Remove($"Products_Page_1_Size_20");
+        _cache.Remove($"Products_Page_1_Size_10");
+        _cache.Remove($"Vendor_{vendorId}_Products_Page_1_Size_20");
+        _cache.Remove($"Search_all_Page_1_Size_20");
+    }
+
+    // ============================================================
     // PUBLIC ENDPOINTS (No authentication required)
     // ============================================================
 
@@ -34,16 +60,29 @@ public class ProductService : IProductService
         page = Math.Max(1, page);
         pageSize = Math.Max(1, pageSize);
 
-        var totalCount = await _context.Products
-            .Where(p => p.IsActive)
-            .CountAsync();
+        // Use LEFT JOIN to include products even if vendor is missing
+        var query = from p in _context.Products
+                    join u in _context.Users on p.VendorId equals u.Id into vendorGroup
+                    from u in vendorGroup.DefaultIfEmpty()
+                    where p.IsActive
+                    select new { p, VendorName = u != null ? u.Username : "بائع" };
 
-        var products = await _context.Products
-            .Where(p => p.IsActive)
-            .OrderBy(p => p.Id)
+        var totalCount = await _context.Products.Where(p => p.IsActive).CountAsync();
+
+        var products = await query
+            .OrderBy(x => x.p.Id)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
-            .Select(p => MapToDto(p))
+            .Select(x => new ProductDto
+            {
+                Id = x.p.Id,
+                Name = x.p.Name,
+                Description = x.p.Description,
+                Price = x.p.Price,
+                StockQuantity = x.p.StockQuantity,
+                ImageUrl = x.p.ImageUrl,
+                VendorName = x.VendorName
+            })
             .ToListAsync();
 
         var result = new PagedResult<ProductDto>
@@ -70,24 +109,36 @@ public class ProductService : IProductService
         page = Math.Max(1, page);
         pageSize = Math.Max(1, pageSize);
 
-        var query = _context.Products
-            .Where(p => p.IsActive);
+        var query = from p in _context.Products
+                    join u in _context.Users on p.VendorId equals u.Id into vendorGroup
+                    from u in vendorGroup.DefaultIfEmpty()
+                    where p.IsActive
+                    select new { p, VendorName = u != null ? u.Username : "بائع" };
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
             var term = searchTerm.ToLower();
-            query = query.Where(p =>
-                p.Name.ToLower().Contains(term) ||
-                p.Description.ToLower().Contains(term));
+            query = query.Where(x =>
+                x.p.Name.ToLower().Contains(term) ||
+                x.p.Description.ToLower().Contains(term));
         }
 
         var totalCount = await query.CountAsync();
 
         var products = await query
-            .OrderBy(p => p.Id)
+            .OrderBy(x => x.p.Id)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
-            .Select(p => MapToDto(p))
+            .Select(x => new ProductDto
+            {
+                Id = x.p.Id,
+                Name = x.p.Name,
+                Description = x.p.Description,
+                Price = x.p.Price,
+                StockQuantity = x.p.StockQuantity,
+                ImageUrl = x.p.ImageUrl,
+                VendorName = x.VendorName
+            })
             .ToListAsync();
 
         var result = new PagedResult<ProductDto>
@@ -121,36 +172,48 @@ public class ProductService : IProductService
         page = Math.Max(1, page);
         pageSize = Math.Max(1, pageSize);
 
-        var query = _context.Products
-            .Where(p => p.IsActive);
+        var query = from p in _context.Products
+                    join u in _context.Users on p.VendorId equals u.Id into vendorGroup
+                    from u in vendorGroup.DefaultIfEmpty()
+                    where p.IsActive
+                    select new { p, VendorName = u != null ? u.Username : "بائع" };
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
             var term = searchTerm.ToLower();
-            query = query.Where(p =>
-                p.Name.ToLower().Contains(term) ||
-                p.Description.ToLower().Contains(term));
+            query = query.Where(x =>
+                x.p.Name.ToLower().Contains(term) ||
+                x.p.Description.ToLower().Contains(term));
         }
 
         if (minPrice.HasValue)
-            query = query.Where(p => p.Price >= minPrice.Value);
+            query = query.Where(x => x.p.Price >= minPrice.Value);
 
         if (maxPrice.HasValue)
-            query = query.Where(p => p.Price <= maxPrice.Value);
+            query = query.Where(x => x.p.Price <= maxPrice.Value);
 
         if (vendorId.HasValue)
-            query = query.Where(p => p.VendorId == vendorId.Value);
+            query = query.Where(x => x.p.VendorId == vendorId.Value);
 
         if (inStock.HasValue && inStock.Value)
-            query = query.Where(p => p.StockQuantity > 0);
+            query = query.Where(x => x.p.StockQuantity > 0);
 
         var totalCount = await query.CountAsync();
 
         var products = await query
-            .OrderBy(p => p.Id)
+            .OrderBy(x => x.p.Id)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
-            .Select(p => MapToDto(p))
+            .Select(x => new ProductDto
+            {
+                Id = x.p.Id,
+                Name = x.p.Name,
+                Description = x.p.Description,
+                Price = x.p.Price,
+                StockQuantity = x.p.StockQuantity,
+                ImageUrl = x.p.ImageUrl,
+                VendorName = x.VendorName
+            })
             .ToListAsync();
 
         var result = new PagedResult<ProductDto>
@@ -167,15 +230,108 @@ public class ProductService : IProductService
 
     public async Task<ProductDto> GetProductByIdAsync(int id)
     {
-        var product = await _context.Products
-            .Where(p => p.IsActive && p.Id == id)
-            .Select(p => MapToDto(p))
-            .FirstOrDefaultAsync();
+        var product = await (from p in _context.Products
+                             join u in _context.Users on p.VendorId equals u.Id into vendorGroup
+                             from u in vendorGroup.DefaultIfEmpty()
+                             where p.Id == id && p.IsActive
+                             select new ProductDto
+                             {
+                                 Id = p.Id,
+                                 Name = p.Name,
+                                 Description = p.Description,
+                                 Price = p.Price,
+                                 StockQuantity = p.StockQuantity,
+                                 ImageUrl = p.ImageUrl,
+                                 VendorName = u != null ? u.Username : "بائع"
+                             }).FirstOrDefaultAsync();
 
         if (product == null)
             throw new Exception("Product not found.");
 
         return product;
+    }
+
+    // ============================================================
+    // NEW: GET PRODUCTS BY CATEGORY
+    // ============================================================
+    public async Task<PagedResult<ProductDto>> GetProductsByCategoryAsync(string categoryName, int page, int pageSize)
+    {
+        string cacheKey = $"Category_{categoryName}_Page_{page}_Size_{pageSize}";
+
+        if (_cache.TryGetValue(cacheKey, out PagedResult<ProductDto>? cachedResult) && cachedResult != null)
+        {
+            return cachedResult;
+        }
+
+        page = Math.Max(1, page);
+        pageSize = Math.Max(1, pageSize);
+
+        // Map Arabic category names to Vendor IDs
+        var vendorIdMap = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
+        {
+            { "software", 1 },
+            { "برامج", 1 },
+            { "hair-care", 2 },
+            { "العناية بالشعر", 2 },
+            { "skin-care", 2 },
+            { "العناية بالبشرة", 2 },
+            { "fashion", 3 },
+            { "أزياء", 3 },
+            { "accessories", 3 },
+            { "إكسسوارات", 3 },
+            { "electronics", 4 },
+            { "إلكترونيات", 4 },
+            { "supplements", 2 },
+            { "مكملات غذائية", 2 },
+            { "home", 5 },
+            { "المنزل", 5 }
+        };
+
+        if (!vendorIdMap.TryGetValue(categoryName, out int vendorId))
+        {
+            return new PagedResult<ProductDto>
+            {
+                Items = new List<ProductDto>(),
+                TotalCount = 0,
+                PageNumber = page,
+                PageSize = pageSize
+            };
+        }
+
+        var query = from p in _context.Products
+                    join u in _context.Users on p.VendorId equals u.Id into vendorGroup
+                    from u in vendorGroup.DefaultIfEmpty()
+                    where p.IsActive && p.VendorId == vendorId
+                    select new { p, VendorName = u != null ? u.Username : "بائع" };
+
+        var totalCount = await query.CountAsync();
+
+        var products = await query
+            .OrderBy(x => x.p.Id)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .Select(x => new ProductDto
+            {
+                Id = x.p.Id,
+                Name = x.p.Name,
+                Description = x.p.Description,
+                Price = x.p.Price,
+                StockQuantity = x.p.StockQuantity,
+                ImageUrl = x.p.ImageUrl,
+                VendorName = x.VendorName
+            })
+            .ToListAsync();
+
+        var result = new PagedResult<ProductDto>
+        {
+            Items = products,
+            TotalCount = totalCount,
+            PageNumber = page,
+            PageSize = pageSize
+        };
+
+        _cache.Set(cacheKey, result, TimeSpan.FromMinutes(5));
+        return result;
     }
 
     // ============================================================
@@ -194,16 +350,28 @@ public class ProductService : IProductService
         page = Math.Max(1, page);
         pageSize = Math.Max(1, pageSize);
 
-        var query = _context.Products
-            .Where(p => p.IsActive && p.VendorId == vendorId);
+        var query = from p in _context.Products
+                    join u in _context.Users on p.VendorId equals u.Id into vendorGroup
+                    from u in vendorGroup.DefaultIfEmpty()
+                    where p.IsActive && p.VendorId == vendorId
+                    select new { p, VendorName = u != null ? u.Username : "بائع" };
 
         var totalCount = await query.CountAsync();
 
         var products = await query
-            .OrderBy(p => p.Id)
+            .OrderBy(x => x.p.Id)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
-            .Select(p => MapToDto(p))
+            .Select(x => new ProductDto
+            {
+                Id = x.p.Id,
+                Name = x.p.Name,
+                Description = x.p.Description,
+                Price = x.p.Price,
+                StockQuantity = x.p.StockQuantity,
+                ImageUrl = x.p.ImageUrl,
+                VendorName = x.VendorName
+            })
             .ToListAsync();
 
         var result = new PagedResult<ProductDto>
@@ -218,10 +386,6 @@ public class ProductService : IProductService
         return result;
     }
 
-    // ============================================================
-    // CREATE / UPDATE / DELETE (Using Product entity directly)
-    // ============================================================
-
     public async Task<ProductDto> CreateProductAsync(Product product, int vendorId)
     {
         product.VendorId = vendorId;
@@ -233,7 +397,8 @@ public class ProductService : IProductService
 
         ClearProductCaches(vendorId);
 
-        return MapToDto(product);
+        var vendor = await _context.Users.FindAsync(vendorId);
+        return MapToDto(product, vendor?.Username);
     }
 
     public async Task<ProductDto> UpdateProductAsync(Product product, int vendorId)
@@ -258,7 +423,8 @@ public class ProductService : IProductService
 
         ClearProductCaches(vendorId);
 
-        return MapToDto(existing);
+        var vendor = await _context.Users.FindAsync(vendorId);
+        return MapToDto(existing, vendor?.Username);
     }
 
     public async Task<bool> DeleteProductAsync(int productId, int vendorId)
@@ -275,31 +441,5 @@ public class ProductService : IProductService
         ClearProductCaches(vendorId);
 
         return true;
-    }
-
-    // ============================================================
-    // PRIVATE HELPERS
-    // ============================================================
-
-    private static ProductDto MapToDto(Product product)
-    {
-        return new ProductDto
-        {
-            Id = product.Id,
-            Name = product.Name,
-            Description = product.Description,
-            Price = product.Price,
-            StockQuantity = product.StockQuantity,
-            ImageUrl = product.ImageUrl
-            // CostPrice is intentionally excluded from public DTO
-        };
-    }
-
-    private void ClearProductCaches(int vendorId)
-    {
-        _cache.Remove($"Products_Page_1_Size_20");
-        _cache.Remove($"Products_Page_1_Size_10");
-        _cache.Remove($"Vendor_{vendorId}_Products_Page_1_Size_20");
-        _cache.Remove($"Search_all_Page_1_Size_20");
     }
 }

@@ -1,12 +1,18 @@
-﻿export interface Product {
+﻿// ============================================================
+// PRODUCT TYPES
+// ============================================================
+export interface Product {
     id: number;
     name: string;
     description: string;
-    price: number;          // Sales price (customer visible)
-    costPrice: number;      // Internal cost (hidden from customers)
+    price: number;
+    costPrice?: number;
     stockQuantity: number;
-    vendorId: number;
     imageUrl?: string;
+    vendorName?: string;
+    rating?: number;
+    reviews?: number;
+    discount?: number;
     isActive: boolean;
 }
 
@@ -18,6 +24,9 @@ export interface PagedResult<T> {
     totalPages: number;
 }
 
+// ============================================================
+// CART TYPES
+// ============================================================
 export interface CartItem {
     id: number;
     productId: number;
@@ -33,6 +42,9 @@ export interface Cart {
     totalItems: number;
 }
 
+// ============================================================
+// ORDER TYPES
+// ============================================================
 export interface OrderItem {
     productId: number;
     productName: string;
@@ -58,6 +70,9 @@ export interface Order {
     paymentConfirmedAt?: string;
 }
 
+// ============================================================
+// AUTHENTICATION TYPES
+// ============================================================
 export interface AuthResponse {
     userId: number;
     username: string;
@@ -77,7 +92,7 @@ export interface RegisterRequest {
 }
 
 // ============================================================
-// STORE SETTINGS (from database)
+// STORE SETTINGS TYPES
 // ============================================================
 export interface Owner {
     name: string;
@@ -93,4 +108,65 @@ export interface StoreSettings {
     emails: string[];
     landline: string;
     whatsapp: string;
+}
+
+// ============================================================
+// VENDOR TYPES
+// ============================================================
+export interface Vendor {
+    id: number;
+    username: string;
+    email: string;
+    role: string;
+    logo?: string;
+    rating?: number;
+    followers?: number;
+    productsCount?: number;
+    isVerified?: boolean;
+}
+
+// ============================================================
+// CATEGORY TYPES
+// ============================================================
+export interface Category {
+    id: number;
+    name: string;
+    slug: string;
+    icon?: string;
+    count: number;
+}
+
+// ============================================================
+// WISHLIST / FAVORITES
+// ============================================================
+export interface WishlistItem {
+    id: number;
+    productId: number;
+    userId: number;
+    product: Product;
+    addedAt: string;
+}
+
+// ============================================================
+// REVIEW / RATING TYPES
+// ============================================================
+export interface Review {
+    id: number;
+    productId: number;
+    userId: number;
+    username: string;
+    rating: number;
+    comment: string;
+    createdAt: string;
+}
+
+// ============================================================
+// PAYMENT TYPES
+// ============================================================
+export interface PaymentIntent {
+    id: string;
+    clientSecret: string;
+    amount: number;
+    currency: string;
+    status: string;
 }

@@ -1,5 +1,5 @@
 ﻿using Marketplace.Application.DTOs;
-using Marketplace.Domain.Entities; // <-- CRUCIAL: Required for Product type
+using Marketplace.Domain.Entities;
 
 namespace Marketplace.Application.Interfaces;
 
@@ -19,15 +19,12 @@ public interface IProductService
         int page,
         int pageSize);
     Task<ProductDto> GetProductByIdAsync(int id);
+    Task<PagedResult<ProductDto>> GetProductsByCategoryAsync(string categoryName, int page, int pageSize);
 
     // ============================================================
     // VENDOR ENDPOINTS (Authentication required)
     // ============================================================
     Task<PagedResult<ProductDto>> GetVendorProductsAsync(int vendorId, int page, int pageSize);
-
-    // ============================================================
-    // CREATE / UPDATE / DELETE (Using Product entity directly)
-    // ============================================================
     Task<ProductDto> CreateProductAsync(Product product, int vendorId);
     Task<ProductDto> UpdateProductAsync(Product product, int vendorId);
     Task<bool> DeleteProductAsync(int productId, int vendorId);

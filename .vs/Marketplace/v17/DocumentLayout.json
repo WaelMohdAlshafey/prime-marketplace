@@ -3,16 +3,160 @@
   "WorkspaceRootPath": "M:\\Marketplace\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\marketplace-frontend\\app\\layout.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:marketplace-frontend\\app\\layout.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\marketplace-frontend\\app\\vendor\\dashboard\\page.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:marketplace-frontend\\app\\vendor\\dashboard\\page.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\marketplace-frontend\\src\\types\\index.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:marketplace-frontend\\src\\types\\index.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\marketplace-frontend\\src\\components\\Navbar.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:marketplace-frontend\\src\\components\\Navbar.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\marketplace-frontend\\src\\components\\HeroBanner.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:marketplace-frontend\\src\\components\\HeroBanner.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\marketplace-frontend\\app\\stores\\page.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:marketplace-frontend\\app\\stores\\page.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\marketplace-frontend\\app\\page.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:marketplace-frontend\\app\\page.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\marketplace-frontend\\app\\orders\\page.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:marketplace-frontend\\app\\orders\\page.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\marketplace-frontend\\app\\orders\\[id]\\page.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:marketplace-frontend\\app\\orders\\[id]\\page.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\marketplace-frontend\\next.config.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:marketplace-frontend\\next.config.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\marketplace-frontend\\src\\components\\ProductCard.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:marketplace-frontend\\src\\components\\ProductCard.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\Marketplace.Application\\Services\\ProductService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Marketplace.Application\\Services\\ProductService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\marketplace-frontend\\app\\cart\\page.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:marketplace-frontend\\app\\cart\\page.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\Marketplace.Application\\DTOs\\OrderDtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Marketplace.Application\\DTOs\\OrderDtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\Marketplace.Application\\DTOs\\CreateOrderDto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Marketplace.Application\\DTOs\\CreateOrderDto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\marketplace-frontend\\src\\components\\CategoryPage.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:marketplace-frontend\\src\\components\\CategoryPage.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\marketplace-frontend\\app\\electronics\\page.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:marketplace-frontend\\app\\electronics\\page.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\marketplace-frontend\\app\\accessories\\page.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:marketplace-frontend\\app\\accessories\\page.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\marketplace-frontend\\src\\components\\CategoryGrid.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:marketplace-frontend\\src\\components\\CategoryGrid.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\Marketplace.Application\\Interfaces\\IProductService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Marketplace.Application\\Interfaces\\IProductService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\Marketplace.API\\Controllers\\ProductsController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Marketplace.API\\Controllers\\ProductsController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\marketplace-frontend\\app\\home\\page.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:marketplace-frontend\\app\\home\\page.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\marketplace-frontend\\app\\supplements\\page.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:marketplace-frontend\\app\\supplements\\page.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\marketplace-frontend\\app\\fashion\\page.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:marketplace-frontend\\app\\fashion\\page.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\marketplace-frontend\\app\\skin-care\\page.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:marketplace-frontend\\app\\skin-care\\page.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\marketplace-frontend\\app\\hair-care\\page.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:marketplace-frontend\\app\\hair-care\\page.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\marketplace-frontend\\app\\software\\page.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:marketplace-frontend\\app\\software\\page.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\Marketplace.API\\Program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Marketplace.API\\Program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\Marketplace.Application\\DTOs\\ProductDtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Marketplace.Application\\DTOs\\ProductDtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\Marketplace.Application\\DTOs\\ProductDto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Marketplace.Application\\DTOs\\ProductDto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\marketplace-frontend\\src\\components\\Footer.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:marketplace-frontend\\src\\components\\Footer.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\marketplace-frontend\\src\\components\\Logo.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:marketplace-frontend\\src\\components\\Logo.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\marketplace-frontend\\app\\globals.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:marketplace-frontend\\app\\globals.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\marketplace-frontend\\tailwind.config.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:marketplace-frontend\\tailwind.config.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\marketplace-frontend\\src\\components\\VendorCard.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:marketplace-frontend\\src\\components\\VendorCard.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\marketplace-frontend\\src\\components\\Filters\\FilterSection.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:marketplace-frontend\\src\\components\\Filters\\FilterSection.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\marketplace-frontend\\src\\components\\Filters\\FilterSidebar.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:marketplace-frontend\\src\\components\\Filters\\FilterSidebar.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\Marketplace.Infrastructure\\Data\\AppDbContext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Marketplace.Infrastructure\\Data\\AppDbContext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\Marketplace.Domain\\Entities\\Product.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Marketplace.Domain\\Entities\\Product.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\Marketplace.Application\\DTOs\\ProductDtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Marketplace.Application\\DTOs\\ProductDtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -22,7 +166,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 7,
           "Children": [
             {
               "$type": "Bookmark",
@@ -30,20 +174,465 @@
             },
             {
               "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "page.tsx",
+              "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\app\\vendor\\dashboard\\page.tsx",
+              "RelativeDocumentMoniker": "marketplace-frontend\\app\\vendor\\dashboard\\page.tsx",
+              "ToolTip": "M:\\Marketplace\\marketplace-frontend\\app\\vendor\\dashboard\\page.tsx",
+              "RelativeToolTip": "marketplace-frontend\\app\\vendor\\dashboard\\page.tsx",
+              "ViewState": "AgIAAF8AAAAAAAAAAAAcwGEAAAAOAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-07-20T14:56:15.185Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "page.tsx",
+              "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\app\\orders\\page.tsx",
+              "RelativeDocumentMoniker": "marketplace-frontend\\app\\orders\\page.tsx",
+              "ToolTip": "M:\\Marketplace\\marketplace-frontend\\app\\orders\\page.tsx",
+              "RelativeToolTip": "marketplace-frontend\\app\\orders\\page.tsx",
+              "ViewState": "AgIAAGwAAAAAAAAAAAAAAHcAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-07-20T11:21:56.984Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Navbar.tsx",
+              "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\src\\components\\Navbar.tsx",
+              "RelativeDocumentMoniker": "marketplace-frontend\\src\\components\\Navbar.tsx",
+              "ToolTip": "M:\\Marketplace\\marketplace-frontend\\src\\components\\Navbar.tsx",
+              "RelativeToolTip": "marketplace-frontend\\src\\components\\Navbar.tsx",
+              "ViewState": "AgIAAM8AAAAAAAAAAAAAANoAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-07-20T07:55:11.446Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "page.tsx",
+              "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\app\\page.tsx",
+              "RelativeDocumentMoniker": "marketplace-frontend\\app\\page.tsx",
+              "ToolTip": "M:\\Marketplace\\marketplace-frontend\\app\\page.tsx",
+              "RelativeToolTip": "marketplace-frontend\\app\\page.tsx",
+              "ViewState": "AgIAAEIAAAAAAAAAAAAswE4AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-07-20T08:12:31.968Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "page.tsx",
+              "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\app\\stores\\page.tsx",
+              "RelativeDocumentMoniker": "marketplace-frontend\\app\\stores\\page.tsx",
+              "ToolTip": "M:\\Marketplace\\marketplace-frontend\\app\\stores\\page.tsx",
+              "RelativeToolTip": "marketplace-frontend\\app\\stores\\page.tsx",
+              "ViewState": "AgIAABsAAAAAAAAAAAAuwCcAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-07-20T11:48:07.145Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "index.ts",
+              "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\src\\types\\index.ts",
+              "RelativeDocumentMoniker": "marketplace-frontend\\src\\types\\index.ts",
+              "ToolTip": "M:\\Marketplace\\marketplace-frontend\\src\\types\\index.ts",
+              "RelativeToolTip": "marketplace-frontend\\src\\types\\index.ts",
+              "ViewState": "AgIAAKQAAAAAAAAAAAAwwKsAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-07-20T10:11:39.7Z"
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "layout.tsx",
+              "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\app\\layout.tsx",
+              "RelativeDocumentMoniker": "marketplace-frontend\\app\\layout.tsx",
+              "ToolTip": "M:\\Marketplace\\marketplace-frontend\\app\\layout.tsx",
+              "RelativeToolTip": "marketplace-frontend\\app\\layout.tsx",
+              "ViewState": "AgIAABMAAAAAAAAAAAAAABMAAAAeAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-07-20T09:20:09.975Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "page.tsx",
+              "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\app\\orders\\[id]\\page.tsx",
+              "RelativeDocumentMoniker": "marketplace-frontend\\app\\orders\\[id]\\page.tsx",
+              "ToolTip": "M:\\Marketplace\\marketplace-frontend\\app\\orders\\[id]\\page.tsx",
+              "RelativeToolTip": "marketplace-frontend\\app\\orders\\[id]\\page.tsx",
+              "ViewState": "AgIAAG8AAAAAAAAAAAAwwHsAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-07-20T14:13:22.746Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "HeroBanner.tsx",
+              "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\src\\components\\HeroBanner.tsx",
+              "RelativeDocumentMoniker": "marketplace-frontend\\src\\components\\HeroBanner.tsx",
+              "ToolTip": "M:\\Marketplace\\marketplace-frontend\\src\\components\\HeroBanner.tsx",
+              "RelativeToolTip": "marketplace-frontend\\src\\components\\HeroBanner.tsx",
+              "ViewState": "AgIAAH4AAAAAAAAAAAAswIkAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-07-20T07:56:15.075Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "next.config.ts",
+              "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\next.config.ts",
+              "RelativeDocumentMoniker": "marketplace-frontend\\next.config.ts",
+              "ToolTip": "M:\\Marketplace\\marketplace-frontend\\next.config.ts",
+              "RelativeToolTip": "marketplace-frontend\\next.config.ts",
+              "ViewState": "AgIAAA8AAAAAAAAAAAAuwBsAAAAaAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-07-20T11:38:54.007Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "ProductService.cs",
+              "DocumentMoniker": "M:\\Marketplace\\Marketplace.Application\\Services\\ProductService.cs",
+              "RelativeDocumentMoniker": "Marketplace.Application\\Services\\ProductService.cs",
+              "ToolTip": "M:\\Marketplace\\Marketplace.Application\\Services\\ProductService.cs",
+              "RelativeToolTip": "Marketplace.Application\\Services\\ProductService.cs",
+              "ViewState": "AgIAALEBAAAAAAAAAAAiwLwBAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-20T10:09:33.795Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "page.tsx",
+              "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\app\\cart\\page.tsx",
+              "RelativeDocumentMoniker": "marketplace-frontend\\app\\cart\\page.tsx",
+              "ToolTip": "M:\\Marketplace\\marketplace-frontend\\app\\cart\\page.tsx",
+              "RelativeToolTip": "marketplace-frontend\\app\\cart\\page.tsx",
+              "ViewState": "AgIAAE0BAAAAAAAAAAAwwFkBAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-07-20T11:21:05.5Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "ProductCard.tsx",
+              "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\src\\components\\ProductCard.tsx",
+              "RelativeDocumentMoniker": "marketplace-frontend\\src\\components\\ProductCard.tsx",
+              "ToolTip": "M:\\Marketplace\\marketplace-frontend\\src\\components\\ProductCard.tsx",
+              "RelativeToolTip": "marketplace-frontend\\src\\components\\ProductCard.tsx",
+              "ViewState": "AgIAALwAAAAAAAAAAAAuwMgAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-07-20T07:57:02.401Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "OrderDtos.cs",
+              "DocumentMoniker": "M:\\Marketplace\\Marketplace.Application\\DTOs\\OrderDtos.cs",
+              "RelativeDocumentMoniker": "Marketplace.Application\\DTOs\\OrderDtos.cs",
+              "ToolTip": "M:\\Marketplace\\Marketplace.Application\\DTOs\\OrderDtos.cs",
+              "RelativeToolTip": "Marketplace.Application\\DTOs\\OrderDtos.cs",
+              "ViewState": "AgIAAEIAAAAAAAAAAAAswE4AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-20T12:10:57.103Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "CreateOrderDto.cs",
+              "DocumentMoniker": "M:\\Marketplace\\Marketplace.Application\\DTOs\\CreateOrderDto.cs",
+              "RelativeDocumentMoniker": "Marketplace.Application\\DTOs\\CreateOrderDto.cs",
+              "ToolTip": "M:\\Marketplace\\Marketplace.Application\\DTOs\\CreateOrderDto.cs",
+              "RelativeToolTip": "Marketplace.Application\\DTOs\\CreateOrderDto.cs",
+              "ViewState": "AgIAAAgAAAAAAAAAAAAUwBQAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-20T12:06:47.249Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "page.tsx",
+              "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\app\\electronics\\page.tsx",
+              "RelativeDocumentMoniker": "marketplace-frontend\\app\\electronics\\page.tsx",
+              "ToolTip": "M:\\Marketplace\\marketplace-frontend\\app\\electronics\\page.tsx",
+              "RelativeToolTip": "marketplace-frontend\\app\\electronics\\page.tsx",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-07-20T11:47:29.254Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "CategoryPage.tsx",
+              "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\src\\components\\CategoryPage.tsx",
+              "RelativeDocumentMoniker": "marketplace-frontend\\src\\components\\CategoryPage.tsx",
+              "ToolTip": "M:\\Marketplace\\marketplace-frontend\\src\\components\\CategoryPage.tsx",
+              "RelativeToolTip": "marketplace-frontend\\src\\components\\CategoryPage.tsx",
+              "ViewState": "AgIAAK4AAAAAAAAAAAAUwLoAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-07-20T08:11:48.416Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
+              "Title": "page.tsx",
+              "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\app\\accessories\\page.tsx",
+              "RelativeDocumentMoniker": "marketplace-frontend\\app\\accessories\\page.tsx",
+              "ToolTip": "M:\\Marketplace\\marketplace-frontend\\app\\accessories\\page.tsx",
+              "RelativeToolTip": "marketplace-frontend\\app\\accessories\\page.tsx",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-07-20T08:11:10.98Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 18,
+              "Title": "CategoryGrid.tsx",
+              "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\src\\components\\CategoryGrid.tsx",
+              "RelativeDocumentMoniker": "marketplace-frontend\\src\\components\\CategoryGrid.tsx",
+              "ToolTip": "M:\\Marketplace\\marketplace-frontend\\src\\components\\CategoryGrid.tsx",
+              "RelativeToolTip": "marketplace-frontend\\src\\components\\CategoryGrid.tsx",
+              "ViewState": "AgIAAGQAAAAAAAAAAAAwwG8AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-07-20T07:56:35.299Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 19,
+              "Title": "IProductService.cs",
+              "DocumentMoniker": "M:\\Marketplace\\Marketplace.Application\\Interfaces\\IProductService.cs",
+              "RelativeDocumentMoniker": "Marketplace.Application\\Interfaces\\IProductService.cs",
+              "ToolTip": "M:\\Marketplace\\Marketplace.Application\\Interfaces\\IProductService.cs",
+              "RelativeToolTip": "Marketplace.Application\\Interfaces\\IProductService.cs",
+              "ViewState": "AgIAABQAAAAAAAAAAAAiwB4AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-20T10:47:19.446Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 20,
+              "Title": "ProductsController.cs",
+              "DocumentMoniker": "M:\\Marketplace\\Marketplace.API\\Controllers\\ProductsController.cs",
+              "RelativeDocumentMoniker": "Marketplace.API\\Controllers\\ProductsController.cs",
+              "ToolTip": "M:\\Marketplace\\Marketplace.API\\Controllers\\ProductsController.cs",
+              "RelativeToolTip": "Marketplace.API\\Controllers\\ProductsController.cs",
+              "ViewState": "AgIAANQAAAAAAAAAAAAiwN4AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-20T10:44:25.134Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 21,
+              "Title": "page.tsx",
+              "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\app\\home\\page.tsx",
+              "RelativeDocumentMoniker": "marketplace-frontend\\app\\home\\page.tsx",
+              "ToolTip": "M:\\Marketplace\\marketplace-frontend\\app\\home\\page.tsx",
+              "RelativeToolTip": "marketplace-frontend\\app\\home\\page.tsx",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-07-20T10:43:00.892Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 24,
+              "Title": "page.tsx",
+              "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\app\\skin-care\\page.tsx",
+              "RelativeDocumentMoniker": "marketplace-frontend\\app\\skin-care\\page.tsx",
+              "ToolTip": "M:\\Marketplace\\marketplace-frontend\\app\\skin-care\\page.tsx",
+              "RelativeToolTip": "marketplace-frontend\\app\\skin-care\\page.tsx",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-07-20T08:09:59.281Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 25,
+              "Title": "page.tsx",
+              "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\app\\hair-care\\page.tsx",
+              "RelativeDocumentMoniker": "marketplace-frontend\\app\\hair-care\\page.tsx",
+              "ToolTip": "M:\\Marketplace\\marketplace-frontend\\app\\hair-care\\page.tsx",
+              "RelativeToolTip": "marketplace-frontend\\app\\hair-care\\page.tsx",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-07-20T08:09:27.53Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 23,
+              "Title": "page.tsx",
+              "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\app\\fashion\\page.tsx",
+              "RelativeDocumentMoniker": "marketplace-frontend\\app\\fashion\\page.tsx",
+              "ToolTip": "M:\\Marketplace\\marketplace-frontend\\app\\fashion\\page.tsx",
+              "RelativeToolTip": "marketplace-frontend\\app\\fashion\\page.tsx",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-07-20T08:10:27.187Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 26,
+              "Title": "page.tsx",
+              "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\app\\software\\page.tsx",
+              "RelativeDocumentMoniker": "marketplace-frontend\\app\\software\\page.tsx",
+              "ToolTip": "M:\\Marketplace\\marketplace-frontend\\app\\software\\page.tsx",
+              "RelativeToolTip": "marketplace-frontend\\app\\software\\page.tsx",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-07-20T08:08:53.282Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 22,
+              "Title": "page.tsx",
+              "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\app\\supplements\\page.tsx",
+              "RelativeDocumentMoniker": "marketplace-frontend\\app\\supplements\\page.tsx",
+              "ToolTip": "M:\\Marketplace\\marketplace-frontend\\app\\supplements\\page.tsx",
+              "RelativeToolTip": "marketplace-frontend\\app\\supplements\\page.tsx",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-07-20T09:57:45.795Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 27,
+              "Title": "Program.cs",
+              "DocumentMoniker": "M:\\Marketplace\\Marketplace.API\\Program.cs",
+              "RelativeDocumentMoniker": "Marketplace.API\\Program.cs",
+              "ToolTip": "M:\\Marketplace\\Marketplace.API\\Program.cs",
+              "RelativeToolTip": "Marketplace.API\\Program.cs",
+              "ViewState": "AgIAAHoAAAAAAAAAAAAiwIQAAAAKAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-20T10:23:43.26Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 29,
+              "Title": "ProductDto.cs",
+              "DocumentMoniker": "M:\\Marketplace\\Marketplace.Application\\DTOs\\ProductDto.cs",
+              "RelativeDocumentMoniker": "Marketplace.Application\\DTOs\\ProductDto.cs",
+              "ToolTip": "M:\\Marketplace\\Marketplace.Application\\DTOs\\ProductDto.cs",
+              "RelativeToolTip": "Marketplace.Application\\DTOs\\ProductDto.cs",
+              "ViewState": "AgIAABoAAAAAAAAAAAAowDEAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-20T10:08:59.75Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 28,
+              "Title": "ProductDtos.cs",
+              "DocumentMoniker": "M:\\Marketplace\\Marketplace.Application\\DTOs\\ProductDtos.cs",
+              "RelativeDocumentMoniker": "Marketplace.Application\\DTOs\\ProductDtos.cs",
+              "ToolTip": "M:\\Marketplace\\Marketplace.Application\\DTOs\\ProductDtos.cs",
+              "RelativeToolTip": "Marketplace.Application\\DTOs\\ProductDtos.cs",
+              "ViewState": "AgIAACYAAAAAAAAAAAAiwDAAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-19T12:38:21.669Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 30,
+              "Title": "Footer.tsx",
+              "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\src\\components\\Footer.tsx",
+              "RelativeDocumentMoniker": "marketplace-frontend\\src\\components\\Footer.tsx",
+              "ToolTip": "M:\\Marketplace\\marketplace-frontend\\src\\components\\Footer.tsx",
+              "RelativeToolTip": "marketplace-frontend\\src\\components\\Footer.tsx",
+              "ViewState": "AgIAADoAAAAAAAAAAAAuwEMAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-07-20T09:19:47.072Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 31,
+              "Title": "Logo.tsx",
+              "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\src\\components\\Logo.tsx",
+              "RelativeDocumentMoniker": "marketplace-frontend\\src\\components\\Logo.tsx",
+              "ToolTip": "M:\\Marketplace\\marketplace-frontend\\src\\components\\Logo.tsx",
+              "RelativeToolTip": "marketplace-frontend\\src\\components\\Logo.tsx",
+              "ViewState": "AgIAAAsAAAAAAAAAAAAuwBQAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-07-20T09:35:31.39Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 32,
+              "Title": "globals.css",
+              "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\app\\globals.css",
+              "RelativeDocumentMoniker": "marketplace-frontend\\app\\globals.css",
+              "ToolTip": "M:\\Marketplace\\marketplace-frontend\\app\\globals.css",
+              "RelativeToolTip": "marketplace-frontend\\app\\globals.css",
+              "ViewState": "AgIAAEwAAAAAAAAAAAAowFYAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
+              "WhenOpened": "2026-07-20T09:00:58.044Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 33,
+              "Title": "tailwind.config.js",
+              "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\tailwind.config.js",
+              "RelativeDocumentMoniker": "marketplace-frontend\\tailwind.config.js",
+              "ToolTip": "M:\\Marketplace\\marketplace-frontend\\tailwind.config.js",
+              "RelativeToolTip": "marketplace-frontend\\tailwind.config.js",
+              "ViewState": "AgIAACIAAAAAAAAAAAAuwC4AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
+              "WhenOpened": "2026-07-20T07:54:42.535Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 34,
+              "Title": "VendorCard.tsx",
+              "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\src\\components\\VendorCard.tsx",
+              "RelativeDocumentMoniker": "marketplace-frontend\\src\\components\\VendorCard.tsx",
+              "ToolTip": "M:\\Marketplace\\marketplace-frontend\\src\\components\\VendorCard.tsx",
+              "RelativeToolTip": "marketplace-frontend\\src\\components\\VendorCard.tsx",
+              "ViewState": "AgIAACQAAAAAAAAAAAAmwDQAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-07-20T08:06:42.333Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 35,
+              "Title": "FilterSection.tsx",
+              "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\src\\components\\Filters\\FilterSection.tsx",
+              "RelativeDocumentMoniker": "marketplace-frontend\\src\\components\\Filters\\FilterSection.tsx",
+              "ToolTip": "M:\\Marketplace\\marketplace-frontend\\src\\components\\Filters\\FilterSection.tsx",
+              "RelativeToolTip": "marketplace-frontend\\src\\components\\Filters\\FilterSection.tsx",
+              "ViewState": "AgIAAA4AAAAAAAAAAAAiwB8AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-07-20T08:05:29.809Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 36,
+              "Title": "FilterSidebar.tsx",
+              "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\src\\components\\Filters\\FilterSidebar.tsx",
+              "RelativeDocumentMoniker": "marketplace-frontend\\src\\components\\Filters\\FilterSidebar.tsx",
+              "ToolTip": "M:\\Marketplace\\marketplace-frontend\\src\\components\\Filters\\FilterSidebar.tsx",
+              "RelativeToolTip": "marketplace-frontend\\src\\components\\Filters\\FilterSidebar.tsx",
+              "ViewState": "AgIAAGsAAAAAAAAAAAAiwHwAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-07-20T07:57:37.092Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 37,
               "Title": "AppDbContext.cs",
               "DocumentMoniker": "M:\\Marketplace\\Marketplace.Infrastructure\\Data\\AppDbContext.cs",
               "RelativeDocumentMoniker": "Marketplace.Infrastructure\\Data\\AppDbContext.cs",
               "ToolTip": "M:\\Marketplace\\Marketplace.Infrastructure\\Data\\AppDbContext.cs",
               "RelativeToolTip": "Marketplace.Infrastructure\\Data\\AppDbContext.cs",
-              "ViewState": "AgIAAAoAAAAAAAAAAAAQwA4AAAA6AAAAAAAAAA==",
+              "ViewState": "AgIAAAoAAAAAAAAAAAAowA4AAAA6AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-07-19T12:47:56.978Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-07-19T12:47:56.978Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 38,
               "Title": "Product.cs",
               "DocumentMoniker": "M:\\Marketplace\\Marketplace.Domain\\Entities\\Product.cs",
               "RelativeDocumentMoniker": "Marketplace.Domain\\Entities\\Product.cs",
@@ -51,21 +640,11 @@
               "RelativeToolTip": "Marketplace.Domain\\Entities\\Product.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAQwAwAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-07-19T12:45:25.91Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-07-19T12:45:25.91Z"
             },
             {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "ProductDtos.cs",
-              "DocumentMoniker": "M:\\Marketplace\\Marketplace.Application\\DTOs\\ProductDtos.cs",
-              "RelativeDocumentMoniker": "Marketplace.Application\\DTOs\\ProductDtos.cs",
-              "ToolTip": "M:\\Marketplace\\Marketplace.Application\\DTOs\\ProductDtos.cs",
-              "RelativeToolTip": "Marketplace.Application\\DTOs\\ProductDtos.cs",
-              "ViewState": "AgIAACQAAAAAAAAAAAAQwDAAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-07-19T12:38:21.669Z",
-              "EditorCaption": ""
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
             }
           ]
         }
