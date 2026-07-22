@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using Npgsql;
+using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.EntityFrameworkCore;
