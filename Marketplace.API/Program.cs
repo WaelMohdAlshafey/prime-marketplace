@@ -72,8 +72,7 @@ if (!string.IsNullOrEmpty(connectionString) && connectionString.Contains("Host="
 {
     // PostgreSQL (Render)
     builder.Services.AddDbContext<AppDbContext>(options =>
-        options.UseNpgsql(connectionString,
-            npgsqlOptions => npgsqlOptions.EnableRetryOnFailure())); // Add retry for transient errors
+        options.UseNpgsql(connectionString));
     Console.WriteLine("✅ Using PostgreSQL Database");
 }
 else
@@ -147,7 +146,6 @@ catch (Exception ex)
 {
     Console.WriteLine($"❌ Database migration failed: {ex.Message}");
     Console.WriteLine($"Inner exception: {ex.InnerException?.Message}");
-    // Log full stack trace for debugging
     Console.WriteLine($"Stack Trace: {ex.StackTrace}");
 }
 
