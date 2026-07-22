@@ -14,4 +14,10 @@ RUN dotnet publish -c Release -o out
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
 COPY --from=build /app/Marketplace.API/out ./
+
+# ============================================================
+# FIX: Disable file watching to prevent inotify limit errors
+# ============================================================
+ENV DOTNET_HOSTBUILDER__RELOADCONFIGONCHANGE=false
+
 ENTRYPOINT ["dotnet", "Marketplace.API.dll"]
