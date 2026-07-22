@@ -1,5 +1,4 @@
-﻿using Npgsql;
-using System.Text;
+﻿using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.EntityFrameworkCore;
@@ -62,6 +61,11 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 // ============================================================
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
+// ============================================================
+// DEBUG: Print the raw connection string to logs
+// ============================================================
+Console.WriteLine($"📌 Raw Connection String: '{connectionString}'");
+
 if (!string.IsNullOrEmpty(connectionString) && connectionString.Contains("Host="))
 {
     // PostgreSQL (Render)
@@ -72,8 +76,9 @@ if (!string.IsNullOrEmpty(connectionString) && connectionString.Contains("Host="
 else
 {
     // SQLite (Local)
+    var sqliteConnection = connectionString ?? "Data Source=Marketplace.db";
     builder.Services.AddDbContext<AppDbContext>(options =>
-        options.UseSqlite(connectionString ?? "Data Source=Marketplace.db"));
+        options.UseSqlite(sqliteConnection));
     Console.WriteLine("✅ Using SQLite Database (Local)");
 }
 
