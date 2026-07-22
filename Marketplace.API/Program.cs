@@ -131,27 +131,20 @@ app.UseAuthorization();
 app.MapControllers();
 
 // ============================================================
-// DATABASE INITIALIZATION: MIGRATE OR ENSURE CREATED
+// DATABASE INITIALIZATION: FORCE RECREATE WITH CORRECT SCHEMA
 // ============================================================
 try
 {
     using (var scope = app.Services.CreateScope())
     {
         var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        try
-        {
-            // Try to run migrations
-            dbContext.Database.Migrate();
-            Console.WriteLine("✅ Database migrations applied successfully.");
-        }
-        catch (Exception migrateEx)
-        {
-            // If migration fails, fallback to EnsureCreated
-            Console.WriteLine($"❌ Migration failed: {migrateEx.Message}");
-            Console.WriteLine("🔄 Falling back to EnsureCreated...");
-            dbContext.Database.EnsureCreated();
-            Console.WriteLine("✅ Database ensured created (fallback).");
-        }
+
+        // ============================================================
+        // IMPORTANT: This deletes and recreates the database with the correct schema
+        // ============================================================
+        dbContext.Database.EnsureDeleted();  // Drops the database if it exists
+        dbContext.Database.EnsureCreated();  // Creates it with the correct schema from your models
+        Console.WriteLine("✅ Database recreated with the correct schema (EnsureCreated).");
     }
 }
 catch (Exception ex)
