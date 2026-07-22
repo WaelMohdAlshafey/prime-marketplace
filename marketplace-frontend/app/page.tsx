@@ -2,8 +2,10 @@
 import HomeContent from './HomeContent';
 
 // ============================================================
-// This is a Server Component that receives searchParams as a prop
+// Force dynamic rendering to avoid prerender issues with useSearchParams
 // ============================================================
+export const dynamic = 'force-dynamic';
+
 export default function HomePage({
     searchParams,
 }: {
