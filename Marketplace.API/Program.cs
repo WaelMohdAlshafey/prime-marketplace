@@ -108,7 +108,7 @@ builder.Services.AddAuthentication(options =>
 var app = builder.Build();
 
 // ============================================================
-// SWAGGER: ENABLED FOR ALL ENVIRONMENTS (FIXES 404)
+// SWAGGER: ENABLED FOR ALL ENVIRONMENTS
 // ============================================================
 app.UseSwagger();
 app.UseSwaggerUI(c =>
@@ -131,21 +131,32 @@ app.UseAuthorization();
 app.MapControllers();
 
 // ============================================================
-// AUTO-MIGRATION: Creates/Updates the database on startup
+// DATABASE INITIALIZATION: MIGRATE OR ENSURE CREATED
 // ============================================================
 try
 {
     using (var scope = app.Services.CreateScope())
     {
         var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        dbContext.Database.Migrate();
-        Console.WriteLine("✅ Database migrations applied successfully.");
+        try
+        {
+            // Try to run migrations
+            dbContext.Database.Migrate();
+            Console.WriteLine("✅ Database migrations applied successfully.");
+        }
+        catch (Exception migrateEx)
+        {
+            // If migration fails, fallback to EnsureCreated
+            Console.WriteLine($"❌ Migration failed: {migrateEx.Message}");
+            Console.WriteLine("🔄 Falling back to EnsureCreated...");
+            dbContext.Database.EnsureCreated();
+            Console.WriteLine("✅ Database ensured created (fallback).");
+        }
     }
 }
 catch (Exception ex)
 {
-    Console.WriteLine($"❌ Database migration failed: {ex.Message}");
-    Console.WriteLine($"Inner exception: {ex.InnerException?.Message}");
+    Console.WriteLine($"❌ Database initialization failed: {ex.Message}");
     Console.WriteLine($"Stack Trace: {ex.StackTrace}");
 }
 
