@@ -1,15 +1,8 @@
 {
   "ExpandedNodes": [
     "",
-    "\\marketplace-frontend",
-    "\\marketplace-frontend\\app",
-    "\\marketplace-frontend\\app\\accessories",
-    "\\marketplace-frontend\\app\\fashion",
-    "\\marketplace-frontend\\app\\hair-care",
-    "\\marketplace-frontend\\app\\skin-care",
-    "\\marketplace-frontend\\app\\software",
-    "\\marketplace-frontend\\src",
-    "\\marketplace-frontend\\src\\components"
+    "\\Marketplace.API"
   ],
+  "SelectedNode": "\\Marketplace.API\\appsettings.json",
   "PreviewInSolutionExplorer": false
 }

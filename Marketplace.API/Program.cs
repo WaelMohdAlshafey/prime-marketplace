@@ -8,13 +8,11 @@ using Marketplace.Application.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ============================================================
-// 1. Add Controllers
-// ============================================================
+// Add services to the container.
 builder.Services.AddControllers();
 
 // ============================================================
-// 2. Add CORS (Allows Next.js frontend to call the API)
+// CORS (Allows React/Next.js frontend to call the API)
 // ============================================================
 builder.Services.AddCors(options =>
 {
@@ -24,14 +22,7 @@ builder.Services.AddCors(options =>
                         .AllowAnyHeader());
 });
 
-// ============================================================
-// 3. Add Memory Cache (for caching products)
-// ============================================================
 builder.Services.AddMemoryCache();
-
-// ============================================================
-// 4. Add Swagger/OpenAPI (with JWT support)
-// ============================================================
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -60,23 +51,33 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// ============================================================
-// 5. Register Application Services (Dependency Injection)
-// ============================================================
+// Register Services
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 
 // ============================================================
-// 6. Database Context (SQLite)
+// DATABASE: AUTO-DETECT SQLite or PostgreSQL
 // ============================================================
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-// ============================================================
-// 7. JWT Authentication
-// ============================================================
-var key = Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Key"] ?? "ThisIsASecretKeyWithAtLeast32CharactersLongForJWT!");
+if (connectionString != null && connectionString.Contains("Host="))
+{
+    // PostgreSQL (Render)
+    builder.Services.AddDbContext<AppDbContext>(options =>
+        options.UseNpgsql(connectionString));
+    Console.WriteLine("✅ Using PostgreSQL Database");
+}
+else
+{
+    // SQLite (Local)
+    builder.Services.AddDbContext<AppDbContext>(options =>
+        options.UseSqlite(connectionString ?? "Data Source=Marketplace.db"));
+    Console.WriteLine("✅ Using SQLite Database (Local)");
+}
+
+// JWT Authentication
+var key = Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Key"] ?? "ThisIsASuperSecretKeyWithAtLeast32CharactersLongForJWT!");
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -96,38 +97,40 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// ============================================================
-// 8. Build the App
-// ============================================================
 var app = builder.Build();
 
-// ============================================================
-// 9. Development Middleware (Swagger)
-// ============================================================
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-// ============================================================
-// 10. Security & Routing
-// ============================================================
 app.UseHttpsRedirection();
 
 // ============================================================
-// 11. Enable CORS (MUST be placed between UseHttpsRedirection and UseAuthentication)
+// CORS MUST BE HERE (BEFORE Authentication)
 // ============================================================
 app.UseCors("AllowAll");
 
-// ============================================================
-// 12. Authentication & Authorization
-// ============================================================
 app.UseAuthentication();
 app.UseAuthorization();
+app.MapControllers();
 
 // ============================================================
-// 13. Map Controllers and Run
+// AUTO-MIGRATION: Creates/Updates the database on startup
 // ============================================================
-app.MapControllers();
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    try
+    {
+        dbContext.Database.Migrate();
+        Console.WriteLine("✅ Database migrations applied successfully.");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"❌ Database migration failed: {ex.Message}");
+    }
+}
+
 app.Run();
