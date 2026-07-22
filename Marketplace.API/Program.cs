@@ -26,6 +26,12 @@ builder.Services.AddMemoryCache();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
+    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    {
+        Title = "Prime Marketplace API",
+        Version = "v1",
+        Description = "Prime Marketplace Backend API"
+    });
     c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
     {
         In = Microsoft.OpenApi.Models.ParameterLocation.Header,
@@ -60,17 +66,14 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 // DATABASE: AUTO-DETECT SQLite or PostgreSQL
 // ============================================================
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-
-// ============================================================
-// DEBUG: Print the raw connection string to logs
-// ============================================================
 Console.WriteLine($"📌 Raw Connection String: '{connectionString}'");
 
 if (!string.IsNullOrEmpty(connectionString) && connectionString.Contains("Host="))
 {
     // PostgreSQL (Render)
     builder.Services.AddDbContext<AppDbContext>(options =>
-        options.UseNpgsql(connectionString));
+        options.UseNpgsql(connectionString,
+            npgsqlOptions => npgsqlOptions.EnableRetryOnFailure())); // Add retry for transient errors
     Console.WriteLine("✅ Using PostgreSQL Database");
 }
 else
@@ -105,11 +108,15 @@ builder.Services.AddAuthentication(options =>
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
+// ============================================================
+// SWAGGER: ENABLED FOR ALL ENVIRONMENTS (FIXES 404)
+// ============================================================
+app.UseSwagger();
+app.UseSwaggerUI(c =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Prime Marketplace API V1");
+    c.RoutePrefix = "swagger";
+});
 
 // ============================================================
 // DISABLE HTTPS REDIRECTION ON PRODUCTION (Render)
@@ -140,6 +147,8 @@ catch (Exception ex)
 {
     Console.WriteLine($"❌ Database migration failed: {ex.Message}");
     Console.WriteLine($"Inner exception: {ex.InnerException?.Message}");
+    // Log full stack trace for debugging
+    Console.WriteLine($"Stack Trace: {ex.StackTrace}");
 }
 
 // ============================================================
