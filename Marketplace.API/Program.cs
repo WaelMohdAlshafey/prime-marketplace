@@ -61,7 +61,7 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 // ============================================================
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-if (connectionString != null && connectionString.Contains("Host="))
+if (!string.IsNullOrEmpty(connectionString) && connectionString.Contains("Host="))
 {
     // PostgreSQL (Render)
     builder.Services.AddDbContext<AppDbContext>(options =>
@@ -105,13 +105,15 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+// ============================================================
+// DISABLE HTTPS REDIRECTION ON PRODUCTION (Render)
+// ============================================================
+if (!app.Environment.IsProduction())
+{
+    app.UseHttpsRedirection();
+}
 
-// ============================================================
-// CORS MUST BE HERE (BEFORE Authentication)
-// ============================================================
 app.UseCors("AllowAll");
-
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
@@ -119,18 +121,23 @@ app.MapControllers();
 // ============================================================
 // AUTO-MIGRATION: Creates/Updates the database on startup
 // ============================================================
-using (var scope = app.Services.CreateScope())
+try
 {
-    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    try
+    using (var scope = app.Services.CreateScope())
     {
+        var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         dbContext.Database.Migrate();
         Console.WriteLine("✅ Database migrations applied successfully.");
     }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"❌ Database migration failed: {ex.Message}");
-    }
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"❌ Database migration failed: {ex.Message}");
+    Console.WriteLine($"Inner exception: {ex.InnerException?.Message}");
 }
 
-app.Run();
+// ============================================================
+// BIND TO PORT PROVIDED BY RENDER
+// ============================================================
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+app.Run($"http://0.0.0.0:{port}");
