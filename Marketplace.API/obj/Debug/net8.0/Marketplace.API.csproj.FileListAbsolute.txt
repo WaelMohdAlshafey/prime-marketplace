@@ -173,3 +173,5 @@ M:\Marketplace\Marketplace.API\obj\Debug\net8.0\refint\Marketplace.API.dll
 M:\Marketplace\Marketplace.API\obj\Debug\net8.0\Marketplace.API.pdb
 M:\Marketplace\Marketplace.API\obj\Debug\net8.0\Marketplace.API.genruntimeconfig.cache
 M:\Marketplace\Marketplace.API\obj\Debug\net8.0\ref\Marketplace.API.dll
+M:\Marketplace\Marketplace.API\bin\Debug\net8.0\Npgsql.dll
+M:\Marketplace\Marketplace.API\bin\Debug\net8.0\Npgsql.EntityFrameworkCore.PostgreSQL.dll

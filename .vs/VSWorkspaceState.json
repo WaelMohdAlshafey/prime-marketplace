@@ -1,8 +1,7 @@
 {
   "ExpandedNodes": [
-    "",
-    "\\Marketplace.API"
+    ""
   ],
-  "SelectedNode": "\\Marketplace.API\\Program.cs",
+  "SelectedNode": "\\Marketplace.Domain\\Entities\\User.cs",
   "PreviewInSolutionExplorer": false
 }
