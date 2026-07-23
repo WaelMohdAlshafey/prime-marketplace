@@ -2,7 +2,7 @@
 import HomeContent from './HomeContent';
 
 // ============================================================
-// Force dynamic rendering to avoid prerender issues with useSearchParams
+// Force dynamic rendering to avoid prerender issues
 // ============================================================
 export const dynamic = 'force-dynamic';
 
