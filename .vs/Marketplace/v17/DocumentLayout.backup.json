@@ -3,6 +3,10 @@
   "WorkspaceRootPath": "M:\\Marketplace\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\marketplace-frontend\\vercel.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:marketplace-frontend\\vercel.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\vercel.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:vercel.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
@@ -18,7 +22,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Bookmark",
@@ -26,29 +30,39 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
+              "Title": "vercel.json",
+              "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\vercel.json",
+              "RelativeDocumentMoniker": "marketplace-frontend\\vercel.json",
+              "ToolTip": "M:\\Marketplace\\marketplace-frontend\\vercel.json",
+              "RelativeToolTip": "marketplace-frontend\\vercel.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-07-23T09:36:59.145Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
               "Title": "package.json",
               "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\package.json",
               "RelativeDocumentMoniker": "marketplace-frontend\\package.json",
               "ToolTip": "M:\\Marketplace\\marketplace-frontend\\package.json",
               "RelativeToolTip": "marketplace-frontend\\package.json",
-              "ViewState": "AgIAABAAAAAAAAAAAAAuwB8AAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAABAAAAAAAAAAAAAwwB8AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2026-07-23T09:01:42.602Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-07-23T09:01:42.602Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "vercel.json",
               "DocumentMoniker": "M:\\Marketplace\\vercel.json",
               "RelativeDocumentMoniker": "vercel.json",
               "ToolTip": "M:\\Marketplace\\vercel.json",
               "RelativeToolTip": "vercel.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2026-07-23T08:57:40.031Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-07-23T08:57:40.031Z"
             },
             {
               "$type": "Bookmark",
