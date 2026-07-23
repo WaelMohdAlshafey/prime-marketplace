@@ -1,6 +1,7 @@
 ﻿'use client';
 
 import { useEffect, useState } from 'react';
+import api from '@/lib/api'; // <-- IMPORT the API client
 
 interface Product {
     id: number;
@@ -18,18 +19,16 @@ export default function Home() {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        fetch('http://localhost:8080/api/Products?page=1&pageSize=20')
-            .then((res) => {
-                if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-                return res.json();
-            })
-            .then((data) => {
-                setProducts(data.items || []);
+        // Use the API client (reads NEXT_PUBLIC_API_URL from .env.local)
+        api
+            .get('/api/Products?page=1&pageSize=20')
+            .then((response) => {
+                setProducts(response.data.items || []);
                 setLoading(false);
             })
             .catch((err) => {
                 console.error('❌ Error fetching products:', err);
-                setError(err.message);
+                setError(err.message || 'حدث خطأ في التحميل');
                 setLoading(false);
             });
     }, []);
