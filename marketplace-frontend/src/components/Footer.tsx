@@ -23,7 +23,8 @@ export default function Footer() {
                         <h4 className="font-semibold mb-4 text-white">روابط سريعة</h4>
                         <ul className="space-y-2 text-gray-400 text-sm">
                             <li><Link href="/" className="hover:text-white transition">الرئيسية</Link></li>
-                            <li><Link href="/products" className="hover:text-white transition">المنتجات</Link></li>
+                            {/* ✅ "المنتجات" → صفحة عرض المنتجات (الصفحة الرئيسية أو صفحة المنتجات العامة) */}
+                            <li><Link href="/" className="hover:text-white transition">المنتجات</Link></li>
                             <li><Link href="/stores" className="hover:text-white transition">المتاجر</Link></li>
                             <li><Link href="/offers" className="hover:text-white transition">العروض</Link></li>
                         </ul>

@@ -1,9 +1,8 @@
 {
   "ExpandedNodes": [
     "",
-    "\\marketplace-frontend",
-    "\\marketplace-frontend\\app"
+    "\\marketplace-frontend"
   ],
-  "SelectedNode": "\\marketplace-frontend\\app\\page.tsx",
+  "SelectedNode": "\\marketplace-frontend\\src\\components\\CategoryPage.tsx",
   "PreviewInSolutionExplorer": false
 }
