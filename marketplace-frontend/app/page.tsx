@@ -1,7 +1,37 @@
 ﻿'use client';
 
 import { useEffect, useState } from 'react';
-import api from '@/lib/api'; // <-- IMPORT the API client
+import api from '@/lib/api';
+
+// ============================================================
+// ADDED: Image mapping function (copied from ProductCard.tsx)
+// ============================================================
+const getProductImage = (name: string): string => {
+    const lower = name.toLowerCase();
+
+    if (lower.includes('سماعة') || lower.includes('headphone') || lower.includes('sony'))
+        return '/images/products/headphones.jpg';
+    if (lower.includes('لابتوب') || lower.includes('laptop') || lower.includes('برمجيات') || lower.includes('برمجة'))
+        return '/images/products/laptop.jpg';
+    if (lower.includes('كتاب') || lower.includes('book') || lower.includes('clean code') || lower.includes('pragmatic'))
+        return '/images/products/book.jpg';
+    if (lower.includes('تي شيرت') || lower.includes('tshirt') || lower.includes('fashion') || lower.includes('قطني'))
+        return '/images/products/tshirt.jpg';
+    if (lower.includes('شعر') || lower.includes('hair') || lower.includes('شامبو'))
+        return '/images/products/haircare.jpg';
+    if (lower.includes('بشرة') || lower.includes('skin') || lower.includes('كريم') || lower.includes('ترطيب'))
+        return '/images/products/skincare.jpg';
+    if (lower.includes('ساعة') || lower.includes('watch') || lower.includes('اكسسوارات') || lower.includes('كلاسيكية'))
+        return '/images/products/watch.jpg';
+    if (lower.includes('حذاء') || lower.includes('shoe') || lower.includes('sneaker'))
+        return '/images/products/shoes.jpg';
+    if (lower.includes('مكمل') || lower.includes('supplement') || lower.includes('فيتامين') || lower.includes('vitamin'))
+        return '/images/products/supplements.jpg';
+    if (lower.includes('أواني') || lower.includes('منزل') || lower.includes('مطبخ') || lower.includes('طقم'))
+        return '/images/products/home.jpg';
+
+    return '/images/placeholder.jpg'; // fallback
+};
 
 interface Product {
     id: number;
@@ -19,7 +49,6 @@ export default function Home() {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        // Use the API client (reads NEXT_PUBLIC_API_URL from .env.local)
         api
             .get('/api/Products?page=1&pageSize=20')
             .then((response) => {
@@ -81,17 +110,21 @@ export default function Home() {
                         className="bg-white rounded-2xl shadow-md hover:shadow-xl transition p-4 text-right border border-gray-50"
                     >
                         <div className="w-full h-40 bg-gray-100 rounded-xl overflow-hidden mb-3">
-                            {product.imageUrl ? (
-                                <img
-                                    src={product.imageUrl}
-                                    alt={product.name}
-                                    className="w-full h-full object-cover"
-                                />
-                            ) : (
-                                <div className="w-full h-full flex items-center justify-center text-4xl text-gray-300">
-                                    📦
-                                </div>
-                            )}
+                            {(() => {
+                                // Use the image mapping function if imageUrl is null
+                                const imgSrc = product.imageUrl || getProductImage(product.name);
+                                return (
+                                    <img
+                                        src={imgSrc}
+                                        alt={product.name}
+                                        className="w-full h-full object-cover"
+                                        onError={(e) => {
+                                            // Fallback to placeholder if the image fails to load
+                                            (e.target as HTMLImageElement).src = '/images/placeholder.jpg';
+                                        }}
+                                    />
+                                );
+                            })()}
                         </div>
                         <h3 className="font-semibold text-gray-800">{product.name}</h3>
                         <p className="text-sm text-gray-500 line-clamp-2">{product.description}</p>
