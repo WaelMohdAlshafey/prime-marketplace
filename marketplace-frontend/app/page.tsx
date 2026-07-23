@@ -1,15 +1,10 @@
-﻿import { Suspense } from 'react';
-import HomeContent from './HomeContent';
-
-// ============================================================
-// FORCE DYNAMIC RENDERING - This prevents prerender errors
-// with useSearchParams on Vercel
+﻿// ============================================================
+// FORCE DYNAMIC RENDERING - Prevents prerender errors
 // ============================================================
 export const dynamic = 'force-dynamic';
 
-// ============================================================
-// Server Component that receives searchParams as a prop
-// ============================================================
+import HomeContent from './HomeContent';
+
 export default function HomePage({
     searchParams,
 }: {
@@ -17,9 +12,5 @@ export default function HomePage({
 }) {
     const query = searchParams?.q || '';
 
-    return (
-        <Suspense fallback={<div className="text-center py-12">جاري التحميل...</div>}>
-            <HomeContent initialQuery={query} />
-        </Suspense>
-    );
+    return <HomeContent initialQuery={query} />;
 }

@@ -34,18 +34,22 @@ export default function HomeContent({ initialQuery }: HomeContentProps) {
         }
     };
 
+    // ============================================================
+    // Fetch products when the query changes (ESLint warning suppressed)
+    // ============================================================
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
-        fetchProducts(query || undefined);
+        fetchProducts(query);
     }, [query]);
 
-    // Update query when URL changes (for client-side navigation)
+    // Listen for client-side navigation changes
     useEffect(() => {
         const handleRouteChange = () => {
             const params = new URLSearchParams(window.location.search);
             const q = params.get('q') || '';
             setQuery(q);
         };
+
         window.addEventListener('popstate', handleRouteChange);
         return () => window.removeEventListener('popstate', handleRouteChange);
     }, []);
