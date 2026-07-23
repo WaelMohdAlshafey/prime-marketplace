@@ -39,6 +39,6 @@ public class AuthResponseDto
     public int UserId { get; set; }
     public string Username { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
-    public string Role { get; set; } = string.Empty; // <-- NEW: User role (Admin, Vendor, Customer)
+    public string Role { get; set; } = string.Empty; // ✅ Already here
     public string Token { get; set; } = string.Empty;
 }

@@ -3,48 +3,30 @@
 import { useState } from 'react';
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
 
-interface FilterSection {
-    title: string;
-    options: { label: string; value: string; count?: number }[];
-    type: 'checkbox' | 'radio' | 'range' | 'stars';
+interface FilterSidebarProps {
+    vendorId?: number; // Current vendor ID (for the category)
+    onApplyFilters: (filters: {
+        minPrice?: number;
+        maxPrice?: number;
+        inStock?: boolean;
+        rating?: number;
+    }) => void;
+    onResetFilters: () => void;
 }
 
-const filterSections: FilterSection[] = [
-    {
-        title: 'Category',
-        type: 'checkbox',
-        options: [
-            { label: 'Software', value: 'software', count: 1234 },
-            { label: 'Hair Care', value: 'hair-care', count: 856 },
-            { label: 'Skin Care', value: 'skin-care', count: 723 },
-        ],
-    },
-    {
-        title: 'Price Range',
-        type: 'range',
-        options: [],
-    },
-    {
-        title: 'Rating',
-        type: 'stars',
-        options: [
-            { label: '★★★★★', value: '5' },
-            { label: '★★★★☆', value: '4' },
-            { label: '★★★☆☆', value: '3' },
-        ],
-    },
-    {
-        title: 'Availability',
-        type: 'checkbox',
-        options: [
-            { label: 'In Stock', value: 'in-stock' },
-            { label: 'Out of Stock', value: 'out-of-stock' },
-        ],
-    },
-];
+export default function FilterSidebar({
+    vendorId,
+    onApplyFilters,
+    onResetFilters,
+}: FilterSidebarProps) {
+    const [minPrice, setMinPrice] = useState<number | undefined>(undefined);
+    const [maxPrice, setMaxPrice] = useState<number | undefined>(undefined);
+    const [inStock, setInStock] = useState<boolean | undefined>(undefined);
+    const [rating, setRating] = useState<number | undefined>(undefined);
 
-export default function FilterSidebar() {
-    const [openSections, setOpenSections] = useState<Set<string>>(new Set(['Category', 'Price Range', 'Rating']));
+    const [openSections, setOpenSections] = useState<Set<string>>(
+        new Set(['نطاق السعر', 'التقييم', 'التوفر'])
+    );
 
     const toggleSection = (title: string) => {
         const newSet = new Set(openSections);
@@ -56,68 +38,157 @@ export default function FilterSidebar() {
         setOpenSections(newSet);
     };
 
+    const handleApply = () => {
+        onApplyFilters({
+            minPrice,
+            maxPrice,
+            inStock,
+            rating,
+        });
+    };
+
+    const handleReset = () => {
+        setMinPrice(undefined);
+        setMaxPrice(undefined);
+        setInStock(undefined);
+        setRating(undefined);
+        onResetFilters();
+    };
+
     return (
-        <aside className="bg-white rounded-card shadow-sm p-6 sticky top-24 h-fit">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Filters</h2>
+        <aside className="bg-white rounded-2xl shadow-sm p-6 sticky top-24 h-fit text-right">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">🧹 الفلاتر</h2>
 
-            {filterSections.map((section) => (
-                <div key={section.title} className="border-b border-gray-200 py-4">
-                    <button
-                        onClick={() => toggleSection(section.title)}
-                        className="flex justify-between items-center w-full text-left font-semibold text-gray-800 hover:text-primary transition"
-                    >
-                        <span>{section.title}</span>
-                        {openSections.has(section.title) ? (
-                            <ChevronUpIcon className="w-5 h-5" />
-                        ) : (
-                            <ChevronDownIcon className="w-5 h-5" />
-                        )}
-                    </button>
-
-                    {openSections.has(section.title) && (
-                        <div className="mt-3 space-y-2">
-                            {section.type === 'checkbox' && section.options.map((option) => (
-                                <label key={option.value} className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 cursor-pointer">
-                                    <input type="checkbox" className="w-4 h-4 accent-primary" />
-                                    <span>{option.label}</span>
-                                    {option.count && <span className="text-gray-400">({option.count})</span>}
-                                </label>
-                            ))}
-
-                            {section.type === 'stars' && section.options.map((option) => (
-                                <label key={option.value} className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 cursor-pointer">
-                                    <input type="radio" name="rating" className="w-4 h-4 accent-primary" />
-                                    <span className="text-amber-400">{option.label}</span>
-                                </label>
-                            ))}
-
-                            {section.type === 'range' && (
-                                <div>
-                                    <input
-                                        type="range"
-                                        min="0"
-                                        max="1000"
-                                        className="w-full accent-primary"
-                                        defaultValue="500"
-                                    />
-                                    <div className="flex justify-between text-xs text-gray-500">
-                                        <span>$0</span>
-                                        <span>$1000</span>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
+            {/* Price Range */}
+            <div className="border-b border-gray-200 py-4">
+                <button
+                    onClick={() => toggleSection('نطاق السعر')}
+                    className="flex justify-between items-center w-full text-left font-semibold text-gray-800 hover:text-[#0F5C45] transition"
+                >
+                    <span>نطاق السعر</span>
+                    {openSections.has('نطاق السعر') ? (
+                        <ChevronUpIcon className="w-5 h-5" />
+                    ) : (
+                        <ChevronDownIcon className="w-5 h-5" />
                     )}
-                </div>
-            ))}
+                </button>
+
+                {openSections.has('نطاق السعر') && (
+                    <div className="mt-3">
+                        <div className="flex gap-2 items-center">
+                            <input
+                                type="number"
+                                placeholder="الحد الأدنى"
+                                value={minPrice ?? ''}
+                                onChange={(e) =>
+                                    setMinPrice(e.target.value ? Number(e.target.value) : undefined)
+                                }
+                                className="w-1/2 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#0F5C45] focus:border-transparent"
+                            />
+                            <span className="text-gray-400">—</span>
+                            <input
+                                type="number"
+                                placeholder="الحد الأقصى"
+                                value={maxPrice ?? ''}
+                                onChange={(e) =>
+                                    setMaxPrice(e.target.value ? Number(e.target.value) : undefined)
+                                }
+                                className="w-1/2 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#0F5C45] focus:border-transparent"
+                            />
+                        </div>
+                    </div>
+                )}
+            </div>
+
+            {/* Rating */}
+            <div className="border-b border-gray-200 py-4">
+                <button
+                    onClick={() => toggleSection('التقييم')}
+                    className="flex justify-between items-center w-full text-left font-semibold text-gray-800 hover:text-[#0F5C45] transition"
+                >
+                    <span>التقييم</span>
+                    {openSections.has('التقييم') ? (
+                        <ChevronUpIcon className="w-5 h-5" />
+                    ) : (
+                        <ChevronDownIcon className="w-5 h-5" />
+                    )}
+                </button>
+
+                {openSections.has('التقييم') && (
+                    <div className="mt-3 space-y-2">
+                        {[4, 3, 2, 1].map((stars) => (
+                            <label
+                                key={stars}
+                                className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 cursor-pointer justify-end"
+                            >
+                                <span className="text-amber-400">{'★'.repeat(stars)}{'☆'.repeat(5 - stars)}</span>
+                                <input
+                                    type="radio"
+                                    name="rating"
+                                    value={stars}
+                                    checked={rating === stars}
+                                    onChange={() => setRating(stars)}
+                                    className="w-4 h-4 accent-[#0F5C45]"
+                                />
+                            </label>
+                        ))}
+                        <label className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 cursor-pointer justify-end">
+                            <span>الكل</span>
+                            <input
+                                type="radio"
+                                name="rating"
+                                value={0}
+                                checked={rating === undefined}
+                                onChange={() => setRating(undefined)}
+                                className="w-4 h-4 accent-[#0F5C45]"
+                            />
+                        </label>
+                    </div>
+                )}
+            </div>
+
+            {/* Availability */}
+            <div className="border-b border-gray-200 py-4">
+                <button
+                    onClick={() => toggleSection('التوفر')}
+                    className="flex justify-between items-center w-full text-left font-semibold text-gray-800 hover:text-[#0F5C45] transition"
+                >
+                    <span>التوفر</span>
+                    {openSections.has('التوفر') ? (
+                        <ChevronUpIcon className="w-5 h-5" />
+                    ) : (
+                        <ChevronDownIcon className="w-5 h-5" />
+                    )}
+                </button>
+
+                {openSections.has('التوفر') && (
+                    <div className="mt-3 space-y-2">
+                        <label className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 cursor-pointer justify-end">
+                            <span>متوفر فقط</span>
+                            <input
+                                type="checkbox"
+                                checked={inStock === true}
+                                onChange={(e) => setInStock(e.target.checked ? true : undefined)}
+                                className="w-4 h-4 accent-[#0F5C45]"
+                            />
+                        </label>
+                    </div>
+                )}
+            </div>
 
             {/* Action Buttons */}
             <div className="mt-6 flex flex-col gap-3">
-                <button className="w-full bg-primary text-white py-2.5 rounded-lg font-medium hover:bg-primary-dark transition">
-                    Apply Filters
+                <button
+                    onClick={handleApply}
+                    className="w-full bg-[#0F5C45] text-white py-2.5 rounded-xl font-medium hover:bg-[#0A4735] transition"
+                >
+                    تطبيق الفلاتر
                 </button>
-                <button className="w-full text-gray-500 text-sm hover:text-gray-700 transition">
-                    Reset Filters
+                <button
+                    onClick={handleReset}
+                    className="w-full text-gray-500 text-sm hover:text-gray-700 transition"
+                >
+                    إعادة تعيين
                 </button>
             </div>
         </aside>

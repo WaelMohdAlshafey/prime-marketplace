@@ -1,7 +1,9 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\marketplace-frontend",
+    "\\marketplace-frontend\\app"
   ],
-  "SelectedNode": "\\marketplace-frontend\\app\\vendor\\dashboard\\page.tsx",
+  "SelectedNode": "\\marketplace-frontend\\app\\page.tsx",
   "PreviewInSolutionExplorer": false
 }

@@ -77,8 +77,8 @@ export interface AuthResponse {
     userId: number;
     username: string;
     email: string;
-    role: string; // <-- ADDED: User role (Admin, Vendor, Customer)
     token: string;
+    role: string; // <-- ADD THIS
 }
 
 export interface LoginRequest {

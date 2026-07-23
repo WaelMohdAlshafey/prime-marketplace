@@ -81,17 +81,35 @@ export default function CategoryPage({ category }: CategoryPageProps) {
     const [search, setSearch] = useState('');
     const catInfo = categoryMap[category];
 
-    // ============================================================
-    // FIX: Move fetchProducts BEFORE the conditional return
-    // so useEffect is ALWAYS called in the same order
-    // ============================================================
-    const fetchProducts = async (q?: string) => {
+    const [activeFilters, setActiveFilters] = useState<{
+        minPrice?: number;
+        maxPrice?: number;
+        inStock?: boolean;
+        rating?: number;
+    }>({});
+
+    const fetchProducts = async (q?: string, filters?: typeof activeFilters) => {
         setLoading(true);
         try {
-            let url = `/api/Products/category/${category}?page=1&pageSize=20`;
+            const finalFilters = filters || activeFilters;
+            let url = '';
+
             if (q) {
                 url = `/api/Products/search?q=${encodeURIComponent(q)}&page=1&pageSize=20`;
             }
+            else if (finalFilters && Object.keys(finalFilters).length > 0) {
+                const params = new URLSearchParams();
+                if (catInfo) params.append('vendorId', catInfo.vendorId.toString());
+                if (finalFilters.minPrice !== undefined) params.append('minPrice', finalFilters.minPrice.toString());
+                if (finalFilters.maxPrice !== undefined) params.append('maxPrice', finalFilters.maxPrice.toString());
+                if (finalFilters.inStock !== undefined) params.append('inStock', finalFilters.inStock.toString());
+                if (finalFilters.rating !== undefined) params.append('rating', finalFilters.rating.toString());
+                url = `/api/Products/filter?${params.toString()}&page=1&pageSize=20`;
+            }
+            else {
+                url = `/api/Products/category/${category}?page=1&pageSize=20`;
+            }
+
             const response = await api.get<PagedResult<Product>>(url);
             setProducts(response.data.items);
         } catch (error) {
@@ -101,29 +119,39 @@ export default function CategoryPage({ category }: CategoryPageProps) {
         }
     };
 
-    // ============================================================
-    // FIX: useEffect must be called BEFORE any conditional returns
-    // ============================================================
     useEffect(() => {
+        if (!catInfo) {
+            router.push('/');
+            return;
+        }
         // eslint-disable-next-line react-hooks/set-state-in-effect
-        fetchProducts();
+        fetchProducts(undefined, {});
     }, [category]);
 
-    // ============================================================
-    // NOW we can do the conditional return (after all hooks)
-    // ============================================================
-    if (!catInfo) {
-        router.push('/');
-        return null;
-    }
+    const handleApplyFilters = (filters: { minPrice?: number; maxPrice?: number; inStock?: boolean; rating?: number }) => {
+        setActiveFilters(filters);
+        fetchProducts(undefined, filters);
+    };
+
+    const handleResetFilters = () => {
+        setActiveFilters({});
+        fetchProducts(undefined, {});
+    };
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
-        fetchProducts(search);
+        if (search.trim()) {
+            fetchProducts(search, {});
+        } else {
+            fetchProducts(undefined, activeFilters);
+        }
     };
+
+    if (!catInfo) return null;
 
     return (
         <div>
+            {/* Category Hero */}
             <section className="bg-gradient-to-r from-[#0F5C45]/10 to-[#0F5C45]/5 py-16">
                 <div className="container mx-auto px-4 text-center">
                     <div className="flex justify-center mb-4">
@@ -156,10 +184,15 @@ export default function CategoryPage({ category }: CategoryPageProps) {
                 </div>
             </section>
 
+            {/* Main Content: Sidebar + Products */}
             <div className="container mx-auto px-4 py-8">
                 <div className="flex flex-col md:flex-row gap-8">
                     <div className="md:w-1/4">
-                        <FilterSidebar />
+                        <FilterSidebar
+                            vendorId={catInfo.vendorId}
+                            onApplyFilters={handleApplyFilters}
+                            onResetFilters={handleResetFilters}
+                        />
                     </div>
                     <div className="md:w-3/4">
                         {loading ? (
@@ -169,8 +202,8 @@ export default function CategoryPage({ category }: CategoryPageProps) {
                                 ))}
                             </div>
                         ) : products.length === 0 ? (
-                            <div className="text-center py-20 text-gray-500">
-                                <p>لا توجد منتجات في هذه الفئة</p>
+                            <div className="text-center py-20 text-gray-500 bg-white rounded-2xl shadow-sm">
+                                <p className="text-lg">لا توجد منتجات تطابق الفلاتر المحددة.</p>
                             </div>
                         ) : (
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">

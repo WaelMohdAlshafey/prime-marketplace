@@ -53,8 +53,8 @@ public class AuthService : IAuthService
             UserId = user.Id,
             Username = user.Username,
             Email = user.Email,
-            Role = user.Role,
-            Token = token
+            Token = token,
+            Role = user.Role  // <-- MAKE SURE THIS LINE EXISTS
         };
     }
 
