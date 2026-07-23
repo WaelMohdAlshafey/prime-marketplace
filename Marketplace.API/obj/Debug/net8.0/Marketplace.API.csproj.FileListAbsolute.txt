@@ -39,6 +39,8 @@ M:\Marketplace\Marketplace.API\bin\Debug\net8.0\Microsoft.OpenApi.dll
 M:\Marketplace\Marketplace.API\bin\Debug\net8.0\Microsoft.SqlServer.Server.dll
 M:\Marketplace\Marketplace.API\bin\Debug\net8.0\Microsoft.Win32.SystemEvents.dll
 M:\Marketplace\Marketplace.API\bin\Debug\net8.0\Mono.TextTemplating.dll
+M:\Marketplace\Marketplace.API\bin\Debug\net8.0\Npgsql.dll
+M:\Marketplace\Marketplace.API\bin\Debug\net8.0\Npgsql.EntityFrameworkCore.PostgreSQL.dll
 M:\Marketplace\Marketplace.API\bin\Debug\net8.0\SQLitePCLRaw.batteries_v2.dll
 M:\Marketplace\Marketplace.API\bin\Debug\net8.0\SQLitePCLRaw.core.dll
 M:\Marketplace\Marketplace.API\bin\Debug\net8.0\SQLitePCLRaw.provider.e_sqlite3.dll
@@ -173,5 +175,3 @@ M:\Marketplace\Marketplace.API\obj\Debug\net8.0\refint\Marketplace.API.dll
 M:\Marketplace\Marketplace.API\obj\Debug\net8.0\Marketplace.API.pdb
 M:\Marketplace\Marketplace.API\obj\Debug\net8.0\Marketplace.API.genruntimeconfig.cache
 M:\Marketplace\Marketplace.API\obj\Debug\net8.0\ref\Marketplace.API.dll
-M:\Marketplace\Marketplace.API\bin\Debug\net8.0\Npgsql.dll
-M:\Marketplace\Marketplace.API\bin\Debug\net8.0\Npgsql.EntityFrameworkCore.PostgreSQL.dll

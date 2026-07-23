@@ -3,31 +3,15 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
 import api from '@/lib/api';
 import { Product } from '@/types';
 import { useAuth } from '@/context/AuthContext';
-import { PlusCircleIcon, ChartBarIcon } from '@heroicons/react/24/outline';
 
 export default function VendorDashboard() {
     const { user, isLoading } = useAuth();
     const router = useRouter();
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        if (isLoading) return;
-        if (!user) {
-            router.push('/auth/login');
-            return;
-        }
-        // Check if user is Vendor or Admin
-        if (user.role !== 'Vendor' && user.role !== 'Admin') {
-            router.push('/');
-            return;
-        }
-        fetchProducts();
-    }, [user, isLoading]);
 
     const fetchProducts = async () => {
         try {
@@ -40,66 +24,85 @@ export default function VendorDashboard() {
         }
     };
 
+    useEffect(() => {
+        if (isLoading) return;
+
+        if (!user) {
+            router.push('/auth/login');
+            return;
+        }
+
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        fetchProducts();
+    }, [user, isLoading]);
+
     if (isLoading || loading) {
         return (
             <div className="flex justify-center items-center min-h-[60vh]">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0F5C45]"></div>
             </div>
         );
     }
 
     return (
         <div className="container mx-auto px-4 py-12">
-            <div className="flex justify-between items-center mb-8">
-                <div className="flex items-center gap-3">
-                    <ChartBarIcon className="w-8 h-8 text-[#0F5C45]" />
-                    <h1 className="text-3xl font-bold text-gray-800">📊 لوحة تحكم البائع</h1>
-                </div>
+            <h1 className="text-3xl font-bold text-gray-800 mb-8 text-right">📊 لوحة تحكم البائع</h1>
 
-                <Link
-                    href="/vendor/products/new"
-                    className="flex items-center gap-2 bg-[#0F5C45] text-white px-6 py-3 rounded-xl font-semibold hover:bg-[#0A4735] transition shadow-md hover:shadow-lg"
+            <div className="mb-6 text-right">
+                <button
+                    onClick={() => alert('إضافة منتج جديد (سيتم فتح نموذج الإضافة قريباً)')}
+                    className="btn-primary"
                 >
-                    <PlusCircleIcon className="w-5 h-5" />
-                    إضافة منتج جديد
-                </Link>
+                    + إضافة منتج جديد
+                </button>
             </div>
 
             {products.length === 0 ? (
-                <div className="text-center py-20 bg-white rounded-2xl shadow-sm border border-gray-100">
-                    <p className="text-gray-500 text-lg">لا توجد منتجات مضافة حتى الآن.</p>
-                    <p className="text-gray-400 text-sm mt-2">
-                        اضغط على زر <span className="font-semibold text-[#0F5C45]">إضافة منتج جديد</span> لإضافة منتجك الأول.
-                    </p>
+                <div className="text-center py-20 text-gray-500 bg-white rounded-xl shadow-md p-8">
+                    <p className="text-lg">لا توجد منتجات مضافة بعد.</p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {products.map((product) => (
-                        <div key={product.id} className="bg-white rounded-2xl shadow-sm hover:shadow-md transition p-4 border border-gray-100">
-                            <div className="relative aspect-square overflow-hidden rounded-xl bg-gray-100 mb-3">
-                                {product.imageUrl ? (
-                                    <Image
+                        <div
+                            key={product.id}
+                            className="bg-white rounded-xl shadow-md p-4 flex justify-between items-center hover:shadow-lg transition text-right"
+                        >
+                            <div>
+                                <h3 className="font-semibold text-gray-800">{product.name}</h3>
+                                <p className="text-gray-600">£{product.price.toFixed(2)} | المخزون: {product.stockQuantity}</p>
+                                {product.imageUrl && (
+                                    <img
                                         src={product.imageUrl}
                                         alt={product.name}
-                                        fill
-                                        className="object-cover"
+                                        className="w-16 h-16 object-cover rounded-lg mt-2"
                                     />
-                                ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-4xl text-gray-300 bg-gray-50">
-                                        📦
-                                    </div>
                                 )}
                             </div>
-                            <div className="flex justify-between items-start">
-                                <div>
-                                    <h3 className="font-semibold text-gray-800 text-lg">{product.name}</h3>
-                                    <p className="text-sm text-gray-500 line-clamp-2">{product.description}</p>
-                                    <p className="text-[#0F5C45] font-bold mt-2">£{product.price.toFixed(2)}</p>
-                                    <p className="text-xs text-gray-400">المخزون: {product.stockQuantity}</p>
-                                </div>
-                                <span className={`text-xs px-2 py-1 rounded-full ${product.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                                    {product.isActive ? 'نشط' : 'غير نشط'}
-                                </span>
+                            <div className="flex flex-col gap-2">
+                                <Link
+                                    href={`/vendor/products/edit/${product.id}`}
+                                    className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                                >
+                                    تعديل
+                                </Link>
+                                <button
+                                    onClick={async () => {
+                                        if (confirm('هل أنت متأكد من حذف هذا المنتج؟')) {
+                                            try {
+                                                await api.delete(`/api/Products/${product.id}`);
+                                                setProducts(products.filter((p) => p.id !== product.id));
+                                                alert('✅ تم حذف المنتج بنجاح!');
+                                            } catch (error) {
+                                                console.error('Delete failed:', error);
+                                                alert('❌ فشل الحذف. حاول مرة أخرى.');
+                                            }
+                                        }
+                                    }}
+                                    className="text-red-600 hover:text-red-800 text-sm font-medium"
+                                >
+                                    حذف
+                                </button>
                             </div>
                         </div>
                     ))}
