@@ -1,6 +1,5 @@
 {
   "framework": "nextjs",
-  "rootDirectory": "marketplace-frontend",
   "buildCommand": "cd marketplace-frontend && npm run build",
   "outputDirectory": "marketplace-frontend/.next",
   "installCommand": "cd marketplace-frontend && npm install"
