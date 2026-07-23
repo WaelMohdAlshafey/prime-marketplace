@@ -10,7 +10,7 @@ public class ProductDto
     public decimal Price { get; set; }
     public int StockQuantity { get; set; }
     public string? ImageUrl { get; set; }
-    public string? VendorName { get; set; } // NEW
+    public string? VendorName { get; set; }
 }
 
 public class ProductCreateDto
@@ -45,5 +45,9 @@ public class ProductUpdateDto
     [Range(0, int.MaxValue)]
     public int StockQuantity { get; set; }
     public bool IsActive { get; set; } = true;
+
+    // ============================================================
+    // هذه الخاصية الجديدة: تحتفظ بالصورة القديمة إذا لم يرفع المستخدم صورة جديدة
+    // ============================================================
     public string? ExistingImageUrl { get; set; }
 }

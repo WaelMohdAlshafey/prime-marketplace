@@ -6,4 +6,5 @@ public interface IAuthService
 {
     Task<AuthResponseDto> RegisterAsync(RegisterDto registerDto);
     Task<AuthResponseDto> LoginAsync(LoginDto loginDto);
+    Task<AuthResponseDto> CreateVendorAsync(RegisterDto registerDto); // <-- ADD THIS
 }

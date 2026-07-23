@@ -2,6 +2,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Marketplace.Application.DTOs;
 
+// ============================================================
+// REGISTER DTO
+// ============================================================
 public class RegisterDto
 {
     [Required(ErrorMessage = "Username is required.")]
@@ -16,6 +19,9 @@ public class RegisterDto
     public string Password { get; set; } = string.Empty;
 }
 
+// ============================================================
+// LOGIN DTO
+// ============================================================
 public class LoginDto
 {
     [Required(ErrorMessage = "Email is required.")]
@@ -25,10 +31,14 @@ public class LoginDto
     public string Password { get; set; } = string.Empty;
 }
 
+// ============================================================
+// AUTH RESPONSE DTO
+// ============================================================
 public class AuthResponseDto
 {
     public int UserId { get; set; }
     public string Username { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
+    public string Role { get; set; } = string.Empty; // <-- NEW: User role (Admin, Vendor, Customer)
     public string Token { get; set; } = string.Empty;
 }

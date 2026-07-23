@@ -1,8 +1,7 @@
 ﻿'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState } from 'react'; // <-- ADD THIS
 import { useAuth } from '@/context/AuthContext';
 import Logo from './Logo';
 import {
@@ -12,17 +11,8 @@ import {
     MagnifyingGlassIcon,
     GlobeAltIcon,
     CurrencyDollarIcon,
-    ClipboardDocumentListIcon,   // ✅ For Orders
-    ChartBarIcon,               // ✅ For Dashboard
 } from '@heroicons/react/24/outline';
 import { AuthResponse } from '@/types';
-
-// ============================================================
-// TYPES
-// ============================================================
-interface MainHeaderProps {
-    user: AuthResponse | null;
-}
 
 // ============================================================
 // TOP BAR – Arabic
@@ -53,16 +43,13 @@ const TopBar = () => (
 // ============================================================
 // MAIN HEADER (with functional search)
 // ============================================================
-const MainHeader = ({ user }: MainHeaderProps) => {
-    const router = useRouter();
+const MainHeader = ({ user }: { user: AuthResponse | null }) => {
     const [searchTerm, setSearchTerm] = useState('');
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
         if (searchTerm.trim()) {
-            router.push(`/?q=${encodeURIComponent(searchTerm.trim())}`);
-        } else {
-            router.push('/');
+            window.location.href = `/?q=${encodeURIComponent(searchTerm.trim())}`;
         }
     };
 
@@ -166,37 +153,46 @@ const NavMenu = () => (
 );
 
 // ============================================================
-// SECONDARY NAVBAR (Logged-in user only) – with REAL ICONS
+// SECONDARY NAVBAR – Role‑Based Links
 // ============================================================
-const UserNav = ({ user, logout }: { user: AuthResponse; logout: () => void }) => (
-    <div className="bg-[#0F5C45] text-white text-sm py-2">
-        <div className="container mx-auto px-4 flex justify-between items-center">
-            <div className="flex items-center gap-6">
-                {/* 🛍️ Cart – real icon */}
-                <Link href="/cart" className="hover:text-yellow-300 transition flex items-center gap-2">
-                    <ShoppingCartIcon className="w-4 h-4" /> سلتي
-                </Link>
-                {/* 📋 Orders – real icon */}
-                <Link href="/orders" className="hover:text-yellow-300 transition flex items-center gap-2">
-                    <ClipboardDocumentListIcon className="w-4 h-4" /> طلباتي
-                </Link>
-                {/* 📊 Dashboard – real icon */}
-                <Link href="/vendor/dashboard" className="hover:text-yellow-300 transition flex items-center gap-2">
-                    <ChartBarIcon className="w-4 h-4" /> لوحة التحكم
-                </Link>
-            </div>
-            <div className="flex items-center gap-4">
-                <span className="text-xs text-white/70">مرحباً، {user.username}</span>
-                <button
-                    onClick={logout}
-                    className="text-xs bg-white/10 px-3 py-1 rounded-full hover:bg-white/20 transition"
-                >
-                    تسجيل الخروج
-                </button>
+const UserNav = ({ user, logout }: { user: AuthResponse; logout: () => void }) => {
+    const isVendor = user.role === 'Vendor' || user.role === 'Admin';
+    const isAdmin = user.role === 'Admin';
+
+    return (
+        <div className="bg-[#0F5C45] text-white text-sm py-2">
+            <div className="container mx-auto px-4 flex justify-between items-center">
+                <div className="flex items-center gap-6">
+                    <Link href="/cart" className="hover:text-yellow-300 transition flex items-center gap-2">
+                        <ShoppingCartIcon className="w-4 h-4" /> سلتي
+                    </Link>
+                    <Link href="/orders" className="hover:text-yellow-300 transition flex items-center gap-2">
+                        <span>📋 طلباتي</span>
+                    </Link>
+                    {isVendor && (
+                        <Link href="/vendor/dashboard" className="hover:text-yellow-300 transition flex items-center gap-2">
+                            <span>📊 لوحة التحكم</span>
+                        </Link>
+                    )}
+                    {isAdmin && (
+                        <Link href="/admin" className="hover:text-yellow-300 transition flex items-center gap-2">
+                            <span>⚙️ الإدارة</span>
+                        </Link>
+                    )}
+                </div>
+                <div className="flex items-center gap-4">
+                    <span className="text-xs text-white/70">مرحباً، {user.username}</span>
+                    <button
+                        onClick={logout}
+                        className="text-xs bg-white/10 px-3 py-1 rounded-full hover:bg-white/20 transition"
+                    >
+                        تسجيل الخروج
+                    </button>
+                </div>
             </div>
         </div>
-    </div>
-);
+    );
+};
 
 // ============================================================
 // MAIN NAVBAR EXPORT

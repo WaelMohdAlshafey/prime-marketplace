@@ -72,7 +72,8 @@ if (!string.IsNullOrEmpty(connectionString) && connectionString.Contains("Host="
 {
     // PostgreSQL (Render)
     builder.Services.AddDbContext<AppDbContext>(options =>
-        options.UseNpgsql(connectionString));
+        options.UseNpgsql(connectionString,
+            npgsqlOptions => npgsqlOptions.EnableRetryOnFailure()));
     Console.WriteLine("✅ Using PostgreSQL Database");
 }
 else
@@ -126,30 +127,32 @@ if (!app.Environment.IsProduction())
 }
 
 app.UseCors("AllowAll");
+
+// ============================================================
+// SERVE STATIC FILES (IMAGES) – REQUIRED FOR UPLOADED PRODUCT IMAGES
+// ============================================================
+app.UseStaticFiles(); // <-- ADDED THIS LINE
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
 // ============================================================
-// DATABASE INITIALIZATION: FORCE RECREATE WITH CORRECT SCHEMA
+// AUTO-MIGRATION: Creates/Updates the database on startup
 // ============================================================
 try
 {
     using (var scope = app.Services.CreateScope())
     {
         var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-
-        // ============================================================
-        // IMPORTANT: This deletes and recreates the database with the correct schema
-        // ============================================================
-        dbContext.Database.EnsureDeleted();  // Drops the database if it exists
-        dbContext.Database.EnsureCreated();  // Creates it with the correct schema from your models
-        Console.WriteLine("✅ Database recreated with the correct schema (EnsureCreated).");
+        dbContext.Database.Migrate();
+        Console.WriteLine("✅ Database migrations applied successfully.");
     }
 }
 catch (Exception ex)
 {
-    Console.WriteLine($"❌ Database initialization failed: {ex.Message}");
+    Console.WriteLine($"❌ Database migration failed: {ex.Message}");
+    Console.WriteLine($"Inner exception: {ex.InnerException?.Message}");
     Console.WriteLine($"Stack Trace: {ex.StackTrace}");
 }
 

@@ -60,7 +60,7 @@ public class ProductService : IProductService
         page = Math.Max(1, page);
         pageSize = Math.Max(1, pageSize);
 
-        // Use LEFT JOIN to include products even if vendor is missing
+        // LEFT JOIN to include products even if vendor is missing
         var query = from p in _context.Products
                     join u in _context.Users on p.VendorId equals u.Id into vendorGroup
                     from u in vendorGroup.DefaultIfEmpty()
@@ -252,7 +252,7 @@ public class ProductService : IProductService
     }
 
     // ============================================================
-    // NEW: GET PRODUCTS BY CATEGORY
+    // NEW: GET PRODUCTS BY CATEGORY (DYNAMIC VENDOR LOOKUP)
     // ============================================================
     public async Task<PagedResult<ProductDto>> GetProductsByCategoryAsync(string categoryName, int page, int pageSize)
     {
@@ -266,28 +266,29 @@ public class ProductService : IProductService
         page = Math.Max(1, page);
         pageSize = Math.Max(1, pageSize);
 
-        // Map Arabic category names to Vendor IDs
-        var vendorIdMap = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
+        // 1. Map category slug to vendor username
+        var vendorNameMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
-            { "software", 1 },
-            { "برامج", 1 },
-            { "hair-care", 2 },
-            { "العناية بالشعر", 2 },
-            { "skin-care", 2 },
-            { "العناية بالبشرة", 2 },
-            { "fashion", 3 },
-            { "أزياء", 3 },
-            { "accessories", 3 },
-            { "إكسسوارات", 3 },
-            { "electronics", 4 },
-            { "إلكترونيات", 4 },
-            { "supplements", 2 },
-            { "مكملات غذائية", 2 },
-            { "home", 5 },
-            { "المنزل", 5 }
+            { "software", "متجر البرمجيات" },
+            { "برامج", "متجر البرمجيات" },
+            { "hair-care", "متجر التجميل" },
+            { "العناية بالشعر", "متجر التجميل" },
+            { "skin-care", "متجر التجميل" },
+            { "العناية بالبشرة", "متجر التجميل" },
+            { "fashion", "متجر الأزياء" },
+            { "أزياء", "متجر الأزياء" },
+            { "accessories", "متجر الأزياء" },
+            { "إكسسوارات", "متجر الأزياء" },
+            { "electronics", "متجر الإلكترونيات" },
+            { "إلكترونيات", "متجر الإلكترونيات" },
+            { "supplements", "متجر التجميل" },
+            { "مكملات غذائية", "متجر التجميل" },
+            { "home", "متجر المنزل" },
+            { "المنزل", "متجر المنزل" }
         };
 
-        if (!vendorIdMap.TryGetValue(categoryName, out int vendorId))
+        // 2. Find the vendor username
+        if (!vendorNameMap.TryGetValue(categoryName, out string? vendorUsername))
         {
             return new PagedResult<ProductDto>
             {
@@ -298,11 +299,24 @@ public class ProductService : IProductService
             };
         }
 
+        // 3. Get the actual VendorId from the database
+        var vendor = await _context.Users.FirstOrDefaultAsync(u => u.Username == vendorUsername);
+        if (vendor == null)
+        {
+            return new PagedResult<ProductDto>
+            {
+                Items = new List<ProductDto>(),
+                TotalCount = 0,
+                PageNumber = page,
+                PageSize = pageSize
+            };
+        }
+
+        // 4. Query products for that vendor
         var query = from p in _context.Products
-                    join u in _context.Users on p.VendorId equals u.Id into vendorGroup
-                    from u in vendorGroup.DefaultIfEmpty()
-                    where p.IsActive && p.VendorId == vendorId
-                    select new { p, VendorName = u != null ? u.Username : "بائع" };
+                    join u in _context.Users on p.VendorId equals u.Id
+                    where p.IsActive && p.VendorId == vendor.Id
+                    select new { p, VendorName = u.Username };
 
         var totalCount = await query.CountAsync();
 

@@ -84,7 +84,7 @@ public class ProductsController : ControllerBase
     }
 
     // ============================================================
-    // VENDOR ENDPOINTS (Authentication required)
+    // VENDOR / ADMIN ENDPOINTS (Authentication required)
     // ============================================================
 
     // POST: api/products (with image upload)
@@ -149,7 +149,9 @@ public class ProductsController : ControllerBase
         return Ok(result);
     }
 
-    // PUT: api/products/5 (with optional image upload)
+    // ============================================================
+    // PUT: api/products/5 (with image update)
+    // ============================================================
     [HttpPut("{id}")]
     [Authorize]
     public async Task<IActionResult> Update(int id, [FromForm] ProductUpdateDto productDto, IFormFile? image)
@@ -189,7 +191,7 @@ public class ProductsController : ControllerBase
             CostPrice = productDto.CostPrice,
             StockQuantity = productDto.StockQuantity,
             IsActive = productDto.IsActive,
-            ImageUrl = newImageUrl ?? productDto.ExistingImageUrl
+            ImageUrl = newImageUrl ?? productDto.ExistingImageUrl // keep old if no new image
         };
 
         try
