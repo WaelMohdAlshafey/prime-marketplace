@@ -2,10 +2,14 @@
 import HomeContent from './HomeContent';
 
 // ============================================================
-// Force dynamic rendering to avoid prerender issues
+// FORCE DYNAMIC RENDERING - This prevents prerender errors
+// with useSearchParams on Vercel
 // ============================================================
 export const dynamic = 'force-dynamic';
 
+// ============================================================
+// Server Component that receives searchParams as a prop
+// ============================================================
 export default function HomePage({
     searchParams,
 }: {
