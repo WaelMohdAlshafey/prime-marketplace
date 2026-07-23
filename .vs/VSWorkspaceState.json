@@ -1,7 +1,11 @@
 {
   "ExpandedNodes": [
     "",
-    "\\marketplace-frontend"
+    "\\marketplace-frontend",
+    "\\marketplace-frontend\\src",
+    "\\marketplace-frontend\\src\\components",
+    "\\marketplace-frontend\\src\\components\\Filters"
   ],
+  "SelectedNode": "\\marketplace-frontend\\src\\components\\Filters\\FilterSidebar.tsx",
   "PreviewInSolutionExplorer": false
 }

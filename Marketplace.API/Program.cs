@@ -8,30 +8,38 @@ using Marketplace.Application.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// ============================================================
+// 1. Add Controllers
+// ============================================================
 builder.Services.AddControllers();
 
 // ============================================================
-// CORS (Allows React/Next.js frontend to call the API)
+// 2. Add CORS (Allows Next.js frontend on Vercel and local)
 // ============================================================
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll",
-        policy => policy.AllowAnyOrigin()
-                        .AllowAnyMethod()
-                        .AllowAnyHeader());
+        policy => policy.WithOrigins(
+            "https://prime-marketplace.vercel.app",
+            "http://localhost:3000",
+            "http://localhost:8080"
+        )
+        .AllowAnyMethod()
+        .AllowAnyHeader()
+        .AllowCredentials());
 });
 
+// ============================================================
+// 3. Add Memory Cache
+// ============================================================
 builder.Services.AddMemoryCache();
+
+// ============================================================
+// 4. Add Swagger/OpenAPI (with JWT support)
+// ============================================================
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
-    {
-        Title = "Prime Marketplace API",
-        Version = "v1",
-        Description = "Prime Marketplace Backend API"
-    });
     c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
     {
         In = Microsoft.OpenApi.Models.ParameterLocation.Header,
@@ -57,35 +65,34 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// Register Services
+// ============================================================
+// 5. Register Application Services
+// ============================================================
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 
 // ============================================================
-// DATABASE: AUTO-DETECT SQLite or PostgreSQL
+// 6. Database Context (SQLite or PostgreSQL)
 // ============================================================
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-Console.WriteLine($"📌 Raw Connection String: '{connectionString}'");
-
-if (!string.IsNullOrEmpty(connectionString) && connectionString.Contains("Host="))
+builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    // PostgreSQL (Render)
-    builder.Services.AddDbContext<AppDbContext>(options =>
-        options.UseNpgsql(connectionString,
-            npgsqlOptions => npgsqlOptions.EnableRetryOnFailure()));
-    Console.WriteLine("✅ Using PostgreSQL Database");
-}
-else
-{
-    // SQLite (Local)
-    var sqliteConnection = connectionString ?? "Data Source=Marketplace.db";
-    builder.Services.AddDbContext<AppDbContext>(options =>
-        options.UseSqlite(sqliteConnection));
-    Console.WriteLine("✅ Using SQLite Database (Local)");
-}
+    // Use SQLite if no environment variable is set, else use PostgreSQL
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    if (builder.Environment.IsDevelopment() && connectionString?.Contains("Data Source") == true)
+    {
+        options.UseSqlite(connectionString);
+    }
+    else
+    {
+        // For production (Render), we assume PostgreSQL
+        options.UseNpgsql(connectionString);
+    }
+});
 
-// JWT Authentication
+// ============================================================
+// 7. JWT Authentication
+// ============================================================
 var key = Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Key"] ?? "ThisIsASuperSecretKeyWithAtLeast32CharactersLongForJWT!");
 builder.Services.AddAuthentication(options =>
 {
@@ -106,58 +113,69 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+// ============================================================
+// 8. Build the App
+// ============================================================
 var app = builder.Build();
 
 // ============================================================
-// SWAGGER: ENABLED FOR ALL ENVIRONMENTS
+// 9. Development Middleware (Swagger)
 // ============================================================
-app.UseSwagger();
-app.UseSwaggerUI(c =>
+if (app.Environment.IsDevelopment())
 {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Prime Marketplace API V1");
-    c.RoutePrefix = "swagger";
-});
-
-// ============================================================
-// DISABLE HTTPS REDIRECTION ON PRODUCTION (Render)
-// ============================================================
-if (!app.Environment.IsProduction())
-{
-    app.UseHttpsRedirection();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
+// ============================================================
+// 10. Security & Routing
+// ============================================================
+app.UseHttpsRedirection();
+
+// ============================================================
+// 11. Enable CORS (MUST be placed between UseHttpsRedirection and UseAuthentication)
+// ============================================================
 app.UseCors("AllowAll");
 
 // ============================================================
-// SERVE STATIC FILES (IMAGES) – REQUIRED FOR UPLOADED PRODUCT IMAGES
+// 12. Authentication & Authorization
 // ============================================================
-app.UseStaticFiles(); // <-- ADDED THIS LINE
-
 app.UseAuthentication();
 app.UseAuthorization();
+
+// ============================================================
+// 13. Map Controllers
+// ============================================================
 app.MapControllers();
 
 // ============================================================
-// AUTO-MIGRATION: Creates/Updates the database on startup
+// 14. Database Initialisation – FIXED (EnsureCreated, not Migrate)
 // ============================================================
-try
+using (var scope = app.Services.CreateScope())
 {
-    using (var scope = app.Services.CreateScope())
+    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    try
     {
-        var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        dbContext.Database.Migrate();
-        Console.WriteLine("✅ Database migrations applied successfully.");
+        // This checks if the database exists and creates it if missing.
+        // If tables already exist, it does nothing – safe to run every time.
+        var created = dbContext.Database.EnsureCreated();
+        if (created)
+        {
+            Console.WriteLine("✅ Database created successfully.");
+        }
+        else
+        {
+            Console.WriteLine("✅ Database already exists. Skipping migrations.");
+        }
     }
-}
-catch (Exception ex)
-{
-    Console.WriteLine($"❌ Database migration failed: {ex.Message}");
-    Console.WriteLine($"Inner exception: {ex.InnerException?.Message}");
-    Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+    catch (Exception ex)
+    {
+        Console.WriteLine($"❌ Database initialisation error: {ex.Message}");
+        throw;
+    }
 }
 
 // ============================================================
-// BIND TO PORT PROVIDED BY RENDER
+// 15. Run the App
 // ============================================================
-var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
-app.Run($"http://0.0.0.0:{port}");
+app.Run();
