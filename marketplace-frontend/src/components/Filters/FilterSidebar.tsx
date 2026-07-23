@@ -15,10 +15,15 @@ interface FilterSidebarProps {
 }
 
 // ============================================================
-// STARS RENDER HELPER
+// STARS RENDER HELPER (Clear filled vs empty)
 // ============================================================
 const renderStars = (count: number) => {
-    return '★'.repeat(count) + '☆'.repeat(5 - count);
+    return (
+        <>
+            <span className="text-amber-400">{'★'.repeat(count)}</span>
+            <span className="text-gray-300">{'★'.repeat(5 - count)}</span>
+        </>
+    );
 };
 
 export default function FilterSidebar({
@@ -107,7 +112,7 @@ export default function FilterSidebar({
             </div>
 
             {/* ============================================================
-          RATING FILTER (With proper stars)
+          RATING FILTER (No "وأعلى" text, clear stars)
           ============================================================ */}
             <div className="border-b border-gray-200 py-4">
                 <button
@@ -129,8 +134,9 @@ export default function FilterSidebar({
                                 key={stars}
                                 className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 cursor-pointer justify-end"
                             >
-                                <span className="text-amber-400">{renderStars(stars)}</span>
-                                <span className="text-xs text-gray-400">وأعلى</span>
+                                {/* Stars: filled = gold, empty = light gray */}
+                                <span className="text-amber-400">{'★'.repeat(stars)}</span>
+                                <span className="text-gray-300">{'★'.repeat(5 - stars)}</span>
                                 <input
                                     type="radio"
                                     name="rating"
