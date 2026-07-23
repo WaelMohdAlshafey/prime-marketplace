@@ -1,16 +1,9 @@
-﻿// ============================================================
-// FORCE DYNAMIC RENDERING - Prevents prerender errors
-// ============================================================
-export const dynamic = 'force-dynamic';
-
+﻿import { connection } from 'next/server';
 import HomeContent from './HomeContent';
 
-export default function HomePage({
-    searchParams,
-}: {
-    searchParams: { q?: string };
-}) {
-    const query = searchParams?.q || '';
+export default async function HomePage() {
+    // This tells Next.js to skip prerendering and wait for the actual request
+    await connection();
 
-    return <HomeContent initialQuery={query} />;
+    return <HomeContent initialQuery="" />;
 }

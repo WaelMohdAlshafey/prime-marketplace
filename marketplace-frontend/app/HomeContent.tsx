@@ -34,9 +34,6 @@ export default function HomeContent({ initialQuery }: HomeContentProps) {
         }
     };
 
-    // ============================================================
-    // Fetch products when the query changes (ESLint warning suppressed)
-    // ============================================================
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchProducts(query);
