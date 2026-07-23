@@ -18,10 +18,6 @@ public class ProductService : IProductService
         _cache = cache;
     }
 
-    // ============================================================
-    // PRIVATE HELPERS
-    // ============================================================
-
     private static ProductDto MapToDto(Product product, string? vendorName = null)
     {
         return new ProductDto
@@ -32,7 +28,8 @@ public class ProductService : IProductService
             Price = product.Price,
             StockQuantity = product.StockQuantity,
             ImageUrl = product.ImageUrl,
-            VendorName = vendorName ?? "بائع"
+            VendorName = vendorName ?? "بائع",
+            Rating = product.Rating // NEW: Include rating
         };
     }
 
@@ -45,9 +42,8 @@ public class ProductService : IProductService
     }
 
     // ============================================================
-    // PUBLIC ENDPOINTS (No authentication required)
+    // GET PRODUCTS
     // ============================================================
-
     public async Task<PagedResult<ProductDto>> GetProductsAsync(int page, int pageSize)
     {
         string cacheKey = $"Products_Page_{page}_Size_{pageSize}";
@@ -60,7 +56,6 @@ public class ProductService : IProductService
         page = Math.Max(1, page);
         pageSize = Math.Max(1, pageSize);
 
-        // LEFT JOIN to include products even if vendor is missing
         var query = from p in _context.Products
                     join u in _context.Users on p.VendorId equals u.Id into vendorGroup
                     from u in vendorGroup.DefaultIfEmpty()
@@ -81,7 +76,8 @@ public class ProductService : IProductService
                 Price = x.p.Price,
                 StockQuantity = x.p.StockQuantity,
                 ImageUrl = x.p.ImageUrl,
-                VendorName = x.VendorName
+                VendorName = x.VendorName,
+                Rating = x.p.Rating // NEW
             })
             .ToListAsync();
 
@@ -97,6 +93,9 @@ public class ProductService : IProductService
         return result;
     }
 
+    // ============================================================
+    // SEARCH PRODUCTS
+    // ============================================================
     public async Task<PagedResult<ProductDto>> SearchProductsAsync(string searchTerm, int page, int pageSize)
     {
         string cacheKey = $"Search_{searchTerm?.ToLower() ?? "all"}_Page_{page}_Size_{pageSize}";
@@ -137,7 +136,8 @@ public class ProductService : IProductService
                 Price = x.p.Price,
                 StockQuantity = x.p.StockQuantity,
                 ImageUrl = x.p.ImageUrl,
-                VendorName = x.VendorName
+                VendorName = x.VendorName,
+                Rating = x.p.Rating // NEW
             })
             .ToListAsync();
 
@@ -153,16 +153,20 @@ public class ProductService : IProductService
         return result;
     }
 
+    // ============================================================
+    // FILTER PRODUCTS (WITH RATING)
+    // ============================================================
     public async Task<PagedResult<ProductDto>> GetProductsFilteredAsync(
         string? searchTerm,
         decimal? minPrice,
         decimal? maxPrice,
         int? vendorId,
         bool? inStock,
+        double? rating, // NEW: Rating filter
         int page,
         int pageSize)
     {
-        string cacheKey = $"Filter_{searchTerm ?? "all"}_{minPrice}_{maxPrice}_{vendorId}_{inStock}_P{page}_S{pageSize}";
+        string cacheKey = $"Filter_{searchTerm ?? "all"}_{minPrice}_{maxPrice}_{vendorId}_{inStock}_{rating}_P{page}_S{pageSize}";
 
         if (_cache.TryGetValue(cacheKey, out PagedResult<ProductDto>? cachedResult) && cachedResult != null)
         {
@@ -198,6 +202,14 @@ public class ProductService : IProductService
         if (inStock.HasValue && inStock.Value)
             query = query.Where(x => x.p.StockQuantity > 0);
 
+        // ============================================================
+        // NEW: Apply rating filter
+        // ============================================================
+        if (rating.HasValue && rating.Value > 0)
+        {
+            query = query.Where(x => x.p.Rating >= rating.Value);
+        }
+
         var totalCount = await query.CountAsync();
 
         var products = await query
@@ -212,7 +224,8 @@ public class ProductService : IProductService
                 Price = x.p.Price,
                 StockQuantity = x.p.StockQuantity,
                 ImageUrl = x.p.ImageUrl,
-                VendorName = x.VendorName
+                VendorName = x.VendorName,
+                Rating = x.p.Rating // NEW
             })
             .ToListAsync();
 
@@ -228,6 +241,9 @@ public class ProductService : IProductService
         return result;
     }
 
+    // ============================================================
+    // GET PRODUCT BY ID
+    // ============================================================
     public async Task<ProductDto> GetProductByIdAsync(int id)
     {
         var product = await (from p in _context.Products
@@ -242,7 +258,8 @@ public class ProductService : IProductService
                                  Price = p.Price,
                                  StockQuantity = p.StockQuantity,
                                  ImageUrl = p.ImageUrl,
-                                 VendorName = u != null ? u.Username : "بائع"
+                                 VendorName = u != null ? u.Username : "بائع",
+                                 Rating = p.Rating // NEW
                              }).FirstOrDefaultAsync();
 
         if (product == null)
@@ -252,7 +269,7 @@ public class ProductService : IProductService
     }
 
     // ============================================================
-    // NEW: GET PRODUCTS BY CATEGORY (DYNAMIC VENDOR LOOKUP)
+    // GET PRODUCTS BY CATEGORY
     // ============================================================
     public async Task<PagedResult<ProductDto>> GetProductsByCategoryAsync(string categoryName, int page, int pageSize)
     {
@@ -266,7 +283,6 @@ public class ProductService : IProductService
         page = Math.Max(1, page);
         pageSize = Math.Max(1, pageSize);
 
-        // 1. Map category slug to vendor username
         var vendorNameMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
             { "software", "متجر البرمجيات" },
@@ -287,7 +303,6 @@ public class ProductService : IProductService
             { "المنزل", "متجر المنزل" }
         };
 
-        // 2. Find the vendor username
         if (!vendorNameMap.TryGetValue(categoryName, out string? vendorUsername))
         {
             return new PagedResult<ProductDto>
@@ -299,7 +314,6 @@ public class ProductService : IProductService
             };
         }
 
-        // 3. Get the actual VendorId from the database
         var vendor = await _context.Users.FirstOrDefaultAsync(u => u.Username == vendorUsername);
         if (vendor == null)
         {
@@ -312,7 +326,6 @@ public class ProductService : IProductService
             };
         }
 
-        // 4. Query products for that vendor
         var query = from p in _context.Products
                     join u in _context.Users on p.VendorId equals u.Id
                     where p.IsActive && p.VendorId == vendor.Id
@@ -332,7 +345,8 @@ public class ProductService : IProductService
                 Price = x.p.Price,
                 StockQuantity = x.p.StockQuantity,
                 ImageUrl = x.p.ImageUrl,
-                VendorName = x.VendorName
+                VendorName = x.VendorName,
+                Rating = x.p.Rating // NEW
             })
             .ToListAsync();
 
@@ -349,9 +363,8 @@ public class ProductService : IProductService
     }
 
     // ============================================================
-    // VENDOR ENDPOINTS (Authentication required)
+    // VENDOR PRODUCTS
     // ============================================================
-
     public async Task<PagedResult<ProductDto>> GetVendorProductsAsync(int vendorId, int page, int pageSize)
     {
         string cacheKey = $"Vendor_{vendorId}_Products_Page_{page}_Size_{pageSize}";
@@ -384,7 +397,8 @@ public class ProductService : IProductService
                 Price = x.p.Price,
                 StockQuantity = x.p.StockQuantity,
                 ImageUrl = x.p.ImageUrl,
-                VendorName = x.VendorName
+                VendorName = x.VendorName,
+                Rating = x.p.Rating // NEW
             })
             .ToListAsync();
 
@@ -400,6 +414,9 @@ public class ProductService : IProductService
         return result;
     }
 
+    // ============================================================
+    // CREATE, UPDATE, DELETE
+    // ============================================================
     public async Task<ProductDto> CreateProductAsync(Product product, int vendorId)
     {
         product.VendorId = vendorId;
@@ -429,6 +446,7 @@ public class ProductService : IProductService
         existing.CostPrice = product.CostPrice;
         existing.StockQuantity = product.StockQuantity;
         existing.IsActive = product.IsActive;
+        existing.Rating = product.Rating; // NEW: Allow updating rating (admin only)
 
         if (!string.IsNullOrEmpty(product.ImageUrl))
             existing.ImageUrl = product.ImageUrl;

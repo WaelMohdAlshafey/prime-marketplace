@@ -10,7 +10,7 @@ export interface Product {
     stockQuantity: number;
     imageUrl?: string;
     vendorName?: string;
-    rating?: number;
+    rating?: number; // ⭐ Average rating (1-5 stars)
     reviews?: number;
     discount?: number;
     isActive: boolean;
@@ -78,7 +78,7 @@ export interface AuthResponse {
     username: string;
     email: string;
     token: string;
-    role: string; // <-- ADD THIS
+    role: string; // "Admin" | "Vendor" | "Customer" | "Employee"
 }
 
 export interface LoginRequest {
@@ -149,7 +149,7 @@ export interface WishlistItem {
 }
 
 // ============================================================
-// REVIEW / RATING TYPES
+// REVIEW / RATING TYPES (for future full review system)
 // ============================================================
 export interface Review {
     id: number;

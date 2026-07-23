@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
 
 interface FilterSidebarProps {
-    vendorId?: number; // Current vendor ID (for the category)
+    vendorId?: number;
     onApplyFilters: (filters: {
         minPrice?: number;
         maxPrice?: number;
@@ -14,8 +14,14 @@ interface FilterSidebarProps {
     onResetFilters: () => void;
 }
 
+// ============================================================
+// STARS RENDER HELPER
+// ============================================================
+const renderStars = (count: number) => {
+    return '★'.repeat(count) + '☆'.repeat(5 - count);
+};
+
 export default function FilterSidebar({
-    vendorId,
     onApplyFilters,
     onResetFilters,
 }: FilterSidebarProps) {
@@ -100,7 +106,9 @@ export default function FilterSidebar({
                 )}
             </div>
 
-            {/* Rating */}
+            {/* ============================================================
+          RATING FILTER (With proper stars)
+          ============================================================ */}
             <div className="border-b border-gray-200 py-4">
                 <button
                     onClick={() => toggleSection('التقييم')}
@@ -116,12 +124,13 @@ export default function FilterSidebar({
 
                 {openSections.has('التقييم') && (
                     <div className="mt-3 space-y-2">
-                        {[4, 3, 2, 1].map((stars) => (
+                        {[5, 4, 3, 2, 1].map((stars) => (
                             <label
                                 key={stars}
                                 className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 cursor-pointer justify-end"
                             >
-                                <span className="text-amber-400">{'★'.repeat(stars)}{'☆'.repeat(5 - stars)}</span>
+                                <span className="text-amber-400">{renderStars(stars)}</span>
+                                <span className="text-xs text-gray-400">وأعلى</span>
                                 <input
                                     type="radio"
                                     name="rating"

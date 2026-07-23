@@ -23,7 +23,7 @@ interface ProductCardProps {
 }
 
 // ============================================================
-// CATEGORY-BASED FALLBACK IMAGE MAPPING (Local images)
+// ARABIC PRODUCT IMAGE MAPPING
 // ============================================================
 const getProductImage = (name: string): string => {
     const lower = name.toLowerCase();
@@ -32,43 +32,45 @@ const getProductImage = (name: string): string => {
         return '/images/products/headphones.jpg';
     if (lower.includes('لابتوب') || lower.includes('laptop') || lower.includes('برمجيات') || lower.includes('برمجة'))
         return '/images/products/laptop.jpg';
-    if (lower.includes('كتاب') || lower.includes('book') || lower.includes('clean code') || lower.includes('pragmatic') || lower.includes('روا'))
+    if (lower.includes('كتاب') || lower.includes('book') || lower.includes('clean code') || lower.includes('pragmatic'))
         return '/images/products/book.jpg';
-    if (lower.includes('تي شيرت') || lower.includes('tshirt') || lower.includes('fashion') || lower.includes('قطني') || lower.includes('قميص') || lower.includes('فستان'))
+    if (lower.includes('تي شيرت') || lower.includes('tshirt') || lower.includes('fashion') || lower.includes('قطني'))
         return '/images/products/tshirt.jpg';
-    if (lower.includes('شعر') || lower.includes('hair') || lower.includes('شامبو') || lower.includes('بلسم') || lower.includes('زيت'))
+    if (lower.includes('شعر') || lower.includes('hair') || lower.includes('شامبو'))
         return '/images/products/haircare.jpg';
-    if (lower.includes('بشرة') || lower.includes('skin') || lower.includes('كريم') || lower.includes('ترطيب') || lower.includes('غسول') || lower.includes('مصل'))
+    if (lower.includes('بشرة') || lower.includes('skin') || lower.includes('كريم') || lower.includes('ترطيب'))
         return '/images/products/skincare.jpg';
-    if (lower.includes('ساعة') || lower.includes('watch') || lower.includes('اكسسوارات') || lower.includes('كلاسيكية') || lower.includes('خاتم') || lower.includes('قلادة'))
+    if (lower.includes('ساعة') || lower.includes('watch') || lower.includes('اكسسوارات') || lower.includes('كلاسيكية'))
         return '/images/products/watch.jpg';
-    if (lower.includes('حذاء') || lower.includes('shoe') || lower.includes('sneaker') || lower.includes('صندل') || lower.includes('جزمة'))
+    if (lower.includes('حذاء') || lower.includes('shoe') || lower.includes('sneaker'))
         return '/images/products/shoes.jpg';
-    if (lower.includes('مكمل') || lower.includes('supplement') || lower.includes('فيتامين') || lower.includes('vitamin') || lower.includes('بروتين'))
+    if (lower.includes('مكمل') || lower.includes('supplement') || lower.includes('فيتامين') || lower.includes('vitamin'))
         return '/images/products/supplements.jpg';
-    if (lower.includes('أواني') || lower.includes('منزل') || lower.includes('مطبخ') || lower.includes('طقم') || lower.includes('غلاية') || lower.includes('خلاط'))
+    if (lower.includes('أواني') || lower.includes('منزل') || lower.includes('مطبخ') || lower.includes('طقم'))
         return '/images/products/home.jpg';
-
     return '/images/placeholder.jpg';
 };
 
 // ============================================================
-// MAIN COMPONENT
+// STARS RENDER HELPER
 // ============================================================
+const renderStars = (rating: number | undefined) => {
+    if (!rating) return <span className="text-gray-400 text-sm">لا توجد تقييمات</span>;
+    const fullStars = Math.round(rating);
+    const emptyStars = 5 - fullStars;
+    return (
+        <span className="text-amber-400">
+            {'★'.repeat(fullStars)}
+            {'☆'.repeat(emptyStars)}
+        </span>
+    );
+};
+
 export default function ProductCard({ product }: ProductCardProps) {
-    const { user } = useAuth();
     const [isWishlist, setIsWishlist] = useState(false);
     const [isAdding, setIsAdding] = useState(false);
-
-    // ============================================================
-    // SMART IMAGE SOURCE: Database first, then fallback
-    // ============================================================
-    const fallbackImage = getProductImage(product.name);
-    const [imgSrc, setImgSrc] = useState<string>(
-        product.imageUrl && product.imageUrl.trim() !== ''
-            ? product.imageUrl
-            : fallbackImage
-    );
+    const { user } = useAuth();
+    const [imgSrc, setImgSrc] = useState(getProductImage(product.name));
 
     const discountPrice = product.discount ? product.price * (1 - product.discount / 100) : null;
 
@@ -93,16 +95,13 @@ export default function ProductCard({ product }: ProductCardProps) {
         }
     };
 
-    // Fallback handler if the primary image fails
     const handleImageError = () => {
-        setImgSrc(fallbackImage);
+        setImgSrc('/images/placeholder.jpg');
     };
 
     return (
         <div className="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden hover:-translate-y-1 border border-gray-50">
-            {/* ============================================================
-           PRODUCT IMAGE
-           ============================================================ */}
+            {/* Image */}
             <div className="relative aspect-square overflow-hidden bg-gray-50">
                 <Image
                     src={imgSrc}
@@ -114,62 +113,52 @@ export default function ProductCard({ product }: ProductCardProps) {
                     onError={handleImageError}
                 />
 
-                {/* Discount Badge */}
                 {product.discount && product.discount > 0 && (
                     <span className="absolute top-3 right-3 bg-gradient-to-r from-red-500 to-red-600 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-md z-10">
                         -{product.discount}%
                     </span>
                 )}
 
-                {/* Wishlist Button */}
                 <button
-                    onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setIsWishlist(!isWishlist);
-                    }}
+                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); setIsWishlist(!isWishlist); }}
                     className="absolute top-3 left-3 bg-white p-2 rounded-full shadow-md hover:shadow-lg transition z-10"
                     aria-label="إضافة إلى المفضلة"
                 >
                     <Heart
-                        className={`w-5 h-5 transition ${isWishlist ? 'fill-red-500 text-red-500' : 'text-gray-600'
-                            }`}
+                        className={`w-5 h-5 transition ${isWishlist ? 'fill-red-500 text-red-500' : 'text-gray-600'}`}
                         strokeWidth={isWishlist ? 0 : 2}
                     />
                 </button>
             </div>
 
-            {/* ============================================================
-           PRODUCT DETAILS
-           ============================================================ */}
+            {/* Content */}
             <div className="p-4 text-right">
                 {/* Vendor Badge */}
                 <span className="text-xs text-[#0F5C45] bg-[#0F5C45]/10 px-2 py-0.5 rounded-full inline-block mb-2 font-medium">
                     {product.vendorName || 'متجر Prime'}
                 </span>
 
-                {/* Product Name */}
                 <Link href={`/products/${product.id}`}>
                     <h3 className="font-semibold text-gray-800 text-base hover:text-[#0F5C45] transition line-clamp-1">
                         {product.name}
                     </h3>
                 </Link>
 
-                {/* Description */}
                 <p className="text-sm text-gray-500 line-clamp-2 mt-1">
                     {product.description}
                 </p>
 
-                {/* Rating */}
-                {product.rating && (
-                    <div className="flex items-center justify-end gap-1 mt-2 text-sm">
-                        <span className="text-amber-400">★★★★★</span>
+                {/* ============================================================
+             RATING DISPLAY (Stars)
+             ============================================================ */}
+                <div className="flex items-center justify-end gap-1 mt-2 text-sm">
+                    <span className="text-amber-400">{renderStars(product.rating)}</span>
+                    {product.rating && (
                         <span className="font-semibold text-gray-700 mr-1">
                             {product.rating.toFixed(1)}
                         </span>
-                        <span className="text-gray-400">({product.reviews || 0})</span>
-                    </div>
-                )}
+                    )}
+                </div>
 
                 {/* Price */}
                 <div className="mt-3 flex items-center justify-end gap-2">
