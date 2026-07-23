@@ -15,7 +15,7 @@ interface FilterSidebarProps {
 }
 
 // ============================================================
-// STARS RENDER HELPER (Clear filled vs empty)
+// STARS RENDER HELPER (Filled = gold, empty = light gray)
 // ============================================================
 const renderStars = (count: number) => {
     return (
@@ -70,7 +70,9 @@ export default function FilterSidebar({
         <aside className="bg-white rounded-2xl shadow-sm p-6 sticky top-24 h-fit text-right">
             <h2 className="text-xl font-bold text-gray-900 mb-4">🧹 الفلاتر</h2>
 
-            {/* Price Range */}
+            {/* ============================================================
+          PRICE RANGE – Allows numbers with up to 5+ digits
+          ============================================================ */}
             <div className="border-b border-gray-200 py-4">
                 <button
                     onClick={() => toggleSection('نطاق السعر')}
@@ -94,6 +96,8 @@ export default function FilterSidebar({
                                 onChange={(e) =>
                                     setMinPrice(e.target.value ? Number(e.target.value) : undefined)
                                 }
+                                min="0"
+                                step="1"
                                 className="w-1/2 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#0F5C45] focus:border-transparent"
                             />
                             <span className="text-gray-400">—</span>
@@ -104,6 +108,8 @@ export default function FilterSidebar({
                                 onChange={(e) =>
                                     setMaxPrice(e.target.value ? Number(e.target.value) : undefined)
                                 }
+                                min="0"
+                                step="1"
                                 className="w-1/2 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#0F5C45] focus:border-transparent"
                             />
                         </div>
@@ -112,7 +118,7 @@ export default function FilterSidebar({
             </div>
 
             {/* ============================================================
-          RATING FILTER (No "وأعلى" text, clear stars)
+          RATING FILTER – Clear stars, no extra text
           ============================================================ */}
             <div className="border-b border-gray-200 py-4">
                 <button
@@ -134,7 +140,6 @@ export default function FilterSidebar({
                                 key={stars}
                                 className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 cursor-pointer justify-end"
                             >
-                                {/* Stars: filled = gold, empty = light gray */}
                                 <span className="text-amber-400">{'★'.repeat(stars)}</span>
                                 <span className="text-gray-300">{'★'.repeat(5 - stars)}</span>
                                 <input
@@ -162,7 +167,9 @@ export default function FilterSidebar({
                 )}
             </div>
 
-            {/* Availability */}
+            {/* ============================================================
+          AVAILABILITY
+          ============================================================ */}
             <div className="border-b border-gray-200 py-4">
                 <button
                     onClick={() => toggleSection('التوفر')}
@@ -191,7 +198,9 @@ export default function FilterSidebar({
                 )}
             </div>
 
-            {/* Action Buttons */}
+            {/* ============================================================
+          ACTION BUTTONS
+          ============================================================ */}
             <div className="mt-6 flex flex-col gap-3">
                 <button
                     onClick={handleApply}
