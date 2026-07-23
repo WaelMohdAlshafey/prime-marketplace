@@ -77,7 +77,7 @@ export interface AuthResponse {
     userId: number;
     username: string;
     email: string;
-    role: string; // <-- ADD THIS
+    role: string; // <-- ADDED: User role (Admin, Vendor, Customer)
     token: string;
 }
 
@@ -162,7 +162,7 @@ export interface Review {
 }
 
 // ============================================================
-// PAYMENT TYPES
+// PAYMENT TYPES (for future Stripe integration)
 // ============================================================
 export interface PaymentIntent {
     id: string;
