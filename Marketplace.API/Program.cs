@@ -14,19 +14,14 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 // ============================================================
-// 2. Add CORS (Allows Next.js frontend on Vercel and local)
+// 2. Add CORS – Allow ANY origin (for all Vercel deployments)
 // ============================================================
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll",
-        policy => policy.WithOrigins(
-            "https://prime-marketplace.vercel.app",
-            "http://localhost:3000",
-            "http://localhost:8080"
-        )
-        .AllowAnyMethod()
-        .AllowAnyHeader()
-        .AllowCredentials());
+        policy => policy.AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader());
 });
 
 // ============================================================
@@ -73,11 +68,10 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 
 // ============================================================
-// 6. Database Context (SQLite or PostgreSQL)
+// 6. Database Context (SQLite locally, PostgreSQL on Render)
 // ============================================================
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    // Use SQLite if no environment variable is set, else use PostgreSQL
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
     if (builder.Environment.IsDevelopment() && connectionString?.Contains("Data Source") == true)
     {
@@ -85,7 +79,6 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     }
     else
     {
-        // For production (Render), we assume PostgreSQL
         options.UseNpgsql(connectionString);
     }
 });
@@ -149,15 +142,13 @@ app.UseAuthorization();
 app.MapControllers();
 
 // ============================================================
-// 14. Database Initialisation – FIXED (EnsureCreated, not Migrate)
+// 14. Database Initialisation – EnsureCreated (safe for existing DB)
 // ============================================================
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     try
     {
-        // This checks if the database exists and creates it if missing.
-        // If tables already exist, it does nothing – safe to run every time.
         var created = dbContext.Database.EnsureCreated();
         if (created)
         {
