@@ -1,7 +1,10 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\marketplace-frontend",
+    "\\marketplace-frontend\\app",
+    "\\marketplace-frontend\\app\\admin\\users"
   ],
-  "SelectedNode": "\\Marketplace.API\\Program.cs",
+  "SelectedNode": "\\marketplace-frontend\\app\\page.tsx",
   "PreviewInSolutionExplorer": false
 }

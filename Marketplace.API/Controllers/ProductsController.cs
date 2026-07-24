@@ -19,7 +19,7 @@ public class ProductsController : ControllerBase
     }
 
     // ============================================================
-    // PUBLIC ENDPOINTS
+    // PUBLIC ENDPOINTS (No authentication required)
     // ============================================================
 
     [HttpGet]
@@ -63,9 +63,6 @@ public class ProductsController : ControllerBase
         return Ok(result);
     }
 
-    // ============================================================
-    // FILTER WITH RATING
-    // ============================================================
     [HttpGet("filter")]
     public async Task<IActionResult> GetFiltered(
         [FromQuery] string? q,
@@ -73,7 +70,7 @@ public class ProductsController : ControllerBase
         [FromQuery] decimal? maxPrice,
         [FromQuery] int? vendorId,
         [FromQuery] bool? inStock,
-        [FromQuery] double? rating, // NEW: Rating filter
+        [FromQuery] double? rating,
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 20)
     {
@@ -83,9 +80,25 @@ public class ProductsController : ControllerBase
     }
 
     // ============================================================
-    // VENDOR / ADMIN ENDPOINTS
+    // VENDOR / ADMIN ENDPOINTS (Authentication + Role required)
     // ============================================================
 
+    // GET: api/products/vendors/products
+    // ONLY returns products belonging to the logged-in vendor
+    [HttpGet("vendors/products")]
+    [Authorize(Roles = "Vendor,Admin")]
+    public async Task<IActionResult> GetMyProducts([FromQuery] int page = 1, [FromQuery] int pageSize = 20)
+    {
+        var vendorIdClaim = User.FindFirst("VendorId") ?? User.FindFirst(ClaimTypes.NameIdentifier);
+        if (vendorIdClaim == null)
+            return Unauthorized();
+
+        var vendorId = int.Parse(vendorIdClaim.Value);
+        var result = await _productService.GetVendorProductsAsync(vendorId, page, pageSize);
+        return Ok(result);
+    }
+
+    // POST: api/products
     [HttpPost]
     [Authorize(Roles = "Vendor,Admin")]
     public async Task<IActionResult> Create([FromForm] ProductCreateDto productDto, IFormFile? image)
@@ -126,26 +139,14 @@ public class ProductsController : ControllerBase
             IsActive = true,
             CreatedAt = DateTime.UtcNow,
             ImageUrl = imageUrl,
-            Rating = null // NEW: Rating starts as null (no reviews yet)
+            Rating = null
         };
 
         var createdProduct = await _productService.CreateProductAsync(product, vendorId);
         return CreatedAtAction(nameof(GetAll), new { id = createdProduct.Id }, createdProduct);
     }
 
-    [HttpGet("vendors/products")]
-    [Authorize(Roles = "Vendor,Admin")]
-    public async Task<IActionResult> GetMyProducts([FromQuery] int page = 1, [FromQuery] int pageSize = 20)
-    {
-        var vendorIdClaim = User.FindFirst("VendorId") ?? User.FindFirst(ClaimTypes.NameIdentifier);
-        if (vendorIdClaim == null)
-            return Unauthorized();
-
-        var vendorId = int.Parse(vendorIdClaim.Value);
-        var result = await _productService.GetVendorProductsAsync(vendorId, page, pageSize);
-        return Ok(result);
-    }
-
+    // PUT: api/products/5
     [HttpPut("{id}")]
     [Authorize(Roles = "Vendor,Admin")]
     public async Task<IActionResult> Update(int id, [FromForm] ProductUpdateDto productDto, IFormFile? image)
@@ -185,7 +186,7 @@ public class ProductsController : ControllerBase
             StockQuantity = productDto.StockQuantity,
             IsActive = productDto.IsActive,
             ImageUrl = newImageUrl ?? productDto.ExistingImageUrl,
-            Rating = null // Keep existing rating; we don't update it here
+            Rating = null // Keep existing rating
         };
 
         try
@@ -199,6 +200,7 @@ public class ProductsController : ControllerBase
         }
     }
 
+    // DELETE: api/products/5
     [HttpDelete("{id}")]
     [Authorize(Roles = "Vendor,Admin")]
     public async Task<IActionResult> Delete(int id)

@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import Link from 'next/link';
-import { useState } from 'react'; // <-- ADD THIS
+import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import Logo from './Logo';
 import {
@@ -153,7 +153,7 @@ const NavMenu = () => (
 );
 
 // ============================================================
-// SECONDARY NAVBAR – Role‑Based Links
+// SECONDARY NAVBAR – Dynamically changes based on user role
 // ============================================================
 const UserNav = ({ user, logout }: { user: AuthResponse; logout: () => void }) => {
     const isVendor = user.role === 'Vendor' || user.role === 'Admin';
@@ -163,21 +163,31 @@ const UserNav = ({ user, logout }: { user: AuthResponse; logout: () => void }) =
         <div className="bg-[#0F5C45] text-white text-sm py-2">
             <div className="container mx-auto px-4 flex justify-between items-center">
                 <div className="flex items-center gap-6">
+                    {/* Always visible */}
                     <Link href="/cart" className="hover:text-yellow-300 transition flex items-center gap-2">
                         <ShoppingCartIcon className="w-4 h-4" /> سلتي
                     </Link>
                     <Link href="/orders" className="hover:text-yellow-300 transition flex items-center gap-2">
                         <span>📋 طلباتي</span>
                     </Link>
+
+                    {/* Only for Vendors & Admins */}
                     {isVendor && (
                         <Link href="/vendor/dashboard" className="hover:text-yellow-300 transition flex items-center gap-2">
                             <span>📊 لوحة التحكم</span>
                         </Link>
                     )}
+
+                    {/* Only for Admins */}
                     {isAdmin && (
-                        <Link href="/admin" className="hover:text-yellow-300 transition flex items-center gap-2">
-                            <span>⚙️ الإدارة</span>
-                        </Link>
+                        <>
+                            <Link href="/admin/users" className="hover:text-yellow-300 transition flex items-center gap-2">
+                                <span>👥 المستخدمين</span>
+                            </Link>
+                            <Link href="/admin" className="hover:text-yellow-300 transition flex items-center gap-2">
+                                <span>⚙️ الإدارة</span>
+                            </Link>
+                        </>
                     )}
                 </div>
                 <div className="flex items-center gap-4">

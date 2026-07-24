@@ -18,25 +18,26 @@ public class StoreSettingService : IStoreSettingService
 
     public async Task<StoreSettingDto> GetSettingsAsync()
     {
+        // Get the first settings record, or create a default one if none exists
         var settings = await _context.StoreSettings.FirstOrDefaultAsync();
+
         if (settings == null)
         {
-            // Create default settings if none exist
-            settings = new StoreSetting
+            // Return default settings if none exist in DB
+            return new StoreSettingDto
             {
                 StoreName = "Prime",
                 Address = "123 Prime Street, Business District, Cairo, Egypt",
                 Location = "Downtown, near City Mall",
-                OwnersJson = JsonSerializer.Serialize(new[] { new { name = "Ahmed Mohamed" }, new { name = "Sara Khaled" } }),
-                MobileNumbersJson = JsonSerializer.Serialize(new[] { "+20 100 123 4567", "+20 101 234 5678" }),
-                EmailsJson = JsonSerializer.Serialize(new[] { "support@primemarket.com", "info@primemarket.com" }),
+                Owners = new List<OwnerDto> { new OwnerDto { Name = "Ahmed Mohamed" }, new OwnerDto { Name = "Sara Khaled" } },
+                MobileNumbers = new List<string> { "+20 100 123 4567", "+20 101 234 5678" },
+                Emails = new List<string> { "support@primemarket.com", "info@primemarket.com" },
                 Landline = "+20 2 345 6789",
                 WhatsApp = "+20 100 123 4567"
             };
-            _context.StoreSettings.Add(settings);
-            await _context.SaveChangesAsync();
         }
 
+        // Map Entity to DTO
         return new StoreSettingDto
         {
             Id = settings.Id,
@@ -54,12 +55,15 @@ public class StoreSettingService : IStoreSettingService
     public async Task<StoreSettingDto> UpdateSettingsAsync(StoreSettingDto dto)
     {
         var settings = await _context.StoreSettings.FirstOrDefaultAsync();
+
         if (settings == null)
         {
+            // If no settings exist, create a new one
             settings = new StoreSetting();
             _context.StoreSettings.Add(settings);
         }
 
+        // Update fields
         settings.StoreName = dto.StoreName;
         settings.Address = dto.Address;
         settings.Location = dto.Location;

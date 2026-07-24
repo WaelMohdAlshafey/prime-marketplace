@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import api from '@/lib/api';
+import HeroBanner from '@/components/HeroBanner';
+import CategoryGrid from '@/components/CategoryGrid';
 
 // ============================================================
-// ADDED: Image mapping function (copied from ProductCard.tsx)
+// Image mapping function (copied from ProductCard.tsx)
 // ============================================================
 const getProductImage = (name: string): string => {
     const lower = name.toLowerCase();
@@ -90,53 +92,69 @@ export default function Home() {
         );
     }
 
-    if (products.length === 0) {
-        return (
-            <div className="flex justify-center items-center min-h-screen">
-                <div className="text-center text-gray-600">
-                    <p className="text-xl">📦 لا توجد منتجات حالياً.</p>
-                </div>
-            </div>
-        );
-    }
-
     return (
-        <div className="container mx-auto px-4 py-8">
-            <h1 className="text-3xl font-bold text-gray-900 text-center mb-8">🛍️ منتجاتنا</h1>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {products.map((product) => (
-                    <div
-                        key={product.id}
-                        className="bg-white rounded-2xl shadow-md hover:shadow-xl transition p-4 text-right border border-gray-50"
-                    >
-                        <div className="w-full h-40 bg-gray-100 rounded-xl overflow-hidden mb-3">
-                            {(() => {
-                                // Use the image mapping function if imageUrl is null
-                                const imgSrc = product.imageUrl || getProductImage(product.name);
-                                return (
-                                    <img
-                                        src={imgSrc}
-                                        alt={product.name}
-                                        className="w-full h-full object-cover"
-                                        onError={(e) => {
-                                            // Fallback to placeholder if the image fails to load
-                                            (e.target as HTMLImageElement).src = '/images/placeholder.jpg';
-                                        }}
-                                    />
-                                );
-                            })()}
-                        </div>
-                        <h3 className="font-semibold text-gray-800">{product.name}</h3>
-                        <p className="text-sm text-gray-500 line-clamp-2">{product.description}</p>
-                        <p className="text-xl font-bold text-[#0F5C45] mt-2">£{product.price}</p>
-                        {product.vendorName && (
-                            <p className="text-xs text-[#0F5C45] bg-[#0F5C45]/10 px-2 py-0.5 rounded-full inline-block mt-1">
-                                {product.vendorName}
-                            </p>
-                        )}
+        <div className="bg-[#F8F9FA]">
+            {/* ============================================================
+                HERO BANNER
+                ============================================================ */}
+            <HeroBanner />
+
+            {/* ============================================================
+                CATEGORY GRID
+                ============================================================ */}
+            <CategoryGrid />
+
+            {/* ============================================================
+                PRODUCT LIST (منتجات مميزة)
+                ============================================================ */}
+            <section className="container mx-auto px-4 py-12">
+                <div className="flex justify-between items-center mb-6">
+                    <div className="text-right">
+                        <h2 className="text-3xl font-bold text-gray-900">🛍️ منتجات مميزة</h2>
+                        <p className="text-sm text-gray-500 mt-1">منتجات مختارة خصيصاً لك</p>
                     </div>
-                ))}
-            </div>
+                    <span className="text-sm text-gray-500">{products.length} منتج</span>
+                </div>
+
+                {products.length === 0 ? (
+                    <div className="text-center py-20 bg-white rounded-2xl shadow-sm">
+                        <p className="text-gray-500">لا توجد منتجات حالياً.</p>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        {products.map((product) => (
+                            <div
+                                key={product.id}
+                                className="bg-white rounded-2xl shadow-md hover:shadow-xl transition p-4 text-right border border-gray-50"
+                            >
+                                <div className="w-full h-40 bg-gray-100 rounded-xl overflow-hidden mb-3">
+                                    {(() => {
+                                        const imgSrc = product.imageUrl || getProductImage(product.name);
+                                        return (
+                                            <img
+                                                src={imgSrc}
+                                                alt={product.name}
+                                                className="w-full h-full object-cover"
+                                                onError={(e) => {
+                                                    (e.target as HTMLImageElement).src = '/images/placeholder.jpg';
+                                                }}
+                                            />
+                                        );
+                                    })()}
+                                </div>
+                                <h3 className="font-semibold text-gray-800">{product.name}</h3>
+                                <p className="text-sm text-gray-500 line-clamp-2">{product.description}</p>
+                                <p className="text-xl font-bold text-[#0F5C45] mt-2">£{product.price}</p>
+                                {product.vendorName && (
+                                    <p className="text-xs text-[#0F5C45] bg-[#0F5C45]/10 px-2 py-0.5 rounded-full inline-block mt-1">
+                                        {product.vendorName}
+                                    </p>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </section>
         </div>
     );
 }

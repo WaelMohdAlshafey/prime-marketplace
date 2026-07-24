@@ -14,7 +14,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 // ============================================================
-// 2. Add CORS – Allow ANY origin (for all Vercel deployments)
+// 2. Add CORS – Allow Any Origin (For Vercel and local testing)
 // ============================================================
 builder.Services.AddCors(options =>
 {
@@ -61,11 +61,12 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 // ============================================================
-// 5. Register Application Services
+// 5. Register Application Services (Dependency Injection)
 // ============================================================
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IStoreSettingService, StoreSettingService>(); // <-- ADDED THIS
 
 // ============================================================
 // 6. Database Context (SQLite locally, PostgreSQL on Render)
