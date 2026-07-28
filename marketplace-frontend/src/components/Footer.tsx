@@ -2,9 +2,12 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Heart, Mail, Phone, MapPin } from 'lucide-react';
+import { Heart } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function Footer() {
+    const { t } = useTranslation('common');
+
     return (
         <footer className="bg-gradient-to-b from-gray-900 to-gray-950 text-white mt-16 relative overflow-hidden">
             {/* Background pattern */}
@@ -23,7 +26,7 @@ export default function Footer() {
                             <span className="text-xl font-bold text-white">Prime</span>
                         </div>
                         <p className="text-gray-400 text-sm leading-relaxed">
-                            منصة تسوق فاخرة تقدم أفضل المنتجات من برامج، تجميل، أزياء، وإكسسوارات.
+                            {t('footer.companyDescription')}
                         </p>
                         <div className="flex gap-3 mt-4 justify-end">
                             <span className="text-gray-500">❤️</span>
@@ -34,26 +37,26 @@ export default function Footer() {
 
                     {/* Quick Links */}
                     <div>
-                        <h4 className="font-semibold mb-4 text-white text-lg">روابط سريعة</h4>
+                        <h4 className="font-semibold mb-4 text-white text-lg">{t('footer.quickLinks')}</h4>
                         <ul className="space-y-2 text-gray-400 text-sm">
                             <li>
                                 <Link href="/" className="hover:text-[#D4A54A] transition duration-300 hover:translate-x-1 inline-block">
-                                    الرئيسية
+                                    {t('footer.home')}
                                 </Link>
                             </li>
                             <li>
                                 <Link href="/" className="hover:text-[#D4A54A] transition duration-300 hover:translate-x-1 inline-block">
-                                    المنتجات
+                                    {t('footer.products')}
                                 </Link>
                             </li>
                             <li>
                                 <Link href="/stores" className="hover:text-[#D4A54A] transition duration-300 hover:translate-x-1 inline-block">
-                                    المتاجر
+                                    {t('footer.stores')}
                                 </Link>
                             </li>
                             <li>
                                 <Link href="/offers" className="hover:text-[#D4A54A] transition duration-300 hover:translate-x-1 inline-block">
-                                    العروض
+                                    {t('footer.offers')}
                                 </Link>
                             </li>
                         </ul>
@@ -61,26 +64,26 @@ export default function Footer() {
 
                     {/* Customer Service */}
                     <div>
-                        <h4 className="font-semibold mb-4 text-white text-lg">خدمة العملاء</h4>
+                        <h4 className="font-semibold mb-4 text-white text-lg">{t('footer.customerService')}</h4>
                         <ul className="space-y-2 text-gray-400 text-sm">
                             <li>
                                 <Link href="/contact" className="hover:text-[#D4A54A] transition duration-300 hover:translate-x-1 inline-block">
-                                    اتصل بنا
+                                    {t('footer.contact')}
                                 </Link>
                             </li>
                             <li>
                                 <Link href="/faq" className="hover:text-[#D4A54A] transition duration-300 hover:translate-x-1 inline-block">
-                                    الأسئلة الشائعة
+                                    {t('footer.faq')}
                                 </Link>
                             </li>
                             <li>
                                 <Link href="/returns" className="hover:text-[#D4A54A] transition duration-300 hover:translate-x-1 inline-block">
-                                    سياسة الإرجاع
+                                    {t('footer.returns')}
                                 </Link>
                             </li>
                             <li>
                                 <Link href="/shipping" className="hover:text-[#D4A54A] transition duration-300 hover:translate-x-1 inline-block">
-                                    الشحن والتوصيل
+                                    {t('footer.shipping')}
                                 </Link>
                             </li>
                         </ul>
@@ -88,27 +91,27 @@ export default function Footer() {
 
                     {/* Newsletter */}
                     <div>
-                        <h4 className="font-semibold mb-4 text-white text-lg">النشرة البريدية</h4>
+                        <h4 className="font-semibold mb-4 text-white text-lg">{t('footer.newsletter')}</h4>
                         <p className="text-gray-400 text-sm mb-3">
-                            اشترك لتحصل على أحدث العروض والمنتجات.
+                            {t('footer.newsletterDescription')}
                         </p>
                         <div className="flex flex-row-reverse">
                             <input
                                 type="email"
-                                placeholder="بريدك الإلكتروني"
+                                placeholder={t('footer.emailPlaceholder') || 'Your email'}
                                 className="flex-1 px-3 py-2 rounded-l-none rounded-r-lg bg-gray-800/50 border border-gray-700 text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#0F5C45] focus:border-transparent"
                             />
                             <button className="bg-gradient-to-r from-[#0F5C45] to-[#1A7A5C] px-4 py-2 rounded-l-lg rounded-r-none text-sm font-medium hover:shadow-lg hover:shadow-[#0F5C45]/20 transition-all duration-300 hover:scale-105">
-                                اشتراك
+                                {t('footer.subscribe')}
                             </button>
                         </div>
                     </div>
                 </div>
 
                 <div className="border-t border-gray-800 mt-8 pt-6 text-center text-gray-500 text-xs">
-                    <p>© 2024 Prime. جميع الحقوق محفوظة.</p>
+                    <p>{t('footer.copyright')}</p>
                     <p className="mt-1 flex items-center justify-center gap-1">
-                        Made with <Heart className="w-3 h-3 text-red-500 fill-red-500 animate-pulse" /> by Prime Team
+                        {t('footer.madeWith')} <Heart className="w-3 h-3 text-red-500 fill-red-500 animate-pulse" /> by Prime Team
                     </p>
                 </div>
             </div>

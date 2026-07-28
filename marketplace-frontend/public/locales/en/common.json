@@ -27,16 +27,63 @@
   "supplements": "Supplements",
   "homeCategory": "Home",
 
-  "heroTitle": "Discover the Joy of Shopping at Prime",
-  "heroSubtitle": "Your #1 Destination for Authentic Products",
-  "heroDescription": "From software and tech to beauty, fashion, and electronics. Everything you need in one place, with competitive prices and fast shipping to all governorates.",
-  "heroCta": "Shop Now",
-  "heroBadge": "🛍️ Your #1 Shopping Destination",
-
-  "featuredProducts": "Featured Products",
+  "featuredProducts": "🛍️ Featured Products",
   "featuredProductsSub": "Handpicked just for you",
   "noProducts": "No products available.",
   "productCount": "products",
+
+  "hero": {
+    "prev": "Previous",
+    "next": "Next",
+    "slide1": {
+      "title": "Discover the Joy of Shopping at Prime",
+      "subtitle": "Your #1 Destination for Authentic Products",
+      "description": "From software and tech to beauty, fashion, and electronics. Everything you need in one place, with competitive prices and fast shipping to all governorates.",
+      "cta": "Shop Now",
+      "badge": "🛍️ Your #1 Shopping Destination"
+    },
+    "slide2": {
+      "title": "Latest Software & Tech Apps",
+      "subtitle": "2025 Releases at Special Prices",
+      "description": "Get development tools, graphic design software, cybersecurity solutions, and AI. Original licenses with continuous technical support.",
+      "cta": "Explore Software",
+      "badge": "💻 Cutting-Edge Tech"
+    },
+    "slide3": {
+      "title": "Luxury Beauty & Care",
+      "subtitle": "Natural Products for Your Skin and Hair",
+      "description": "Organic shampoo, moisturizing creams for sensitive skin, authentic Moroccan oils. Products certified by top global brands, suitable for all skin types.",
+      "cta": "Shop Beauty",
+      "badge": "✨ Premium Care"
+    },
+    "slide4": {
+      "title": "Latest Fashion Trends",
+      "subtitle": "Clothing & Accessories for Every Taste",
+      "description": "A distinctive collection of cotton clothing, sports shoes, classic watches, and jewelry. We cater to all occasions with the best quality and unbeatable prices.",
+      "cta": "Shop Fashion",
+      "badge": "👗 Modern Style"
+    }
+  },
+
+  "footer": {
+    "companyDescription": "A premium marketplace offering the best products in software, beauty, fashion, and accessories.",
+    "quickLinks": "Quick Links",
+    "home": "Home",
+    "products": "Products",
+    "stores": "Stores",
+    "offers": "Offers",
+    "customerService": "Customer Service",
+    "contact": "Contact Us",
+    "faq": "FAQ",
+    "returns": "Return Policy",
+    "shipping": "Shipping & Delivery",
+    "newsletter": "Newsletter",
+    "newsletterDescription": "Subscribe to get the latest offers and products.",
+    "emailPlaceholder": "Your email",
+    "subscribe": "Subscribe",
+    "copyright": "© 2024 Prime. All rights reserved.",
+    "madeWith": "Made with"
+  },
 
   "aboutTitle": "🏢 About {storeName}",
   "aboutOwners": "👤 Owners",
