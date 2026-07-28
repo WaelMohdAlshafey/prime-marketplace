@@ -13,6 +13,8 @@ public class AppDbContext : DbContext
     public DbSet<Order> Orders { get; set; }
     public DbSet<OrderItem> OrderItems { get; set; }
     public DbSet<StoreSetting> StoreSettings { get; set; }
+    public DbSet<WishlistItem> WishlistItems { get; set; } // NEW
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -38,7 +40,7 @@ public class AppDbContext : DbContext
             .HasOne(ci => ci.Product)
             .WithMany()
             .HasForeignKey(ci => ci.ProductId)
-            .OnDelete(DeleteBehavior.Restrict); // Prevent deleting a product that is in a cart
+            .OnDelete(DeleteBehavior.Restrict);
 
         // Order configurations
         modelBuilder.Entity<Order>()
@@ -51,5 +53,24 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<OrderItem>()
             .Property(oi => oi.UnitPrice)
             .HasPrecision(18, 2);
+
+        // ============================================================
+        // WISHLIST CONFIGURATIONS (NEW)
+        // ============================================================
+        modelBuilder.Entity<WishlistItem>()
+            .HasIndex(wi => new { wi.UserId, wi.ProductId })
+            .IsUnique();
+
+        modelBuilder.Entity<WishlistItem>()
+            .HasOne(wi => wi.Product)
+            .WithMany()
+            .HasForeignKey(wi => wi.ProductId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<WishlistItem>()
+            .HasOne(wi => wi.User)
+            .WithMany()
+            .HasForeignKey(wi => wi.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

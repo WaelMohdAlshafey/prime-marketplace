@@ -1,7 +1,11 @@
 ﻿import type { Metadata } from 'next';
 import { Cairo, Inter } from 'next/font/google';
 import './globals.css';
+import { I18nProvider } from '@/providers/I18nProvider';
 import { AuthProvider } from '@/context/AuthContext';
+import { CartProvider } from '@/context/CartContext';
+import { WishlistProvider } from '@/context/WishlistContext';
+import { CartIconRefProvider } from '@/context/CartIconRefContext'; // <-- NEW
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
@@ -17,8 +21,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-    title: 'Prime | سوق برايم ',
-    description: 'أفضل سوق للتسوق عبر الإنترنت - منتجات فاخرة، برامج، تجميل، أزياء',
+    title: 'Prime | Premium Marketplace',
+    description: 'The best marketplace for premium products.',
 };
 
 export default function RootLayout({
@@ -29,11 +33,19 @@ export default function RootLayout({
     return (
         <html lang="ar" dir="rtl" className={`${cairo.variable} ${inter.variable}`}>
             <body className={cairo.className}>
-                <AuthProvider>
-                    <Navbar />
-                    <main className="min-h-screen bg-[#F8F9FA]">{children}</main>
-                    <Footer />
-                </AuthProvider>
+                <I18nProvider>
+                    <AuthProvider>
+                        <CartProvider>
+                            <WishlistProvider>
+                                <CartIconRefProvider>   {/* ← ADD THIS */}
+                                    <Navbar />
+                                    <main className="min-h-screen bg-[#F8F9FA]">{children}</main>
+                                    <Footer />
+                                </CartIconRefProvider>
+                            </WishlistProvider>
+                        </CartProvider>
+                    </AuthProvider>
+                </I18nProvider>
             </body>
         </html>
     );

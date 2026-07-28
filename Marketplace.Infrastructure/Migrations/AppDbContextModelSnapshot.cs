@@ -53,6 +53,9 @@ namespace Marketplace.Infrastructure.Migrations
                     b.Property<string>("CardLastFour")
                         .HasColumnType("TEXT");
 
+                    b.Property<DateTime?>("DeliveredAt")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("DeliveryInstructions")
                         .HasColumnType("TEXT");
 
@@ -77,7 +80,13 @@ namespace Marketplace.Infrastructure.Migrations
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("TEXT");
 
+                    b.Property<DateTime?>("ShippedAt")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("ShippingAddress")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ShippingCarrier")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Status")
@@ -86,6 +95,9 @@ namespace Marketplace.Infrastructure.Migrations
 
                     b.Property<decimal>("TotalAmount")
                         .HasPrecision(18, 2)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("TrackingNumber")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("UserId")
@@ -252,6 +264,28 @@ namespace Marketplace.Infrastructure.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("Marketplace.Domain.Entities.WishlistItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("UserId", "ProductId")
+                        .IsUnique();
+
+                    b.ToTable("WishlistItems");
+                });
+
             modelBuilder.Entity("Marketplace.Domain.Entities.CartItem", b =>
                 {
                     b.HasOne("Marketplace.Domain.Entities.Product", "Product")
@@ -272,6 +306,25 @@ namespace Marketplace.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Order");
+                });
+
+            modelBuilder.Entity("Marketplace.Domain.Entities.WishlistItem", b =>
+                {
+                    b.HasOne("Marketplace.Domain.Entities.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Marketplace.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.Order", b =>

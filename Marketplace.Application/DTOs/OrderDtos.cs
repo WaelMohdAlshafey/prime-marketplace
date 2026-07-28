@@ -21,6 +21,11 @@ public class CreateOrderDto
     public string? PhoneNumber { get; set; }
     public string? PayPalEmail { get; set; }
     public string? DeliveryInstructions { get; set; }
+    public string? TrackingNumber { get; set; }
+    public string? ShippingCarrier { get; set; }
+    public DateTime? ShippedAt { get; set; }
+    public DateTime? DeliveredAt { get; set; }
+
 }
 
 // ============================================================

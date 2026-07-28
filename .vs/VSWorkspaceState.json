@@ -2,9 +2,9 @@
   "ExpandedNodes": [
     "",
     "\\marketplace-frontend",
-    "\\marketplace-frontend\\app",
-    "\\marketplace-frontend\\app\\admin\\users"
+    "\\marketplace-frontend\\src",
+    "\\marketplace-frontend\\src\\components"
   ],
-  "SelectedNode": "\\marketplace-frontend\\app\\page.tsx",
+  "SelectedNode": "\\marketplace-frontend\\src\\components\\Navbar.tsx",
   "PreviewInSolutionExplorer": false
 }

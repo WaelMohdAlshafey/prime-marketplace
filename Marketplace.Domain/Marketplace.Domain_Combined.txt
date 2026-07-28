@@ -1,0 +1,403 @@
+// ===== Class1.cs =====
+namespace Marketplace.Domain;
+
+public class Class1
+{
+
+}
+
+
+// ===== Marketplace.Domain.csproj =====
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+	</PropertyGroup>
+
+</Project>
+
+// ===== Marketplace.Domain.deps.json =====
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v8.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v8.0": {
+      "Marketplace.Domain/1.0.0": {
+        "runtime": {
+          "Marketplace.Domain.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Marketplace.Domain/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
+
+// ===== CartItem.cs =====
+namespace Marketplace.Domain.Entities;
+
+public class CartItem
+{
+    public int Id { get; set; }
+    public int UserId { get; set; }        // The buyer (VendorId from token)
+    public int ProductId { get; set; }
+    public int Quantity { get; set; }
+    public DateTime AddedAt { get; set; } = DateTime.UtcNow;
+
+    // Navigation property
+    public virtual Product? Product { get; set; }
+}
+
+// ===== Order.cs =====
+namespace Marketplace.Domain.Entities;
+
+public class Order
+{
+    public int Id { get; set; }
+    public int UserId { get; set; }
+    public DateTime OrderDate { get; set; } = DateTime.UtcNow;
+    public decimal TotalAmount { get; set; }
+    public string Status { get; set; } = "Pending"; // Pending, Paid, Shipped, Delivered, Cancelled
+    public string? ShippingAddress { get; set; }
+    public string? PaymentMethod { get; set; }
+    public string? TrackingNumber { get; set; }
+    public string? ShippingCarrier { get; set; } // e.g., "DHL", "Aramex"
+    public DateTime? ShippedAt { get; set; }
+    public DateTime? DeliveredAt { get; set; }
+
+    // ============================================================
+    // PAYMENT DETAILS
+    // ============================================================
+    public string? PaymentTransactionId { get; set; } // For tracking
+    public string? CardLastFour { get; set; }         // For card payments
+    public string? PhoneNumber { get; set; }          // For mobile wallet
+    public string? PayPalEmail { get; set; }          // For PayPal
+    public string? DeliveryInstructions { get; set; } // For Cash on Delivery
+    public bool IsPaymentConfirmed { get; set; } = false;
+    public DateTime? PaymentConfirmedAt { get; set; }
+
+    // Navigation property
+    public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+}
+
+// ===== OrderItem.cs =====
+namespace Marketplace.Domain.Entities;
+
+public class OrderItem
+{
+    public int Id { get; set; }
+    public int OrderId { get; set; }
+    public int ProductId { get; set; }
+    public string ProductName { get; set; } = string.Empty;  // Snapshot at time of purchase
+    public decimal UnitPrice { get; set; }                   // Snapshot at time of purchase
+    public int Quantity { get; set; }
+
+    // Navigation property
+    public virtual Order? Order { get; set; }
+}
+
+// ===== Product.cs =====
+namespace Marketplace.Domain.Entities;
+
+public class Product
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public decimal Price { get; set; }
+    public decimal CostPrice { get; set; }
+    public int StockQuantity { get; set; }
+    public int VendorId { get; set; }
+    public string? ImageUrl { get; set; }
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public bool IsActive { get; set; } = true;
+    public double? Rating { get; set; } // Average rating (1-5 stars)
+}
+
+// ===== StoreSetting.cs =====
+namespace Marketplace.Domain.Entities;
+
+public class StoreSetting
+{
+    public int Id { get; set; }
+    public string StoreName { get; set; } = "Prime";
+    public string Address { get; set; } = string.Empty;
+    public string Location { get; set; } = string.Empty;
+
+    // Stored as JSON strings to easily handle arrays
+    public string OwnersJson { get; set; } = "[]"; // e.g., [{"name":"Ahmed"}]
+    public string MobileNumbersJson { get; set; } = "[]";
+    public string EmailsJson { get; set; } = "[]";
+
+    public string Landline { get; set; } = string.Empty;
+    public string WhatsApp { get; set; } = string.Empty;
+}
+
+// ===== User.cs =====
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Marketplace.Domain.Entities;
+
+public class User
+{
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public int Id { get; set; }
+
+    public string Username { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string PasswordHash { get; set; } = string.Empty;
+    public string Role { get; set; } = "Vendor";
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+}
+
+// ===== Marketplace.Domain.csproj.nuget.dgspec.json =====
+{
+  "format": 1,
+  "restore": {
+    "M:\\Marketplace\\Marketplace.Domain\\Marketplace.Domain.csproj": {}
+  },
+  "projects": {
+    "M:\\Marketplace\\Marketplace.Domain\\Marketplace.Domain.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "M:\\Marketplace\\Marketplace.Domain\\Marketplace.Domain.csproj",
+        "projectName": "Marketplace.Domain",
+        "projectPath": "M:\\Marketplace\\Marketplace.Domain\\Marketplace.Domain.csproj",
+        "packagesPath": "C:\\Users\\Andalus\\.nuget\\packages\\",
+        "outputPath": "M:\\Marketplace\\Marketplace.Domain\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\Andalus\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "9.0.300"
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.307/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}
+
+// ===== project.assets.json =====
+{
+  "version": 3,
+  "targets": {
+    "net8.0": {}
+  },
+  "libraries": {},
+  "projectFileDependencyGroups": {
+    "net8.0": []
+  },
+  "packageFolders": {
+    "C:\\Users\\Andalus\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectUniqueName": "M:\\Marketplace\\Marketplace.Domain\\Marketplace.Domain.csproj",
+      "projectName": "Marketplace.Domain",
+      "projectPath": "M:\\Marketplace\\Marketplace.Domain\\Marketplace.Domain.csproj",
+      "packagesPath": "C:\\Users\\Andalus\\.nuget\\packages\\",
+      "outputPath": "M:\\Marketplace\\Marketplace.Domain\\obj\\",
+      "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
+      "configFilePaths": [
+        "C:\\Users\\Andalus\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+      ],
+      "originalTargetFrameworks": [
+        "net8.0"
+      ],
+      "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "https://api.nuget.org/v3/index.json": {}
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "projectReferences": {}
+        }
+      },
+      "warningProperties": {
+        "warnAsError": [
+          "NU1605"
+        ]
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
+      },
+      "SdkAnalysisLevel": "9.0.300"
+    },
+    "frameworks": {
+      "net8.0": {
+        "targetAlias": "net8.0",
+        "imports": [
+          "net461",
+          "net462",
+          "net47",
+          "net471",
+          "net472",
+          "net48",
+          "net481"
+        ],
+        "assetTargetFallback": true,
+        "warn": true,
+        "frameworkReferences": {
+          "Microsoft.NETCore.App": {
+            "privateAssets": "all"
+          }
+        },
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.307/PortableRuntimeIdentifierGraph.json"
+      }
+    }
+  }
+}
+
+// ===== .NETCoreApp,Version=v8.0.AssemblyAttributes.cs =====
+// <autogenerated />
+using System;
+using System.Reflection;
+[assembly: global::System.Runtime.Versioning.TargetFrameworkAttribute(".NETCoreApp,Version=v8.0", FrameworkDisplayName = ".NET 8.0")]
+
+
+// ===== Marketplace.Domain.AssemblyInfo.cs =====
+//------------------------------------------------------------------------------
+// <auto-generated>
+//     This code was generated by a tool.
+//
+//     Changes to this file may cause incorrect behavior and will be lost if
+//     the code is regenerated.
+// </auto-generated>
+//------------------------------------------------------------------------------
+
+using System;
+using System.Reflection;
+
+[assembly: System.Reflection.AssemblyCompanyAttribute("Marketplace.Domain")]
+[assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
+[assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5ba002d1c721fa5d6dd1fd52c68f2f87158ebda8")]
+[assembly: System.Reflection.AssemblyProductAttribute("Marketplace.Domain")]
+[assembly: System.Reflection.AssemblyTitleAttribute("Marketplace.Domain")]
+[assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
+
+// Generated by the MSBuild WriteCodeFragment class.
+
+
+
+// ===== Marketplace.Domain.csproj.FileListAbsolute.txt =====
+M:\Marketplace\Marketplace.Domain\bin\Debug\net8.0\Marketplace.Domain.deps.json
+M:\Marketplace\Marketplace.Domain\bin\Debug\net8.0\Marketplace.Domain.dll
+M:\Marketplace\Marketplace.Domain\bin\Debug\net8.0\Marketplace.Domain.pdb
+M:\Marketplace\Marketplace.Domain\obj\Debug\net8.0\Marketplace.Domain.GeneratedMSBuildEditorConfig.editorconfig
+M:\Marketplace\Marketplace.Domain\obj\Debug\net8.0\Marketplace.Domain.AssemblyInfoInputs.cache
+M:\Marketplace\Marketplace.Domain\obj\Debug\net8.0\Marketplace.Domain.AssemblyInfo.cs
+M:\Marketplace\Marketplace.Domain\obj\Debug\net8.0\Marketplace.Domain.csproj.CoreCompileInputs.cache
+M:\Marketplace\Marketplace.Domain\obj\Debug\net8.0\Marketplace.Domain.sourcelink.json
+M:\Marketplace\Marketplace.Domain\obj\Debug\net8.0\Marketplace.Domain.dll
+M:\Marketplace\Marketplace.Domain\obj\Debug\net8.0\refint\Marketplace.Domain.dll
+M:\Marketplace\Marketplace.Domain\obj\Debug\net8.0\Marketplace.Domain.pdb
+M:\Marketplace\Marketplace.Domain\obj\Debug\net8.0\ref\Marketplace.Domain.dll
+
+
+// ===== Marketplace.Domain.sourcelink.json =====
+{"documents":{"M:\\Marketplace\\*":"https://raw.githubusercontent.com/WaelMohdAlshafey/prime-marketplace/5ba002d1c721fa5d6dd1fd52c68f2f87158ebda8/*"}}
+
+// ===== .NETCoreApp,Version=v8.0.AssemblyAttributes.cs =====
+// <autogenerated />
+using System;
+using System.Reflection;
+[assembly: global::System.Runtime.Versioning.TargetFrameworkAttribute(".NETCoreApp,Version=v8.0", FrameworkDisplayName = ".NET 8.0")]
+
+
+// ===== Marketplace.Domain.AssemblyInfo.cs =====
+//------------------------------------------------------------------------------
+// <auto-generated>
+//     This code was generated by a tool.
+//     Runtime Version:4.0.30319.42000
+//
+//     Changes to this file may cause incorrect behavior and will be lost if
+//     the code is regenerated.
+// </auto-generated>
+//------------------------------------------------------------------------------
+
+using System;
+using System.Reflection;
+
+[assembly: System.Reflection.AssemblyCompanyAttribute("Marketplace.Domain")]
+[assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
+[assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c0c73470108084eb1f0a9b380db981f2657bcc69")]
+[assembly: System.Reflection.AssemblyProductAttribute("Marketplace.Domain")]
+[assembly: System.Reflection.AssemblyTitleAttribute("Marketplace.Domain")]
+[assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
+
+// Generated by the MSBuild WriteCodeFragment class.
+
+
+

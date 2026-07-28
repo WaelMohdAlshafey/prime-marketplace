@@ -9,6 +9,10 @@ public class Order
     public string Status { get; set; } = "Pending"; // Pending, Paid, Shipped, Delivered, Cancelled
     public string? ShippingAddress { get; set; }
     public string? PaymentMethod { get; set; }
+    public string? TrackingNumber { get; set; }
+    public string? ShippingCarrier { get; set; } // e.g., "DHL", "Aramex"
+    public DateTime? ShippedAt { get; set; }
+    public DateTime? DeliveredAt { get; set; }
 
     // ============================================================
     // PAYMENT DETAILS

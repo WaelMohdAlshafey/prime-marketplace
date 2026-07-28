@@ -22,17 +22,15 @@ export default function Login() {
             await login({ email, password });
             router.push('/');
         } catch (err: unknown) {
+            console.error('Login error:', err);
             let message = 'Login failed. Please try again.';
-
             if (err && typeof err === 'object' && 'response' in err) {
                 const response = (err as { response: { data?: { message?: string; title?: string } } }).response;
                 message = response.data?.message || response.data?.title || message;
             } else if (err instanceof Error) {
                 message = err.message;
             }
-
             setError(message);
-            console.error('Login Error:', err);
         } finally {
             setLoading(false);
         }
@@ -48,31 +46,31 @@ export default function Login() {
 
                 <form onSubmit={handleSubmit} className="mt-8 space-y-6">
                     {error && (
-                        <div className="p-3 bg-red-50 text-red-600 rounded-lg text-sm border border-red-200">
+                        <div className="p-3 bg-red-50 text-red-600 rounded-lg text-sm border border-red-200 text-right">
                             ⚠️ {error}
                         </div>
                     )}
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1 text-right">Email</label>
                         <input
                             type="email"
                             required
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition text-right"
                             placeholder="you@example.com"
                         />
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1 text-right">Password</label>
                         <input
                             type="password"
                             required
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition text-right"
                             placeholder="••••••••"
                         />
                     </div>
