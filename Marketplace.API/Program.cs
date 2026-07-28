@@ -66,7 +66,8 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
-builder.Services.AddScoped<IStoreSettingService, StoreSettingService>(); // <-- ADDED THIS
+builder.Services.AddScoped<IStoreSettingService, StoreSettingService>();
+builder.Services.AddScoped<IWishlistService, WishlistService>(); // <-- NEW
 
 // ============================================================
 // 6. Database Context (SQLite locally, PostgreSQL on Render)

@@ -1,8 +1,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using Marketplace.Application.DTOs;
 using Marketplace.Application.Interfaces;
+using Marketplace.Domain.Entities;
+using Marketplace.Infrastructure.Data;
 
 namespace Marketplace.API.Controllers;
 
@@ -12,10 +15,12 @@ namespace Marketplace.API.Controllers;
 public class OrdersController : ControllerBase
 {
     private readonly IOrderService _orderService;
+    private readonly AppDbContext _context;
 
-    public OrdersController(IOrderService orderService)
+    public OrdersController(IOrderService orderService, AppDbContext context)
     {
         _orderService = orderService;
+        _context = context;
     }
 
     private int GetUserId()
@@ -24,6 +29,9 @@ public class OrdersController : ControllerBase
         return int.Parse(claim!.Value);
     }
 
+    // ============================================================
+    // CHECKOUT
+    // ============================================================
     [HttpPost("checkout")]
     public async Task<IActionResult> Checkout(CreateOrderDto createOrderDto)
     {
@@ -42,6 +50,9 @@ public class OrdersController : ControllerBase
         }
     }
 
+    // ============================================================
+    // GET ALL ORDERS
+    // ============================================================
     [HttpGet]
     public async Task<IActionResult> GetOrders()
     {
@@ -50,6 +61,9 @@ public class OrdersController : ControllerBase
         return Ok(orders);
     }
 
+    // ============================================================
+    // GET ORDER BY ID
+    // ============================================================
     [HttpGet("{id}")]
     public async Task<IActionResult> GetOrderById(int id)
     {
@@ -65,11 +79,13 @@ public class OrdersController : ControllerBase
         }
     }
 
+    // ============================================================
+    // UPDATE ORDER STATUS
+    // ============================================================
     [HttpPut("{id}/status")]
     public async Task<IActionResult> UpdateStatus(int id, [FromBody] UpdateStatusDto request)
     {
         var userId = GetUserId();
-
         try
         {
             await _orderService.UpdateOrderStatusAsync(userId, id, request.Status);
@@ -82,13 +98,12 @@ public class OrdersController : ControllerBase
     }
 
     // ============================================================
-    // CONFIRM PAYMENT (NEW)
+    // CONFIRM PAYMENT
     // ============================================================
     [HttpPost("{id}/confirm-payment")]
     public async Task<IActionResult> ConfirmPayment(int id, [FromBody] PaymentConfirmationDto confirmation)
     {
         var userId = GetUserId();
-
         try
         {
             var order = await _orderService.ConfirmPaymentAsync(userId, id, confirmation);
@@ -98,5 +113,44 @@ public class OrdersController : ControllerBase
         {
             return BadRequest(new { message = ex.Message });
         }
+    }
+
+    // ============================================================
+    // TRACK SHIPMENT – PUBLIC (no auth)
+    // ============================================================
+    [HttpGet("track/{trackingNumber}")]
+    [AllowAnonymous]
+    public async Task<IActionResult> TrackShipment(string trackingNumber)
+    {
+        var order = await _context.Orders
+            .FirstOrDefaultAsync(o => o.TrackingNumber == trackingNumber);
+
+        if (order == null)
+            return NotFound(new { message = "Order not found for this tracking number." });
+
+        var items = await _context.OrderItems
+            .Where(oi => oi.OrderId == order.Id)
+            .Select(oi => new
+            {
+                oi.ProductName,
+                oi.Quantity,
+                oi.UnitPrice
+            })
+            .ToListAsync();
+
+        var result = new
+        {
+            order.Id,
+            order.TrackingNumber,
+            order.ShippingCarrier,
+            order.ShippedAt,
+            order.DeliveredAt,
+            order.Status,
+            order.TotalAmount,
+            order.OrderDate,
+            Items = items
+        };
+
+        return Ok(result);
     }
 }
