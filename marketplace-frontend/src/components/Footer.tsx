@@ -3,10 +3,57 @@
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Heart } from 'lucide-react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import api from '@/lib/api';
+
+// ✅ Define a proper type for API error responses
+interface ApiError {
+    response?: {
+        data?: {
+            message?: string;
+        };
+    };
+    message?: string;
+}
 
 export default function Footer() {
     const { t } = useTranslation('common');
+    const [email, setEmail] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+    const handleSubscribe = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!email) {
+            setMessage({ type: 'error', text: 'Please enter your email.' });
+            return;
+        }
+
+        setLoading(true);
+        setMessage(null);
+
+        try {
+            await api.post('/api/Newsletter/subscribe', { email });
+            setMessage({ type: 'success', text: '✅ Subscription successful!' });
+            setEmail('');
+        } catch (err: unknown) {
+            // ✅ Proper type handling – no `any`
+            let errorMsg = 'Something went wrong. Please try again.';
+            if (err && typeof err === 'object') {
+                const error = err as ApiError;
+                if (error.response?.data?.message) {
+                    errorMsg = error.response.data.message;
+                } else if (error.message) {
+                    errorMsg = error.message;
+                }
+            }
+            setMessage({ type: 'error', text: errorMsg });
+        } finally {
+            setLoading(false);
+            setTimeout(() => setMessage(null), 5000);
+        }
+    };
 
     return (
         <footer className="bg-gradient-to-b from-gray-900 to-gray-950 text-white mt-16 relative overflow-hidden">
@@ -95,16 +142,31 @@ export default function Footer() {
                         <p className="text-gray-400 text-sm mb-3">
                             {t('footer.newsletterDescription')}
                         </p>
-                        <div className="flex flex-row-reverse">
+
+                        {message && (
+                            <div className={`mb-3 p-2 rounded text-sm ${message.type === 'success' ? 'bg-green-500/20 text-green-300' : 'bg-red-500/20 text-red-300'
+                                }`}>
+                                {message.text}
+                            </div>
+                        )}
+
+                        <form onSubmit={handleSubscribe} className="flex flex-row-reverse">
                             <input
                                 type="email"
-                                placeholder={t('footer.emailPlaceholder') || 'Your email'}
+                                placeholder={t('footer.emailPlaceholder')}
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                required
                                 className="flex-1 px-3 py-2 rounded-l-none rounded-r-lg bg-gray-800/50 border border-gray-700 text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#0F5C45] focus:border-transparent"
                             />
-                            <button className="bg-gradient-to-r from-[#0F5C45] to-[#1A7A5C] px-4 py-2 rounded-l-lg rounded-r-none text-sm font-medium hover:shadow-lg hover:shadow-[#0F5C45]/20 transition-all duration-300 hover:scale-105">
-                                {t('footer.subscribe')}
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="bg-gradient-to-r from-[#0F5C45] to-[#1A7A5C] px-4 py-2 rounded-l-lg rounded-r-none text-sm font-medium hover:shadow-lg hover:shadow-[#0F5C45]/20 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {loading ? '...' : t('footer.subscribe')}
                             </button>
-                        </div>
+                        </form>
                     </div>
                 </div>
 

@@ -14,12 +14,16 @@ public class AppDbContext : DbContext
     public DbSet<OrderItem> OrderItems { get; set; }
     public DbSet<StoreSetting> StoreSettings { get; set; }
     public DbSet<WishlistItem> WishlistItems { get; set; } // NEW
+    public DbSet<NewsletterSubscription> NewsletterSubscriptions { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
         // Product configurations
+        modelBuilder.Entity<NewsletterSubscription>()
+          .HasIndex(ns => ns.Email)
+          .IsUnique();
         modelBuilder.Entity<Product>()
             .HasIndex(p => p.VendorId);
         modelBuilder.Entity<Product>()
