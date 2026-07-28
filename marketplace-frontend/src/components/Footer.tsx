@@ -1,49 +1,94 @@
+'use client';
+
 import Link from 'next/link';
+import { motion } from 'framer-motion';
+import { Heart, Mail, Phone, MapPin } from 'lucide-react';
 
 export default function Footer() {
     return (
-        <footer className="bg-gray-900 text-white mt-16">
-            <div className="container mx-auto px-4 py-12">
+        <footer className="bg-gradient-to-b from-gray-900 to-gray-950 text-white mt-16 relative overflow-hidden">
+            {/* Background pattern */}
+            <div className="absolute inset-0 opacity-5">
+                <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDM0djItSDI0di0yaDEyek0zNiAyNHYySDI0di0yaDEyeiIvPjwvZz48L2c+PC9zdmc+')]"></div>
+            </div>
+
+            <div className="container mx-auto px-4 py-12 relative z-10">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-right">
                     {/* Company */}
                     <div>
                         <div className="flex items-center gap-2.5 mb-4 justify-end">
-                            <div className="w-10 h-10 bg-[#0F5C45] rounded-xl flex items-center justify-center text-white font-bold text-lg">
+                            <div className="w-10 h-10 bg-gradient-to-br from-[#0F5C45] to-[#1A7A5C] rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-lg">
                                 P
                             </div>
                             <span className="text-xl font-bold text-white">Prime</span>
                         </div>
-                        <p className="text-gray-400 text-sm">
+                        <p className="text-gray-400 text-sm leading-relaxed">
                             منصة تسوق فاخرة تقدم أفضل المنتجات من برامج، تجميل، أزياء، وإكسسوارات.
                         </p>
+                        <div className="flex gap-3 mt-4 justify-end">
+                            <span className="text-gray-500">❤️</span>
+                            <span className="text-gray-500">🛍️</span>
+                            <span className="text-gray-500">✨</span>
+                        </div>
                     </div>
 
                     {/* Quick Links */}
                     <div>
-                        <h4 className="font-semibold mb-4 text-white">روابط سريعة</h4>
+                        <h4 className="font-semibold mb-4 text-white text-lg">روابط سريعة</h4>
                         <ul className="space-y-2 text-gray-400 text-sm">
-                            <li><Link href="/" className="hover:text-white transition">الرئيسية</Link></li>
-                            {/* ✅ "المنتجات" → صفحة عرض المنتجات (الصفحة الرئيسية أو صفحة المنتجات العامة) */}
-                            <li><Link href="/" className="hover:text-white transition">المنتجات</Link></li>
-                            <li><Link href="/stores" className="hover:text-white transition">المتاجر</Link></li>
-                            <li><Link href="/offers" className="hover:text-white transition">العروض</Link></li>
+                            <li>
+                                <Link href="/" className="hover:text-[#D4A54A] transition duration-300 hover:translate-x-1 inline-block">
+                                    الرئيسية
+                                </Link>
+                            </li>
+                            <li>
+                                <Link href="/" className="hover:text-[#D4A54A] transition duration-300 hover:translate-x-1 inline-block">
+                                    المنتجات
+                                </Link>
+                            </li>
+                            <li>
+                                <Link href="/stores" className="hover:text-[#D4A54A] transition duration-300 hover:translate-x-1 inline-block">
+                                    المتاجر
+                                </Link>
+                            </li>
+                            <li>
+                                <Link href="/offers" className="hover:text-[#D4A54A] transition duration-300 hover:translate-x-1 inline-block">
+                                    العروض
+                                </Link>
+                            </li>
                         </ul>
                     </div>
 
                     {/* Customer Service */}
                     <div>
-                        <h4 className="font-semibold mb-4 text-white">خدمة العملاء</h4>
+                        <h4 className="font-semibold mb-4 text-white text-lg">خدمة العملاء</h4>
                         <ul className="space-y-2 text-gray-400 text-sm">
-                            <li><Link href="/contact" className="hover:text-white transition">اتصل بنا</Link></li>
-                            <li><Link href="/faq" className="hover:text-white transition">الأسئلة الشائعة</Link></li>
-                            <li><Link href="/returns" className="hover:text-white transition">سياسة الإرجاع</Link></li>
-                            <li><Link href="/shipping" className="hover:text-white transition">الشحن والتوصيل</Link></li>
+                            <li>
+                                <Link href="/contact" className="hover:text-[#D4A54A] transition duration-300 hover:translate-x-1 inline-block">
+                                    اتصل بنا
+                                </Link>
+                            </li>
+                            <li>
+                                <Link href="/faq" className="hover:text-[#D4A54A] transition duration-300 hover:translate-x-1 inline-block">
+                                    الأسئلة الشائعة
+                                </Link>
+                            </li>
+                            <li>
+                                <Link href="/returns" className="hover:text-[#D4A54A] transition duration-300 hover:translate-x-1 inline-block">
+                                    سياسة الإرجاع
+                                </Link>
+                            </li>
+                            <li>
+                                <Link href="/shipping" className="hover:text-[#D4A54A] transition duration-300 hover:translate-x-1 inline-block">
+                                    الشحن والتوصيل
+                                </Link>
+                            </li>
                         </ul>
                     </div>
 
                     {/* Newsletter */}
                     <div>
-                        <h4 className="font-semibold mb-4 text-white">النشرة البريدية</h4>
+                        <h4 className="font-semibold mb-4 text-white text-lg">النشرة البريدية</h4>
                         <p className="text-gray-400 text-sm mb-3">
                             اشترك لتحصل على أحدث العروض والمنتجات.
                         </p>
@@ -51,9 +96,9 @@ export default function Footer() {
                             <input
                                 type="email"
                                 placeholder="بريدك الإلكتروني"
-                                className="flex-1 px-3 py-2 rounded-l-none rounded-r-lg text-gray-900 text-sm focus:outline-none"
+                                className="flex-1 px-3 py-2 rounded-l-none rounded-r-lg bg-gray-800/50 border border-gray-700 text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#0F5C45] focus:border-transparent"
                             />
-                            <button className="bg-[#0F5C45] px-4 py-2 rounded-l-lg rounded-r-none text-sm font-medium hover:bg-[#0A4735] transition">
+                            <button className="bg-gradient-to-r from-[#0F5C45] to-[#1A7A5C] px-4 py-2 rounded-l-lg rounded-r-none text-sm font-medium hover:shadow-lg hover:shadow-[#0F5C45]/20 transition-all duration-300 hover:scale-105">
                                 اشتراك
                             </button>
                         </div>
@@ -61,7 +106,10 @@ export default function Footer() {
                 </div>
 
                 <div className="border-t border-gray-800 mt-8 pt-6 text-center text-gray-500 text-xs">
-                    © 2024 Prime. جميع الحقوق محفوظة.
+                    <p>© 2024 Prime. جميع الحقوق محفوظة.</p>
+                    <p className="mt-1 flex items-center justify-center gap-1">
+                        Made with <Heart className="w-3 h-3 text-red-500 fill-red-500 animate-pulse" /> by Prime Team
+                    </p>
                 </div>
             </div>
         </footer>

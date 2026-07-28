@@ -17,6 +17,7 @@ import {
     CurrencyDollarIcon,
 } from '@heroicons/react/24/outline';
 import { AuthResponse } from '@/types';
+import { motion } from 'framer-motion';
 
 // ============================================================
 // TOP BAR
@@ -24,23 +25,28 @@ import { AuthResponse } from '@/types';
 const TopBar = () => {
     const { t } = useTranslation('common');
     return (
-        <div className="bg-[#0F5C45] text-white text-xs py-1.5">
-            <div className="container mx-auto px-4 flex justify-between items-center">
+        <div className="bg-gradient-to-r from-[#0F5C45] to-[#1A7A5C] text-white text-xs py-1.5 relative overflow-hidden">
+            <div className="absolute inset-0 opacity-10 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDM0djItSDI0di0yaDEyek0zNiAyNHYySDI0di0yaDEyeiIvPjwvZz48L2c+PC9zdmc+')]"></div>
+            <div className="container mx-auto px-4 flex justify-between items-center relative z-10">
                 <div className="flex items-center gap-4">
                     <span className="flex items-center gap-1.5">
-                        <span className="text-yellow-400">✦</span> {t('freeShipping')}
+                        <span className="text-yellow-400 animate-pulse">✦</span>
+                        {t('freeShipping')}
                     </span>
                     <span className="text-white/30">|</span>
-                    <Link href="/tracking" className="hover:text-yellow-400 transition">
+                    <Link href="/tracking" className="hover:text-yellow-300 transition duration-300">
                         {t('trackOrder')}
                     </Link>
                 </div>
                 <div className="flex items-center gap-3">
                     <LanguageSwitcher />
-                    <button className="flex items-center gap-1 hover:text-yellow-400 transition">
-                        <CurrencyDollarIcon className="w-3.5 h-3.5" /> {t('currency')}
+                    <button className="flex items-center gap-1 hover:text-yellow-300 transition duration-300">
+                        <CurrencyDollarIcon className="w-3.5 h-3.5" />
+                        {t('currency')}
                     </button>
-                    <button className="hover:text-yellow-400 transition">{t('support')}</button>
+                    <button className="hover:text-yellow-300 transition duration-300">
+                        {t('support')}
+                    </button>
                 </div>
             </div>
         </div>
@@ -48,16 +54,23 @@ const TopBar = () => {
 };
 
 // ============================================================
-// MAIN HEADER
+// MAIN HEADER – Glassmorphism
 // ============================================================
 const MainHeader = ({ user }: { user: AuthResponse | null }) => {
     const { t } = useTranslation('common');
     const [searchTerm, setSearchTerm] = useState('');
+    const [isScrolled, setIsScrolled] = useState(false);
     const { totalItems } = useCart();
     const { totalFavorites } = useWishlist();
     const { cartIconRef } = useCartIconRef();
     const [isAnimating, setIsAnimating] = useState(false);
     const prevTotalRef = useRef(totalItems);
+
+    useEffect(() => {
+        const handleScroll = () => setIsScrolled(window.scrollY > 20);
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     useEffect(() => {
         if (totalItems > prevTotalRef.current) {
@@ -76,22 +89,28 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
     };
 
     return (
-        <div className="bg-white border-b border-gray-100 shadow-header py-3">
-            <div className="container mx-auto px-4 flex items-center gap-4">
+        <div
+            className={`sticky top-0 z-40 transition-all duration-500 ${isScrolled
+                    ? 'bg-white/80 backdrop-blur-xl shadow-lg border-b border-white/20'
+                    : 'bg-white/60 backdrop-blur-md shadow-sm border-b border-gray-100/50'
+                }`}
+        >
+            <div className="container mx-auto px-4 flex items-center gap-4 py-3">
                 <Logo />
 
-                <form onSubmit={handleSearch} className="flex-1 max-w-2xl relative">
+                <form onSubmit={handleSearch} className="flex-1 max-w-2xl relative group">
+                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-[#0F5C45]/5 to-[#D4A54A]/5 opacity-0 group-hover:opacity-100 transition duration-500 blur-xl"></div>
                     <input
                         type="text"
                         placeholder={t('searchPlaceholder')}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full px-5 py-3 pr-12 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#0F5C45]/30 focus:border-[#0F5C45] transition bg-gray-50 hover:bg-white text-right"
+                        className="w-full px-5 py-3 pr-12 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#0F5C45]/30 focus:border-[#0F5C45] transition-all duration-300 bg-white/80 backdrop-blur-sm hover:bg-white text-right shadow-soft relative z-10"
                     />
-                    <MagnifyingGlassIcon className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <MagnifyingGlassIcon className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-hover:text-[#0F5C45] transition duration-300" />
                     <button
                         type="submit"
-                        className="absolute left-1.5 top-1/2 -translate-y-1/2 bg-[#0F5C45] text-white px-5 py-1.5 rounded-xl text-sm font-medium hover:bg-[#0A4735] transition shadow-soft"
+                        className="absolute left-1.5 top-1/2 -translate-y-1/2 bg-gradient-to-r from-[#0F5C45] to-[#1A7A5C] text-white px-5 py-1.5 rounded-xl text-sm font-medium hover:shadow-lg hover:scale-105 transition-all duration-300 shadow-soft"
                     >
                         {t('search')}
                     </button>
@@ -99,42 +118,59 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
 
                 <div className="flex items-center gap-4 flex-shrink-0">
                     {/* FAVORITES */}
-                    <button className="text-gray-600 hover:text-[#0F5C45] transition relative">
-                        <HeartIcon className="w-6 h-6" />
-                        <span className="absolute -top-1 -right-1 bg-[#0F5C45] text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
-                            {totalFavorites}
-                        </span>
-                    </button>
-
-                    {/* CART with ref – proper casting */}
-                    <Link
-                        href="/cart"
-                        ref={(el) => {
-                            // Cast to HTMLElement to match the context type
-                            cartIconRef.current = el as HTMLElement;
-                        }}
+                    <motion.button
+                        whileHover={{ scale: 1.15, rotate: -5 }}
+                        whileTap={{ scale: 0.9 }}
                         className="text-gray-600 hover:text-[#0F5C45] transition relative group"
                     >
-                        <ShoppingCartIcon className="w-6 h-6" />
-                        <span
-                            className={`absolute -top-1 -right-1 bg-[#0F5C45] text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center transition-transform duration-300 ${isAnimating ? 'scale-150 bg-[#0A4735]' : 'scale-100'
-                                }`}
+                        <HeartIcon className="w-6 h-6 group-hover:fill-[#0F5C45]/10 transition" />
+                        <motion.span
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            className="absolute -top-1 -right-1 bg-gradient-to-r from-[#0F5C45] to-[#1A7A5C] text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center shadow-md"
                         >
-                            {totalItems}
-                        </span>
-                        <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[10px] px-2 py-0.5 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap">
-                            {totalItems} {totalItems === 1 ? 'item' : 'items'}
-                        </span>
+                            {totalFavorites}
+                        </motion.span>
+                    </motion.button>
+
+                    {/* CART */}
+                    <Link
+                        href="/cart"
+                        ref={(el) => { cartIconRef.current = el as HTMLElement; }}
+                        className="text-gray-600 hover:text-[#0F5C45] transition relative group"
+                    >
+                        <motion.div
+                            whileHover={{ scale: 1.15, rotate: 8 }}
+                            whileTap={{ scale: 0.9 }}
+                            className="relative"
+                        >
+                            <ShoppingCartIcon className="w-6 h-6 group-hover:fill-[#0F5C45]/10 transition" />
+                            <motion.span
+                                animate={{
+                                    scale: isAnimating ? 1.5 : 1,
+                                }}
+                                transition={{ type: 'spring', stiffness: 400, damping: 10 }}
+                                className={`absolute -top-1 -right-1 bg-gradient-to-r from-[#0F5C45] to-[#1A7A5C] text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center shadow-md`}
+                            >
+                                {totalItems}
+                            </motion.span>
+                            <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 bg-gray-900/90 text-white text-[10px] px-2 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-all duration-300 whitespace-nowrap backdrop-blur-sm">
+                                {totalItems} {totalItems === 1 ? 'item' : 'items'}
+                            </span>
+                        </motion.div>
                     </Link>
 
                     {user ? (
-                        <div className="flex items-center gap-2">
-                            <span className="text-sm text-gray-600">{user.username}</span>
-                            <UserIcon className="w-5 h-5 text-gray-600" />
-                        </div>
+                        <motion.div
+                            whileHover={{ scale: 1.05 }}
+                            className="flex items-center gap-2 bg-[#0F5C45]/5 px-3 py-1.5 rounded-full border border-[#0F5C45]/10"
+                        >
+                            <span className="text-sm text-gray-700 font-medium">{user.username}</span>
+                            <UserIcon className="w-4 h-4 text-[#0F5C45]" />
+                        </motion.div>
                     ) : (
                         <Link href="/auth/login" className="text-gray-600 hover:text-[#0F5C45] transition">
-                            <UserIcon className="w-6 h-6" />
+                            <UserIcon className="w-6 h-6 hover:scale-110 transition duration-300" />
                         </Link>
                     )}
                 </div>
@@ -144,41 +180,67 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
 };
 
 // ============================================================
-// NAVIGATION MENU
+// NAVIGATION MENU – Premium animated
 // ============================================================
 const NavMenu = () => {
     const { t } = useTranslation('common');
     const categories = [
-        { key: 'software', label: t('software') },
-        { key: 'hair-care', label: t('hairCare') },
-        { key: 'skin-care', label: t('skinCare') },
-        { key: 'fashion', label: t('fashion') },
-        { key: 'accessories', label: t('accessories') },
-        { key: 'electronics', label: t('electronics') },
-        { key: 'supplements', label: t('supplements') },
-        { key: 'home', label: t('homeCategory') },
+        { key: 'software', label: t('software'), icon: '💻' },
+        { key: 'hair-care', label: t('hairCare'), icon: '✨' },
+        { key: 'skin-care', label: t('skinCare'), icon: '🌿' },
+        { key: 'fashion', label: t('fashion'), icon: '👗' },
+        { key: 'accessories', label: t('accessories'), icon: '💎' },
+        { key: 'electronics', label: t('electronics'), icon: '📱' },
+        { key: 'supplements', label: t('supplements'), icon: '💊' },
+        { key: 'home', label: t('homeCategory'), icon: '🏠' },
     ];
 
     return (
-        <div className="bg-white border-b border-gray-100 shadow-sm">
+        <div className="bg-white/70 backdrop-blur-sm border-b border-gray-100/50 shadow-sm">
             <div className="container mx-auto px-4">
                 <div className="flex items-center gap-6 py-2.5 overflow-x-auto whitespace-nowrap text-sm">
-                    <Link href="/" className="text-[#0F5C45] font-semibold hover:text-[#0A4735] transition border-b-2 border-[#0F5C45] pb-1">
-                        {t('home')}
+                    <Link
+                        href="/"
+                        className="text-[#0F5C45] font-semibold hover:text-[#0A4735] transition border-b-2 border-[#0F5C45] pb-1 relative group"
+                    >
+                        <span className="relative">
+                            {t('home')}
+                            <span className="absolute -bottom-0.5 left-0 w-full h-0.5 bg-gradient-to-r from-[#0F5C45] to-[#D4A54A] scale-x-0 group-hover:scale-x-100 transition duration-300"></span>
+                        </span>
                     </Link>
                     {categories.map((cat) => (
-                        <Link key={cat.key} href={`/${cat.key}`} className="text-gray-600 hover:text-[#0F5C45] transition pb-1">
-                            {cat.label}
+                        <Link
+                            key={cat.key}
+                            href={`/${cat.key}`}
+                            className="text-gray-600 hover:text-[#0F5C45] transition pb-1 relative group"
+                        >
+                            <span className="flex items-center gap-1">
+                                <span className="text-sm">{cat.icon}</span>
+                                {cat.label}
+                            </span>
+                            <span className="absolute -bottom-0.5 left-0 w-full h-0.5 bg-gradient-to-r from-[#0F5C45] to-[#D4A54A] scale-x-0 group-hover:scale-x-100 transition duration-300"></span>
                         </Link>
                     ))}
-                    <Link href="/stores" className="text-gray-600 hover:text-[#0F5C45] transition pb-1">
+                    <Link
+                        href="/stores"
+                        className="text-gray-600 hover:text-[#0F5C45] transition pb-1 relative group"
+                    >
                         {t('stores')}
+                        <span className="absolute -bottom-0.5 left-0 w-full h-0.5 bg-gradient-to-r from-[#0F5C45] to-[#D4A54A] scale-x-0 group-hover:scale-x-100 transition duration-300"></span>
                     </Link>
-                    <Link href="/offers" className="text-orange-500 font-medium hover:text-orange-600 transition pb-1">
+                    <Link
+                        href="/offers"
+                        className="text-orange-500 font-medium hover:text-orange-600 transition pb-1 relative group"
+                    >
                         🔥 {t('offers')}
+                        <span className="absolute -bottom-0.5 left-0 w-full h-0.5 bg-gradient-to-r from-orange-400 to-orange-600 scale-x-0 group-hover:scale-x-100 transition duration-300"></span>
                     </Link>
-                    <Link href="/contact" className="text-gray-600 hover:text-[#0F5C45] transition pb-1">
+                    <Link
+                        href="/contact"
+                        className="text-gray-600 hover:text-[#0F5C45] transition pb-1 relative group"
+                    >
                         {t('contact')}
+                        <span className="absolute -bottom-0.5 left-0 w-full h-0.5 bg-gradient-to-r from-[#0F5C45] to-[#D4A54A] scale-x-0 group-hover:scale-x-100 transition duration-300"></span>
                     </Link>
                 </div>
             </div>
@@ -195,7 +257,7 @@ const UserNav = ({ user, logout }: { user: AuthResponse; logout: () => void }) =
     const isAdmin = user.role === 'Admin';
 
     return (
-        <div className="bg-[#0F5C45] text-white text-sm py-2">
+        <div className="bg-gradient-to-r from-[#0F5C45] to-[#1A7A5C] text-white text-sm py-2">
             <div className="container mx-auto px-4 flex justify-between items-center">
                 <div className="flex items-center gap-6">
                     <Link href="/cart" className="hover:text-yellow-300 transition flex items-center gap-2">
@@ -222,7 +284,7 @@ const UserNav = ({ user, logout }: { user: AuthResponse; logout: () => void }) =
                 </div>
                 <div className="flex items-center gap-4">
                     <span className="text-xs text-white/70">{t('welcome')}، {user.username}</span>
-                    <button onClick={logout} className="text-xs bg-white/10 px-3 py-1 rounded-full hover:bg-white/20 transition">
+                    <button onClick={logout} className="text-xs bg-white/10 px-3 py-1 rounded-full hover:bg-white/20 transition duration-300 hover:scale-105">
                         {t('logout')}
                     </button>
                 </div>
@@ -239,11 +301,11 @@ export default function Navbar() {
     const { t } = useTranslation('common');
 
     if (isLoading) {
-        return <div className="bg-white shadow-md py-4 text-center text-gray-500">{t('loading')}</div>;
+        return <div className="bg-white shadow-md py-4 text-center text-gray-500 animate-pulse">{t('loading')}</div>;
     }
 
     return (
-        <header className="sticky top-0 z-50 bg-white shadow-header">
+        <header className="sticky top-0 z-50">
             <TopBar />
             <MainHeader user={user} />
             <NavMenu />

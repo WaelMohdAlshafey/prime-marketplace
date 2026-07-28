@@ -2,9 +2,9 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { Heart } from 'lucide-react';
+import { Heart, Star, ShoppingBag } from 'lucide-react';
 import { useState, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import { useWishlist } from '@/context/WishlistContext';
 import { useCart } from '@/context/CartContext';
@@ -25,7 +25,6 @@ interface ProductCardProps {
     };
 }
 
-// Helper: fallback image – now uses a reliable external placeholder
 const getProductImage = (name: string): string => {
     const lower = name.toLowerCase();
     if (lower.includes('سماعة') || lower.includes('headphone') || lower.includes('sony'))
@@ -48,19 +47,16 @@ const getProductImage = (name: string): string => {
         return '/images/products/supplements.jpg';
     if (lower.includes('أواني') || lower.includes('منزل') || lower.includes('مطبخ') || lower.includes('طقم'))
         return '/images/products/home.jpg';
-
-    // ✅ FIXED: Use a reliable external placeholder (avoids 400 errors)
-    return 'https://via.placeholder.com/300x300/e0e0e0/666666?text=No+Image';
+    return 'https://placehold.co/400x400/e0e0e0/666666?text=No+Image';
 };
 
 export default function ProductCard({ product }: ProductCardProps) {
     const [isAdding, setIsAdding] = useState(false);
-    const [imgSrc, setImgSrc] = useState(
-        product.imageUrl || getProductImage(product.name)
-    );
+    const [imgSrc, setImgSrc] = useState(product.imageUrl || getProductImage(product.name));
     const [fly, setFly] = useState(false);
     const [flyStart, setFlyStart] = useState({ x: 0, y: 0 });
     const [flyEnd, setFlyEnd] = useState({ x: 0, y: 0 });
+    const [isHovered, setIsHovered] = useState(false);
     const cardRef = useRef<HTMLDivElement>(null);
     const { user } = useAuth();
     const { toggleFavorite, isFavorite } = useWishlist();
@@ -101,8 +97,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             setTimeout(() => {
                 setFly(false);
                 setIsAdding(true);
-                addToCart(product.id, 1)
-                    .finally(() => setIsAdding(false));
+                addToCart(product.id, 1).finally(() => setIsAdding(false));
             }, 800);
         } else {
             setIsAdding(true);
@@ -112,64 +107,108 @@ export default function ProductCard({ product }: ProductCardProps) {
     };
 
     const handleImageError = () => {
-        // If the image fails, use the external placeholder
-        setImgSrc('https://via.placeholder.com/300x300/e0e0e0/666666?text=No+Image');
+        setImgSrc('https://placehold.co/400x400/e0e0e0/666666?text=No+Image');
     };
 
     return (
         <>
-            <div
+            <motion.div
                 ref={cardRef}
-                className="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden hover:-translate-y-1 border border-gray-50"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4 }}
+                whileHover={{ y: -8 }}
+                onHoverStart={() => setIsHovered(true)}
+                onHoverEnd={() => setIsHovered(false)}
+                className="group relative bg-white/80 backdrop-blur-sm rounded-2xl shadow-soft hover:shadow-strong transition-all duration-500 overflow-hidden border border-gray-100/50 hover:border-[#0F5C45]/20"
             >
                 {/* Image */}
-                <div className="relative aspect-square overflow-hidden bg-gray-50">
+                <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100">
                     <Image
                         src={imgSrc}
                         alt={product.name}
                         fill
-                        className="object-cover group-hover:scale-105 transition duration-500"
+                        className={`object-cover transition-transform duration-700 ${isHovered ? 'scale-110' : 'scale-100'}`}
                         sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                         priority={false}
                         onError={handleImageError}
                     />
+
+                    {/* Discount Badge */}
                     {product.discount && product.discount > 0 && (
-                        <span className="absolute top-3 right-3 bg-gradient-to-r from-red-500 to-red-600 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-md z-10">
+                        <motion.span
+                            initial={{ x: 20, opacity: 0 }}
+                            animate={{ x: 0, opacity: 1 }}
+                            className="absolute top-3 right-3 bg-gradient-to-r from-red-500 to-red-600 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-lg z-10"
+                        >
                             -{product.discount}%
-                        </span>
+                        </motion.span>
                     )}
-                    <button
+
+                    {/* Wishlist Button */}
+                    <motion.button
+                        whileHover={{ scale: 1.2, rotate: 10 }}
+                        whileTap={{ scale: 0.8 }}
                         onClick={handleWishlistToggle}
-                        className="absolute top-3 left-3 bg-white p-2 rounded-full shadow-md hover:shadow-lg transition z-10"
+                        className={`absolute top-3 left-3 p-2 rounded-full shadow-md transition-all duration-300 z-10 ${isWishlist
+                                ? 'bg-gradient-to-r from-red-500 to-red-600 text-white shadow-red-200'
+                                : 'bg-white/90 backdrop-blur-sm text-gray-600 hover:text-red-500 hover:bg-white'
+                            }`}
                         aria-label="إضافة إلى المفضلة"
                     >
                         <Heart
-                            className={`w-5 h-5 transition ${isWishlist ? 'fill-red-500 text-red-500' : 'text-gray-600'}`}
+                            className={`w-5 h-5 transition ${isWishlist ? 'fill-white' : 'fill-transparent'}`}
                             strokeWidth={isWishlist ? 0 : 2}
                         />
-                    </button>
+                    </motion.button>
+
+                    {/* Vendor Badge */}
+                    <div className="absolute bottom-3 left-3 right-3">
+                        <span className="inline-block bg-white/90 backdrop-blur-sm text-[#0F5C45] text-xs font-medium px-3 py-1 rounded-full shadow-md border border-white/20">
+                            {product.vendorName || 'متجر Prime'}
+                        </span>
+                    </div>
                 </div>
 
                 {/* Content */}
                 <div className="p-4 text-right">
-                    <span className="text-xs text-[#0F5C45] bg-[#0F5C45]/10 px-2 py-0.5 rounded-full inline-block mb-2 font-medium">
-                        {product.vendorName || 'متجر Prime'}
-                    </span>
                     <Link href={`/products/${product.id}`}>
-                        <h3 className="font-semibold text-gray-800 text-base hover:text-[#0F5C45] transition line-clamp-1">
+                        <motion.h3
+                            whileHover={{ color: '#0F5C45' }}
+                            className="font-semibold text-gray-800 text-base line-clamp-1"
+                        >
                             {product.name}
-                        </h3>
+                        </motion.h3>
                     </Link>
-                    <p className="text-sm text-gray-500 line-clamp-2 mt-1">{product.description}</p>
+
+                    <p className="text-sm text-gray-500 line-clamp-2 mt-1 min-h-[40px]">
+                        {product.description}
+                    </p>
+
+                    {/* Rating */}
                     {product.rating && (
-                        <div className="flex items-center justify-end gap-1 mt-2 text-sm">
-                            <span className="text-amber-400">
-                                {'★'.repeat(Math.round(product.rating))}
-                                {'☆'.repeat(5 - Math.round(product.rating))}
+                        <div className="flex items-center justify-end gap-1 mt-2">
+                            <div className="flex items-center gap-0.5">
+                                {[...Array(5)].map((_, i) => (
+                                    <Star
+                                        key={i}
+                                        className={`w-3.5 h-3.5 ${i < Math.round(product.rating!)
+                                                ? 'fill-[#D4A54A] text-[#D4A54A]'
+                                                : 'text-gray-300 fill-gray-300'
+                                            }`}
+                                    />
+                                ))}
+                            </div>
+                            <span className="text-sm font-semibold text-gray-700 mr-1">
+                                {product.rating.toFixed(1)}
                             </span>
-                            <span className="font-semibold text-gray-700 mr-1">{product.rating.toFixed(1)}</span>
+                            {product.reviews && (
+                                <span className="text-xs text-gray-400">({product.reviews})</span>
+                            )}
                         </div>
                     )}
+
+                    {/* Price */}
                     <div className="mt-3 flex items-center justify-end gap-2">
                         <span className="text-xl font-bold text-[#0F5C45]">
                             £{(discountPrice || product.price).toFixed(2)}
@@ -180,51 +219,45 @@ export default function ProductCard({ product }: ProductCardProps) {
                             </span>
                         )}
                     </div>
-                    <button
+
+                    {/* Add to Cart Button */}
+                    <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.97 }}
                         onClick={handleAddToCart}
                         disabled={isAdding || product.stockQuantity === 0}
-                        className="w-full mt-3 bg-[#0F5C45] text-white py-2.5 rounded-xl font-medium hover:bg-[#0A4735] transition duration-200 group-hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                        className={`w-full mt-3 py-2.5 rounded-xl font-medium transition-all duration-300 flex items-center justify-center gap-2 ${product.stockQuantity === 0
+                                ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                                : isAdding
+                                    ? 'bg-[#0F5C45]/70 text-white cursor-wait'
+                                    : 'bg-gradient-to-r from-[#0F5C45] to-[#1A7A5C] text-white hover:shadow-lg hover:shadow-[#0F5C45]/20 hover:scale-105'
+                            }`}
                     >
+                        <ShoppingBag className="w-4 h-4" />
                         {isAdding
                             ? 'جاري الإضافة...'
                             : product.stockQuantity === 0
                                 ? 'غير متوفر'
                                 : 'إضافة إلى السلة'}
-                    </button>
+                    </motion.button>
                 </div>
-            </div>
+            </motion.div>
 
             {/* Flying item */}
-            {fly && (
-                <motion.div
-                    initial={{
-                        x: flyStart.x,
-                        y: flyStart.y,
-                        scale: 1,
-                        opacity: 1,
-                    }}
-                    animate={{
-                        x: flyEnd.x - 32,
-                        y: flyEnd.y - 32,
-                        scale: 0.3,
-                        opacity: 0,
-                    }}
-                    transition={{
-                        duration: 0.8,
-                        ease: 'easeInOut',
-                    }}
-                    className="fixed w-16 h-16 rounded-full bg-white shadow-xl z-50 pointer-events-none"
-                    style={{ left: -32, top: -32 }}
-                >
-                    <Image
-                        src={imgSrc}
-                        alt={product.name}
-                        fill
-                        className="object-cover rounded-full"
-                        sizes="64px"
-                    />
-                </motion.div>
-            )}
+            <AnimatePresence>
+                {fly && (
+                    <motion.div
+                        initial={{ x: flyStart.x, y: flyStart.y, scale: 1, opacity: 1 }}
+                        animate={{ x: flyEnd.x - 32, y: flyEnd.y - 32, scale: 0.3, opacity: 0 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.8, ease: 'easeInOut' }}
+                        className="fixed w-16 h-16 rounded-full bg-white shadow-xl z-50 pointer-events-none"
+                        style={{ left: -32, top: -32 }}
+                    >
+                        <Image src={imgSrc} alt={product.name} fill className="object-cover rounded-full" sizes="64px" />
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </>
     );
 }
