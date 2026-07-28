@@ -1,8 +1,8 @@
 ﻿'use client';
 
 import Link from 'next/link';
+import { useTranslation } from 'react-i18next';
 
-// The 5 vendors we inserted into the database
 const vendors = [
     { id: 1, name: 'متجر البرمجيات', description: 'أفضل البرامج والتطبيقات', icon: '💻' },
     { id: 2, name: 'متجر التجميل', description: 'العناية بالشعر والبشرة', icon: '✨' },
@@ -12,10 +12,12 @@ const vendors = [
 ];
 
 export default function StoresPage() {
+    const { t } = useTranslation('common');
+
     return (
         <div className="container mx-auto px-4 py-12">
-            <h1 className="text-4xl font-bold text-gray-900 text-center mb-4">🏪 المتاجر</h1>
-            <p className="text-gray-600 text-center mb-12">تسوق من أفضل المتاجر الموثوقة في Prime</p>
+            <h1 className="text-4xl font-bold text-gray-900 text-center mb-4">{t('storesTitle')}</h1>
+            <p className="text-gray-600 text-center mb-12">{t('storesSubtitle')}</p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {vendors.map((vendor) => (
@@ -30,7 +32,7 @@ export default function StoresPage() {
                             href={`/vendors/${vendor.id}`}
                             className="mt-4 inline-block bg-[#0F5C45] text-white px-6 py-2 rounded-full text-sm font-medium hover:bg-[#0A4735] transition"
                         >
-                            زيارة المتجر ←
+                            {t('storesVisit')}
                         </Link>
                     </div>
                 ))}

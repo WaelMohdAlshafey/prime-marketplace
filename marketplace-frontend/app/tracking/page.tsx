@@ -1,12 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import api from '@/lib/api';
 import { useTranslation } from 'react-i18next';
+import api from '@/lib/api';
 
-// ============================================================
-// TYPE for tracking data
-// ============================================================
 interface TrackingData {
     id: number;
     trackingNumber: string;
@@ -38,7 +35,7 @@ export default function TrackingPage() {
             const response = await api.get(`/api/Orders/track/${trackingNumber.trim()}`);
             setData(response.data);
         } catch (err: unknown) {
-            let message = 'Tracking number not found.';
+            let message = t('trackingNotFound');
             if (err && typeof err === 'object' && 'response' in err) {
                 const errorObj = err as { response: { data?: { message?: string } } };
                 if (errorObj.response?.data?.message) {
@@ -54,13 +51,13 @@ export default function TrackingPage() {
     return (
         <div className="container mx-auto px-4 py-12 max-w-2xl">
             <h1 className="text-3xl font-bold text-gray-800 text-center mb-8">
-                {t('trackOrder')}
+                {t('trackingTitle')}
             </h1>
 
             <form onSubmit={handleTrack} className="flex gap-2 mb-8">
                 <input
                     type="text"
-                    placeholder="Enter tracking number..."
+                    placeholder={t('trackingPlaceholder')}
                     value={trackingNumber}
                     onChange={(e) => setTrackingNumber(e.target.value)}
                     className="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#0F5C45] focus:border-transparent"
@@ -71,7 +68,7 @@ export default function TrackingPage() {
                     disabled={loading}
                     className="px-6 py-3 bg-[#0F5C45] text-white rounded-xl hover:bg-[#0A4735] transition disabled:opacity-50"
                 >
-                    {loading ? 'Searching...' : 'Track'}
+                    {loading ? t('trackingSearching') : t('trackingButton')}
                 </button>
             </form>
 
@@ -84,7 +81,9 @@ export default function TrackingPage() {
             {data && (
                 <div className="bg-white rounded-2xl shadow-md p-6">
                     <div className="flex justify-between items-center border-b border-gray-200 pb-4 mb-4">
-                        <span className="text-sm text-gray-500">Order #{data.id}</span>
+                        <span className="text-sm text-gray-500">
+                            {t('trackingOrder', { id: data.id })}
+                        </span>
                         <span className={`px-3 py-1 rounded-full text-sm font-medium ${data.status === 'Delivered' ? 'bg-green-100 text-green-800' :
                                 data.status === 'Shipped' ? 'bg-blue-100 text-blue-800' :
                                     'bg-yellow-100 text-yellow-800'
@@ -94,15 +93,15 @@ export default function TrackingPage() {
                     </div>
 
                     <div className="space-y-2 text-sm">
-                        <p><strong>Tracking Number:</strong> {data.trackingNumber}</p>
-                        <p><strong>Carrier:</strong> {data.shippingCarrier || 'N/A'}</p>
-                        <p><strong>Shipped:</strong> {data.shippedAt ? new Date(data.shippedAt).toLocaleDateString() : 'Not yet'}</p>
-                        <p><strong>Delivered:</strong> {data.deliveredAt ? new Date(data.deliveredAt).toLocaleDateString() : 'In transit'}</p>
-                        <p><strong>Total:</strong> £{data.totalAmount.toFixed(2)}</p>
+                        <p><strong>{t('trackingNumber')}:</strong> {data.trackingNumber}</p>
+                        <p><strong>{t('trackingCarrier')}:</strong> {data.shippingCarrier || 'N/A'}</p>
+                        <p><strong>{t('trackingShipped')}:</strong> {data.shippedAt ? new Date(data.shippedAt).toLocaleDateString() : 'Not yet'}</p>
+                        <p><strong>{t('trackingDelivered')}:</strong> {data.deliveredAt ? new Date(data.deliveredAt).toLocaleDateString() : 'In transit'}</p>
+                        <p><strong>{t('trackingTotal')}:</strong> £{data.totalAmount.toFixed(2)}</p>
                     </div>
 
                     <div className="mt-4 border-t border-gray-200 pt-4">
-                        <h4 className="font-semibold mb-2">Items</h4>
+                        <h4 className="font-semibold mb-2">{t('trackingItems')}</h4>
                         {data.items.map((item, idx) => (
                             <div key={idx} className="flex justify-between text-sm py-1 border-b border-gray-100">
                                 <span>{item.productName} × {item.quantity}</span>

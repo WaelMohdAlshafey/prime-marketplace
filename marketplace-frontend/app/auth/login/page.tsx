@@ -3,9 +3,11 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/context/AuthContext';
 
 export default function Login() {
+    const { t } = useTranslation('common');
     const router = useRouter();
     const { login } = useAuth();
     const [email, setEmail] = useState('');
@@ -23,7 +25,7 @@ export default function Login() {
             router.push('/');
         } catch (err: unknown) {
             console.error('Login error:', err);
-            let message = 'Login failed. Please try again.';
+            let message = t('loginError');
             if (err && typeof err === 'object' && 'response' in err) {
                 const response = (err as { response: { data?: { message?: string; title?: string } } }).response;
                 message = response.data?.message || response.data?.title || message;
@@ -40,8 +42,8 @@ export default function Login() {
         <div className="min-h-[80vh] flex items-center justify-center bg-gray-50 py-12 px-4">
             <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8">
                 <div className="text-center">
-                    <h1 className="text-3xl font-bold text-gray-800">Welcome Back</h1>
-                    <p className="text-gray-500 mt-2">Sign in to your account</p>
+                    <h1 className="text-3xl font-bold text-gray-800">{t('loginTitle')}</h1>
+                    <p className="text-gray-500 mt-2">{t('loginSubtitle')}</p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="mt-8 space-y-6">
@@ -52,7 +54,7 @@ export default function Login() {
                     )}
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1 text-right">Email</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1 text-right">{t('loginEmail')}</label>
                         <input
                             type="email"
                             required
@@ -64,7 +66,7 @@ export default function Login() {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1 text-right">Password</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1 text-right">{t('loginPassword')}</label>
                         <input
                             type="password"
                             required
@@ -80,13 +82,13 @@ export default function Login() {
                         disabled={loading}
                         className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-indigo-700 transition disabled:opacity-50"
                     >
-                        {loading ? 'Signing in...' : 'Sign In'}
+                        {loading ? t('loginLoading') : t('loginButton')}
                     </button>
 
                     <p className="text-center text-sm text-gray-600">
-                        Don&apos;t have an account?{' '}
+                        {t('loginRegister')}{' '}
                         <Link href="/auth/register" className="text-blue-600 hover:underline font-medium">
-                            Create one
+                            {t('registerTitle')}
                         </Link>
                     </p>
                 </form>

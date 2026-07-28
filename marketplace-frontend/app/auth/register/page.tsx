@@ -3,9 +3,11 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/context/AuthContext';
 
 export default function Register() {
+    const { t } = useTranslation('common');
     const router = useRouter();
     const { register } = useAuth();
     const [username, setUsername] = useState('');
@@ -16,24 +18,20 @@ export default function Register() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setError('');        // Clear previous errors
+        setError('');
         setLoading(true);
 
         try {
             await register({ username, email, password });
-            // If successful, redirect to home
             router.push('/');
         } catch (err: unknown) {
-            // Extract the real error message from the backend
-            let message = 'Registration failed. Please try again.';
-
+            let message = t('registerError');
             if (err && typeof err === 'object' && 'response' in err) {
                 const response = (err as { response: { data?: { message?: string; title?: string } } }).response;
                 message = response.data?.message || response.data?.title || message;
             } else if (err instanceof Error) {
                 message = err.message;
             }
-
             setError(message);
             console.error('Registration Error:', err);
         } finally {
@@ -45,12 +43,11 @@ export default function Register() {
         <div className="min-h-[80vh] flex items-center justify-center bg-gray-50 py-12 px-4">
             <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8">
                 <div className="text-center">
-                    <h1 className="text-3xl font-bold text-gray-800">Create Account</h1>
-                    <p className="text-gray-500 mt-2">Join the marketplace today</p>
+                    <h1 className="text-3xl font-bold text-gray-800">{t('registerTitle')}</h1>
+                    <p className="text-gray-500 mt-2">{t('registerSubtitle')}</p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="mt-8 space-y-6">
-                    {/* Display error messages clearly */}
                     {error && (
                         <div className="p-3 bg-red-50 text-red-600 rounded-lg text-sm border border-red-200">
                             ⚠️ {error}
@@ -58,7 +55,7 @@ export default function Register() {
                     )}
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">{t('registerUsername')}</label>
                         <input
                             type="text"
                             required
@@ -70,7 +67,7 @@ export default function Register() {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">{t('registerEmail')}</label>
                         <input
                             type="email"
                             required
@@ -82,7 +79,7 @@ export default function Register() {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">{t('registerPassword')}</label>
                         <input
                             type="password"
                             required
@@ -99,13 +96,13 @@ export default function Register() {
                         disabled={loading}
                         className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-indigo-700 transition disabled:opacity-50"
                     >
-                        {loading ? 'Creating account...' : 'Create Account'}
+                        {loading ? t('registerLoading') : t('registerButton')}
                     </button>
 
                     <p className="text-center text-sm text-gray-600">
-                        Already have an account?{' '}
+                        {t('registerLogin')}{' '}
                         <Link href="/auth/login" className="text-blue-600 hover:underline font-medium">
-                            Sign in
+                            {t('loginTitle')}
                         </Link>
                     </p>
                 </form>
