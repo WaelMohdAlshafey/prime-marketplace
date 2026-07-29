@@ -16,7 +16,7 @@ public class OrderService : IOrderService
     }
 
     // ============================================================
-    // CART OPERATIONS (unchanged)
+    // CART OPERATIONS
     // ============================================================
 
     public async Task<CartResponseDto> GetCartAsync(int userId)
@@ -240,11 +240,10 @@ public class OrderService : IOrderService
     }
 
     // ============================================================
-    // CONFIRM PAYMENT – Admin, Vendor, Employee
+    // CONFIRM PAYMENT
     // ============================================================
     public async Task<OrderDto> ConfirmPaymentAsync(int userId, int orderId, PaymentConfirmationDto confirmation)
     {
-        // Allow Admin, Vendor, Employee
         var user = await _context.Users.FindAsync(userId);
         if (user == null || (user.Role != "Admin" && user.Role != "Vendor" && user.Role != "Employee"))
             throw new Exception("You do not have permission to confirm payments.");
@@ -278,7 +277,6 @@ public class OrderService : IOrderService
                 break;
 
             case "CashOnDelivery":
-                // Delivery confirmation is optional; if not provided, we use a default message.
                 order.DeliveryInstructions = confirmation.DeliveryConfirmation ?? "Confirmed by staff.";
                 break;
 
@@ -341,7 +339,7 @@ public class OrderService : IOrderService
     }
 
     // ============================================================
-    // UPDATE ORDER STATUS – Admin, Vendor, Employee with permissions
+    // UPDATE ORDER STATUS – WITH DUPLICATE PREVENTION & SHIPPEDAT
     // ============================================================
     public async Task<OrderDto> UpdateOrderStatusAsync(int userId, int orderId, string newStatus, string? note = null)
     {
@@ -372,11 +370,10 @@ public class OrderService : IOrderService
             isVendor = productVendorIds.Contains(userId);
         }
 
-        // --- Permission rules ---
+        // Permission rules
         if (!isAdmin && !isEmployee && !isVendor && !isCustomer)
             throw new Exception("You do not have permission to update this order.");
 
-        // Customer can only cancel if order is not yet shipped/delivered
         if (isCustomer && !isAdmin && !isEmployee && !isVendor)
         {
             if (newStatus != "Cancelled")
@@ -385,16 +382,30 @@ public class OrderService : IOrderService
                 throw new Exception("You cannot cancel an order that has already been shipped or delivered.");
         }
 
-        // Update status
+        // ============================================================
+        // ✅ DUPLICATE PREVENTION: only proceed if status actually changes
+        // ============================================================
+        if (order.CurrentStatus == newStatus)
+        {
+            // Status unchanged – just return the current order without creating a log
+            return await GetOrderByIdAsync(order.UserId, orderId);
+        }
+
         var oldStatus = order.CurrentStatus;
         order.CurrentStatus = newStatus;
+
+        // ✅ Set ShippedAt when status becomes Shipped or In Transit
+        if (newStatus == "Shipped" || newStatus == "In Transit")
+        {
+            order.ShippedAt = DateTime.UtcNow;
+        }
 
         if (newStatus == "Delivered")
             order.DeliveredAt = DateTime.UtcNow;
 
         await _context.SaveChangesAsync();
 
-        // Log the status change
+        // Create a log entry (only when status changed)
         var log = new ShipmentStatusLog
         {
             OrderId = orderId,
