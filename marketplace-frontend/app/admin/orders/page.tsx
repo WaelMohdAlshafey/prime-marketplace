@@ -4,7 +4,18 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import api from '@/lib/api';
 import { Order } from '@/types';
-import { Eye, CheckCircle, Clock } from 'lucide-react';
+import { Eye, CheckCircle, Clock, Send } from 'lucide-react';
+
+const STATUS_OPTIONS = [
+    'Pending',
+    'Paid',
+    'Packaging',
+    'Shipped',
+    'In Transit',
+    'Out for Delivery',
+    'Delivered',
+    'Cancelled'
+];
 
 export default function AdminOrders() {
     const { t } = useTranslation('common');
@@ -12,10 +23,12 @@ export default function AdminOrders() {
     const [loading, setLoading] = useState(true);
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
     const [showModal, setShowModal] = useState(false);
+    const [note, setNote] = useState('');
+    const [updating, setUpdating] = useState(false);
 
     const fetchOrders = async () => {
         try {
-            const response = await api.get('/api/Admin/orders');
+            const response = await api.get('/api/Orders/admin/all');
             setOrders(response.data);
             setLoading(false);
         } catch (err) {
@@ -29,30 +42,35 @@ export default function AdminOrders() {
         fetchOrders();
     }, []);
 
-    const handleUpdateStatus = async (orderId: number, status: string) => {
+    const handleUpdateStatus = async (orderId: number, newStatus: string) => {
+        setUpdating(true);
         try {
-            await api.put(`/api/Orders/${orderId}/status`, { status });
+            await api.put(`/api/Orders/${orderId}/status`, { status: newStatus, note });
             await fetchOrders();
+            setNote('');
+            // If modal is open, refresh selected order
+            if (selectedOrder && selectedOrder.id === orderId) {
+                const updatedOrder = orders.find(o => o.id === orderId);
+                if (updatedOrder) setSelectedOrder(updatedOrder);
+            }
         } catch (err) {
             console.error('Failed to update order status:', err);
             alert('Failed to update order status.');
+        } finally {
+            setUpdating(false);
         }
     };
 
     const getStatusColor = (status: string) => {
         switch (status) {
-            case 'Paid':
-                return 'bg-green-100 text-green-800';
-            case 'Pending':
-                return 'bg-yellow-100 text-yellow-800';
-            case 'Shipped':
-                return 'bg-blue-100 text-blue-800';
-            case 'Delivered':
-                return 'bg-indigo-100 text-indigo-800';
-            case 'Cancelled':
-                return 'bg-red-100 text-red-800';
-            default:
-                return 'bg-gray-100 text-gray-800';
+            case 'Paid': return 'bg-green-100 text-green-800';
+            case 'Pending': return 'bg-yellow-100 text-yellow-800';
+            case 'Shipped': return 'bg-blue-100 text-blue-800';
+            case 'In Transit': return 'bg-purple-100 text-purple-800';
+            case 'Out for Delivery': return 'bg-indigo-100 text-indigo-800';
+            case 'Delivered': return 'bg-emerald-100 text-emerald-800';
+            case 'Cancelled': return 'bg-red-100 text-red-800';
+            default: return 'bg-gray-100 text-gray-800';
         }
     };
 
@@ -125,17 +143,6 @@ export default function AdminOrders() {
                                         >
                                             <Eye className="w-4 h-4 inline" /> View
                                         </button>
-                                        <select
-                                            value={order.status}
-                                            onChange={(e) => handleUpdateStatus(order.id, e.target.value)}
-                                            className="text-sm border border-gray-300 rounded-lg px-2 py-1 focus:ring-[#0F5C45] focus:border-[#0F5C45]"
-                                        >
-                                            <option value="Pending">Pending</option>
-                                            <option value="Paid">Paid</option>
-                                            <option value="Shipped">Shipped</option>
-                                            <option value="Delivered">Delivered</option>
-                                            <option value="Cancelled">Cancelled</option>
-                                        </select>
                                     </td>
                                 </tr>
                             ))}
@@ -144,7 +151,7 @@ export default function AdminOrders() {
                 </div>
             </div>
 
-            {/* Order Details Modal */}
+            {/* Order Details Modal with Status Update */}
             {showModal && selectedOrder && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
                     <div className="bg-white rounded-2xl p-8 max-w-2xl w-full max-h-[80vh] overflow-y-auto">
@@ -186,6 +193,41 @@ export default function AdminOrders() {
                                 </div>
                             </div>
 
+                            {/* Update Status Section */}
+                            <div className="border-t border-gray-200 pt-4">
+                                <h3 className="font-semibold text-gray-800 mb-2">Update Status</h3>
+                                <div className="flex flex-col md:flex-row gap-3">
+                                    <select
+                                        value={selectedOrder.status}
+                                        onChange={(e) => {
+                                            const newStatus = e.target.value;
+                                            setSelectedOrder({ ...selectedOrder, status: newStatus });
+                                        }}
+                                        className="flex-1 px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#0F5C45] focus:border-transparent"
+                                    >
+                                        {STATUS_OPTIONS.map((opt) => (
+                                            <option key={opt} value={opt}>{opt}</option>
+                                        ))}
+                                    </select>
+                                    <input
+                                        type="text"
+                                        placeholder="Add a note (optional)"
+                                        value={note}
+                                        onChange={(e) => setNote(e.target.value)}
+                                        className="flex-1 px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#0F5C45] focus:border-transparent"
+                                    />
+                                    <button
+                                        onClick={() => handleUpdateStatus(selectedOrder.id, selectedOrder.status)}
+                                        disabled={updating}
+                                        className="px-6 py-2 bg-[#0F5C45] text-white rounded-xl hover:bg-[#0A4735] transition disabled:opacity-50 flex items-center gap-2"
+                                    >
+                                        <Send className="w-4 h-4" />
+                                        {updating ? 'Updating...' : 'Update'}
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Items */}
                             <div className="border-t border-gray-200 pt-4">
                                 <h3 className="font-semibold text-gray-800 mb-2">Items</h3>
                                 {selectedOrder.items.map((item, idx) => (
