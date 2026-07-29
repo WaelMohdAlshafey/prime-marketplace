@@ -190,7 +190,6 @@ public class OrdersController : ControllerBase
         order = await _context.Orders
             .Include(o => o.StatusLogs)
             .ThenInclude(s => s.UpdatedBy)
-            .Include(o => o.User) // ✅ Include the User navigation property
             .FirstOrDefaultAsync(o => o.TrackingNumber == trackingNumberOrId);
 
         // 2. If not found, try parsing as Order ID (int)
@@ -199,12 +198,22 @@ public class OrdersController : ControllerBase
             order = await _context.Orders
                 .Include(o => o.StatusLogs)
                 .ThenInclude(s => s.UpdatedBy)
-                .Include(o => o.User) // ✅ Include the User navigation property
                 .FirstOrDefaultAsync(o => o.Id == orderId);
         }
 
         if (order == null)
             return NotFound(new { message = "Order not found for this tracking number or ID." });
+
+        // ✅ Fetch the customer username separately using the UserId
+        string? customerName = null;
+        if (order.UserId > 0)
+        {
+            var user = await _context.Users
+                .Where(u => u.Id == order.UserId)
+                .Select(u => u.Username)
+                .FirstOrDefaultAsync();
+            customerName = user ?? "Guest";
+        }
 
         var items = await _context.OrderItems
             .Where(oi => oi.OrderId == order.Id)
@@ -226,7 +235,7 @@ public class OrdersController : ControllerBase
             order.CurrentStatus,
             order.TotalAmount,
             order.OrderDate,
-            CustomerName = order.User != null ? order.User.Username : "Guest", // ✅ Customer name added
+            CustomerName = customerName ?? "Guest", // ✅ Customer name from separate query
             Items = items,
             Logs = order.StatusLogs.Select(s => new
             {
