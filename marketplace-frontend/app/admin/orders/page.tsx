@@ -35,6 +35,7 @@ export default function AdminOrders() {
     const [showModal, setShowModal] = useState(false);
     const [note, setNote] = useState('');
     const [updating, setUpdating] = useState(false);
+    const [confirmingPayment, setConfirmingPayment] = useState(false);
 
     const fetchOrders = async () => {
         try {
@@ -52,6 +53,9 @@ export default function AdminOrders() {
         fetchOrders();
     }, []);
 
+    // ============================================================
+    // UPDATE STATUS
+    // ============================================================
     const handleUpdateStatus = async (orderId: number, newStatus: string) => {
         setUpdating(true);
         try {
@@ -76,6 +80,36 @@ export default function AdminOrders() {
             alert(`❌ ${message}`);
         } finally {
             setUpdating(false);
+        }
+    };
+
+    // ============================================================
+    // CONFIRM PAYMENT
+    // ============================================================
+    const handleConfirmPayment = async () => {
+        if (!selectedOrder) return;
+        setConfirmingPayment(true);
+        try {
+            await api.post(`/api/Orders/${selectedOrder.id}/confirm-payment`, {
+                transactionId: `TXN-${Date.now()}`
+            });
+            alert('✅ Payment confirmed successfully!');
+            await fetchOrders();
+            setShowModal(false);
+        } catch (err) {
+            console.error('Failed to confirm payment:', err);
+            let message = 'Failed to confirm payment.';
+            if (err && typeof err === 'object') {
+                const error = err as ApiError;
+                if (error.response?.data?.message) {
+                    message = error.response.data.message;
+                } else if (error.message) {
+                    message = error.message;
+                }
+            }
+            alert(`❌ ${message}`);
+        } finally {
+            setConfirmingPayment(false);
         }
     };
 
@@ -169,7 +203,7 @@ export default function AdminOrders() {
                 </div>
             </div>
 
-            {/* Order Details Modal with Status Update */}
+            {/* Order Details Modal with Status Update & Payment Confirmation */}
             {showModal && selectedOrder && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
                     <div className="bg-white rounded-2xl p-8 max-w-2xl w-full max-h-[80vh] overflow-y-auto">
@@ -184,6 +218,7 @@ export default function AdminOrders() {
                         </div>
 
                         <div className="space-y-4">
+                            {/* Order Summary */}
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <p className="text-sm text-gray-500">Date</p>
@@ -211,7 +246,33 @@ export default function AdminOrders() {
                                 </div>
                             </div>
 
-                            {/* Update Status Section */}
+                            {/* ============================================================
+                                CONFIRM PAYMENT BUTTON
+                                ============================================================ */}
+                            <div className="border-t border-gray-200 pt-4">
+                                <h3 className="font-semibold text-gray-800 mb-2">Payment</h3>
+                                <div className="flex items-center gap-4">
+                                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${selectedOrder.isPaymentConfirmed
+                                            ? 'bg-green-100 text-green-800'
+                                            : 'bg-yellow-100 text-yellow-800'
+                                        }`}>
+                                        {selectedOrder.isPaymentConfirmed ? '✅ Confirmed' : '⏳ Pending'}
+                                    </span>
+                                    {!selectedOrder.isPaymentConfirmed && (
+                                        <button
+                                            onClick={handleConfirmPayment}
+                                            disabled={confirmingPayment}
+                                            className="px-4 py-2 bg-[#0F5C45] text-white rounded-lg hover:bg-[#0A4735] transition disabled:opacity-50"
+                                        >
+                                            {confirmingPayment ? 'Confirming...' : 'Confirm Payment'}
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* ============================================================
+                                UPDATE STATUS SECTION
+                                ============================================================ */}
                             <div className="border-t border-gray-200 pt-4">
                                 <h3 className="font-semibold text-gray-800 mb-2">Update Status</h3>
                                 <div className="flex flex-col md:flex-row gap-3">
