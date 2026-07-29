@@ -67,8 +67,8 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IStoreSettingService, StoreSettingService>();
-builder.Services.AddScoped<IWishlistService, WishlistService>(); // Chat service is already added below
-builder.Services.AddScoped<IChatService, ChatService>(); // <-- Add this if not already present
+builder.Services.AddScoped<IWishlistService, WishlistService>();
+builder.Services.AddScoped<IChatService, ChatService>();
 
 // ============================================================
 // 6. Database Context (SQLite locally, PostgreSQL on Render)
@@ -129,23 +129,41 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 // ============================================================
-// 11. Enable CORS – MUST be placed here (after UseHttpsRedirection, before UseAuthentication)
+// 11. Manual OPTIONS handling (fixes preflight CORS)
+// ============================================================
+app.Use(async (context, next) =>
+{
+    // Respond to preflight requests immediately
+    if (context.Request.Method == "OPTIONS")
+    {
+        context.Response.Headers.Add("Access-Control-Allow-Origin", "*");
+        context.Response.Headers.Add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+        context.Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
+        context.Response.Headers.Add("Access-Control-Max-Age", "86400");
+        context.Response.StatusCode = 204; // No content
+        return;
+    }
+    await next();
+});
+
+// ============================================================
+// 12. Enable CORS – MUST be placed after manual OPTIONS handler
 // ============================================================
 app.UseCors("AllowAll");
 
 // ============================================================
-// 12. Authentication & Authorization
+// 13. Authentication & Authorization
 // ============================================================
 app.UseAuthentication();
 app.UseAuthorization();
 
 // ============================================================
-// 13. Map Controllers
+// 14. Map Controllers
 // ============================================================
 app.MapControllers();
 
 // ============================================================
-// 14. Database Initialisation – EnsureCreated (safe for existing DB)
+// 15. Database Initialisation – EnsureCreated (safe for existing DB)
 // ============================================================
 using (var scope = app.Services.CreateScope())
 {
@@ -170,6 +188,6 @@ using (var scope = app.Services.CreateScope())
 }
 
 // ============================================================
-// 15. Run the App
+// 16. Run the App
 // ============================================================
 app.Run();
