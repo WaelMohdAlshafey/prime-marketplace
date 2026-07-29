@@ -32,6 +32,23 @@
   "noProducts": "لا توجد منتجات حالياً.",
   "productCount": "منتج",
 
+  "categories": {
+    "title": "تسوق حسب الفئة",
+    "subtitle": "ابحث بالضبط عما تبحث عنه",
+    "viewAll": "عرض الكل",
+    "software": "برامج",
+    "hairCare": "العناية بالشعر",
+    "skinCare": "العناية بالبشرة",
+    "fashion": "أزياء",
+    "accessories": "إكسسوارات",
+    "electronics": "إلكترونيات",
+    "supplements": "مكملات غذائية",
+    "homeCategory": "المنزل",
+    "discover": "اكتشف أفضل منتجات {category} من بائعين موثوقين",
+    "searchPlaceholder": "ابحث في {category}...",
+    "noProducts": "لا توجد منتجات تطابق الفلاتر المحددة."
+  },
+
   "hero": {
     "prev": "السابق",
     "next": "التالي",

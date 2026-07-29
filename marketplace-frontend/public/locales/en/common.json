@@ -32,6 +32,23 @@
   "noProducts": "No products available.",
   "productCount": "products",
 
+  "categories": {
+    "title": "Shop by Category",
+    "subtitle": "Find exactly what you're looking for",
+    "viewAll": "View All",
+    "software": "Software",
+    "hairCare": "Hair Care",
+    "skinCare": "Skin Care",
+    "fashion": "Fashion",
+    "accessories": "Accessories",
+    "electronics": "Electronics",
+    "supplements": "Supplements",
+    "homeCategory": "Home",
+    "discover": "Discover the best {category} products from trusted vendors",
+    "searchPlaceholder": "Search in {category}...",
+    "noProducts": "No products match the selected filters."
+  },
+
   "hero": {
     "prev": "Previous",
     "next": "Next",
