@@ -3,16 +3,20 @@
   "WorkspaceRootPath": "M:\\Marketplace\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\marketplace-frontend\\src\\app\\cart\\page.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:marketplace-frontend\\src\\app\\cart\\page.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\marketplace-frontend\\src\\app\\admin\\orders\\page.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:marketplace-frontend\\src\\app\\admin\\orders\\page.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\marketplace-frontend\\public\\locales\\en\\common.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:marketplace-frontend\\public\\locales\\en\\common.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\Marketplace.API\\Program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Marketplace.API\\Program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\marketplace-frontend\\public\\locales\\en\\common.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:marketplace-frontend\\public\\locales\\en\\common.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\Marketplace.Application\\Services\\OrderService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -105,10 +109,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\Marketplace.Domain\\Entities\\Conversation.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Marketplace.Domain\\Entities\\Conversation.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\marketplace-frontend\\src\\app\\cart\\page.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:marketplace-frontend\\src\\app\\cart\\page.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\marketplace-frontend\\app\\admin\\orders\\page.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
@@ -234,7 +234,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 5,
           "Children": [
             {
               "$type": "Bookmark",
@@ -242,32 +242,20 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "page.tsx",
               "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\src\\app\\admin\\orders\\page.tsx",
               "RelativeDocumentMoniker": "marketplace-frontend\\src\\app\\admin\\orders\\page.tsx",
               "ToolTip": "M:\\Marketplace\\marketplace-frontend\\src\\app\\admin\\orders\\page.tsx",
               "RelativeToolTip": "marketplace-frontend\\src\\app\\admin\\orders\\page.tsx",
-              "ViewState": "AgIAAGYBAAAAAAAAAAAIwHUBAAABAAAAAAAAAA==",
+              "ViewState": "AgIAAFwBAAAAAAAAAAAAwGUBAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
-              "WhenOpened": "2026-07-29T11:47:16.773Z",
+              "WhenOpened": "2026-07-29T13:33:45.871Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "common.json",
-              "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\public\\locales\\ar\\common.json",
-              "RelativeDocumentMoniker": "marketplace-frontend\\public\\locales\\ar\\common.json",
-              "ToolTip": "M:\\Marketplace\\marketplace-frontend\\public\\locales\\ar\\common.json",
-              "RelativeToolTip": "marketplace-frontend\\public\\locales\\ar\\common.json",
-              "ViewState": "AgIAAL0AAAAAAAAAAAAAwMsAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2026-07-28T13:17:09.187Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 3,
               "Title": "common.json",
               "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\public\\locales\\en\\common.json",
               "RelativeDocumentMoniker": "marketplace-frontend\\public\\locales\\en\\common.json",
@@ -280,7 +268,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 4,
               "Title": "OrderService.cs",
               "DocumentMoniker": "M:\\Marketplace\\Marketplace.Application\\Services\\OrderService.cs",
               "RelativeDocumentMoniker": "Marketplace.Application\\Services\\OrderService.cs",
@@ -288,7 +276,8 @@
               "RelativeToolTip": "Marketplace.Application\\Services\\OrderService.cs",
               "ViewState": "AgIAAJcBAAAAAAAAAAAswKUBAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-07-29T07:01:09.243Z"
+              "WhenOpened": "2026-07-29T07:01:09.243Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -298,14 +287,40 @@
               "RelativeDocumentMoniker": "Marketplace.API\\Program.cs",
               "ToolTip": "M:\\Marketplace\\Marketplace.API\\Program.cs",
               "RelativeToolTip": "Marketplace.API\\Program.cs",
-              "ViewState": "AgIAAKoAAAAAAAAAAAAowLkAAAAKAAAAAAAAAA==",
+              "ViewState": "AgIAALYAAAAAAAAAAAAmwL8AAAAKAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-07-28T13:38:27.994Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "page.tsx",
+              "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\src\\app\\cart\\page.tsx",
+              "RelativeDocumentMoniker": "marketplace-frontend\\src\\app\\cart\\page.tsx",
+              "ToolTip": "M:\\Marketplace\\marketplace-frontend\\src\\app\\cart\\page.tsx",
+              "RelativeToolTip": "marketplace-frontend\\src\\app\\cart\\page.tsx",
+              "ViewState": "AgIAAFABAAAAAAAAAAAAwFkBAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-07-29T09:18:46.183Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 5,
+              "Title": "common.json",
+              "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\public\\locales\\ar\\common.json",
+              "RelativeDocumentMoniker": "marketplace-frontend\\public\\locales\\ar\\common.json",
+              "ToolTip": "M:\\Marketplace\\marketplace-frontend\\public\\locales\\ar\\common.json",
+              "RelativeToolTip": "marketplace-frontend\\public\\locales\\ar\\common.json",
+              "ViewState": "AgIAAL0AAAAAAAAAAAAAwMsAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-07-28T13:17:09.187Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
               "Title": "CategoryGrid.tsx",
               "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\src\\components\\CategoryGrid.tsx",
               "RelativeDocumentMoniker": "marketplace-frontend\\src\\components\\CategoryGrid.tsx",
@@ -313,11 +328,12 @@
               "RelativeToolTip": "marketplace-frontend\\src\\components\\CategoryGrid.tsx",
               "ViewState": "AgIAADEAAAAAAAAAAAAIwD8AAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
-              "WhenOpened": "2026-07-29T11:30:21.232Z"
+              "WhenOpened": "2026-07-29T11:30:21.232Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 7,
               "Title": "OrdersController.cs",
               "DocumentMoniker": "M:\\Marketplace\\Marketplace.API\\Controllers\\OrdersController.cs",
               "RelativeDocumentMoniker": "Marketplace.API\\Controllers\\OrdersController.cs",
@@ -325,11 +341,12 @@
               "RelativeToolTip": "Marketplace.API\\Controllers\\OrdersController.cs",
               "ViewState": "AgIAAAcBAAAAAAAAAAAswBUBAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-07-29T07:06:28.355Z"
+              "WhenOpened": "2026-07-29T07:06:28.355Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 8,
               "Title": "CategoryPage.tsx",
               "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\src\\components\\CategoryPage.tsx",
               "RelativeDocumentMoniker": "marketplace-frontend\\src\\components\\CategoryPage.tsx",
@@ -337,11 +354,12 @@
               "RelativeToolTip": "marketplace-frontend\\src\\components\\CategoryPage.tsx",
               "ViewState": "AgIAAM4AAAAAAAAAAAAUwNwAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
-              "WhenOpened": "2026-07-29T11:31:26.148Z"
+              "WhenOpened": "2026-07-29T11:31:26.148Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 9,
               "Title": "page.tsx",
               "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\src\\app\\categories\\page.tsx",
               "RelativeDocumentMoniker": "marketplace-frontend\\src\\app\\categories\\page.tsx",
@@ -349,11 +367,12 @@
               "RelativeToolTip": "marketplace-frontend\\src\\app\\categories\\page.tsx",
               "ViewState": "AgIAAAAAAAAAAAAAAAAqwAcAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
-              "WhenOpened": "2026-07-29T11:21:08.044Z"
+              "WhenOpened": "2026-07-29T11:21:08.044Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 10,
               "Title": "page.tsx",
               "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\src\\app\\offers\\page.tsx",
               "RelativeDocumentMoniker": "marketplace-frontend\\src\\app\\offers\\page.tsx",
@@ -361,11 +380,12 @@
               "RelativeToolTip": "marketplace-frontend\\src\\app\\offers\\page.tsx",
               "ViewState": "AgIAAAAAAAAAAAAAAAAqwAcAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
-              "WhenOpened": "2026-07-29T11:17:48.25Z"
+              "WhenOpened": "2026-07-29T11:17:48.25Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 11,
               "Title": "page.tsx",
               "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\src\\app\\chat\\page.tsx",
               "RelativeDocumentMoniker": "marketplace-frontend\\src\\app\\chat\\page.tsx",
@@ -373,11 +393,12 @@
               "RelativeToolTip": "marketplace-frontend\\src\\app\\chat\\page.tsx",
               "ViewState": "AgIAACIAAAAAAAAAAAAIwDAAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
-              "WhenOpened": "2026-07-29T11:17:06.728Z"
+              "WhenOpened": "2026-07-29T11:17:06.728Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 12,
               "Title": "api.ts",
               "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\src\\lib\\api.ts",
               "RelativeDocumentMoniker": "marketplace-frontend\\src\\lib\\api.ts",
@@ -385,11 +406,12 @@
               "RelativeToolTip": "marketplace-frontend\\src\\lib\\api.ts",
               "ViewState": "AgIAAAgAAAAAAAAAAAAIwBYAAAATAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
-              "WhenOpened": "2026-07-29T10:01:35.576Z"
+              "WhenOpened": "2026-07-29T10:01:35.576Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 16,
+              "DocumentIndex": 17,
               "Title": "Navbar.tsx",
               "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\src\\components\\Navbar.tsx",
               "RelativeDocumentMoniker": "marketplace-frontend\\src\\components\\Navbar.tsx",
@@ -397,11 +419,12 @@
               "RelativeToolTip": "marketplace-frontend\\src\\components\\Navbar.tsx",
               "ViewState": "AgIAAD8BAAAAAAAAAAAgwEUBAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
-              "WhenOpened": "2026-07-28T13:03:22.748Z"
+              "WhenOpened": "2026-07-28T13:03:22.748Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 15,
+              "DocumentIndex": 16,
               "Title": "ChatSidebar.tsx",
               "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\src\\components\\Chat\\ChatSidebar.tsx",
               "RelativeDocumentMoniker": "marketplace-frontend\\src\\components\\Chat\\ChatSidebar.tsx",
@@ -409,11 +432,12 @@
               "RelativeToolTip": "marketplace-frontend\\src\\components\\Chat\\ChatSidebar.tsx",
               "ViewState": "AgIAADsAAAAAAAAAAAAgwEEAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
-              "WhenOpened": "2026-07-29T09:30:52.662Z"
+              "WhenOpened": "2026-07-29T09:30:52.662Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 14,
+              "DocumentIndex": 15,
               "Title": "ChatWindow.tsx",
               "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\src\\components\\Chat\\ChatWindow.tsx",
               "RelativeDocumentMoniker": "marketplace-frontend\\src\\components\\Chat\\ChatWindow.tsx",
@@ -421,11 +445,12 @@
               "RelativeToolTip": "marketplace-frontend\\src\\components\\Chat\\ChatWindow.tsx",
               "ViewState": "AgIAAGAAAAAAAAAAAAAgwGYAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
-              "WhenOpened": "2026-07-29T09:31:16.896Z"
+              "WhenOpened": "2026-07-29T09:31:16.896Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 13,
+              "DocumentIndex": 14,
               "Title": "page.tsx",
               "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\app\\admin\\products\\page.tsx",
               "RelativeDocumentMoniker": "marketplace-frontend\\app\\admin\\products\\page.tsx",
@@ -433,11 +458,12 @@
               "RelativeToolTip": "marketplace-frontend\\app\\admin\\products\\page.tsx",
               "ViewState": "AgIAAL0AAAAAAAAAAAAUwMYAAAAcAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
-              "WhenOpened": "2026-07-29T06:14:54.011Z"
+              "WhenOpened": "2026-07-29T06:14:54.011Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 17,
+              "DocumentIndex": 18,
               "Title": "index.ts",
               "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\src\\types\\index.ts",
               "RelativeDocumentMoniker": "marketplace-frontend\\src\\types\\index.ts",
@@ -445,11 +471,12 @@
               "RelativeToolTip": "marketplace-frontend\\src\\types\\index.ts",
               "ViewState": "AgIAALoAAAAAAAAAAAAIwMgAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
-              "WhenOpened": "2026-07-29T05:20:13.772Z"
+              "WhenOpened": "2026-07-29T05:20:13.772Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
+              "DocumentIndex": 13,
               "Title": "page.tsx",
               "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\src\\app\\orders\\page.tsx",
               "RelativeDocumentMoniker": "marketplace-frontend\\src\\app\\orders\\page.tsx",
@@ -457,11 +484,12 @@
               "RelativeToolTip": "marketplace-frontend\\src\\app\\orders\\page.tsx",
               "ViewState": "AgIAAJgAAAAAAAAAAAAUwKYAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
-              "WhenOpened": "2026-07-29T09:18:01.956Z"
+              "WhenOpened": "2026-07-29T09:18:01.956Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 18,
+              "DocumentIndex": 19,
               "Title": "AppDbContext.cs",
               "DocumentMoniker": "M:\\Marketplace\\Marketplace.Infrastructure\\Data\\AppDbContext.cs",
               "RelativeDocumentMoniker": "Marketplace.Infrastructure\\Data\\AppDbContext.cs",
@@ -469,11 +497,12 @@
               "RelativeToolTip": "Marketplace.Infrastructure\\Data\\AppDbContext.cs",
               "ViewState": "AgIAAHMAAAAAAAAAAAAswIEAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-07-28T13:34:53.361Z"
+              "WhenOpened": "2026-07-28T13:34:53.361Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 19,
+              "DocumentIndex": 20,
               "Title": "page.tsx",
               "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\src\\components\\Chat\\page.tsx",
               "RelativeDocumentMoniker": "marketplace-frontend\\src\\components\\Chat\\page.tsx",
@@ -481,11 +510,12 @@
               "RelativeToolTip": "marketplace-frontend\\src\\components\\Chat\\page.tsx",
               "ViewState": "AgIAAHwAAAAAAAAAAAAIwIoAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
-              "WhenOpened": "2026-07-29T09:31:45.14Z"
+              "WhenOpened": "2026-07-29T09:31:45.14Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 20,
+              "DocumentIndex": 21,
               "Title": "ChatController.cs",
               "DocumentMoniker": "M:\\Marketplace\\Marketplace.API\\Controllers\\ChatController.cs",
               "RelativeDocumentMoniker": "Marketplace.API\\Controllers\\ChatController.cs",
@@ -493,11 +523,12 @@
               "RelativeToolTip": "Marketplace.API\\Controllers\\ChatController.cs",
               "ViewState": "AgIAAD0AAAAAAAAAAAAUwEsAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-07-29T09:29:30.918Z"
+              "WhenOpened": "2026-07-29T09:29:30.918Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 21,
+              "DocumentIndex": 22,
               "Title": "ChatService.cs",
               "DocumentMoniker": "M:\\Marketplace\\Marketplace.Application\\Services\\ChatService.cs",
               "RelativeDocumentMoniker": "Marketplace.Application\\Services\\ChatService.cs",
@@ -505,11 +536,12 @@
               "RelativeToolTip": "Marketplace.Application\\Services\\ChatService.cs",
               "ViewState": "AgIAAJIAAAAAAAAAAAAUwKAAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-07-29T09:29:03.826Z"
+              "WhenOpened": "2026-07-29T09:29:03.826Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 22,
+              "DocumentIndex": 23,
               "Title": "ChatDtos.cs",
               "DocumentMoniker": "M:\\Marketplace\\Marketplace.Application\\DTOs\\ChatDtos.cs",
               "RelativeDocumentMoniker": "Marketplace.Application\\DTOs\\ChatDtos.cs",
@@ -517,11 +549,12 @@
               "RelativeToolTip": "Marketplace.Application\\DTOs\\ChatDtos.cs",
               "ViewState": "AgIAAA0AAAAAAAAAAAAUwBsAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-07-29T09:28:44.57Z"
+              "WhenOpened": "2026-07-29T09:28:44.57Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 23,
+              "DocumentIndex": 24,
               "Title": "IChatService.cs",
               "DocumentMoniker": "M:\\Marketplace\\Marketplace.Application\\Interfaces\\IChatService.cs",
               "RelativeDocumentMoniker": "Marketplace.Application\\Interfaces\\IChatService.cs",
@@ -529,11 +562,12 @@
               "RelativeToolTip": "Marketplace.Application\\Interfaces\\IChatService.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-07-29T09:28:22.32Z"
+              "WhenOpened": "2026-07-29T09:28:22.32Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 24,
+              "DocumentIndex": 25,
               "Title": "Message.cs",
               "DocumentMoniker": "M:\\Marketplace\\Marketplace.Domain\\Entities\\Message.cs",
               "RelativeDocumentMoniker": "Marketplace.Domain\\Entities\\Message.cs",
@@ -541,11 +575,12 @@
               "RelativeToolTip": "Marketplace.Domain\\Entities\\Message.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAUwA4AAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-07-29T09:27:15.48Z"
+              "WhenOpened": "2026-07-29T09:27:15.48Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 25,
+              "DocumentIndex": 26,
               "Title": "Conversation.cs",
               "DocumentMoniker": "M:\\Marketplace\\Marketplace.Domain\\Entities\\Conversation.cs",
               "RelativeDocumentMoniker": "Marketplace.Domain\\Entities\\Conversation.cs",
@@ -553,19 +588,8 @@
               "RelativeToolTip": "Marketplace.Domain\\Entities\\Conversation.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAUwA4AAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-07-29T09:26:57.952Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 26,
-              "Title": "page.tsx",
-              "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\src\\app\\cart\\page.tsx",
-              "RelativeDocumentMoniker": "marketplace-frontend\\src\\app\\cart\\page.tsx",
-              "ToolTip": "M:\\Marketplace\\marketplace-frontend\\src\\app\\cart\\page.tsx",
-              "RelativeToolTip": "marketplace-frontend\\src\\app\\cart\\page.tsx",
-              "ViewState": "AgIAACgBAAAAAAAAAAAUwDYBAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
-              "WhenOpened": "2026-07-29T09:18:46.183Z"
+              "WhenOpened": "2026-07-29T09:26:57.952Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -577,7 +601,8 @@
               "RelativeToolTip": "marketplace-frontend\\app\\cart\\page.tsx",
               "ViewState": "AgIAAEsBAAAAAAAAAAAUwFkBAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
-              "WhenOpened": "2026-07-29T09:14:22.526Z"
+              "WhenOpened": "2026-07-29T09:14:22.526Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -589,7 +614,8 @@
               "RelativeToolTip": "Marketplace.Application\\Interfaces\\IOrderService.cs",
               "ViewState": "AgIAAAwAAAAAAAAAAAAAABcAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-07-29T07:07:29.153Z"
+              "WhenOpened": "2026-07-29T07:07:29.153Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -601,7 +627,8 @@
               "RelativeToolTip": "marketplace-frontend\\app\\admin\\orders\\page.tsx",
               "ViewState": "AgIAAFoBAAAAAAAAAAAUwGQBAAAWAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
-              "WhenOpened": "2026-07-29T05:14:39.42Z"
+              "WhenOpened": "2026-07-29T05:14:39.42Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -613,7 +640,8 @@
               "RelativeToolTip": "Marketplace.API\\Controllers\\ProductsController.cs",
               "ViewState": "AgIAAAYBAAAAAAAAAAAswBQBAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-07-29T06:15:18.141Z"
+              "WhenOpened": "2026-07-29T06:15:18.141Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -625,7 +653,8 @@
               "RelativeToolTip": "Marketplace.Domain\\Entities\\Order.cs",
               "ViewState": "AgIAAAwAAAAAAAAAAAAAABAAAABrAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-07-29T06:57:45.621Z"
+              "WhenOpened": "2026-07-29T06:57:45.621Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -637,7 +666,8 @@
               "RelativeToolTip": "marketplace-frontend\\app\\tracking\\page.tsx",
               "ViewState": "AgIAAKgAAAAAAAAAAAAUwLYAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
-              "WhenOpened": "2026-07-28T13:21:08.921Z"
+              "WhenOpened": "2026-07-28T13:21:08.921Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -649,7 +679,8 @@
               "RelativeToolTip": "Marketplace.Domain\\Entities\\ShipmentStatusLog.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAUwA4AAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-07-29T06:57:15.578Z"
+              "WhenOpened": "2026-07-29T06:57:15.578Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -661,7 +692,8 @@
               "RelativeToolTip": "Marketplace.Application\\DTOs\\ProductDtos.cs",
               "ViewState": "AgIAACQAAAAAAAAAAAAswDIAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-07-29T06:17:28.891Z"
+              "WhenOpened": "2026-07-29T06:17:28.891Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -673,7 +705,8 @@
               "RelativeToolTip": "marketplace-frontend\\app\\admin\\newsletter\\page.tsx",
               "ViewState": "AgIAAJ0AAAAAAAAAAAAIwKwAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
-              "WhenOpened": "2026-07-29T05:16:18.411Z"
+              "WhenOpened": "2026-07-29T05:16:18.411Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -685,7 +718,8 @@
               "RelativeToolTip": "marketplace-frontend\\app\\admin\\analytics\\page.tsx",
               "ViewState": "AgIAAJoAAAAAAAAAAAAIwKkAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
-              "WhenOpened": "2026-07-29T05:17:55.934Z"
+              "WhenOpened": "2026-07-29T05:17:55.934Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -697,7 +731,8 @@
               "RelativeToolTip": "Marketplace.API\\Controllers\\AdminController.cs",
               "ViewState": "AgIAAIwAAAAAAAAAAAAAAJUAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-07-29T05:08:17.545Z"
+              "WhenOpened": "2026-07-29T05:08:17.545Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -709,7 +744,8 @@
               "RelativeToolTip": "marketplace-frontend\\app\\admin\\page.tsx",
               "ViewState": "AgIAAPsAAAAAAAAAAAAIwAoBAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
-              "WhenOpened": "2026-07-29T05:13:23.54Z"
+              "WhenOpened": "2026-07-29T05:13:23.54Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -721,7 +757,8 @@
               "RelativeToolTip": "marketplace-frontend\\app\\admin\\layout.tsx",
               "ViewState": "AgIAABwAAAAAAAAAAADwvysAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
-              "WhenOpened": "2026-07-29T05:12:39.308Z"
+              "WhenOpened": "2026-07-29T05:12:39.308Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -733,7 +770,8 @@
               "RelativeToolTip": "marketplace-frontend\\src\\components\\admin\\AdminSidebar.tsx",
               "ViewState": "AgIAAEIAAAAAAAAAAAAIwFEAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
-              "WhenOpened": "2026-07-29T05:10:35.383Z"
+              "WhenOpened": "2026-07-29T05:10:35.383Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -745,7 +783,8 @@
               "RelativeToolTip": "Marketplace.API\\Controllers\\NewsletterController.cs",
               "ViewState": "AgIAABIAAAAAAAAAAAAAACkAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-07-28T13:38:10.538Z"
+              "WhenOpened": "2026-07-28T13:38:10.538Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -757,7 +796,8 @@
               "RelativeToolTip": "Marketplace.Application\\Services\\NewsletterService.cs",
               "ViewState": "AgIAAA8AAAAAAAAAAAAAACYAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-07-28T13:37:27.525Z"
+              "WhenOpened": "2026-07-28T13:37:27.525Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -769,7 +809,8 @@
               "RelativeToolTip": "marketplace-frontend\\src\\components\\Footer.tsx",
               "ViewState": "AgIAAKYAAAAAAAAAAAAQwLUAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
-              "WhenOpened": "2026-07-28T13:05:15.667Z"
+              "WhenOpened": "2026-07-28T13:05:15.667Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -781,7 +822,8 @@
               "RelativeToolTip": "Marketplace.Application\\Interfaces\\INewsletterService.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-07-28T13:36:58.725Z"
+              "WhenOpened": "2026-07-28T13:36:58.725Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -793,7 +835,8 @@
               "RelativeToolTip": "Marketplace.Domain\\Entities\\NewsletterSubscription.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-07-28T13:34:34.372Z"
+              "WhenOpened": "2026-07-28T13:34:34.372Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -805,7 +848,8 @@
               "RelativeToolTip": "marketplace-frontend\\app\\auth\\register\\page.tsx",
               "ViewState": "AgIAAFgAAAAAAAAAAADwv28AAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
-              "WhenOpened": "2026-07-28T13:22:25.187Z"
+              "WhenOpened": "2026-07-28T13:22:25.187Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -817,7 +861,8 @@
               "RelativeToolTip": "marketplace-frontend\\app\\page.tsx",
               "ViewState": "AgIAAIwAAAAAAAAAAAAAAKMAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
-              "WhenOpened": "2026-07-28T13:18:32.576Z"
+              "WhenOpened": "2026-07-28T13:18:32.576Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -829,7 +874,8 @@
               "RelativeToolTip": "marketplace-frontend\\src\\components\\HeroBanner.tsx",
               "ViewState": "AgIAAMgAAAAAAAAAAAAuwN8AAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
-              "WhenOpened": "2026-07-28T13:04:19.111Z"
+              "WhenOpened": "2026-07-28T13:04:19.111Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -841,7 +887,8 @@
               "RelativeToolTip": "marketplace-frontend\\app\\auth\\login\\page.tsx",
               "ViewState": "AgIAAEoAAAAAAAAAAAAAAGEAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
-              "WhenOpened": "2026-07-28T13:22:03.015Z"
+              "WhenOpened": "2026-07-28T13:22:03.015Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -853,7 +900,8 @@
               "RelativeToolTip": "marketplace-frontend\\app\\stores\\page.tsx",
               "ViewState": "AgIAABEAAAAAAAAAAAAuwCkAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
-              "WhenOpened": "2026-07-28T13:20:48.047Z"
+              "WhenOpened": "2026-07-28T13:20:48.047Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -865,7 +913,8 @@
               "RelativeToolTip": "marketplace-frontend\\app\\contact\\page.tsx",
               "ViewState": "AgIAACAAAAAAAAAAAAAuwDgAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
-              "WhenOpened": "2026-07-28T13:20:19.797Z"
+              "WhenOpened": "2026-07-28T13:20:19.797Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -877,7 +926,8 @@
               "RelativeToolTip": "marketplace-frontend\\app\\about\\page.tsx",
               "ViewState": "AgIAADsAAAAAAAAAAAAuwFMAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
-              "WhenOpened": "2026-07-28T13:19:57.984Z"
+              "WhenOpened": "2026-07-28T13:19:57.984Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -889,7 +939,8 @@
               "RelativeToolTip": "marketplace-frontend\\src\\components\\Logo.tsx",
               "ViewState": "AgIAABIAAAAAAAAAAAAkwB0AAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
-              "WhenOpened": "2026-07-28T13:04:53.373Z"
+              "WhenOpened": "2026-07-28T13:04:53.373Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -901,7 +952,8 @@
               "RelativeToolTip": "marketplace-frontend\\src\\components\\ProductCard.tsx",
               "ViewState": "AgIAAPsAAAAAAAAAAAAkwAYBAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
-              "WhenOpened": "2026-07-28T13:03:54.712Z"
+              "WhenOpened": "2026-07-28T13:03:54.712Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -913,7 +965,8 @@
               "RelativeToolTip": "marketplace-frontend\\app\\globals.css",
               "ViewState": "AgIAAMsAAAAAAAAAAAAcwNcAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
-              "WhenOpened": "2026-07-28T13:01:37.097Z"
+              "WhenOpened": "2026-07-28T13:01:37.097Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Bookmark",

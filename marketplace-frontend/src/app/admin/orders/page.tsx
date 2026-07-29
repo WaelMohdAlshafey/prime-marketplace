@@ -30,15 +30,12 @@ export default function AdminOrders() {
     const { t } = useTranslation('common');
     const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
-    const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null);
+    const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
     const [showModal, setShowModal] = useState(false);
     const [note, setNote] = useState('');
     const [updating, setUpdating] = useState(false);
     const [confirmingPayment, setConfirmingPayment] = useState(false);
     const [revertingPayment, setRevertingPayment] = useState(false);
-
-    // Derive the full order from the orders list
-    const selectedOrder = orders.find(o => o.id === selectedOrderId) || null;
 
     const fetchOrders = async () => {
         try {
@@ -63,7 +60,7 @@ export default function AdminOrders() {
             await api.put(`/api/Orders/${orderId}/status`, { status: newStatus, note });
             await fetchOrders();
             setNote('');
-            // ✅ Close modal after successful update
+            // ✅ CLOSE MODAL AFTER SUCCESSFUL UPDATE
             setShowModal(false);
         } catch (err) {
             console.error('Failed to update order status:', err);
@@ -214,7 +211,7 @@ export default function AdminOrders() {
                                     <td className="px-6 py-4 text-sm space-x-2 rtl:space-x-reverse">
                                         <button
                                             onClick={() => {
-                                                setSelectedOrderId(order.id);
+                                                setSelectedOrder(order);
                                                 setShowModal(true);
                                             }}
                                             className="text-[#0F5C45] hover:text-[#0A4735] font-medium"
@@ -311,8 +308,8 @@ export default function AdminOrders() {
                                     <select
                                         value={selectedOrder.status}
                                         onChange={(e) => {
-                                            // We update the local state only; the API call will use the new value
-                                            // We'll use the select's value on button click
+                                            const newStatus = e.target.value;
+                                            setSelectedOrder({ ...selectedOrder, status: newStatus });
                                         }}
                                         className="flex-1 px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#0F5C45] focus:border-transparent"
                                     >
@@ -328,12 +325,7 @@ export default function AdminOrders() {
                                         className="flex-1 px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#0F5C45] focus:border-transparent"
                                     />
                                     <button
-                                        onClick={() => {
-                                            const select = document.querySelector('select') as HTMLSelectElement;
-                                            if (select) {
-                                                handleUpdateStatus(selectedOrder.id, select.value);
-                                            }
-                                        }}
+                                        onClick={() => handleUpdateStatus(selectedOrder.id, selectedOrder.status)}
                                         disabled={updating}
                                         className="px-6 py-2 bg-[#0F5C45] text-white rounded-xl hover:bg-[#0A4735] transition disabled:opacity-50 flex items-center gap-2"
                                     >
