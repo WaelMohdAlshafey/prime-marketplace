@@ -133,21 +133,20 @@ app.UseHttpsRedirection();
 // ============================================================
 app.Use(async (context, next) =>
 {
-    // Respond to preflight requests immediately
     if (context.Request.Method == "OPTIONS")
     {
         context.Response.Headers.Add("Access-Control-Allow-Origin", "*");
         context.Response.Headers.Add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
         context.Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
         context.Response.Headers.Add("Access-Control-Max-Age", "86400");
-        context.Response.StatusCode = 204; // No content
+        context.Response.StatusCode = 204;
         return;
     }
     await next();
 });
 
 // ============================================================
-// 12. Enable CORS – MUST be placed after manual OPTIONS handler
+// 12. Enable CORS
 // ============================================================
 app.UseCors("AllowAll");
 
@@ -163,26 +162,20 @@ app.UseAuthorization();
 app.MapControllers();
 
 // ============================================================
-// 15. Database Initialisation – EnsureCreated (safe for existing DB)
+// 15. Database Migration – APPLY ALL PENDING MIGRATIONS
 // ============================================================
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     try
     {
-        var created = dbContext.Database.EnsureCreated();
-        if (created)
-        {
-            Console.WriteLine("✅ Database created successfully.");
-        }
-        else
-        {
-            Console.WriteLine("✅ Database already exists. Skipping migrations.");
-        }
+        // Instead of EnsureCreated, we use Migrate to apply all pending migrations
+        dbContext.Database.Migrate();
+        Console.WriteLine("✅ Migrations applied successfully.");
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"❌ Database initialisation error: {ex.Message}");
+        Console.WriteLine($"❌ Database migration error: {ex.Message}");
         throw;
     }
 }
