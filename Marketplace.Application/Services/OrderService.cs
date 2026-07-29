@@ -127,13 +127,14 @@ public class OrderService : IOrderService
             UserId = userId,
             OrderDate = DateTime.UtcNow,
             TotalAmount = cart.TotalAmount,
-            Status = "Pending",
+            CurrentStatus = "Pending",
             ShippingAddress = createOrderDto.ShippingAddress,
             PaymentMethod = createOrderDto.PaymentMethod,
             PhoneNumber = createOrderDto.PhoneNumber,
             PayPalEmail = createOrderDto.PayPalEmail,
             DeliveryInstructions = createOrderDto.DeliveryInstructions,
-            IsPaymentConfirmed = false
+            IsPaymentConfirmed = false,
+            TrackingNumber = GenerateTrackingNumber()
         };
 
         if (!string.IsNullOrEmpty(createOrderDto.CardNumber) && createOrderDto.CardNumber.Length >= 4)
@@ -143,6 +144,17 @@ public class OrderService : IOrderService
 
         _context.Orders.Add(order);
         await _context.SaveChangesAsync();
+
+        // Add first status log
+        var statusLog = new ShipmentStatusLog
+        {
+            OrderId = order.Id,
+            Status = "Pending",
+            Note = "Order created.",
+            CreatedAt = DateTime.UtcNow,
+            UpdatedByUserId = userId
+        };
+        _context.ShipmentStatusLogs.Add(statusLog);
 
         foreach (var item in cart.Items)
         {
@@ -168,9 +180,11 @@ public class OrderService : IOrderService
         return await GetOrderByIdAsync(userId, order.Id);
     }
 
-    // ============================================================
-    // FIXED: Return type is List<OrderDto> to match interface
-    // ============================================================
+    private string GenerateTrackingNumber()
+    {
+        return "TRK-" + DateTime.UtcNow.Ticks.ToString().Substring(0, 8) + Guid.NewGuid().ToString().Substring(0, 6);
+    }
+
     public async Task<List<OrderDto>> GetOrdersAsync(int userId)
     {
         var orders = await _context.Orders
@@ -211,7 +225,7 @@ public class OrderService : IOrderService
             Id = order.Id,
             OrderDate = order.OrderDate,
             TotalAmount = order.TotalAmount,
-            Status = order.Status,
+            Status = order.CurrentStatus,
             ShippingAddress = order.ShippingAddress,
             PaymentMethod = order.PaymentMethod,
             PaymentTransactionId = order.PaymentTransactionId,
@@ -233,7 +247,7 @@ public class OrderService : IOrderService
         if (order == null)
             throw new Exception("Order not found.");
 
-        order.Status = status;
+        order.CurrentStatus = status;
         await _context.SaveChangesAsync();
     }
 
@@ -280,10 +294,80 @@ public class OrderService : IOrderService
 
         order.IsPaymentConfirmed = true;
         order.PaymentConfirmedAt = DateTime.UtcNow;
-        order.Status = "Paid";
+        order.CurrentStatus = "Paid";
+        await _context.SaveChangesAsync();
 
+        // Add status log for payment confirmation
+        var statusLog = new ShipmentStatusLog
+        {
+            OrderId = orderId,
+            Status = "Paid",
+            Note = "Payment confirmed.",
+            CreatedAt = DateTime.UtcNow,
+            UpdatedByUserId = userId
+        };
+        _context.ShipmentStatusLogs.Add(statusLog);
         await _context.SaveChangesAsync();
 
         return await GetOrderByIdAsync(userId, orderId);
+    }
+
+    // ============================================================
+    // TRACKING / SHIPMENT STATUS LOG (NEW)
+    // ============================================================
+
+    public async Task<OrderDto> UpdateOrderStatusWithLogAsync(int userId, int orderId, string newStatus, string? note = null)
+    {
+        var order = await _context.Orders.FindAsync(orderId);
+        if (order == null)
+            throw new Exception("Order not found.");
+
+        // ✅ FIX: Get user role from database instead of using User.IsInRole
+        var user = await _context.Users.FindAsync(userId);
+        if (user == null)
+            throw new Exception("User not found.");
+
+        bool isAdmin = user.Role == "Admin";
+
+        // Check if the user is the vendor of any product in the order
+        var isVendor = await _context.OrderItems
+            .Where(oi => oi.OrderId == orderId)
+            .Join(_context.Products, oi => oi.ProductId, p => p.Id, (oi, p) => p.VendorId)
+            .AnyAsync(vendorId => vendorId == userId);
+
+        if (!isAdmin && !isVendor)
+            throw new Exception("You do not have permission to update this order.");
+
+        var oldStatus = order.CurrentStatus;
+        order.CurrentStatus = newStatus;
+
+        if (newStatus == "Delivered")
+            order.DeliveredAt = DateTime.UtcNow;
+
+        await _context.SaveChangesAsync();
+
+        // Log the status change
+        var log = new ShipmentStatusLog
+        {
+            OrderId = orderId,
+            Status = newStatus,
+            Note = note,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedByUserId = userId
+        };
+        _context.ShipmentStatusLogs.Add(log);
+        await _context.SaveChangesAsync();
+
+        // (Optional) Send notification/email here
+
+        return await GetOrderByIdAsync(order.UserId, orderId);
+    }
+
+    public async Task<List<ShipmentStatusLog>> GetStatusLogsAsync(int orderId)
+    {
+        return await _context.ShipmentStatusLogs
+            .Where(s => s.OrderId == orderId)
+            .OrderBy(s => s.CreatedAt)
+            .ToListAsync();
     }
 }

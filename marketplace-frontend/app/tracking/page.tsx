@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import api from '@/lib/api';
+import { CheckCircle, Package, Truck, Clock } from 'lucide-react';
 
 interface TrackingData {
     id: number;
@@ -14,6 +15,13 @@ interface TrackingData {
     totalAmount: number;
     orderDate: string;
     items: { productName: string; quantity: number; unitPrice: number }[];
+    logs: {
+        id: number;
+        status: string;
+        note: string | null;
+        createdAt: string;
+        updatedBy: { username: string };
+    }[];
 }
 
 export default function TrackingPage() {
@@ -35,7 +43,7 @@ export default function TrackingPage() {
             const response = await api.get(`/api/Orders/track/${trackingNumber.trim()}`);
             setData(response.data);
         } catch (err: unknown) {
-            let message = t('trackingNotFound');
+            let message = 'Tracking number not found.';
             if (err && typeof err === 'object' && 'response' in err) {
                 const errorObj = err as { response: { data?: { message?: string } } };
                 if (errorObj.response?.data?.message) {
@@ -45,6 +53,30 @@ export default function TrackingPage() {
             setError(message);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const getStatusIcon = (status: string) => {
+        switch (status.toLowerCase()) {
+            case 'delivered':
+                return <CheckCircle className="w-6 h-6 text-green-500" />;
+            case 'shipped':
+            case 'in transit':
+                return <Truck className="w-6 h-6 text-blue-500" />;
+            case 'packaging':
+                return <Package className="w-6 h-6 text-yellow-500" />;
+            default:
+                return <Clock className="w-6 h-6 text-gray-400" />;
+        }
+    };
+
+    const getStatusColor = (status: string) => {
+        switch (status.toLowerCase()) {
+            case 'delivered': return 'border-green-500 bg-green-50';
+            case 'shipped':
+            case 'in transit': return 'border-blue-500 bg-blue-50';
+            case 'packaging': return 'border-yellow-500 bg-yellow-50';
+            default: return 'border-gray-300 bg-gray-50';
         }
     };
 
@@ -80,19 +112,21 @@ export default function TrackingPage() {
 
             {data && (
                 <div className="bg-white rounded-2xl shadow-md p-6">
+                    {/* Order Summary */}
                     <div className="flex justify-between items-center border-b border-gray-200 pb-4 mb-4">
                         <span className="text-sm text-gray-500">
                             {t('trackingOrder', { id: data.id })}
                         </span>
                         <span className={`px-3 py-1 rounded-full text-sm font-medium ${data.status === 'Delivered' ? 'bg-green-100 text-green-800' :
                                 data.status === 'Shipped' ? 'bg-blue-100 text-blue-800' :
-                                    'bg-yellow-100 text-yellow-800'
+                                    data.status === 'In Transit' ? 'bg-purple-100 text-purple-800' :
+                                        'bg-yellow-100 text-yellow-800'
                             }`}>
                             {data.status}
                         </span>
                     </div>
 
-                    <div className="space-y-2 text-sm">
+                    <div className="space-y-2 text-sm mb-4">
                         <p><strong>{t('trackingNumber')}:</strong> {data.trackingNumber}</p>
                         <p><strong>{t('trackingCarrier')}:</strong> {data.shippingCarrier || 'N/A'}</p>
                         <p><strong>{t('trackingShipped')}:</strong> {data.shippedAt ? new Date(data.shippedAt).toLocaleDateString() : 'Not yet'}</p>
@@ -100,6 +134,39 @@ export default function TrackingPage() {
                         <p><strong>{t('trackingTotal')}:</strong> £{data.totalAmount.toFixed(2)}</p>
                     </div>
 
+                    {/* Timeline */}
+                    <div className="mt-6 border-t border-gray-200 pt-4">
+                        <h4 className="font-semibold text-gray-800 mb-4">Tracking History</h4>
+                        {data.logs && data.logs.length > 0 ? (
+                            <div className="space-y-4">
+                                {data.logs.map((log, index) => (
+                                    <div key={log.id} className="flex items-start gap-3">
+                                        <div className={`p-2 rounded-full ${getStatusColor(log.status)}`}>
+                                            {getStatusIcon(log.status)}
+                                        </div>
+                                        <div className="flex-1">
+                                            <div className="flex justify-between items-center">
+                                                <span className="font-semibold text-gray-800">{log.status}</span>
+                                                <span className="text-xs text-gray-400">
+                                                    {new Date(log.createdAt).toLocaleString()}
+                                                </span>
+                                            </div>
+                                            {log.note && (
+                                                <p className="text-sm text-gray-600 mt-1">{log.note}</p>
+                                            )}
+                                            <p className="text-xs text-gray-400 mt-1">
+                                                Updated by: {log.updatedBy?.username || 'System'}
+                                            </p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <p className="text-gray-500 text-sm">No tracking history yet.</p>
+                        )}
+                    </div>
+
+                    {/* Items */}
                     <div className="mt-4 border-t border-gray-200 pt-4">
                         <h4 className="font-semibold mb-2">{t('trackingItems')}</h4>
                         {data.items.map((item, idx) => (

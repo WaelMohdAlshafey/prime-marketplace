@@ -13,7 +13,8 @@ public class Order
     public string? ShippingCarrier { get; set; } // e.g., "DHL", "Aramex"
     public DateTime? ShippedAt { get; set; }
     public DateTime? DeliveredAt { get; set; }
-
+    public string CurrentStatus { get; set; } = "Pending"; // This will be the latest status
+    public virtual ICollection<ShipmentStatusLog> StatusLogs { get; set; } = new List<ShipmentStatusLog>();
     // ============================================================
     // PAYMENT DETAILS
     // ============================================================

@@ -30,8 +30,55 @@ public class OrdersController : ControllerBase
     }
 
     // ============================================================
-    // CHECKOUT
+    // CART
     // ============================================================
+
+    [HttpGet("cart")]
+    public async Task<IActionResult> GetCart()
+    {
+        var userId = GetUserId();
+        var cart = await _orderService.GetCartAsync(userId);
+        return Ok(cart);
+    }
+
+    [HttpPost("cart")]
+    public async Task<IActionResult> AddToCart(AddToCartDto addToCartDto)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        try
+        {
+            var userId = GetUserId();
+            var cart = await _orderService.AddToCartAsync(userId, addToCartDto);
+            return Ok(cart);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    [HttpDelete("cart/{id}")]
+    public async Task<IActionResult> RemoveFromCart(int id)
+    {
+        var userId = GetUserId();
+        var cart = await _orderService.RemoveFromCartAsync(userId, id);
+        return Ok(cart);
+    }
+
+    [HttpDelete("cart")]
+    public async Task<IActionResult> ClearCart()
+    {
+        var userId = GetUserId();
+        await _orderService.ClearCartAsync(userId);
+        return NoContent();
+    }
+
+    // ============================================================
+    // ORDERS
+    // ============================================================
+
     [HttpPost("checkout")]
     public async Task<IActionResult> Checkout(CreateOrderDto createOrderDto)
     {
@@ -50,9 +97,6 @@ public class OrdersController : ControllerBase
         }
     }
 
-    // ============================================================
-    // GET ALL ORDERS
-    // ============================================================
     [HttpGet]
     public async Task<IActionResult> GetOrders()
     {
@@ -61,9 +105,6 @@ public class OrdersController : ControllerBase
         return Ok(orders);
     }
 
-    // ============================================================
-    // GET ORDER BY ID
-    // ============================================================
     [HttpGet("{id}")]
     public async Task<IActionResult> GetOrderById(int id)
     {
@@ -79,27 +120,22 @@ public class OrdersController : ControllerBase
         }
     }
 
-    // ============================================================
-    // UPDATE ORDER STATUS
-    // ============================================================
     [HttpPut("{id}/status")]
-    public async Task<IActionResult> UpdateStatus(int id, [FromBody] UpdateStatusDto request)
+    [Authorize(Roles = "Admin,Vendor")]
+    public async Task<IActionResult> UpdateStatusWithNote(int id, [FromBody] UpdateStatusWithNoteDto request)
     {
-        var userId = GetUserId();
         try
         {
-            await _orderService.UpdateOrderStatusAsync(userId, id, request.Status);
-            return Ok(new { message = $"Order #{id} status updated to '{request.Status}'." });
+            var userId = GetUserId();
+            var updatedOrder = await _orderService.UpdateOrderStatusWithLogAsync(userId, id, request.Status, request.Note);
+            return Ok(updatedOrder);
         }
         catch (Exception ex)
         {
-            return NotFound(new { message = ex.Message });
+            return BadRequest(new { message = ex.Message });
         }
     }
 
-    // ============================================================
-    // CONFIRM PAYMENT
-    // ============================================================
     [HttpPost("{id}/confirm-payment")]
     public async Task<IActionResult> ConfirmPayment(int id, [FromBody] PaymentConfirmationDto confirmation)
     {
@@ -116,13 +152,16 @@ public class OrdersController : ControllerBase
     }
 
     // ============================================================
-    // TRACK SHIPMENT – PUBLIC (no auth)
+    // TRACKING – PUBLIC
     // ============================================================
+
     [HttpGet("track/{trackingNumber}")]
     [AllowAnonymous]
     public async Task<IActionResult> TrackShipment(string trackingNumber)
     {
         var order = await _context.Orders
+            .Include(o => o.StatusLogs)
+            .ThenInclude(s => s.UpdatedBy)
             .FirstOrDefaultAsync(o => o.TrackingNumber == trackingNumber);
 
         if (order == null)
@@ -145,12 +184,66 @@ public class OrdersController : ControllerBase
             order.ShippingCarrier,
             order.ShippedAt,
             order.DeliveredAt,
-            order.Status,
+            order.CurrentStatus,
             order.TotalAmount,
             order.OrderDate,
-            Items = items
+            Items = items,
+            Logs = order.StatusLogs.Select(s => new
+            {
+                s.Id,
+                s.Status,
+                s.Note,
+                s.CreatedAt,
+                UpdatedBy = s.UpdatedBy != null ? new { s.UpdatedBy.Username } : null
+            })
         };
 
         return Ok(result);
     }
+
+    // ============================================================
+    // ADMIN: Get all orders (for admin panel)
+    // ============================================================
+
+    [HttpGet("admin/all")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> GetAllOrdersForAdmin()
+    {
+        var orders = await _context.Orders
+            .Include(o => o.OrderItems)
+            .OrderByDescending(o => o.OrderDate)
+            .Select(o => new
+            {
+                o.Id,
+                o.UserId,
+                o.OrderDate,
+                o.TotalAmount,
+                o.CurrentStatus,
+                o.ShippingAddress,
+                o.PaymentMethod,
+                o.IsPaymentConfirmed,
+                o.PaymentConfirmedAt,
+                Items = o.OrderItems.Select(oi => new
+                {
+                    oi.ProductId,
+                    oi.ProductName,
+                    oi.UnitPrice,
+                    oi.Quantity,
+                    Subtotal = oi.UnitPrice * oi.Quantity
+                })
+            })
+            .ToListAsync();
+
+        return Ok(orders);
+    }
+}
+
+// ============================================================
+// DTOs
+// ============================================================
+
+public class UpdateStatusWithNoteDto
+{
+    public string Status { get; set; } = string.Empty;
+    public string? Note { get; set; }
 }

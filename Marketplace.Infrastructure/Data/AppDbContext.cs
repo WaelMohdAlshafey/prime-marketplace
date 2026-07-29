@@ -15,6 +15,7 @@ public class AppDbContext : DbContext
     public DbSet<StoreSetting> StoreSettings { get; set; }
     public DbSet<WishlistItem> WishlistItems { get; set; } // NEW
     public DbSet<NewsletterSubscription> NewsletterSubscriptions { get; set; }
+    public DbSet<ShipmentStatusLog> ShipmentStatusLogs { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -76,5 +77,21 @@ public class AppDbContext : DbContext
             .WithMany()
             .HasForeignKey(wi => wi.UserId)
             .OnDelete(DeleteBehavior.Cascade);
+
+
+        modelBuilder.Entity<ShipmentStatusLog>()
+    .HasIndex(s => s.OrderId);
+
+        modelBuilder.Entity<ShipmentStatusLog>()
+            .HasOne(s => s.Order)
+            .WithMany(o => o.StatusLogs)
+            .HasForeignKey(s => s.OrderId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<ShipmentStatusLog>()
+            .HasOne(s => s.UpdatedBy)
+            .WithMany()
+            .HasForeignKey(s => s.UpdatedByUserId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }
