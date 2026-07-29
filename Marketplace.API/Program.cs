@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 using Marketplace.Infrastructure.Data;
 using Marketplace.Application.Interfaces;
 using Marketplace.Application.Services;
-using Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -136,10 +135,11 @@ app.Use(async (context, next) =>
 {
     if (context.Request.Method == "OPTIONS")
     {
-        context.Response.Headers.Add("Access-Control-Allow-Origin", "*");
-        context.Response.Headers.Add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-        context.Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
-        context.Response.Headers.Add("Access-Control-Max-Age", "86400");
+        // Using indexer instead of Add to avoid duplicate key warnings
+        context.Response.Headers["Access-Control-Allow-Origin"] = "*";
+        context.Response.Headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS";
+        context.Response.Headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With";
+        context.Response.Headers["Access-Control-Max-Age"] = "86400";
         context.Response.StatusCode = 204;
         return;
     }
@@ -163,31 +163,26 @@ app.UseAuthorization();
 app.MapControllers();
 
 // ============================================================
-// 15. Database Migration – ROBUST HANDLER (FIX)
+// 15. Database Migration – BULLETPROOF HANDLER
 // ============================================================
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     try
     {
-        // Check if the 'Orders' table exists (indicates a database created with EnsureCreated)
-        bool tableExists;
-        try
-        {
-            tableExists = dbContext.Database.ExecuteSqlRaw(
-                "SELECT EXISTS (SELECT 1 FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace WHERE n.nspname = 'public' AND c.relname = 'Orders');") > 0;
-        }
-        catch (Exception)
-        {
-            // If the query fails (e.g., database doesn't exist yet), assume no tables.
-            tableExists = false;
-        }
+        // ============================================================
+        // Step 1: Check if the 'Orders' table exists
+        // ============================================================
+        var ordersTableExists = dbContext.Database.ExecuteSqlRaw(
+            "SELECT EXISTS (SELECT 1 FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace WHERE n.nspname = 'public' AND c.relname = 'Orders');") > 0;
 
-        if (tableExists)
+        if (ordersTableExists)
         {
-            Console.WriteLine("✅ Existing tables detected. Checking migration history...");
+            Console.WriteLine("✅ Existing database detected. Preparing migrations...");
 
-            // Ensure the __EFMigrationsHistory table exists.
+            // ============================================================
+            // Step 2: Create the migration history table if it doesn't exist
+            // ============================================================
             dbContext.Database.ExecuteSqlRaw(
                 @"CREATE TABLE IF NOT EXISTS ""__EFMigrationsHistory"" (
                     ""MigrationId"" TEXT NOT NULL,
@@ -195,30 +190,42 @@ using (var scope = app.Services.CreateScope())
                     CONSTRAINT ""PK___EFMigrationsHistory"" PRIMARY KEY (""MigrationId"")
                 );");
 
-            // Check if the initial migration is already recorded.
+            // ============================================================
+            // Step 3: Check if the initial migration is already recorded
+            // ============================================================
             var initialMigrationId = "20260720092925_InitialCreate";
-            var historyExists = dbContext.Database.ExecuteSqlRaw(
-                "SELECT EXISTS (SELECT 1 FROM \"__EFMigrationsHistory\" WHERE \"MigrationId\" = {0});", initialMigrationId) > 0;
+            var historyRecordExists = dbContext.Database.ExecuteSqlRaw(
+                $"SELECT EXISTS (SELECT 1 FROM \"__EFMigrationsHistory\" WHERE \"MigrationId\" = '{initialMigrationId}');") > 0;
 
-            if (!historyExists)
+            if (!historyRecordExists)
             {
                 Console.WriteLine($"⚠️ Initial migration '{initialMigrationId}' not recorded. Inserting now...");
-                var productVersion = "8.0.0"; // EF Core version used
+
+                // Insert the migration record using raw SQL (this is guaranteed to work)
                 dbContext.Database.ExecuteSqlRaw(
-                    "INSERT INTO \"__EFMigrationsHistory\" (\"MigrationId\", \"ProductVersion\") VALUES ({0}, {1});",
-                    initialMigrationId, productVersion);
+                    $"INSERT INTO \"__EFMigrationsHistory\" (\"MigrationId\", \"ProductVersion\") VALUES ('{initialMigrationId}', '8.0.0');");
+
                 Console.WriteLine("✅ Initial migration marked as applied.");
             }
+            else
+            {
+                Console.WriteLine("✅ Initial migration already recorded.");
+            }
+        }
+        else
+        {
+            Console.WriteLine("🆕 Fresh database. Migrations will be applied normally.");
         }
 
-        // Now run migrations – this will apply any pending ones (e.g., AddShipmentTrackingFields, AddRatingToProducts, etc.)
+        // ============================================================
+        // Step 4: Apply all pending migrations
+        // ============================================================
         dbContext.Database.Migrate();
         Console.WriteLine("✅ All migrations applied successfully.");
     }
     catch (Exception ex)
     {
         Console.WriteLine($"❌ Database migration error: {ex.Message}");
-        // We throw so that the deployment fails explicitly – better than running with a broken DB.
         throw;
     }
 }
