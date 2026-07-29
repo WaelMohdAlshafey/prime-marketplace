@@ -120,6 +120,9 @@ public class OrdersController : ControllerBase
         }
     }
 
+    // ============================================================
+    // CONFIRM PAYMENT – Admin, Vendor, Employee
+    // ============================================================
     [HttpPost("{id}/confirm-payment")]
     [Authorize(Roles = "Admin,Vendor,Employee")]
     public async Task<IActionResult> ConfirmPayment(int id, [FromBody] PaymentConfirmationDto confirmation)
@@ -136,6 +139,9 @@ public class OrdersController : ControllerBase
         }
     }
 
+    // ============================================================
+    // REVERT PAYMENT – Admin only
+    // ============================================================
     [HttpPost("{id}/revert-payment")]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> RevertPayment(int id, [FromBody] RevertPaymentDto request)
@@ -152,8 +158,11 @@ public class OrdersController : ControllerBase
         }
     }
 
+    // ============================================================
+    // UPDATE ORDER STATUS – Admin, Vendor, Employee, Customer (cancel only)
+    // ============================================================
     [HttpPut("{id}/status")]
-    [Authorize]
+    [Authorize] // any logged-in user
     public async Task<IActionResult> UpdateStatus(int id, [FromBody] UpdateStatusWithNoteDto request)
     {
         try
@@ -181,6 +190,7 @@ public class OrdersController : ControllerBase
         order = await _context.Orders
             .Include(o => o.StatusLogs)
             .ThenInclude(s => s.UpdatedBy)
+            .Include(o => o.User) // ✅ Include the User navigation property
             .FirstOrDefaultAsync(o => o.TrackingNumber == trackingNumberOrId);
 
         // 2. If not found, try parsing as Order ID (int)
@@ -189,6 +199,7 @@ public class OrdersController : ControllerBase
             order = await _context.Orders
                 .Include(o => o.StatusLogs)
                 .ThenInclude(s => s.UpdatedBy)
+                .Include(o => o.User) // ✅ Include the User navigation property
                 .FirstOrDefaultAsync(o => o.Id == orderId);
         }
 
@@ -215,6 +226,7 @@ public class OrdersController : ControllerBase
             order.CurrentStatus,
             order.TotalAmount,
             order.OrderDate,
+            CustomerName = order.User != null ? order.User.Username : "Guest", // ✅ Customer name added
             Items = items,
             Logs = order.StatusLogs.Select(s => new
             {
