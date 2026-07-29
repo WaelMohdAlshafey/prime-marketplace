@@ -306,6 +306,40 @@ public class OrderService : IOrderService
     }
 
     // ============================================================
+    // REVERT PAYMENT – Admin only
+    // ============================================================
+    public async Task<OrderDto> RevertPaymentAsync(int userId, int orderId, string? note = null)
+    {
+        var user = await _context.Users.FindAsync(userId);
+        if (user == null || user.Role != "Admin")
+            throw new Exception("Only Admins can revert payments.");
+
+        var order = await _context.Orders.FindAsync(orderId);
+        if (order == null)
+            throw new Exception("Order not found.");
+
+        if (!order.IsPaymentConfirmed)
+            throw new Exception("Payment is not confirmed.");
+
+        order.IsPaymentConfirmed = false;
+        order.CurrentStatus = "Pending";
+        await _context.SaveChangesAsync();
+
+        var statusLog = new ShipmentStatusLog
+        {
+            OrderId = orderId,
+            Status = "Pending",
+            Note = note ?? "Payment reverted by Admin.",
+            CreatedAt = DateTime.UtcNow,
+            UpdatedByUserId = userId
+        };
+        _context.ShipmentStatusLogs.Add(statusLog);
+        await _context.SaveChangesAsync();
+
+        return await GetOrderByIdAsync(order.UserId, orderId);
+    }
+
+    // ============================================================
     // UPDATE ORDER STATUS – with permissions
     // ============================================================
     public async Task<OrderDto> UpdateOrderStatusAsync(int userId, int orderId, string newStatus, string? note = null)

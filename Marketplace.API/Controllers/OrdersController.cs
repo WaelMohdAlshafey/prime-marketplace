@@ -140,6 +140,25 @@ public class OrdersController : ControllerBase
     }
 
     // ============================================================
+    // ADMIN: REVERT PAYMENT
+    // ============================================================
+    [HttpPost("{id}/revert-payment")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> RevertPayment(int id, [FromBody] RevertPaymentDto request)
+    {
+        var userId = GetUserId();
+        try
+        {
+            var order = await _orderService.RevertPaymentAsync(userId, id, request.Note);
+            return Ok(new { message = "Payment reverted successfully!", order });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    // ============================================================
     // UPDATE ORDER STATUS – with permissions
     // ============================================================
     [HttpPut("{id}/status")]
@@ -243,10 +262,16 @@ public class OrdersController : ControllerBase
 }
 
 // ============================================================
-// DTO FOR STATUS UPDATE
+// DTOs
 // ============================================================
+
 public class UpdateStatusWithNoteDto
 {
     public string Status { get; set; } = string.Empty;
+    public string? Note { get; set; }
+}
+
+public class RevertPaymentDto
+{
     public string? Note { get; set; }
 }

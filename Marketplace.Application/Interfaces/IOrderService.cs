@@ -20,6 +20,7 @@ public interface IOrderService
     Task<List<OrderDto>> GetOrdersAsync(int userId);
     Task<OrderDto> GetOrderByIdAsync(int userId, int orderId);
     Task<OrderDto> ConfirmPaymentAsync(int userId, int orderId, PaymentConfirmationDto confirmation);
+    Task<OrderDto> RevertPaymentAsync(int userId, int orderId, string? note = null);
 
     // ============================================================
     // STATUS UPDATE WITH PERMISSION CHECKS

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import api from '@/lib/api';
 import { Order } from '@/types';
-import { Eye, CheckCircle, Clock, Send } from 'lucide-react';
+import { Eye, CheckCircle, Clock, Send, ArrowLeftCircle } from 'lucide-react';
 
 // ✅ Define proper error type
 interface ApiError {
@@ -36,6 +36,7 @@ export default function AdminOrders() {
     const [note, setNote] = useState('');
     const [updating, setUpdating] = useState(false);
     const [confirmingPayment, setConfirmingPayment] = useState(false);
+    const [revertingPayment, setRevertingPayment] = useState(false);
 
     const fetchOrders = async () => {
         try {
@@ -53,9 +54,7 @@ export default function AdminOrders() {
         fetchOrders();
     }, []);
 
-    // ============================================================
-    // UPDATE STATUS
-    // ============================================================
+    // ---------- Update Status ----------
     const handleUpdateStatus = async (orderId: number, newStatus: string) => {
         setUpdating(true);
         try {
@@ -83,9 +82,7 @@ export default function AdminOrders() {
         }
     };
 
-    // ============================================================
-    // CONFIRM PAYMENT
-    // ============================================================
+    // ---------- Confirm Payment ----------
     const handleConfirmPayment = async () => {
         if (!selectedOrder) return;
         setConfirmingPayment(true);
@@ -110,6 +107,35 @@ export default function AdminOrders() {
             alert(`❌ ${message}`);
         } finally {
             setConfirmingPayment(false);
+        }
+    };
+
+    // ---------- Revert Payment ----------
+    const handleRevertPayment = async () => {
+        if (!selectedOrder) return;
+        if (!confirm('Revert payment for this order? This will set status back to Pending.')) return;
+        setRevertingPayment(true);
+        try {
+            await api.post(`/api/Orders/${selectedOrder.id}/revert-payment`, {
+                note: note || 'Payment reverted by Admin.'
+            });
+            alert('✅ Payment reverted successfully!');
+            await fetchOrders();
+            setShowModal(false);
+        } catch (err) {
+            console.error('Failed to revert payment:', err);
+            let message = 'Failed to revert payment.';
+            if (err && typeof err === 'object') {
+                const error = err as ApiError;
+                if (error.response?.data?.message) {
+                    message = error.response.data.message;
+                } else if (error.message) {
+                    message = error.message;
+                }
+            }
+            alert(`❌ ${message}`);
+        } finally {
+            setRevertingPayment(false);
         }
     };
 
@@ -203,7 +229,7 @@ export default function AdminOrders() {
                 </div>
             </div>
 
-            {/* Order Details Modal with Status Update & Payment Confirmation */}
+            {/* Order Details Modal */}
             {showModal && selectedOrder && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
                     <div className="bg-white rounded-2xl p-8 max-w-2xl w-full max-h-[80vh] overflow-y-auto">
@@ -246,12 +272,10 @@ export default function AdminOrders() {
                                 </div>
                             </div>
 
-                            {/* ============================================================
-                                CONFIRM PAYMENT BUTTON
-                                ============================================================ */}
+                            {/* Payment Actions */}
                             <div className="border-t border-gray-200 pt-4">
                                 <h3 className="font-semibold text-gray-800 mb-2">Payment</h3>
-                                <div className="flex items-center gap-4">
+                                <div className="flex flex-wrap items-center gap-3">
                                     <span className={`px-3 py-1 rounded-full text-sm font-medium ${selectedOrder.isPaymentConfirmed
                                             ? 'bg-green-100 text-green-800'
                                             : 'bg-yellow-100 text-yellow-800'
@@ -267,12 +291,20 @@ export default function AdminOrders() {
                                             {confirmingPayment ? 'Confirming...' : 'Confirm Payment'}
                                         </button>
                                     )}
+                                    {selectedOrder.isPaymentConfirmed && (
+                                        <button
+                                            onClick={handleRevertPayment}
+                                            disabled={revertingPayment}
+                                            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition disabled:opacity-50 flex items-center gap-2"
+                                        >
+                                            <ArrowLeftCircle className="w-4 h-4" />
+                                            {revertingPayment ? 'Reverting...' : 'Revert Payment'}
+                                        </button>
+                                    )}
                                 </div>
                             </div>
 
-                            {/* ============================================================
-                                UPDATE STATUS SECTION
-                                ============================================================ */}
+                            {/* Update Status */}
                             <div className="border-t border-gray-200 pt-4">
                                 <h3 className="font-semibold text-gray-800 mb-2">Update Status</h3>
                                 <div className="flex flex-col md:flex-row gap-3">
