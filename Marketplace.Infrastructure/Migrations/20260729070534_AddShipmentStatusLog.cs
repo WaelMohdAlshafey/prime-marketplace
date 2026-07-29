@@ -4,21 +4,16 @@
 
 namespace Marketplace.Infrastructure.Migrations
 {
-    /// <inheritdoc />
     public partial class AddShipmentStatusLog : Migration
     {
-        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            // Column "CurrentStatus" and table "ShipmentStatusLogs" 
-            // already exist in both production and local.
-            // This migration is intentionally empty to avoid duplicate column/table errors.
+            // Column and table already exist; no action needed.
         }
 
-        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            // No rollback needed.
+            // No rollback.
         }
     }
 }
