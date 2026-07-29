@@ -5,8 +5,8 @@
     "\\marketplace-frontend\\src",
     "\\marketplace-frontend\\src\\app",
     "\\marketplace-frontend\\src\\app\\admin",
-    "\\marketplace-frontend\\src\\app\\admin\\orders"
+    "\\marketplace-frontend\\src\\app\\admin\\orders",
+    "\\marketplace-frontend\\src\\app\\cart"
   ],
-  "SelectedNode": "\\marketplace-frontend\\src\\app\\admin\\orders\\page.tsx",
   "PreviewInSolutionExplorer": false
 }

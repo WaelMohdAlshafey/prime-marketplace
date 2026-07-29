@@ -162,26 +162,19 @@ app.UseAuthorization();
 app.MapControllers();
 
 // ============================================================
-// 15. Database Initialisation – EnsureCreated (original)
+// 15. Database Migration – Apply pending migrations
 // ============================================================
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     try
     {
-        var created = dbContext.Database.EnsureCreated();
-        if (created)
-        {
-            Console.WriteLine("✅ Database created successfully.");
-        }
-        else
-        {
-            Console.WriteLine("✅ Database already exists. Skipping migrations.");
-        }
+        dbContext.Database.Migrate();
+        Console.WriteLine("✅ Database migrations applied successfully.");
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"❌ Database initialisation error: {ex.Message}");
+        Console.WriteLine($"❌ Database migration error: {ex.Message}");
         throw;
     }
 }
