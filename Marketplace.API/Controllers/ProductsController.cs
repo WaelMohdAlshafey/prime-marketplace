@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore; // ✅ ADD THIS – for async LINQ methods
 using System.Security.Claims;
 using Marketplace.Application.DTOs;
 using Marketplace.Application.Interfaces;
@@ -12,10 +13,12 @@ namespace Marketplace.API.Controllers;
 public class ProductsController : ControllerBase
 {
     private readonly IProductService _productService;
+    private readonly AppDbContext _context; // ✅ ADD THIS – for admin query
 
-    public ProductsController(IProductService productService)
+    public ProductsController(IProductService productService, AppDbContext context)
     {
         _productService = productService;
+        _context = context; // ✅ Inject context
     }
 
     // ============================================================
@@ -80,11 +83,52 @@ public class ProductsController : ControllerBase
     }
 
     // ============================================================
-    // VENDOR / ADMIN ENDPOINTS (Authentication + Role required)
+    // ADMIN ENDPOINT – Get ALL products (including inactive)
+    // ============================================================
+    [HttpGet("admin/all")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> GetAllProductsForAdmin(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 50)
+    {
+        // Query all products with vendor names
+        var query = from p in _context.Products
+                    join u in _context.Users on p.VendorId equals u.Id into vendorGroup
+                    from u in vendorGroup.DefaultIfEmpty()
+                    select new ProductDto
+                    {
+                        Id = p.Id,
+                        Name = p.Name,
+                        Description = p.Description,
+                        Price = p.Price,
+                        StockQuantity = p.StockQuantity,
+                        ImageUrl = p.ImageUrl,
+                        VendorName = u != null ? u.Username : "بائع",
+                        IsActive = p.IsActive,
+                        Rating = p.Rating
+                    };
+
+        var totalCount = await query.CountAsync();
+
+        var products = await query
+            .OrderByDescending(p => p.Id)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return Ok(new PagedResult<ProductDto>
+        {
+            Items = products,
+            TotalCount = totalCount,
+            PageNumber = page,
+            PageSize = pageSize
+        });
+    }
+
+    // ============================================================
+    // VENDOR / ADMIN ENDPOINTS
     // ============================================================
 
-    // GET: api/products/vendors/products
-    // ONLY returns products belonging to the logged-in vendor
     [HttpGet("vendors/products")]
     [Authorize(Roles = "Vendor,Admin")]
     public async Task<IActionResult> GetMyProducts([FromQuery] int page = 1, [FromQuery] int pageSize = 20)
@@ -98,7 +142,6 @@ public class ProductsController : ControllerBase
         return Ok(result);
     }
 
-    // POST: api/products
     [HttpPost]
     [Authorize(Roles = "Vendor,Admin")]
     public async Task<IActionResult> Create([FromForm] ProductCreateDto productDto, IFormFile? image)
@@ -146,7 +189,6 @@ public class ProductsController : ControllerBase
         return CreatedAtAction(nameof(GetAll), new { id = createdProduct.Id }, createdProduct);
     }
 
-    // PUT: api/products/5
     [HttpPut("{id}")]
     [Authorize(Roles = "Vendor,Admin")]
     public async Task<IActionResult> Update(int id, [FromForm] ProductUpdateDto productDto, IFormFile? image)
@@ -186,7 +228,7 @@ public class ProductsController : ControllerBase
             StockQuantity = productDto.StockQuantity,
             IsActive = productDto.IsActive,
             ImageUrl = newImageUrl ?? productDto.ExistingImageUrl,
-            Rating = null // Keep existing rating
+            Rating = null
         };
 
         try
@@ -200,7 +242,6 @@ public class ProductsController : ControllerBase
         }
     }
 
-    // DELETE: api/products/5
     [HttpDelete("{id}")]
     [Authorize(Roles = "Vendor,Admin")]
     public async Task<IActionResult> Delete(int id)

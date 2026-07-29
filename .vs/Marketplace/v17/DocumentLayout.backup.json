@@ -3,6 +3,14 @@
   "WorkspaceRootPath": "M:\\Marketplace\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\Marketplace.API\\Controllers\\ProductsController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Marketplace.API\\Controllers\\ProductsController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\marketplace-frontend\\app\\admin\\products\\page.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:marketplace-frontend\\app\\admin\\products\\page.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\Marketplace.API\\Program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Marketplace.API\\Program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -126,7 +134,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 6,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Bookmark",
@@ -134,7 +142,33 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 0,
+              "Title": "ProductsController.cs",
+              "DocumentMoniker": "M:\\Marketplace\\Marketplace.API\\Controllers\\ProductsController.cs",
+              "RelativeDocumentMoniker": "Marketplace.API\\Controllers\\ProductsController.cs",
+              "ToolTip": "M:\\Marketplace\\Marketplace.API\\Controllers\\ProductsController.cs",
+              "RelativeToolTip": "Marketplace.API\\Controllers\\ProductsController.cs",
+              "ViewState": "AgIAAPcAAAAAAAAAAAAowAYBAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-29T06:15:18.141Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "page.tsx",
+              "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\app\\admin\\products\\page.tsx",
+              "RelativeDocumentMoniker": "marketplace-frontend\\app\\admin\\products\\page.tsx",
+              "ToolTip": "M:\\Marketplace\\marketplace-frontend\\app\\admin\\products\\page.tsx",
+              "RelativeToolTip": "marketplace-frontend\\app\\admin\\products\\page.tsx",
+              "ViewState": "AgIAAIkAAAAAAAAAAAAIwJgAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-07-29T06:14:54.011Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
               "Title": "index.ts",
               "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\src\\types\\index.ts",
               "RelativeDocumentMoniker": "marketplace-frontend\\src\\types\\index.ts",
@@ -147,7 +181,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 7,
               "Title": "page.tsx",
               "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\app\\admin\\analytics\\page.tsx",
               "RelativeDocumentMoniker": "marketplace-frontend\\app\\admin\\analytics\\page.tsx",
@@ -160,7 +194,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 6,
               "Title": "page.tsx",
               "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\app\\admin\\newsletter\\page.tsx",
               "RelativeDocumentMoniker": "marketplace-frontend\\app\\admin\\newsletter\\page.tsx",
@@ -173,7 +207,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 5,
               "Title": "page.tsx",
               "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\app\\admin\\orders\\page.tsx",
               "RelativeDocumentMoniker": "marketplace-frontend\\app\\admin\\orders\\page.tsx",
@@ -186,7 +220,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 3,
               "Title": "AdminController.cs",
               "DocumentMoniker": "M:\\Marketplace\\Marketplace.API\\Controllers\\AdminController.cs",
               "RelativeDocumentMoniker": "Marketplace.API\\Controllers\\AdminController.cs",
@@ -199,7 +233,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 2,
               "Title": "Program.cs",
               "DocumentMoniker": "M:\\Marketplace\\Marketplace.API\\Program.cs",
               "RelativeDocumentMoniker": "Marketplace.API\\Program.cs",
@@ -212,7 +246,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 8,
               "Title": "page.tsx",
               "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\app\\admin\\page.tsx",
               "RelativeDocumentMoniker": "marketplace-frontend\\app\\admin\\page.tsx",
@@ -225,7 +259,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 9,
               "Title": "layout.tsx",
               "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\app\\admin\\layout.tsx",
               "RelativeDocumentMoniker": "marketplace-frontend\\app\\admin\\layout.tsx",
@@ -238,7 +272,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 10,
               "Title": "AdminSidebar.tsx",
               "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\src\\components\\admin\\AdminSidebar.tsx",
               "RelativeDocumentMoniker": "marketplace-frontend\\src\\components\\admin\\AdminSidebar.tsx",
@@ -255,7 +289,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 12,
               "Title": "NewsletterController.cs",
               "DocumentMoniker": "M:\\Marketplace\\Marketplace.API\\Controllers\\NewsletterController.cs",
               "RelativeDocumentMoniker": "Marketplace.API\\Controllers\\NewsletterController.cs",
@@ -268,7 +302,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 13,
               "Title": "NewsletterService.cs",
               "DocumentMoniker": "M:\\Marketplace\\Marketplace.Application\\Services\\NewsletterService.cs",
               "RelativeDocumentMoniker": "Marketplace.Application\\Services\\NewsletterService.cs",
@@ -281,7 +315,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 11,
               "Title": "Footer.tsx",
               "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\src\\components\\Footer.tsx",
               "RelativeDocumentMoniker": "marketplace-frontend\\src\\components\\Footer.tsx",
@@ -294,7 +328,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
+              "DocumentIndex": 14,
               "Title": "INewsletterService.cs",
               "DocumentMoniker": "M:\\Marketplace\\Marketplace.Application\\Interfaces\\INewsletterService.cs",
               "RelativeDocumentMoniker": "Marketplace.Application\\Interfaces\\INewsletterService.cs",
@@ -307,7 +341,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 13,
+              "DocumentIndex": 15,
               "Title": "AppDbContext.cs",
               "DocumentMoniker": "M:\\Marketplace\\Marketplace.Infrastructure\\Data\\AppDbContext.cs",
               "RelativeDocumentMoniker": "Marketplace.Infrastructure\\Data\\AppDbContext.cs",
@@ -320,7 +354,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 14,
+              "DocumentIndex": 16,
               "Title": "NewsletterSubscription.cs",
               "DocumentMoniker": "M:\\Marketplace\\Marketplace.Domain\\Entities\\NewsletterSubscription.cs",
               "RelativeDocumentMoniker": "Marketplace.Domain\\Entities\\NewsletterSubscription.cs",
@@ -333,7 +367,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 19,
+              "DocumentIndex": 21,
               "Title": "page.tsx",
               "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\app\\auth\\register\\page.tsx",
               "RelativeDocumentMoniker": "marketplace-frontend\\app\\auth\\register\\page.tsx",
@@ -346,7 +380,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 18,
+              "DocumentIndex": 20,
               "Title": "page.tsx",
               "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\app\\page.tsx",
               "RelativeDocumentMoniker": "marketplace-frontend\\app\\page.tsx",
@@ -359,7 +393,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 17,
+              "DocumentIndex": 19,
               "Title": "HeroBanner.tsx",
               "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\src\\components\\HeroBanner.tsx",
               "RelativeDocumentMoniker": "marketplace-frontend\\src\\components\\HeroBanner.tsx",
@@ -372,7 +406,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 16,
+              "DocumentIndex": 18,
               "Title": "common.json",
               "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\public\\locales\\ar\\common.json",
               "RelativeDocumentMoniker": "marketplace-frontend\\public\\locales\\ar\\common.json",
@@ -385,7 +419,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 15,
+              "DocumentIndex": 17,
               "Title": "common.json",
               "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\public\\locales\\en\\common.json",
               "RelativeDocumentMoniker": "marketplace-frontend\\public\\locales\\en\\common.json",
@@ -398,7 +432,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 20,
+              "DocumentIndex": 22,
               "Title": "page.tsx",
               "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\app\\auth\\login\\page.tsx",
               "RelativeDocumentMoniker": "marketplace-frontend\\app\\auth\\login\\page.tsx",
@@ -411,7 +445,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 21,
+              "DocumentIndex": 23,
               "Title": "page.tsx",
               "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\app\\tracking\\page.tsx",
               "RelativeDocumentMoniker": "marketplace-frontend\\app\\tracking\\page.tsx",
@@ -424,7 +458,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 22,
+              "DocumentIndex": 24,
               "Title": "page.tsx",
               "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\app\\stores\\page.tsx",
               "RelativeDocumentMoniker": "marketplace-frontend\\app\\stores\\page.tsx",
@@ -437,7 +471,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 23,
+              "DocumentIndex": 25,
               "Title": "page.tsx",
               "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\app\\contact\\page.tsx",
               "RelativeDocumentMoniker": "marketplace-frontend\\app\\contact\\page.tsx",
@@ -450,7 +484,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 24,
+              "DocumentIndex": 26,
               "Title": "page.tsx",
               "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\app\\about\\page.tsx",
               "RelativeDocumentMoniker": "marketplace-frontend\\app\\about\\page.tsx",
@@ -463,7 +497,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 25,
+              "DocumentIndex": 27,
               "Title": "Logo.tsx",
               "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\src\\components\\Logo.tsx",
               "RelativeDocumentMoniker": "marketplace-frontend\\src\\components\\Logo.tsx",
@@ -476,7 +510,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 26,
+              "DocumentIndex": 28,
               "Title": "ProductCard.tsx",
               "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\src\\components\\ProductCard.tsx",
               "RelativeDocumentMoniker": "marketplace-frontend\\src\\components\\ProductCard.tsx",
@@ -489,7 +523,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 27,
+              "DocumentIndex": 29,
               "Title": "Navbar.tsx",
               "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\src\\components\\Navbar.tsx",
               "RelativeDocumentMoniker": "marketplace-frontend\\src\\components\\Navbar.tsx",
@@ -502,7 +536,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 28,
+              "DocumentIndex": 30,
               "Title": "globals.css",
               "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\app\\globals.css",
               "RelativeDocumentMoniker": "marketplace-frontend\\app\\globals.css",
