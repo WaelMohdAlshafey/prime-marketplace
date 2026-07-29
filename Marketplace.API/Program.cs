@@ -14,7 +14,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 // ============================================================
-// 2. CORS – Allow Any Origin
+// 2. CORS – Allow Any Origin (for Vercel and local testing)
 // ============================================================
 builder.Services.AddCors(options =>
 {
@@ -30,7 +30,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddMemoryCache();
 
 // ============================================================
-// 4. Swagger / OpenAPI (JWT enabled)
+// 4. Swagger / OpenAPI (with JWT support)
 // ============================================================
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -61,7 +61,7 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 // ============================================================
-// 5. Register Services (DI)
+// 5. Register Application Services (Dependency Injection)
 // ============================================================
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -71,7 +71,7 @@ builder.Services.AddScoped<IWishlistService, WishlistService>();
 builder.Services.AddScoped<IChatService, ChatService>();
 
 // ============================================================
-// 6. Database Context (SQLite local / PostgreSQL on Render)
+// 6. Database Context (SQLite locally, PostgreSQL on Render)
 // ============================================================
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
@@ -162,57 +162,164 @@ app.UseAuthorization();
 app.MapControllers();
 
 // ============================================================
-// 15. Database Migration – BULLETPROOF (FIX FOR DISPOSED CONNECTION)
+// 15. Database Migration – SELF-HEALING (No Shell Needed)
 // ============================================================
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     var connection = dbContext.Database.GetDbConnection();
+
     try
     {
         connection.Open();
 
         // ------------------------------------------------------------
-        // 1. Check if the 'Orders' table exists
+        // Step 1: Check if Orders table exists
         // ------------------------------------------------------------
-        using (var command = connection.CreateCommand())
+        using (var cmd = connection.CreateCommand())
         {
-            command.CommandText = "SELECT EXISTS (SELECT 1 FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace WHERE n.nspname = 'public' AND c.relname = 'Orders');";
-            var result = command.ExecuteScalar();
+            cmd.CommandText = "SELECT EXISTS (SELECT 1 FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace WHERE n.nspname = 'public' AND c.relname = 'Orders');";
+            var result = cmd.ExecuteScalar();
             var ordersTableExists = result != null && (bool)result;
 
             if (ordersTableExists)
             {
-                Console.WriteLine("✅ Existing database detected. Preparing migrations...");
+                Console.WriteLine("✅ Existing database detected. Checking for missing columns...");
 
                 // ------------------------------------------------------------
-                // 2. Create the migration history table if it doesn't exist
+                // Step 2: Add missing columns (if they don't exist)
                 // ------------------------------------------------------------
-                using (var cmd2 = connection.CreateCommand())
+
+                // 2a. Check and add CurrentStatus
+                using (var cmdCheck = connection.CreateCommand())
                 {
-                    cmd2.CommandText = @"
+                    cmdCheck.CommandText = "SELECT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'Orders' AND column_name = 'CurrentStatus');";
+                    var columnExists = cmdCheck.ExecuteScalar();
+                    if (columnExists == null || !(bool)columnExists)
+                    {
+                        Console.WriteLine("⚠️ Adding 'CurrentStatus' column to Orders...");
+                        using (var cmdAdd = connection.CreateCommand())
+                        {
+                            cmdAdd.CommandText = "ALTER TABLE \"Orders\" ADD COLUMN \"CurrentStatus\" TEXT DEFAULT 'Pending';";
+                            cmdAdd.ExecuteNonQuery();
+                        }
+                        Console.WriteLine("✅ 'CurrentStatus' column added.");
+                    }
+                }
+
+                // 2b. Check and add TrackingNumber
+                using (var cmdCheck = connection.CreateCommand())
+                {
+                    cmdCheck.CommandText = "SELECT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'Orders' AND column_name = 'TrackingNumber');";
+                    var columnExists = cmdCheck.ExecuteScalar();
+                    if (columnExists == null || !(bool)columnExists)
+                    {
+                        Console.WriteLine("⚠️ Adding 'TrackingNumber' column to Orders...");
+                        using (var cmdAdd = connection.CreateCommand())
+                        {
+                            cmdAdd.CommandText = "ALTER TABLE \"Orders\" ADD COLUMN \"TrackingNumber\" TEXT;";
+                            cmdAdd.ExecuteNonQuery();
+                        }
+                        Console.WriteLine("✅ 'TrackingNumber' column added.");
+                    }
+                }
+
+                // 2c. Check and add ShippingCarrier
+                using (var cmdCheck = connection.CreateCommand())
+                {
+                    cmdCheck.CommandText = "SELECT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'Orders' AND column_name = 'ShippingCarrier');";
+                    var columnExists = cmdCheck.ExecuteScalar();
+                    if (columnExists == null || !(bool)columnExists)
+                    {
+                        Console.WriteLine("⚠️ Adding 'ShippingCarrier' column to Orders...");
+                        using (var cmdAdd = connection.CreateCommand())
+                        {
+                            cmdAdd.CommandText = "ALTER TABLE \"Orders\" ADD COLUMN \"ShippingCarrier\" TEXT;";
+                            cmdAdd.ExecuteNonQuery();
+                        }
+                        Console.WriteLine("✅ 'ShippingCarrier' column added.");
+                    }
+                }
+
+                // 2d. Check and add ShippedAt
+                using (var cmdCheck = connection.CreateCommand())
+                {
+                    cmdCheck.CommandText = "SELECT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'Orders' AND column_name = 'ShippedAt');";
+                    var columnExists = cmdCheck.ExecuteScalar();
+                    if (columnExists == null || !(bool)columnExists)
+                    {
+                        Console.WriteLine("⚠️ Adding 'ShippedAt' column to Orders...");
+                        using (var cmdAdd = connection.CreateCommand())
+                        {
+                            cmdAdd.CommandText = "ALTER TABLE \"Orders\" ADD COLUMN \"ShippedAt\" TIMESTAMP;";
+                            cmdAdd.ExecuteNonQuery();
+                        }
+                        Console.WriteLine("✅ 'ShippedAt' column added.");
+                    }
+                }
+
+                // 2e. Check and add DeliveredAt
+                using (var cmdCheck = connection.CreateCommand())
+                {
+                    cmdCheck.CommandText = "SELECT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'Orders' AND column_name = 'DeliveredAt');";
+                    var columnExists = cmdCheck.ExecuteScalar();
+                    if (columnExists == null || !(bool)columnExists)
+                    {
+                        Console.WriteLine("⚠️ Adding 'DeliveredAt' column to Orders...");
+                        using (var cmdAdd = connection.CreateCommand())
+                        {
+                            cmdAdd.CommandText = "ALTER TABLE \"Orders\" ADD COLUMN \"DeliveredAt\" TIMESTAMP;";
+                            cmdAdd.ExecuteNonQuery();
+                        }
+                        Console.WriteLine("✅ 'DeliveredAt' column added.");
+                    }
+                }
+
+                // 2f. Check and add Rating to Products (if missing)
+                using (var cmdCheck = connection.CreateCommand())
+                {
+                    cmdCheck.CommandText = "SELECT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'Products' AND column_name = 'Rating');";
+                    var columnExists = cmdCheck.ExecuteScalar();
+                    if (columnExists == null || !(bool)columnExists)
+                    {
+                        Console.WriteLine("⚠️ Adding 'Rating' column to Products...");
+                        using (var cmdAdd = connection.CreateCommand())
+                        {
+                            cmdAdd.CommandText = "ALTER TABLE \"Products\" ADD COLUMN \"Rating\" DOUBLE PRECISION;";
+                            cmdAdd.ExecuteNonQuery();
+                        }
+                        Console.WriteLine("✅ 'Rating' column added.");
+                    }
+                }
+
+                // ------------------------------------------------------------
+                // Step 3: Ensure __EFMigrationsHistory table exists
+                // ------------------------------------------------------------
+                using (var cmd = connection.CreateCommand())
+                {
+                    cmd.CommandText = @"
                         CREATE TABLE IF NOT EXISTS ""__EFMigrationsHistory"" (
                             ""MigrationId"" TEXT NOT NULL,
                             ""ProductVersion"" TEXT NOT NULL,
                             CONSTRAINT ""PK___EFMigrationsHistory"" PRIMARY KEY (""MigrationId"")
                         );";
-                    cmd2.ExecuteNonQuery();
+                    cmd.ExecuteNonQuery();
                 }
 
                 // ------------------------------------------------------------
-                // 3. Check if the initial migration is already recorded
+                // Step 4: Mark the initial migration as applied if not already
                 // ------------------------------------------------------------
-                using (var cmd3 = connection.CreateCommand())
+                using (var cmd = connection.CreateCommand())
                 {
-                    cmd3.CommandText = "SELECT EXISTS (SELECT 1 FROM \"__EFMigrationsHistory\" WHERE \"MigrationId\" = '20260720092925_InitialCreate');";
-                    var historyExists = cmd3.ExecuteScalar();
+                    cmd.CommandText = "SELECT EXISTS (SELECT 1 FROM \"__EFMigrationsHistory\" WHERE \"MigrationId\" = '20260720092925_InitialCreate');";
+                    var historyExists = cmd.ExecuteScalar();
                     if (historyExists == null || !(bool)historyExists)
                     {
-                        Console.WriteLine("⚠️ Initial migration not recorded. Inserting now...");
-                        using (var cmd4 = connection.CreateCommand())
+                        Console.WriteLine("⚠️ Initial migration not recorded. Inserting...");
+                        using (var cmdInsert = connection.CreateCommand())
                         {
-                            cmd4.CommandText = "INSERT INTO \"__EFMigrationsHistory\" (\"MigrationId\", \"ProductVersion\") VALUES ('20260720092925_InitialCreate', '8.0.0');";
-                            cmd4.ExecuteNonQuery();
+                            cmdInsert.CommandText = "INSERT INTO \"__EFMigrationsHistory\" (\"MigrationId\", \"ProductVersion\") VALUES ('20260720092925_InitialCreate', '8.0.0');";
+                            cmdInsert.ExecuteNonQuery();
                         }
                         Console.WriteLine("✅ Initial migration marked as applied.");
                     }
@@ -221,6 +328,8 @@ using (var scope = app.Services.CreateScope())
                         Console.WriteLine("✅ Initial migration already recorded.");
                     }
                 }
+
+                Console.WriteLine("✅ All columns verified and added if needed.");
             }
             else
             {
@@ -229,8 +338,7 @@ using (var scope = app.Services.CreateScope())
         }
 
         // ------------------------------------------------------------
-        // 4. Now run migrations – connection is still open, but Migrate() will manage its own connection.
-        //    We keep it open to avoid "disposed object" error.
+        // Step 6: Now run Migrate() – it should only apply what's needed
         // ------------------------------------------------------------
         dbContext.Database.Migrate();
         Console.WriteLine("✅ All migrations applied successfully.");
@@ -242,7 +350,6 @@ using (var scope = app.Services.CreateScope())
     }
     finally
     {
-        // Clean up: close and dispose the connection if it's still open
         if (connection.State == System.Data.ConnectionState.Open)
             connection.Close();
         connection.Dispose();
