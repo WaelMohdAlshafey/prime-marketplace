@@ -341,7 +341,10 @@ public class OrderService : IOrderService
     // ============================================================
     // UPDATE ORDER STATUS – WITH DUPLICATE PREVENTION & SHIPPEDAT
     // ============================================================
-    public async Task<OrderDto> UpdateOrderStatusAsync(int userId, int orderId, string newStatus, string? note = null)
+    // ============================================================
+    // UPDATE ORDER STATUS – WITH DUPLICATE PREVENTION, SHIPPEDAT, AND CARRIER UPDATE
+    // ============================================================
+    public async Task<OrderDto> UpdateOrderStatusAsync(int userId, int orderId, string newStatus, string? note = null, string? carrier = null)
     {
         var order = await _context.Orders
             .Include(o => o.OrderItems)
@@ -358,7 +361,6 @@ public class OrderService : IOrderService
         bool isCustomer = order.UserId == userId;
         bool isVendor = false;
 
-        // Check if user is a Vendor of any product in this order
         if (!isAdmin && !isEmployee)
         {
             var productVendorIds = await _context.OrderItems
@@ -370,7 +372,6 @@ public class OrderService : IOrderService
             isVendor = productVendorIds.Contains(userId);
         }
 
-        // Permission rules
         if (!isAdmin && !isEmployee && !isVendor && !isCustomer)
             throw new Exception("You do not have permission to update this order.");
 
@@ -382,19 +383,23 @@ public class OrderService : IOrderService
                 throw new Exception("You cannot cancel an order that has already been shipped or delivered.");
         }
 
-        // ============================================================
-        // ✅ DUPLICATE PREVENTION: only proceed if status actually changes
-        // ============================================================
-        if (order.CurrentStatus == newStatus)
+        // ✅ Prevent duplicate logs: only proceed if status actually changes OR carrier is updated
+        if (order.CurrentStatus == newStatus && string.IsNullOrEmpty(carrier))
         {
-            // Status unchanged – just return the current order without creating a log
+            // No changes – just return the current order
             return await GetOrderByIdAsync(order.UserId, orderId);
         }
 
         var oldStatus = order.CurrentStatus;
         order.CurrentStatus = newStatus;
 
-        // ✅ Set ShippedAt when status becomes Shipped or In Transit
+        // ✅ Update carrier if provided
+        if (!string.IsNullOrEmpty(carrier))
+        {
+            order.ShippingCarrier = carrier;
+        }
+
+        // Set ShippedAt when status becomes Shipped or In Transit
         if (newStatus == "Shipped" || newStatus == "In Transit")
         {
             order.ShippedAt = DateTime.UtcNow;

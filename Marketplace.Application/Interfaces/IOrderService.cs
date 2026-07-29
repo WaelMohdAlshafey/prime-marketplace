@@ -22,10 +22,8 @@ public interface IOrderService
     Task<OrderDto> ConfirmPaymentAsync(int userId, int orderId, PaymentConfirmationDto confirmation);
     Task<OrderDto> RevertPaymentAsync(int userId, int orderId, string? note = null);
 
-    // ============================================================
-    // STATUS UPDATE WITH PERMISSION CHECKS
-    // ============================================================
-    Task<OrderDto> UpdateOrderStatusAsync(int userId, int orderId, string newStatus, string? note = null);
+    // ✅ Updated signature: adds optional carrier parameter
+    Task<OrderDto> UpdateOrderStatusAsync(int userId, int orderId, string newStatus, string? note = null, string? carrier = null);
 
     // ============================================================
     // STATUS LOGS
