@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Marketplace.Infrastructure.Data;
 using Marketplace.Application.Interfaces;
 using Marketplace.Application.Services;
+using Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,7 +15,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 // ============================================================
-// 2. Add CORS – Allow Any Origin (For Vercel and local testing)
+// 2. CORS – Allow Any Origin
 // ============================================================
 builder.Services.AddCors(options =>
 {
@@ -25,12 +26,12 @@ builder.Services.AddCors(options =>
 });
 
 // ============================================================
-// 3. Add Memory Cache
+// 3. Memory Cache
 // ============================================================
 builder.Services.AddMemoryCache();
 
 // ============================================================
-// 4. Add Swagger/OpenAPI (with JWT support)
+// 4. Swagger / OpenAPI (JWT enabled)
 // ============================================================
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -61,7 +62,7 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 // ============================================================
-// 5. Register Application Services (Dependency Injection)
+// 5. Register Services (DI)
 // ============================================================
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -71,7 +72,7 @@ builder.Services.AddScoped<IWishlistService, WishlistService>();
 builder.Services.AddScoped<IChatService, ChatService>();
 
 // ============================================================
-// 6. Database Context (SQLite locally, PostgreSQL on Render)
+// 6. Database Context (SQLite local / PostgreSQL on Render)
 // ============================================================
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
@@ -162,20 +163,62 @@ app.UseAuthorization();
 app.MapControllers();
 
 // ============================================================
-// 15. Database Migration – APPLY ALL PENDING MIGRATIONS
+// 15. Database Migration – ROBUST HANDLER (FIX)
 // ============================================================
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     try
     {
-        // Instead of EnsureCreated, we use Migrate to apply all pending migrations
+        // Check if the 'Orders' table exists (indicates a database created with EnsureCreated)
+        bool tableExists;
+        try
+        {
+            tableExists = dbContext.Database.ExecuteSqlRaw(
+                "SELECT EXISTS (SELECT 1 FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace WHERE n.nspname = 'public' AND c.relname = 'Orders');") > 0;
+        }
+        catch (Exception)
+        {
+            // If the query fails (e.g., database doesn't exist yet), assume no tables.
+            tableExists = false;
+        }
+
+        if (tableExists)
+        {
+            Console.WriteLine("✅ Existing tables detected. Checking migration history...");
+
+            // Ensure the __EFMigrationsHistory table exists.
+            dbContext.Database.ExecuteSqlRaw(
+                @"CREATE TABLE IF NOT EXISTS ""__EFMigrationsHistory"" (
+                    ""MigrationId"" TEXT NOT NULL,
+                    ""ProductVersion"" TEXT NOT NULL,
+                    CONSTRAINT ""PK___EFMigrationsHistory"" PRIMARY KEY (""MigrationId"")
+                );");
+
+            // Check if the initial migration is already recorded.
+            var initialMigrationId = "20260720092925_InitialCreate";
+            var historyExists = dbContext.Database.ExecuteSqlRaw(
+                "SELECT EXISTS (SELECT 1 FROM \"__EFMigrationsHistory\" WHERE \"MigrationId\" = {0});", initialMigrationId) > 0;
+
+            if (!historyExists)
+            {
+                Console.WriteLine($"⚠️ Initial migration '{initialMigrationId}' not recorded. Inserting now...");
+                var productVersion = "8.0.0"; // EF Core version used
+                dbContext.Database.ExecuteSqlRaw(
+                    "INSERT INTO \"__EFMigrationsHistory\" (\"MigrationId\", \"ProductVersion\") VALUES ({0}, {1});",
+                    initialMigrationId, productVersion);
+                Console.WriteLine("✅ Initial migration marked as applied.");
+            }
+        }
+
+        // Now run migrations – this will apply any pending ones (e.g., AddShipmentTrackingFields, AddRatingToProducts, etc.)
         dbContext.Database.Migrate();
-        Console.WriteLine("✅ Migrations applied successfully.");
+        Console.WriteLine("✅ All migrations applied successfully.");
     }
     catch (Exception ex)
     {
         Console.WriteLine($"❌ Database migration error: {ex.Message}");
+        // We throw so that the deployment fails explicitly – better than running with a broken DB.
         throw;
     }
 }
