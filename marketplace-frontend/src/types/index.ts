@@ -10,7 +10,7 @@ export interface Product {
     stockQuantity: number;
     imageUrl?: string;
     vendorName?: string;
-    rating?: number; // ⭐ Average rating (1-5 stars)
+    rating?: number;
     reviews?: number;
     discount?: number;
     isActive: boolean;
@@ -55,7 +55,7 @@ export interface OrderItem {
 
 export interface Order {
     id: number;
-    userId: number; // ✅ ADDED – required for admin orders page
+    userId: number;
     orderDate: string;
     totalAmount: number;
     status: string;
@@ -79,7 +79,7 @@ export interface AuthResponse {
     username: string;
     email: string;
     token: string;
-    role: string; // "Admin" | "Vendor" | "Customer" | "Employee"
+    role: string;
 }
 
 export interface LoginRequest {
@@ -150,7 +150,7 @@ export interface WishlistItem {
 }
 
 // ============================================================
-// REVIEW / RATING TYPES (for future full review system)
+// REVIEW / RATING TYPES
 // ============================================================
 export interface Review {
     id: number;
@@ -163,7 +163,7 @@ export interface Review {
 }
 
 // ============================================================
-// PAYMENT TYPES (for future Stripe integration)
+// PAYMENT TYPES
 // ============================================================
 export interface PaymentIntent {
     id: string;
@@ -171,4 +171,31 @@ export interface PaymentIntent {
     amount: number;
     currency: string;
     status: string;
+}
+
+// ============================================================
+// CHAT TYPES (NEW)
+// ============================================================
+export interface UserDto {
+    id: number;
+    username: string;
+    role: string;
+}
+
+export interface ConversationDto {
+    id: number;
+    otherUserId: number;
+    otherUserName: string;
+    otherUserRole: string;
+    lastMessageAt?: string;
+    lastMessageContent?: string;
+}
+
+export interface MessageDto {
+    id: number;
+    senderId: number;
+    senderName: string;
+    content: string;
+    sentAt: string;
+    isRead: boolean;
 }

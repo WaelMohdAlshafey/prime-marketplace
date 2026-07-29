@@ -69,7 +69,7 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IStoreSettingService, StoreSettingService>();
 builder.Services.AddScoped<IWishlistService, WishlistService>(); // <-- NEW
 builder.Services.AddScoped<INewsletterService, NewsletterService>();
-
+builder.Services.AddScoped<IChatService, ChatService>();
 // ============================================================
 // 6. Database Context (SQLite locally, PostgreSQL on Render)
 // ============================================================

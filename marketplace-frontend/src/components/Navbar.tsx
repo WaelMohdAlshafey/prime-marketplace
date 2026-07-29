@@ -249,7 +249,7 @@ const NavMenu = () => {
 };
 
 // ============================================================
-// USER NAV
+// USER NAV – includes chat link
 // ============================================================
 const UserNav = ({ user, logout }: { user: AuthResponse; logout: () => void }) => {
     const { t } = useTranslation('common');
@@ -257,7 +257,7 @@ const UserNav = ({ user, logout }: { user: AuthResponse; logout: () => void }) =
     const isAdmin = user.role === 'Admin';
 
     return (
-        <div className="bg-[#0F5C45] text-white text-sm py-2">
+        <div className="bg-gradient-to-r from-[#0F5C45] to-[#1A7A5C] text-white text-sm py-2">
             <div className="container mx-auto px-4 flex justify-between items-center">
                 <div className="flex items-center gap-6">
                     <Link href="/cart" className="hover:text-yellow-300 transition flex items-center gap-2">
@@ -266,21 +266,16 @@ const UserNav = ({ user, logout }: { user: AuthResponse; logout: () => void }) =
                     <Link href="/orders" className="hover:text-yellow-300 transition flex items-center gap-2">
                         <span>📋 {t('orders')}</span>
                     </Link>
-
-                    {/* Vendor Links */}
                     {isVendor && (
                         <>
                             <Link href="/vendor/dashboard" className="hover:text-yellow-300 transition flex items-center gap-2">
                                 <span>📊 {t('dashboard')}</span>
                             </Link>
-                            {/* ✅ NEW LINK – Manage Orders */}
                             <Link href="/admin/orders" className="hover:text-yellow-300 transition flex items-center gap-2">
                                 <span>📦 Manage Orders</span>
                             </Link>
                         </>
                     )}
-
-                    {/* Admin Links */}
                     {isAdmin && (
                         <>
                             <Link href="/admin/users" className="hover:text-yellow-300 transition flex items-center gap-2">
@@ -291,10 +286,16 @@ const UserNav = ({ user, logout }: { user: AuthResponse; logout: () => void }) =
                             </Link>
                         </>
                     )}
+                    {/* ============================================================
+                        NEW – Chat link for all logged‑in users
+                        ============================================================ */}
+                    <Link href="/chat" className="hover:text-yellow-300 transition flex items-center gap-2">
+                        <span>💬 Chat</span>
+                    </Link>
                 </div>
                 <div className="flex items-center gap-4">
                     <span className="text-xs text-white/70">{t('welcome')}، {user.username}</span>
-                    <button onClick={logout} className="text-xs bg-white/10 px-3 py-1 rounded-full hover:bg-white/20 transition">
+                    <button onClick={logout} className="text-xs bg-white/10 px-3 py-1 rounded-full hover:bg-white/20 transition duration-300 hover:scale-105">
                         {t('logout')}
                     </button>
                 </div>
@@ -302,6 +303,7 @@ const UserNav = ({ user, logout }: { user: AuthResponse; logout: () => void }) =
         </div>
     );
 };
+
 // ============================================================
 // MAIN EXPORT
 // ============================================================
