@@ -55,6 +55,7 @@ export interface OrderItem {
 
 export interface Order {
     id: number;
+    userId: number; // ✅ ADDED – required for admin orders page
     orderDate: string;
     totalAmount: number;
     status: string;
