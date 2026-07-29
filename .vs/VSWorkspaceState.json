@@ -3,8 +3,10 @@
     "",
     "\\marketplace-frontend",
     "\\marketplace-frontend\\src",
-    "\\marketplace-frontend\\src\\components"
+    "\\marketplace-frontend\\src\\app",
+    "\\marketplace-frontend\\src\\app\\admin",
+    "\\marketplace-frontend\\src\\app\\admin\\orders"
   ],
-  "SelectedNode": "\\marketplace-frontend\\src\\components\\Footer.tsx",
+  "SelectedNode": "\\marketplace-frontend\\src\\app\\admin\\orders\\page.tsx",
   "PreviewInSolutionExplorer": false
 }
