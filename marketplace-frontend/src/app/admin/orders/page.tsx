@@ -30,7 +30,6 @@ export default function AdminOrders() {
     const { t } = useTranslation('common');
     const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
-    // Store only the ID of the selected order
     const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null);
     const [showModal, setShowModal] = useState(false);
     const [note, setNote] = useState('');
@@ -38,7 +37,7 @@ export default function AdminOrders() {
     const [confirmingPayment, setConfirmingPayment] = useState(false);
     const [revertingPayment, setRevertingPayment] = useState(false);
 
-    // Derive the full order from the orders list using the selectedId
+    // Derive the full order from the orders list
     const selectedOrder = orders.find(o => o.id === selectedOrderId) || null;
 
     const fetchOrders = async () => {
@@ -312,15 +311,8 @@ export default function AdminOrders() {
                                     <select
                                         value={selectedOrder.status}
                                         onChange={(e) => {
-                                            // We don't update the orders list here; we rely on the selectedOrder derived value.
-                                            // We'll update the status in the selectedOrder only when the user clicks Update.
-                                            // For the modal, we can keep a local copy if needed, but we simply use selectedOrder.
-                                            // However, to allow changing the status in the select, we need to update some state.
-                                            // We'll keep a local status state for the modal.
-                                            // For simplicity, we'll let the user select and then we'll call handleUpdateStatus with the selected value.
-                                            // We'll use the current value from the select, but we need to store it.
-                                            // Let's create a localStatus state for the modal.
-                                            // But to avoid complexity, we'll just read the value from the select on click.
+                                            // We update the local state only; the API call will use the new value
+                                            // We'll use the select's value on button click
                                         }}
                                         className="flex-1 px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#0F5C45] focus:border-transparent"
                                     >
