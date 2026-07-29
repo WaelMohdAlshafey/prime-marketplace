@@ -14,7 +14,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 // ============================================================
-// 2. CORS – Allow Any Origin (for Vercel and local testing)
+// 2. CORS – Allow Any Origin
 // ============================================================
 builder.Services.AddCors(options =>
 {
@@ -30,7 +30,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddMemoryCache();
 
 // ============================================================
-// 4. Swagger / OpenAPI (with JWT support)
+// 4. Swagger / OpenAPI (JWT enabled)
 // ============================================================
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -61,7 +61,7 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 // ============================================================
-// 5. Register Application Services (Dependency Injection)
+// 5. Register Services (DI)
 // ============================================================
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -71,7 +71,7 @@ builder.Services.AddScoped<IWishlistService, WishlistService>();
 builder.Services.AddScoped<IChatService, ChatService>();
 
 // ============================================================
-// 6. Database Context (SQLite locally, PostgreSQL on Render)
+// 6. Database Context (SQLite local / PostgreSQL on Render)
 // ============================================================
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
@@ -135,7 +135,6 @@ app.Use(async (context, next) =>
 {
     if (context.Request.Method == "OPTIONS")
     {
-        // Use indexer instead of Add to avoid duplicate key warnings
         context.Response.Headers["Access-Control-Allow-Origin"] = "*";
         context.Response.Headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS";
         context.Response.Headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With";
@@ -163,75 +162,75 @@ app.UseAuthorization();
 app.MapControllers();
 
 // ============================================================
-// 15. Database Migration – BULLETPROOF HANDLER (FIX)
+// 15. Database Migration – BULLETPROOF (FIX FOR DISPOSED CONNECTION)
 // ============================================================
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    var connection = dbContext.Database.GetDbConnection();
     try
     {
+        connection.Open();
+
         // ------------------------------------------------------------
-        // 1. Check if the 'Orders' table exists using ExecuteScalar
+        // 1. Check if the 'Orders' table exists
         // ------------------------------------------------------------
-        using (var connection = dbContext.Database.GetDbConnection())
+        using (var command = connection.CreateCommand())
         {
-            connection.Open();
-            using (var command = connection.CreateCommand())
+            command.CommandText = "SELECT EXISTS (SELECT 1 FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace WHERE n.nspname = 'public' AND c.relname = 'Orders');";
+            var result = command.ExecuteScalar();
+            var ordersTableExists = result != null && (bool)result;
+
+            if (ordersTableExists)
             {
-                command.CommandText = "SELECT EXISTS (SELECT 1 FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace WHERE n.nspname = 'public' AND c.relname = 'Orders');";
-                var result = command.ExecuteScalar();
-                var ordersTableExists = result != null && (bool)result;
+                Console.WriteLine("✅ Existing database detected. Preparing migrations...");
 
-                if (ordersTableExists)
+                // ------------------------------------------------------------
+                // 2. Create the migration history table if it doesn't exist
+                // ------------------------------------------------------------
+                using (var cmd2 = connection.CreateCommand())
                 {
-                    Console.WriteLine("✅ Existing database detected. Preparing migrations...");
+                    cmd2.CommandText = @"
+                        CREATE TABLE IF NOT EXISTS ""__EFMigrationsHistory"" (
+                            ""MigrationId"" TEXT NOT NULL,
+                            ""ProductVersion"" TEXT NOT NULL,
+                            CONSTRAINT ""PK___EFMigrationsHistory"" PRIMARY KEY (""MigrationId"")
+                        );";
+                    cmd2.ExecuteNonQuery();
+                }
 
-                    // ------------------------------------------------------------
-                    // 2. Create the migration history table if it doesn't exist
-                    // ------------------------------------------------------------
-                    using (var cmd2 = connection.CreateCommand())
+                // ------------------------------------------------------------
+                // 3. Check if the initial migration is already recorded
+                // ------------------------------------------------------------
+                using (var cmd3 = connection.CreateCommand())
+                {
+                    cmd3.CommandText = "SELECT EXISTS (SELECT 1 FROM \"__EFMigrationsHistory\" WHERE \"MigrationId\" = '20260720092925_InitialCreate');";
+                    var historyExists = cmd3.ExecuteScalar();
+                    if (historyExists == null || !(bool)historyExists)
                     {
-                        cmd2.CommandText = @"
-                            CREATE TABLE IF NOT EXISTS ""__EFMigrationsHistory"" (
-                                ""MigrationId"" TEXT NOT NULL,
-                                ""ProductVersion"" TEXT NOT NULL,
-                                CONSTRAINT ""PK___EFMigrationsHistory"" PRIMARY KEY (""MigrationId"")
-                            );";
-                        cmd2.ExecuteNonQuery();
+                        Console.WriteLine("⚠️ Initial migration not recorded. Inserting now...");
+                        using (var cmd4 = connection.CreateCommand())
+                        {
+                            cmd4.CommandText = "INSERT INTO \"__EFMigrationsHistory\" (\"MigrationId\", \"ProductVersion\") VALUES ('20260720092925_InitialCreate', '8.0.0');";
+                            cmd4.ExecuteNonQuery();
+                        }
+                        Console.WriteLine("✅ Initial migration marked as applied.");
                     }
-
-                    // ------------------------------------------------------------
-                    // 3. Check if the initial migration is already recorded
-                    // ------------------------------------------------------------
-                    using (var cmd3 = connection.CreateCommand())
+                    else
                     {
-                        cmd3.CommandText = "SELECT EXISTS (SELECT 1 FROM \"__EFMigrationsHistory\" WHERE \"MigrationId\" = '20260720092925_InitialCreate');";
-                        var historyExists = cmd3.ExecuteScalar();
-                        if (historyExists == null || !(bool)historyExists)
-                        {
-                            Console.WriteLine("⚠️ Initial migration not recorded. Inserting now...");
-                            using (var cmd4 = connection.CreateCommand())
-                            {
-                                cmd4.CommandText = "INSERT INTO \"__EFMigrationsHistory\" (\"MigrationId\", \"ProductVersion\") VALUES ('20260720092925_InitialCreate', '8.0.0');";
-                                cmd4.ExecuteNonQuery();
-                            }
-                            Console.WriteLine("✅ Initial migration marked as applied.");
-                        }
-                        else
-                        {
-                            Console.WriteLine("✅ Initial migration already recorded.");
-                        }
+                        Console.WriteLine("✅ Initial migration already recorded.");
                     }
                 }
-                else
-                {
-                    Console.WriteLine("🆕 Fresh database. Migrations will be applied normally.");
-                }
+            }
+            else
+            {
+                Console.WriteLine("🆕 Fresh database. Migrations will be applied normally.");
             }
         }
 
         // ------------------------------------------------------------
-        // 4. Now run migrations – this will apply only pending ones
+        // 4. Now run migrations – connection is still open, but Migrate() will manage its own connection.
+        //    We keep it open to avoid "disposed object" error.
         // ------------------------------------------------------------
         dbContext.Database.Migrate();
         Console.WriteLine("✅ All migrations applied successfully.");
@@ -240,6 +239,13 @@ using (var scope = app.Services.CreateScope())
     {
         Console.WriteLine($"❌ Database migration error: {ex.Message}");
         throw;
+    }
+    finally
+    {
+        // Clean up: close and dispose the connection if it's still open
+        if (connection.State == System.Data.ConnectionState.Open)
+            connection.Close();
+        connection.Dispose();
     }
 }
 
