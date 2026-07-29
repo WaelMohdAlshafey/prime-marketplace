@@ -30,7 +30,7 @@ public class OrdersController : ControllerBase
     }
 
     // ============================================================
-    // CART
+    // CART ENDPOINTS
     // ============================================================
 
     [HttpGet("cart")]
@@ -42,7 +42,7 @@ public class OrdersController : ControllerBase
     }
 
     [HttpPost("cart")]
-    public async Task<IActionResult> AddToCart(AddToCartDto addToCartDto)
+    public async Task<IActionResult> AddToCart([FromBody] AddToCartDto addToCartDto)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
@@ -76,11 +76,11 @@ public class OrdersController : ControllerBase
     }
 
     // ============================================================
-    // ORDERS
+    // ORDER ENDPOINTS
     // ============================================================
 
     [HttpPost("checkout")]
-    public async Task<IActionResult> Checkout(CreateOrderDto createOrderDto)
+    public async Task<IActionResult> Checkout([FromBody] CreateOrderDto createOrderDto)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
@@ -120,23 +120,11 @@ public class OrdersController : ControllerBase
         }
     }
 
-    [HttpPut("{id}/status")]
-    [Authorize(Roles = "Admin,Vendor")]
-    public async Task<IActionResult> UpdateStatusWithNote(int id, [FromBody] UpdateStatusWithNoteDto request)
-    {
-        try
-        {
-            var userId = GetUserId();
-            var updatedOrder = await _orderService.UpdateOrderStatusWithLogAsync(userId, id, request.Status, request.Note);
-            return Ok(updatedOrder);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { message = ex.Message });
-        }
-    }
-
+    // ============================================================
+    // ADMIN: CONFIRM PAYMENT
+    // ============================================================
     [HttpPost("{id}/confirm-payment")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> ConfirmPayment(int id, [FromBody] PaymentConfirmationDto confirmation)
     {
         var userId = GetUserId();
@@ -152,9 +140,26 @@ public class OrdersController : ControllerBase
     }
 
     // ============================================================
+    // UPDATE ORDER STATUS – with permissions
+    // ============================================================
+    [HttpPut("{id}/status")]
+    public async Task<IActionResult> UpdateStatus(int id, [FromBody] UpdateStatusWithNoteDto request)
+    {
+        try
+        {
+            var userId = GetUserId();
+            var updatedOrder = await _orderService.UpdateOrderStatusAsync(userId, id, request.Status, request.Note);
+            return Ok(updatedOrder);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    // ============================================================
     // TRACKING – PUBLIC
     // ============================================================
-
     [HttpGet("track/{trackingNumber}")]
     [AllowAnonymous]
     public async Task<IActionResult> TrackShipment(string trackingNumber)
@@ -202,9 +207,8 @@ public class OrdersController : ControllerBase
     }
 
     // ============================================================
-    // ADMIN: Get all orders (for admin panel)
+    // ADMIN: GET ALL ORDERS
     // ============================================================
-
     [HttpGet("admin/all")]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> GetAllOrdersForAdmin()
@@ -239,9 +243,8 @@ public class OrdersController : ControllerBase
 }
 
 // ============================================================
-// DTOs
+// DTO FOR STATUS UPDATE
 // ============================================================
-
 public class UpdateStatusWithNoteDto
 {
     public string Status { get; set; } = string.Empty;

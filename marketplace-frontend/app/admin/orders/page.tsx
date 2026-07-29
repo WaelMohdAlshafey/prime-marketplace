@@ -6,6 +6,16 @@ import api from '@/lib/api';
 import { Order } from '@/types';
 import { Eye, CheckCircle, Clock, Send } from 'lucide-react';
 
+// ✅ Define proper error type
+interface ApiError {
+    response?: {
+        data?: {
+            message?: string;
+        };
+    };
+    message?: string;
+}
+
 const STATUS_OPTIONS = [
     'Pending',
     'Paid',
@@ -48,14 +58,22 @@ export default function AdminOrders() {
             await api.put(`/api/Orders/${orderId}/status`, { status: newStatus, note });
             await fetchOrders();
             setNote('');
-            // If modal is open, refresh selected order
             if (selectedOrder && selectedOrder.id === orderId) {
                 const updatedOrder = orders.find(o => o.id === orderId);
                 if (updatedOrder) setSelectedOrder(updatedOrder);
             }
         } catch (err) {
             console.error('Failed to update order status:', err);
-            alert('Failed to update order status.');
+            let message = 'Failed to update order status.';
+            if (err && typeof err === 'object') {
+                const error = err as ApiError;
+                if (error.response?.data?.message) {
+                    message = error.response.data.message;
+                } else if (error.message) {
+                    message = error.message;
+                }
+            }
+            alert(`❌ ${message}`);
         } finally {
             setUpdating(false);
         }

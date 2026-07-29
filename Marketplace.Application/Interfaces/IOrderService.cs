@@ -19,19 +19,15 @@ public interface IOrderService
     Task<OrderDto> CheckoutAsync(int userId, CreateOrderDto createOrderDto);
     Task<List<OrderDto>> GetOrdersAsync(int userId);
     Task<OrderDto> GetOrderByIdAsync(int userId, int orderId);
-    Task UpdateOrderStatusAsync(int userId, int orderId, string status);
     Task<OrderDto> ConfirmPaymentAsync(int userId, int orderId, PaymentConfirmationDto confirmation);
 
     // ============================================================
-    // TRACKING / SHIPMENT STATUS LOG (NEW)
+    // STATUS UPDATE WITH PERMISSION CHECKS
     // ============================================================
-    /// <summary>
-    /// Updates order status and adds a log entry with optional note.
-    /// </summary>
-    Task<OrderDto> UpdateOrderStatusWithLogAsync(int userId, int orderId, string newStatus, string? note = null);
+    Task<OrderDto> UpdateOrderStatusAsync(int userId, int orderId, string newStatus, string? note = null);
 
-    /// <summary>
-    /// Gets all status history logs for an order.
-    /// </summary>
+    // ============================================================
+    // STATUS LOGS
+    // ============================================================
     Task<List<ShipmentStatusLog>> GetStatusLogsAsync(int orderId);
 }
