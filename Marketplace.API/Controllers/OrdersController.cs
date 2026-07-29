@@ -227,7 +227,7 @@ public class OrdersController : ControllerBase
     }
 
     // ============================================================
-    // ADMIN: GET ALL ORDERS
+    // ADMIN: GET ALL ORDERS – FIXED (Status = o.CurrentStatus)
     // ============================================================
     [HttpGet("admin/all")]
     [Authorize(Roles = "Admin,Vendor,Employee")]
@@ -242,7 +242,7 @@ public class OrdersController : ControllerBase
                 o.UserId,
                 o.OrderDate,
                 o.TotalAmount,
-                o.CurrentStatus,
+                Status = o.CurrentStatus, // ✅ Frontend expects "status"
                 o.ShippingAddress,
                 o.PaymentMethod,
                 o.IsPaymentConfirmed,
