@@ -16,7 +16,7 @@ public class OrderService : IOrderService
     }
 
     // ============================================================
-    // CART OPERATIONS
+    // CART OPERATIONS (unchanged)
     // ============================================================
 
     public async Task<CartResponseDto> GetCartAsync(int userId)
@@ -240,13 +240,14 @@ public class OrderService : IOrderService
     }
 
     // ============================================================
-    // CONFIRM PAYMENT – Admin only
+    // CONFIRM PAYMENT – Admin, Vendor, Employee
     // ============================================================
     public async Task<OrderDto> ConfirmPaymentAsync(int userId, int orderId, PaymentConfirmationDto confirmation)
     {
+        // Allow Admin, Vendor, Employee
         var user = await _context.Users.FindAsync(userId);
-        if (user == null || user.Role != "Admin")
-            throw new Exception("Only Admins can confirm payments.");
+        if (user == null || (user.Role != "Admin" && user.Role != "Vendor" && user.Role != "Employee"))
+            throw new Exception("You do not have permission to confirm payments.");
 
         var order = await _context.Orders.FindAsync(orderId);
         if (order == null)
@@ -255,7 +256,7 @@ public class OrderService : IOrderService
         if (order.IsPaymentConfirmed)
             throw new Exception("Payment already confirmed.");
 
-        // Payment method specific validation
+        // Validate based on payment method
         switch (order.PaymentMethod)
         {
             case "Card":
@@ -277,9 +278,8 @@ public class OrderService : IOrderService
                 break;
 
             case "CashOnDelivery":
-                if (string.IsNullOrEmpty(confirmation.DeliveryConfirmation))
-                    throw new Exception("Delivery confirmation is required.");
-                order.DeliveryInstructions = confirmation.DeliveryConfirmation;
+                // Delivery confirmation is optional; if not provided, we use a default message.
+                order.DeliveryInstructions = confirmation.DeliveryConfirmation ?? "Confirmed by staff.";
                 break;
 
             default:
@@ -291,11 +291,12 @@ public class OrderService : IOrderService
         order.CurrentStatus = "Paid";
         await _context.SaveChangesAsync();
 
+        // Log the status change
         var statusLog = new ShipmentStatusLog
         {
             OrderId = orderId,
             Status = "Paid",
-            Note = "Payment confirmed by Admin.",
+            Note = "Payment confirmed.",
             CreatedAt = DateTime.UtcNow,
             UpdatedByUserId = userId
         };
@@ -340,7 +341,7 @@ public class OrderService : IOrderService
     }
 
     // ============================================================
-    // UPDATE ORDER STATUS – with permissions
+    // UPDATE ORDER STATUS – Admin, Vendor, Employee with permissions
     // ============================================================
     public async Task<OrderDto> UpdateOrderStatusAsync(int userId, int orderId, string newStatus, string? note = null)
     {
@@ -355,11 +356,12 @@ public class OrderService : IOrderService
             throw new Exception("User not found.");
 
         bool isAdmin = user.Role == "Admin";
+        bool isEmployee = user.Role == "Employee";
         bool isCustomer = order.UserId == userId;
         bool isVendor = false;
 
         // Check if user is a Vendor of any product in this order
-        if (!isAdmin)
+        if (!isAdmin && !isEmployee)
         {
             var productVendorIds = await _context.OrderItems
                 .Where(oi => oi.OrderId == orderId)
@@ -371,11 +373,11 @@ public class OrderService : IOrderService
         }
 
         // --- Permission rules ---
-        if (!isAdmin && !isVendor && !isCustomer)
+        if (!isAdmin && !isEmployee && !isVendor && !isCustomer)
             throw new Exception("You do not have permission to update this order.");
 
         // Customer can only cancel if order is not yet shipped/delivered
-        if (isCustomer && !isAdmin && !isVendor)
+        if (isCustomer && !isAdmin && !isEmployee && !isVendor)
         {
             if (newStatus != "Cancelled")
                 throw new Exception("Customers can only cancel their orders.");
@@ -403,8 +405,6 @@ public class OrderService : IOrderService
         };
         _context.ShipmentStatusLogs.Add(log);
         await _context.SaveChangesAsync();
-
-        // (Optional) Send email notification here
 
         return await GetOrderByIdAsync(order.UserId, orderId);
     }

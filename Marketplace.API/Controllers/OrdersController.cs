@@ -121,10 +121,10 @@ public class OrdersController : ControllerBase
     }
 
     // ============================================================
-    // ADMIN: CONFIRM PAYMENT
+    // CONFIRM PAYMENT – Admin, Vendor, Employee
     // ============================================================
     [HttpPost("{id}/confirm-payment")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Vendor,Employee")]
     public async Task<IActionResult> ConfirmPayment(int id, [FromBody] PaymentConfirmationDto confirmation)
     {
         var userId = GetUserId();
@@ -140,7 +140,7 @@ public class OrdersController : ControllerBase
     }
 
     // ============================================================
-    // ADMIN: REVERT PAYMENT
+    // REVERT PAYMENT – Admin only
     // ============================================================
     [HttpPost("{id}/revert-payment")]
     [Authorize(Roles = "Admin")]
@@ -159,9 +159,10 @@ public class OrdersController : ControllerBase
     }
 
     // ============================================================
-    // UPDATE ORDER STATUS – with permissions
+    // UPDATE ORDER STATUS – Admin, Vendor, Employee, Customer (cancel only)
     // ============================================================
     [HttpPut("{id}/status")]
+    [Authorize] // any logged-in user
     public async Task<IActionResult> UpdateStatus(int id, [FromBody] UpdateStatusWithNoteDto request)
     {
         try
@@ -229,7 +230,7 @@ public class OrdersController : ControllerBase
     // ADMIN: GET ALL ORDERS
     // ============================================================
     [HttpGet("admin/all")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Vendor,Employee")]
     public async Task<IActionResult> GetAllOrdersForAdmin()
     {
         var orders = await _context.Orders
