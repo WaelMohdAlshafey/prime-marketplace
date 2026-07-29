@@ -67,9 +67,9 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IStoreSettingService, StoreSettingService>();
-builder.Services.AddScoped<IWishlistService, WishlistService>(); // <-- NEW
-builder.Services.AddScoped<INewsletterService, NewsletterService>();
-builder.Services.AddScoped<IChatService, ChatService>();
+builder.Services.AddScoped<IWishlistService, WishlistService>(); // Chat service is already added below
+builder.Services.AddScoped<IChatService, ChatService>(); // <-- Add this if not already present
+
 // ============================================================
 // 6. Database Context (SQLite locally, PostgreSQL on Render)
 // ============================================================
@@ -129,7 +129,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 // ============================================================
-// 11. Enable CORS (MUST be placed between UseHttpsRedirection and UseAuthentication)
+// 11. Enable CORS – MUST be placed here (after UseHttpsRedirection, before UseAuthentication)
 // ============================================================
 app.UseCors("AllowAll");
 
