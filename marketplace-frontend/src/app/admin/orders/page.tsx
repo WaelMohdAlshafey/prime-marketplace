@@ -54,17 +54,24 @@ export default function AdminOrders() {
         fetchOrders();
     }, []);
 
+    // 🔄 Keep modal data fresh when orders list updates
+    useEffect(() => {
+        if (showModal && selectedOrder) {
+            const updated = orders.find(o => o.id === selectedOrder.id);
+            if (updated) {
+                setSelectedOrder(updated);
+            }
+        }
+    }, [orders, showModal, selectedOrder]);
+
     // ---------- Update Status ----------
     const handleUpdateStatus = async (orderId: number, newStatus: string) => {
         setUpdating(true);
         try {
             await api.put(`/api/Orders/${orderId}/status`, { status: newStatus, note });
-            await fetchOrders();
+            await fetchOrders(); // refresh the list
             setNote('');
-            if (selectedOrder && selectedOrder.id === orderId) {
-                const updatedOrder = orders.find(o => o.id === orderId);
-                if (updatedOrder) setSelectedOrder(updatedOrder);
-            }
+            // The useEffect above will update selectedOrder automatically
         } catch (err) {
             console.error('Failed to update order status:', err);
             let message = 'Failed to update order status.';
@@ -87,7 +94,6 @@ export default function AdminOrders() {
         if (!selectedOrder) return;
         setConfirmingPayment(true);
         try {
-            // For simplicity, we send a dummy transactionId; the backend will handle based on payment method.
             await api.post(`/api/Orders/${selectedOrder.id}/confirm-payment`, {
                 transactionId: `TXN-${Date.now()}`
             });
