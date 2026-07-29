@@ -168,7 +168,16 @@ public class OrdersController : ControllerBase
         try
         {
             var userId = GetUserId();
-            var updatedOrder = await _orderService.UpdateOrderStatusAsync(userId, id, request.Status, request.Note);
+
+            // ✅ Pass the carrier field (if provided) to the service
+            var updatedOrder = await _orderService.UpdateOrderStatusAsync(
+                userId,
+                id,
+                request.Status,
+                request.Note,
+                request.Carrier // ✅ New parameter for carrier update
+            );
+
             return Ok(updatedOrder);
         }
         catch (Exception ex)
@@ -204,7 +213,7 @@ public class OrdersController : ControllerBase
         if (order == null)
             return NotFound(new { message = "Order not found for this tracking number or ID." });
 
-        // ✅ Fetch the customer username separately using the UserId
+        // ✅ Fetch the customer username separately (Order has no navigation to User)
         string? customerName = null;
         if (order.UserId > 0)
         {
@@ -229,13 +238,13 @@ public class OrdersController : ControllerBase
         {
             order.Id,
             order.TrackingNumber,
-            order.ShippingCarrier,
+            ShippingCarrier = order.ShippingCarrier ?? "N/A", // ✅ Carrier included
             order.ShippedAt,
             order.DeliveredAt,
             order.CurrentStatus,
             order.TotalAmount,
             order.OrderDate,
-            CustomerName = customerName ?? "Guest", // ✅ Customer name from separate query
+            CustomerName = customerName ?? "Guest",
             Items = items,
             Logs = order.StatusLogs.Select(s => new
             {
@@ -287,13 +296,14 @@ public class OrdersController : ControllerBase
 }
 
 // ============================================================
-// DTOs
+// DTOs (local to this controller)
 // ============================================================
 
 public class UpdateStatusWithNoteDto
 {
     public string Status { get; set; } = string.Empty;
     public string? Note { get; set; }
+    public string? Carrier { get; set; } // ✅ New field for carrier update
 }
 
 public class RevertPaymentDto
