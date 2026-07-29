@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore; // ✅ ADD THIS – for async LINQ methods
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using Marketplace.Application.DTOs;
 using Marketplace.Application.Interfaces;
 using Marketplace.Domain.Entities;
+using Marketplace.Infrastructure.Data;
 
 namespace Marketplace.API.Controllers;
 
@@ -13,16 +14,16 @@ namespace Marketplace.API.Controllers;
 public class ProductsController : ControllerBase
 {
     private readonly IProductService _productService;
-    private readonly AppDbContext _context; // ✅ ADD THIS – for admin query
+    private readonly AppDbContext _context;
 
     public ProductsController(IProductService productService, AppDbContext context)
     {
         _productService = productService;
-        _context = context; // ✅ Inject context
+        _context = context;
     }
 
     // ============================================================
-    // PUBLIC ENDPOINTS (No authentication required)
+    // PUBLIC ENDPOINTS
     // ============================================================
 
     [HttpGet]
@@ -83,7 +84,7 @@ public class ProductsController : ControllerBase
     }
 
     // ============================================================
-    // ADMIN ENDPOINT – Get ALL products (including inactive)
+    // ADMIN ENDPOINT
     // ============================================================
     [HttpGet("admin/all")]
     [Authorize(Roles = "Admin")]
@@ -91,7 +92,6 @@ public class ProductsController : ControllerBase
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 50)
     {
-        // Query all products with vendor names
         var query = from p in _context.Products
                     join u in _context.Users on p.VendorId equals u.Id into vendorGroup
                     from u in vendorGroup.DefaultIfEmpty()
@@ -104,12 +104,11 @@ public class ProductsController : ControllerBase
                         StockQuantity = p.StockQuantity,
                         ImageUrl = p.ImageUrl,
                         VendorName = u != null ? u.Username : "بائع",
-                        IsActive = p.IsActive,
+                        IsActive = p.IsActive, // ✅ Now exists
                         Rating = p.Rating
                     };
 
         var totalCount = await query.CountAsync();
-
         var products = await query
             .OrderByDescending(p => p.Id)
             .Skip((page - 1) * pageSize)

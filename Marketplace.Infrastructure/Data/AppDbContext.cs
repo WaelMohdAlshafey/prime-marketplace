@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Marketplace.Domain.Entities;
-
+using Marketplace.Infrastructure.Data;
 namespace Marketplace.Infrastructure.Data;
 
 public class AppDbContext : DbContext

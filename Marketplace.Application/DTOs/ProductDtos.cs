@@ -11,7 +11,8 @@ public class ProductDto
     public int StockQuantity { get; set; }
     public string? ImageUrl { get; set; }
     public string? VendorName { get; set; }
-    public double? Rating { get; set; } // NEW: Product rating
+    public double? Rating { get; set; }
+    public bool IsActive { get; set; } = true; // ✅ ADD THIS
 }
 
 public class ProductCreateDto
