@@ -84,7 +84,7 @@ public class ProductsController : ControllerBase
     }
 
     // ============================================================
-    // ADMIN ENDPOINT
+    // ADMIN ENDPOINT – Get ALL products (including inactive)
     // ============================================================
     [HttpGet("admin/all")]
     [Authorize(Roles = "Admin")]
@@ -104,7 +104,7 @@ public class ProductsController : ControllerBase
                         StockQuantity = p.StockQuantity,
                         ImageUrl = p.ImageUrl,
                         VendorName = u != null ? u.Username : "بائع",
-                        IsActive = p.IsActive, // ✅ Now exists
+                        IsActive = p.IsActive,
                         Rating = p.Rating
                     };
 
@@ -188,6 +188,9 @@ public class ProductsController : ControllerBase
         return CreatedAtAction(nameof(GetAll), new { id = createdProduct.Id }, createdProduct);
     }
 
+    // ============================================================
+    // UPDATE – Allows Admin to edit ANY product
+    // ============================================================
     [HttpPut("{id}")]
     [Authorize(Roles = "Vendor,Admin")]
     public async Task<IActionResult> Update(int id, [FromForm] ProductUpdateDto productDto, IFormFile? image)
@@ -195,11 +198,25 @@ public class ProductsController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        var vendorIdClaim = User.FindFirst("VendorId") ?? User.FindFirst(ClaimTypes.NameIdentifier);
-        if (vendorIdClaim == null)
-            return Unauthorized();
+        var isAdmin = User.IsInRole("Admin");
+        int vendorId;
 
-        var vendorId = int.Parse(vendorIdClaim.Value);
+        if (isAdmin)
+        {
+            // Admin: find the product's actual vendor
+            var existingProduct = await _context.Products.FindAsync(id);
+            if (existingProduct == null)
+                return NotFound(new { message = "Product not found." });
+            vendorId = existingProduct.VendorId;
+        }
+        else
+        {
+            // Vendor: use their own ID
+            var vendorIdClaim = User.FindFirst("VendorId") ?? User.FindFirst(ClaimTypes.NameIdentifier);
+            if (vendorIdClaim == null)
+                return Unauthorized();
+            vendorId = int.Parse(vendorIdClaim.Value);
+        }
 
         string? newImageUrl = null;
         if (image != null && image.Length > 0)
