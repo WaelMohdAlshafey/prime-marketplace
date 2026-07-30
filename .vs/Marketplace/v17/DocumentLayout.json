@@ -3,6 +3,18 @@
   "WorkspaceRootPath": "M:\\Marketplace\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\Marketplace.Application\\Services\\ProductService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Marketplace.Application\\Services\\ProductService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\Marketplace.Infrastructure\\Data\\AppDbContext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Marketplace.Infrastructure\\Data\\AppDbContext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\Marketplace.Domain\\Entities\\Product.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Marketplace.Domain\\Entities\\Product.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|M:\\Marketplace\\Marketplace.API\\Controllers\\StoresController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Marketplace.API\\Controllers\\StoresController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -51,19 +63,58 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "ProductService.cs",
+              "DocumentMoniker": "M:\\Marketplace\\Marketplace.Application\\Services\\ProductService.cs",
+              "RelativeDocumentMoniker": "Marketplace.Application\\Services\\ProductService.cs",
+              "ToolTip": "M:\\Marketplace\\Marketplace.Application\\Services\\ProductService.cs",
+              "RelativeToolTip": "Marketplace.Application\\Services\\ProductService.cs",
+              "ViewState": "AgIAAKABAAAAAAAAAAAgwLEBAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-30T14:09:57.932Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "AppDbContext.cs",
+              "DocumentMoniker": "M:\\Marketplace\\Marketplace.Infrastructure\\Data\\AppDbContext.cs",
+              "RelativeDocumentMoniker": "Marketplace.Infrastructure\\Data\\AppDbContext.cs",
+              "ToolTip": "M:\\Marketplace\\Marketplace.Infrastructure\\Data\\AppDbContext.cs",
+              "RelativeToolTip": "Marketplace.Infrastructure\\Data\\AppDbContext.cs",
+              "ViewState": "AgIAABYAAAAAAAAAAAAkwCQAAAAhAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-30T14:08:11.054Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Product.cs",
+              "DocumentMoniker": "M:\\Marketplace\\Marketplace.Domain\\Entities\\Product.cs",
+              "RelativeDocumentMoniker": "Marketplace.Domain\\Entities\\Product.cs",
+              "ToolTip": "M:\\Marketplace\\Marketplace.Domain\\Entities\\Product.cs",
+              "RelativeToolTip": "Marketplace.Domain\\Entities\\Product.cs",
+              "ViewState": "AgIAAAcAAAAAAAAAAAAIwBIAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-30T14:05:17.486Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
               "Title": "StoresController.cs",
               "DocumentMoniker": "M:\\Marketplace\\Marketplace.API\\Controllers\\StoresController.cs",
               "RelativeDocumentMoniker": "Marketplace.API\\Controllers\\StoresController.cs",
               "ToolTip": "M:\\Marketplace\\Marketplace.API\\Controllers\\StoresController.cs",
               "RelativeToolTip": "Marketplace.API\\Controllers\\StoresController.cs",
-              "ViewState": "AgIAAHcAAAAAAAAAAAAmwIMAAAABAAAAAAAAAA==",
+              "ViewState": "AgIAAHcAAAAAAAAAAAAowIMAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-07-30T13:48:33.345Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 4,
               "Title": "ProductSuggestionsController.cs",
               "DocumentMoniker": "M:\\Marketplace\\Marketplace.API\\Controllers\\ProductSuggestionsController.cs",
               "RelativeDocumentMoniker": "Marketplace.API\\Controllers\\ProductSuggestionsController.cs",
@@ -76,7 +127,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 6,
               "Title": "20260730125446_AddStoreTable.cs",
               "DocumentMoniker": "M:\\Marketplace\\Marketplace.Infrastructure\\Migrations\\20260730125446_AddStoreTable.cs",
               "RelativeDocumentMoniker": "Marketplace.Infrastructure\\Migrations\\20260730125446_AddStoreTable.cs",
@@ -89,7 +140,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 7,
               "Title": "page.tsx",
               "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\app\\admin\\stores\\edit\\[id]\\page.tsx",
               "RelativeDocumentMoniker": "marketplace-frontend\\app\\admin\\stores\\edit\\[id]\\page.tsx",
@@ -102,7 +153,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 8,
               "Title": "page.tsx",
               "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\app\\admin\\stores\\create\\page.tsx",
               "RelativeDocumentMoniker": "marketplace-frontend\\app\\admin\\stores\\create\\page.tsx",
@@ -115,7 +166,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 5,
               "Title": "Program.cs",
               "DocumentMoniker": "M:\\Marketplace\\Marketplace.API\\Program.cs",
               "RelativeDocumentMoniker": "Marketplace.API\\Program.cs",
@@ -128,7 +179,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 10,
               "Title": "AdminSidebar.tsx",
               "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\src\\components\\admin\\AdminSidebar.tsx",
               "RelativeDocumentMoniker": "marketplace-frontend\\src\\components\\admin\\AdminSidebar.tsx",
@@ -141,7 +192,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 9,
               "Title": "page.tsx",
               "DocumentMoniker": "M:\\Marketplace\\marketplace-frontend\\app\\admin\\stores\\page.tsx",
               "RelativeDocumentMoniker": "marketplace-frontend\\app\\admin\\stores\\page.tsx",

@@ -29,7 +29,7 @@ public class ProductService : IProductService
             StockQuantity = product.StockQuantity,
             ImageUrl = product.ImageUrl,
             VendorName = vendorName ?? "بائع",
-            Rating = product.Rating // NEW: Include rating
+            Rating = product.Rating
         };
     }
 
@@ -77,7 +77,7 @@ public class ProductService : IProductService
                 StockQuantity = x.p.StockQuantity,
                 ImageUrl = x.p.ImageUrl,
                 VendorName = x.VendorName,
-                Rating = x.p.Rating // NEW
+                Rating = x.p.Rating
             })
             .ToListAsync();
 
@@ -137,7 +137,7 @@ public class ProductService : IProductService
                 StockQuantity = x.p.StockQuantity,
                 ImageUrl = x.p.ImageUrl,
                 VendorName = x.VendorName,
-                Rating = x.p.Rating // NEW
+                Rating = x.p.Rating
             })
             .ToListAsync();
 
@@ -162,7 +162,7 @@ public class ProductService : IProductService
         decimal? maxPrice,
         int? vendorId,
         bool? inStock,
-        double? rating, // NEW: Rating filter
+        double? rating,
         int page,
         int pageSize)
     {
@@ -202,9 +202,6 @@ public class ProductService : IProductService
         if (inStock.HasValue && inStock.Value)
             query = query.Where(x => x.p.StockQuantity > 0);
 
-        // ============================================================
-        // NEW: Apply rating filter
-        // ============================================================
         if (rating.HasValue && rating.Value > 0)
         {
             query = query.Where(x => x.p.Rating >= rating.Value);
@@ -225,7 +222,7 @@ public class ProductService : IProductService
                 StockQuantity = x.p.StockQuantity,
                 ImageUrl = x.p.ImageUrl,
                 VendorName = x.VendorName,
-                Rating = x.p.Rating // NEW
+                Rating = x.p.Rating
             })
             .ToListAsync();
 
@@ -259,7 +256,7 @@ public class ProductService : IProductService
                                  StockQuantity = p.StockQuantity,
                                  ImageUrl = p.ImageUrl,
                                  VendorName = u != null ? u.Username : "بائع",
-                                 Rating = p.Rating // NEW
+                                 Rating = p.Rating
                              }).FirstOrDefaultAsync();
 
         if (product == null)
@@ -269,7 +266,7 @@ public class ProductService : IProductService
     }
 
     // ============================================================
-    // GET PRODUCTS BY CATEGORY
+    // GET PRODUCTS BY CATEGORY – NOW USES CATEGORY COLUMN
     // ============================================================
     public async Task<PagedResult<ProductDto>> GetProductsByCategoryAsync(string categoryName, int page, int pageSize)
     {
@@ -283,53 +280,12 @@ public class ProductService : IProductService
         page = Math.Max(1, page);
         pageSize = Math.Max(1, pageSize);
 
-        var vendorNameMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-        {
-            { "software", "متجر البرمجيات" },
-            { "برامج", "متجر البرمجيات" },
-            { "hair-care", "متجر التجميل" },
-            { "العناية بالشعر", "متجر التجميل" },
-            { "skin-care", "متجر التجميل" },
-            { "العناية بالبشرة", "متجر التجميل" },
-            { "fashion", "متجر الأزياء" },
-            { "أزياء", "متجر الأزياء" },
-            { "accessories", "متجر الأزياء" },
-            { "إكسسوارات", "متجر الأزياء" },
-            { "electronics", "متجر الإلكترونيات" },
-            { "إلكترونيات", "متجر الإلكترونيات" },
-            { "supplements", "متجر التجميل" },
-            { "مكملات غذائية", "متجر التجميل" },
-            { "home", "متجر المنزل" },
-            { "المنزل", "متجر المنزل" }
-        };
-
-        if (!vendorNameMap.TryGetValue(categoryName, out string? vendorUsername))
-        {
-            return new PagedResult<ProductDto>
-            {
-                Items = new List<ProductDto>(),
-                TotalCount = 0,
-                PageNumber = page,
-                PageSize = pageSize
-            };
-        }
-
-        var vendor = await _context.Users.FirstOrDefaultAsync(u => u.Username == vendorUsername);
-        if (vendor == null)
-        {
-            return new PagedResult<ProductDto>
-            {
-                Items = new List<ProductDto>(),
-                TotalCount = 0,
-                PageNumber = page,
-                PageSize = pageSize
-            };
-        }
-
+        // ✅ Filter by the Category column directly, no vendor name mapping
         var query = from p in _context.Products
-                    join u in _context.Users on p.VendorId equals u.Id
-                    where p.IsActive && p.VendorId == vendor.Id
-                    select new { p, VendorName = u.Username };
+                    join u in _context.Users on p.VendorId equals u.Id into vendorGroup
+                    from u in vendorGroup.DefaultIfEmpty()
+                    where p.IsActive && p.Category == categoryName
+                    select new { p, VendorName = u != null ? u.Username : "بائع" };
 
         var totalCount = await query.CountAsync();
 
@@ -346,7 +302,7 @@ public class ProductService : IProductService
                 StockQuantity = x.p.StockQuantity,
                 ImageUrl = x.p.ImageUrl,
                 VendorName = x.VendorName,
-                Rating = x.p.Rating // NEW
+                Rating = x.p.Rating
             })
             .ToListAsync();
 
@@ -398,7 +354,7 @@ public class ProductService : IProductService
                 StockQuantity = x.p.StockQuantity,
                 ImageUrl = x.p.ImageUrl,
                 VendorName = x.VendorName,
-                Rating = x.p.Rating // NEW
+                Rating = x.p.Rating
             })
             .ToListAsync();
 
@@ -446,7 +402,8 @@ public class ProductService : IProductService
         existing.CostPrice = product.CostPrice;
         existing.StockQuantity = product.StockQuantity;
         existing.IsActive = product.IsActive;
-        existing.Rating = product.Rating; // NEW: Allow updating rating (admin only)
+        existing.Rating = product.Rating;
+        existing.Category = product.Category; // ✅ Allow updating category
 
         if (!string.IsNullOrEmpty(product.ImageUrl))
             existing.ImageUrl = product.ImageUrl;

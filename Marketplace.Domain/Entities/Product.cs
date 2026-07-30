@@ -12,5 +12,8 @@ public class Product
     public string? ImageUrl { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public bool IsActive { get; set; } = true;
-    public double? Rating { get; set; } // Average rating (1-5 stars)
+    public double? Rating { get; set; }
+
+    // ✅ NEW: Product category (e.g., "Software", "Hair Care", etc.)
+    public string? Category { get; set; }
 }

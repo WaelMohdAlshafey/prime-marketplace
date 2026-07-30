@@ -27,9 +27,11 @@ public class AppDbContext : DbContext
 
         // ---- Product configurations ----
         modelBuilder.Entity<Product>()
-            .HasIndex(p => p.VendorId);
+     .HasIndex(p => p.VendorId);
         modelBuilder.Entity<Product>()
             .HasIndex(p => p.IsActive);
+        modelBuilder.Entity<Product>()
+            .HasIndex(p => p.Category); // ✅ NEW
         modelBuilder.Entity<Product>()
             .Property(p => p.Price)
             .HasPrecision(18, 2);
