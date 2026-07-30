@@ -91,8 +91,8 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
     return (
         <div
             className={`sticky top-0 z-40 transition-all duration-500 ${isScrolled
-                    ? 'bg-white/80 backdrop-blur-xl shadow-lg border-b border-white/20'
-                    : 'bg-white/60 backdrop-blur-md shadow-sm border-b border-gray-100/50'
+                ? 'bg-white/80 backdrop-blur-xl shadow-lg border-b border-white/20'
+                : 'bg-white/60 backdrop-blur-md shadow-sm border-b border-gray-100/50'
                 }`}
         >
             <div className="container mx-auto px-4 flex items-center gap-4 py-3">
@@ -249,7 +249,7 @@ const NavMenu = () => {
 };
 
 // ============================================================
-// USER NAV – includes chat link
+// USER NAV – includes chat & suggest links
 // ============================================================
 const UserNav = ({ user, logout }: { user: AuthResponse; logout: () => void }) => {
     const { t } = useTranslation('common');
@@ -265,6 +265,10 @@ const UserNav = ({ user, logout }: { user: AuthResponse; logout: () => void }) =
                     </Link>
                     <Link href="/orders" className="hover:text-yellow-300 transition flex items-center gap-2">
                         <span>📋 {t('orders')}</span>
+                    </Link>
+                    {/* ✅ NEW: Suggest link for all logged‑in users */}
+                    <Link href="/suggest" className="hover:text-yellow-300 transition flex items-center gap-2">
+                        <span>💡 Suggest</span>
                     </Link>
                     {isVendor && (
                         <>
@@ -286,9 +290,6 @@ const UserNav = ({ user, logout }: { user: AuthResponse; logout: () => void }) =
                             </Link>
                         </>
                     )}
-                    {/* ============================================================
-                        NEW – Chat link for all logged‑in users
-                        ============================================================ */}
                     <Link href="/chat" className="hover:text-yellow-300 transition flex items-center gap-2">
                         <span>💬 Chat</span>
                     </Link>

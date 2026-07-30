@@ -12,6 +12,7 @@ import {
     Settings,
     LogOut,
     BarChart3,
+    Lightbulb, // ✅ NEW
 } from 'lucide-react';
 
 interface NavItem {
@@ -29,6 +30,7 @@ export default function AdminSidebar() {
         { name: 'Users', href: '/admin/users', icon: <Users className="w-5 h-5" /> },
         { name: 'Products', href: '/admin/products', icon: <Package className="w-5 h-5" /> },
         { name: 'Orders', href: '/admin/orders', icon: <ShoppingBag className="w-5 h-5" /> },
+        { name: 'Suggestions', href: '/admin/suggestions', icon: <Lightbulb className="w-5 h-5" /> }, // ✅ NEW
         { name: 'Newsletter', href: '/admin/newsletter', icon: <Mail className="w-5 h-5" /> },
         { name: 'Analytics', href: '/admin/analytics', icon: <BarChart3 className="w-5 h-5" /> },
         { name: 'Settings', href: '/admin/settings', icon: <Settings className="w-5 h-5" /> },
@@ -53,8 +55,8 @@ export default function AdminSidebar() {
                             key={item.href}
                             href={item.href}
                             className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${isActive
-                                    ? 'bg-[#0F5C45] text-white shadow-lg shadow-[#0F5C45]/20'
-                                    : 'text-gray-400 hover:text-white hover:bg-white/10'
+                                ? 'bg-[#0F5C45] text-white shadow-lg shadow-[#0F5C45]/20'
+                                : 'text-gray-400 hover:text-white hover:bg-white/10'
                                 }`}
                         >
                             {item.icon}

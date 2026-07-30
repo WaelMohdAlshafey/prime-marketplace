@@ -12,9 +12,8 @@ public class CreateOrderDto
     public string ShippingAddress { get; set; } = string.Empty;
 
     [Required]
-    public string PaymentMethod { get; set; } = string.Empty; // Card, MobileWallet, PayPal, CashOnDelivery
+    public string PaymentMethod { get; set; } = string.Empty;
 
-    // Payment Details (Conditional based on PaymentMethod)
     public string? CardNumber { get; set; }
     public string? CardExpiry { get; set; }
     public string? CardCvv { get; set; }
@@ -22,18 +21,27 @@ public class CreateOrderDto
     public string? PayPalEmail { get; set; }
     public string? DeliveryInstructions { get; set; }
     public string? TrackingNumber { get; set; }
-    public string? ShippingCarrier { get; set; }
+    public string? ShippingCarrier { get; set; } // ✅ NEW – Allows user to specify carrier
     public DateTime? ShippedAt { get; set; }
     public DateTime? DeliveredAt { get; set; }
-
 }
 
 // ============================================================
-// UPDATE STATUS DTO
+// UPDATE STATUS DTO (for admin)
 // ============================================================
 public class UpdateStatusDto
 {
     public string Status { get; set; } = string.Empty;
+}
+
+// ============================================================
+// UPDATE STATUS WITH NOTE DTO (for admin with extra fields)
+// ============================================================
+public class UpdateStatusWithNoteDto
+{
+    public string Status { get; set; } = string.Empty;
+    public string? Note { get; set; }
+    public string? Carrier { get; set; } // ✅ NEW – Admin can set/update carrier
 }
 
 // ============================================================
@@ -58,8 +66,6 @@ public class OrderDto
     public string Status { get; set; } = string.Empty;
     public string? ShippingAddress { get; set; }
     public string? PaymentMethod { get; set; }
-
-    // Payment details
     public string? PaymentTransactionId { get; set; }
     public string? CardLastFour { get; set; }
     public string? PhoneNumber { get; set; }
@@ -67,7 +73,7 @@ public class OrderDto
     public string? DeliveryInstructions { get; set; }
     public bool IsPaymentConfirmed { get; set; }
     public DateTime? PaymentConfirmedAt { get; set; }
-
+    public string? ShippingCarrier { get; set; } // ✅ NEW – Return carrier in response
     public List<OrderItemDto> Items { get; set; } = new();
 }
 

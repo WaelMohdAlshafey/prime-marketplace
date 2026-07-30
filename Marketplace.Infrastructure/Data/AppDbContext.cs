@@ -16,18 +16,18 @@ public class AppDbContext : DbContext
     public DbSet<WishlistItem> WishlistItems { get; set; }
     public DbSet<NewsletterSubscription> NewsletterSubscriptions { get; set; }
     public DbSet<ShipmentStatusLog> ShipmentStatusLogs { get; set; }
-
-    // ============================================================
-    // NEW – Chat entities
-    // ============================================================
     public DbSet<Conversation> Conversations { get; set; }
     public DbSet<Message> Messages { get; set; }
+
+    // ✅ NEW: Product Suggestions
+    public DbSet<ProductSuggestion> ProductSuggestions { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
-        // Product configurations
+        // ---- Existing configurations ----
+
         modelBuilder.Entity<Product>()
             .HasIndex(p => p.VendorId);
         modelBuilder.Entity<Product>()
@@ -36,12 +36,10 @@ public class AppDbContext : DbContext
             .Property(p => p.Price)
             .HasPrecision(18, 2);
 
-        // User configurations
         modelBuilder.Entity<User>()
             .HasIndex(u => u.Email)
             .IsUnique();
 
-        // CartItem configurations
         modelBuilder.Entity<CartItem>()
             .HasIndex(ci => ci.UserId);
         modelBuilder.Entity<CartItem>()
@@ -50,19 +48,16 @@ public class AppDbContext : DbContext
             .HasForeignKey(ci => ci.ProductId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        // Order configurations
         modelBuilder.Entity<Order>()
             .Property(o => o.TotalAmount)
             .HasPrecision(18, 2);
         modelBuilder.Entity<Order>()
             .HasIndex(o => o.UserId);
 
-        // OrderItem configurations
         modelBuilder.Entity<OrderItem>()
             .Property(oi => oi.UnitPrice)
             .HasPrecision(18, 2);
 
-        // Wishlist configurations
         modelBuilder.Entity<WishlistItem>()
             .HasIndex(wi => new { wi.UserId, wi.ProductId })
             .IsUnique();
@@ -77,12 +72,10 @@ public class AppDbContext : DbContext
             .HasForeignKey(wi => wi.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        // Newsletter configurations
         modelBuilder.Entity<NewsletterSubscription>()
             .HasIndex(ns => ns.Email)
             .IsUnique();
 
-        // ShipmentStatusLog configurations
         modelBuilder.Entity<ShipmentStatusLog>()
             .HasIndex(s => s.OrderId);
         modelBuilder.Entity<ShipmentStatusLog>()
@@ -96,19 +89,14 @@ public class AppDbContext : DbContext
             .HasForeignKey(s => s.UpdatedByUserId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        // ============================================================
-        // NEW – Chat configurations
-        // ============================================================
         modelBuilder.Entity<Conversation>()
             .HasIndex(c => new { c.UserId1, c.UserId2 })
             .IsUnique();
-
         modelBuilder.Entity<Conversation>()
             .HasOne(c => c.User1)
             .WithMany()
             .HasForeignKey(c => c.UserId1)
             .OnDelete(DeleteBehavior.Restrict);
-
         modelBuilder.Entity<Conversation>()
             .HasOne(c => c.User2)
             .WithMany()
@@ -120,11 +108,26 @@ public class AppDbContext : DbContext
             .WithMany(c => c.Messages)
             .HasForeignKey(m => m.ConversationId)
             .OnDelete(DeleteBehavior.Cascade);
-
         modelBuilder.Entity<Message>()
             .HasOne(m => m.Sender)
             .WithMany()
             .HasForeignKey(m => m.SenderId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        // ✅ NEW: ProductSuggestion configuration
+        modelBuilder.Entity<ProductSuggestion>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Status).HasMaxLength(20);
+            entity.HasIndex(e => e.Status);
+            entity.HasOne(e => e.SuggestedByUser)
+                  .WithMany()
+                  .HasForeignKey(e => e.SuggestedByUserId)
+                  .OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne(e => e.ReviewedByUser)
+                  .WithMany()
+                  .HasForeignKey(e => e.ReviewedByUserId)
+                  .OnDelete(DeleteBehavior.Restrict);
+        });
     }
 }
