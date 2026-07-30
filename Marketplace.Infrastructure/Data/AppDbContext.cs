@@ -18,16 +18,14 @@ public class AppDbContext : DbContext
     public DbSet<ShipmentStatusLog> ShipmentStatusLogs { get; set; }
     public DbSet<Conversation> Conversations { get; set; }
     public DbSet<Message> Messages { get; set; }
-
-    // ✅ NEW: Product Suggestions
     public DbSet<ProductSuggestion> ProductSuggestions { get; set; }
+    public DbSet<Store> Stores { get; set; } // ✅ NEW
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
-        // ---- Existing configurations ----
-
+        // ---- Product configurations ----
         modelBuilder.Entity<Product>()
             .HasIndex(p => p.VendorId);
         modelBuilder.Entity<Product>()
@@ -36,10 +34,12 @@ public class AppDbContext : DbContext
             .Property(p => p.Price)
             .HasPrecision(18, 2);
 
+        // ---- User configurations ----
         modelBuilder.Entity<User>()
             .HasIndex(u => u.Email)
             .IsUnique();
 
+        // ---- CartItem configurations ----
         modelBuilder.Entity<CartItem>()
             .HasIndex(ci => ci.UserId);
         modelBuilder.Entity<CartItem>()
@@ -48,16 +48,19 @@ public class AppDbContext : DbContext
             .HasForeignKey(ci => ci.ProductId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        // ---- Order configurations ----
         modelBuilder.Entity<Order>()
             .Property(o => o.TotalAmount)
             .HasPrecision(18, 2);
         modelBuilder.Entity<Order>()
             .HasIndex(o => o.UserId);
 
+        // ---- OrderItem configurations ----
         modelBuilder.Entity<OrderItem>()
             .Property(oi => oi.UnitPrice)
             .HasPrecision(18, 2);
 
+        // ---- Wishlist configurations ----
         modelBuilder.Entity<WishlistItem>()
             .HasIndex(wi => new { wi.UserId, wi.ProductId })
             .IsUnique();
@@ -72,10 +75,12 @@ public class AppDbContext : DbContext
             .HasForeignKey(wi => wi.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        // ---- Newsletter configurations ----
         modelBuilder.Entity<NewsletterSubscription>()
             .HasIndex(ns => ns.Email)
             .IsUnique();
 
+        // ---- ShipmentStatusLog configurations ----
         modelBuilder.Entity<ShipmentStatusLog>()
             .HasIndex(s => s.OrderId);
         modelBuilder.Entity<ShipmentStatusLog>()
@@ -89,6 +94,7 @@ public class AppDbContext : DbContext
             .HasForeignKey(s => s.UpdatedByUserId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        // ---- Conversation configurations ----
         modelBuilder.Entity<Conversation>()
             .HasIndex(c => new { c.UserId1, c.UserId2 })
             .IsUnique();
@@ -103,6 +109,7 @@ public class AppDbContext : DbContext
             .HasForeignKey(c => c.UserId2)
             .OnDelete(DeleteBehavior.Restrict);
 
+        // ---- Message configurations ----
         modelBuilder.Entity<Message>()
             .HasOne(m => m.Conversation)
             .WithMany(c => c.Messages)
@@ -114,7 +121,7 @@ public class AppDbContext : DbContext
             .HasForeignKey(m => m.SenderId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        // ✅ NEW: ProductSuggestion configuration
+        // ---- ProductSuggestion configurations ----
         modelBuilder.Entity<ProductSuggestion>(entity =>
         {
             entity.HasKey(e => e.Id);
@@ -127,6 +134,18 @@ public class AppDbContext : DbContext
             entity.HasOne(e => e.ReviewedByUser)
                   .WithMany()
                   .HasForeignKey(e => e.ReviewedByUserId)
+                  .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // ---- Store configurations (NEW) ----
+        modelBuilder.Entity<Store>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
+            entity.HasIndex(e => e.VendorId).IsUnique(); // One store per vendor
+            entity.HasOne(e => e.Vendor)
+                  .WithMany()
+                  .HasForeignKey(e => e.VendorId)
                   .OnDelete(DeleteBehavior.Restrict);
         });
     }

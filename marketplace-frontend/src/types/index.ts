@@ -174,7 +174,7 @@ export interface PaymentIntent {
 }
 
 // ============================================================
-// CHAT TYPES (NEW)
+// CHAT TYPES
 // ============================================================
 export interface UserDto {
     id: number;
@@ -198,4 +198,67 @@ export interface MessageDto {
     content: string;
     sentAt: string;
     isRead: boolean;
+}
+
+// ============================================================
+// SUGGESTION TYPES
+// ============================================================
+export interface ProductSuggestionCreateDto {
+    name: string;
+    description?: string;
+    category?: string;
+    vendorId?: number;
+    suggestedPrice?: number;
+    estimatedCostPrice?: number;
+    suggestedStockQuantity?: number;
+    notes?: string;
+}
+
+export interface ProductSuggestionResponseDto {
+    id: number;
+    name: string;
+    description?: string;
+    category?: string;
+    vendorId?: number;
+    vendorName?: string;
+    suggestedPrice?: number;
+    estimatedCostPrice?: number;
+    suggestedStockQuantity?: number;
+    imageData?: string;
+    notes?: string;
+    status: string;
+    adminNote?: string;
+    createdAt: string;
+    reviewedAt?: string;
+    suggestedByUsername: string;
+    reviewedByUsername?: string;
+}
+
+// ============================================================
+// STORE TYPES (NEW)
+// ============================================================
+export interface StoreResponseDto {
+    id: number;
+    name: string;
+    logoUrl?: string;
+    description?: string;
+    vendorId: number;
+    vendorUsername: string;
+    isActive: boolean;
+    createdAt: string;
+    productCount: number;
+}
+
+export interface StoreCreateDto {
+    name: string;
+    logoUrl?: string;
+    description?: string;
+    vendorId: number;
+}
+
+export interface StoreUpdateDto {
+    name: string;
+    logoUrl?: string;
+    description?: string;
+    isActive: boolean;
 }

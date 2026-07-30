@@ -368,6 +368,40 @@ namespace Marketplace.Infrastructure.Migrations
                     b.ToTable("ShipmentStatusLogs");
                 });
 
+            modelBuilder.Entity("Marketplace.Domain.Entities.Store", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("LogoUrl")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("VendorId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("VendorId")
+                        .IsUnique();
+
+                    b.ToTable("Stores");
+                });
+
             modelBuilder.Entity("Marketplace.Domain.Entities.StoreSetting", b =>
                 {
                     b.Property<int>("Id")
@@ -561,6 +595,17 @@ namespace Marketplace.Infrastructure.Migrations
                     b.Navigation("Order");
 
                     b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Marketplace.Domain.Entities.Store", b =>
+                {
+                    b.HasOne("Marketplace.Domain.Entities.User", "Vendor")
+                        .WithMany()
+                        .HasForeignKey("VendorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Vendor");
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.WishlistItem", b =>
