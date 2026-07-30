@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import { Heart, Star, ShoppingBag } from 'lucide-react';
 import { useState, useRef } from 'react';
@@ -22,11 +23,12 @@ interface ProductCardProps {
         rating?: number;
         reviews?: number;
         discount?: number;
-        category?: string; // ✅ from database – no hard‑coding
+        category?: string;
     };
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
+    const pathname = usePathname();
     const [isAdding, setIsAdding] = useState(false);
     const [imgSrc, setImgSrc] = useState(product.imageUrl || '/images/placeholder.jpg');
     const [fly, setFly] = useState(false);
@@ -41,6 +43,14 @@ export default function ProductCard({ product }: ProductCardProps) {
 
     const isWishlist = isFavorite(product.id);
     const discountPrice = product.discount ? product.price * (1 - product.discount / 100) : null;
+
+    // ✅ Option B: show category on store page, vendor on category pages
+    const isStorePage = pathname.startsWith('/stores/');
+    const isCategoryPage = pathname.length > 1 && !pathname.startsWith('/stores/') && !pathname.startsWith('/products');
+
+    const primaryBadge = isStorePage
+        ? product.category || 'Category'
+        : product.vendorName || 'Vendor';
 
     const handleWishlistToggle = (e: React.MouseEvent) => {
         e.preventDefault();
@@ -139,10 +149,10 @@ export default function ProductCard({ product }: ProductCardProps) {
                             />
                         </motion.button>
 
-                        {/* Vendor Badge */}
+                        {/* Primary Badge – Option B: store → category, category → vendor */}
                         <div className="absolute bottom-3 left-3 right-3">
                             <span className="inline-block bg-white/90 backdrop-blur-sm text-[#0F5C45] text-xs font-medium px-3 py-1 rounded-full shadow-md border border-white/20">
-                                {product.vendorName || 'متجر Prime'}
+                                {primaryBadge}
                             </span>
                         </div>
                     </div>
@@ -157,7 +167,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                             {product.description}
                         </p>
 
-                        {/* ✅ Category Link – fully dynamic from database */}
+                        {/* Category Link – always visible */}
                         {product.category && (
                             <Link
                                 href={`/${product.category}`}
@@ -205,7 +215,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                     </div>
                 </Link>
 
-                {/* Add to Cart Button */}
+                {/* Add to Cart */}
                 <div className="px-4 pb-4">
                     <motion.button
                         whileHover={{ scale: 1.02 }}
@@ -229,7 +239,6 @@ export default function ProductCard({ product }: ProductCardProps) {
                 </div>
             </motion.div>
 
-            {/* Flying item animation */}
             <AnimatePresence>
                 {fly && (
                     <motion.div
