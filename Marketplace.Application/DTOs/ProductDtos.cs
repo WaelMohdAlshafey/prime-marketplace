@@ -12,7 +12,8 @@ public class ProductDto
     public string? ImageUrl { get; set; }
     public string? VendorName { get; set; }
     public double? Rating { get; set; }
-    public bool IsActive { get; set; } = true; // ✅ ADD THIS
+    public bool IsActive { get; set; } = true;
+    public string? Category { get; set; } // ✅ NEW
 }
 
 public class ProductCreateDto
@@ -30,6 +31,7 @@ public class ProductCreateDto
     [Range(0, int.MaxValue)]
     public int StockQuantity { get; set; }
     public bool IsActive { get; set; } = true;
+    public string? Category { get; set; } // ✅ NEW
 }
 
 public class ProductUpdateDto
@@ -48,4 +50,5 @@ public class ProductUpdateDto
     public int StockQuantity { get; set; }
     public bool IsActive { get; set; } = true;
     public string? ExistingImageUrl { get; set; }
+    public string? Category { get; set; } // ✅ NEW
 }

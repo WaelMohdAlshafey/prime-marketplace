@@ -29,7 +29,8 @@ public class ProductService : IProductService
             StockQuantity = product.StockQuantity,
             ImageUrl = product.ImageUrl,
             VendorName = vendorName ?? "بائع",
-            Rating = product.Rating
+            Rating = product.Rating,
+            Category = product.Category // ✅ NEW
         };
     }
 
@@ -77,7 +78,8 @@ public class ProductService : IProductService
                 StockQuantity = x.p.StockQuantity,
                 ImageUrl = x.p.ImageUrl,
                 VendorName = x.VendorName,
-                Rating = x.p.Rating
+                Rating = x.p.Rating,
+                Category = x.p.Category // ✅ NEW
             })
             .ToListAsync();
 
@@ -137,7 +139,8 @@ public class ProductService : IProductService
                 StockQuantity = x.p.StockQuantity,
                 ImageUrl = x.p.ImageUrl,
                 VendorName = x.VendorName,
-                Rating = x.p.Rating
+                Rating = x.p.Rating,
+                Category = x.p.Category // ✅ NEW
             })
             .ToListAsync();
 
@@ -222,7 +225,8 @@ public class ProductService : IProductService
                 StockQuantity = x.p.StockQuantity,
                 ImageUrl = x.p.ImageUrl,
                 VendorName = x.VendorName,
-                Rating = x.p.Rating
+                Rating = x.p.Rating,
+                Category = x.p.Category // ✅ NEW
             })
             .ToListAsync();
 
@@ -256,7 +260,8 @@ public class ProductService : IProductService
                                  StockQuantity = p.StockQuantity,
                                  ImageUrl = p.ImageUrl,
                                  VendorName = u != null ? u.Username : "بائع",
-                                 Rating = p.Rating
+                                 Rating = p.Rating,
+                                 Category = p.Category // ✅ NEW
                              }).FirstOrDefaultAsync();
 
         if (product == null)
@@ -280,7 +285,7 @@ public class ProductService : IProductService
         page = Math.Max(1, page);
         pageSize = Math.Max(1, pageSize);
 
-        // ✅ Filter by the Category column directly, no vendor name mapping
+        // ✅ Filter by the Category column directly
         var query = from p in _context.Products
                     join u in _context.Users on p.VendorId equals u.Id into vendorGroup
                     from u in vendorGroup.DefaultIfEmpty()
@@ -302,7 +307,8 @@ public class ProductService : IProductService
                 StockQuantity = x.p.StockQuantity,
                 ImageUrl = x.p.ImageUrl,
                 VendorName = x.VendorName,
-                Rating = x.p.Rating
+                Rating = x.p.Rating,
+                Category = x.p.Category // ✅ NEW
             })
             .ToListAsync();
 
@@ -354,7 +360,8 @@ public class ProductService : IProductService
                 StockQuantity = x.p.StockQuantity,
                 ImageUrl = x.p.ImageUrl,
                 VendorName = x.VendorName,
-                Rating = x.p.Rating
+                Rating = x.p.Rating,
+                Category = x.p.Category // ✅ NEW
             })
             .ToListAsync();
 

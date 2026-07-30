@@ -1,31 +1,38 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useTranslation } from 'react-i18next'; // ✅ Fixed: added space after 'from'
-import {
-    Monitor,
-    Sparkles,
-    Droplet,
-    Shirt,
-    Gem,
-    Smartphone,
-    Pill,
-    Home
-} from 'lucide-react';
-
-const categories = [
-    { nameKey: 'software', icon: Monitor, color: 'from-indigo-500 to-indigo-700', count: '1,234', slug: 'software' },
-    { nameKey: 'hairCare', icon: Sparkles, color: 'from-pink-500 to-pink-700', count: '856', slug: 'hair-care' },
-    { nameKey: 'skinCare', icon: Droplet, color: 'from-amber-400 to-amber-600', count: '723', slug: 'skin-care' },
-    { nameKey: 'fashion', icon: Shirt, color: 'from-rose-400 to-rose-600', count: '2,104', slug: 'fashion' },
-    { nameKey: 'accessories', icon: Gem, color: 'from-yellow-400 to-yellow-600', count: '1,502', slug: 'accessories' },
-    { nameKey: 'electronics', icon: Smartphone, color: 'from-blue-500 to-blue-700', count: '945', slug: 'electronics' },
-    { nameKey: 'supplements', icon: Pill, color: 'from-green-500 to-green-700', count: '678', slug: 'supplements' },
-    { nameKey: 'homeCategory', icon: Home, color: 'from-gray-400 to-gray-600', count: '432', slug: 'home' },
-];
+import { useTranslation } from 'react-i18next';
+import api from '@/lib/api';
 
 export default function CategoryGrid() {
     const { t } = useTranslation('common');
+    const [categories, setCategories] = useState<string[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const response = await api.get('/api/Categories');
+                setCategories(response.data);
+            } catch (error) {
+                console.error('Failed to fetch categories:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchCategories();
+    }, []);
+
+    if (loading) {
+        return (
+            <section className="container mx-auto px-4 py-12">
+                <div className="flex justify-center">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0F5C45]"></div>
+                </div>
+            </section>
+        );
+    }
 
     return (
         <section className="container mx-auto px-4 py-12">
@@ -40,24 +47,16 @@ export default function CategoryGrid() {
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                {categories.map((cat) => {
-                    const Icon = cat.icon;
-                    return (
-                        <Link
-                            key={cat.slug}
-                            href={`/${cat.slug}`}
-                            className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition p-5 text-center hover:-translate-y-1 duration-300 border border-gray-50"
-                        >
-                            <div
-                                className={`w-16 h-16 mx-auto rounded-full bg-gradient-to-br ${cat.color} flex items-center justify-center text-white mb-3 shadow-md group-hover:shadow-lg transition`}
-                            >
-                                <Icon className="w-8 h-8" strokeWidth={1.5} />
-                            </div>
-                            <h3 className="font-semibold text-gray-800 text-sm">{t(`categories.${cat.nameKey}`)}</h3>
-                            <p className="text-xs text-gray-500">{cat.count} {t('productCount')}</p>
-                        </Link>
-                    );
-                })}
+                {categories.map((cat) => (
+                    <Link
+                        key={cat}
+                        href={`/${cat}`}
+                        className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition p-5 text-center hover:-translate-y-1 duration-300 border border-gray-50"
+                    >
+                        <div className="text-4xl mb-2">{cat.replace(/-/g, ' ')}</div>
+                        <h3 className="font-semibold text-gray-800 text-sm">{cat.replace(/-/g, ' ')}</h3>
+                    </Link>
+                ))}
             </div>
         </section>
     );

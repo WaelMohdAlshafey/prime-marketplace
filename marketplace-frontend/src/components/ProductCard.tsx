@@ -22,37 +22,13 @@ interface ProductCardProps {
         rating?: number;
         reviews?: number;
         discount?: number;
+        category?: string; // ✅ from database – no hard‑coding
     };
 }
 
-const getProductImage = (name: string): string => {
-    const lower = name.toLowerCase();
-    if (lower.includes('سماعة') || lower.includes('headphone') || lower.includes('sony'))
-        return '/images/products/headphones.jpg';
-    if (lower.includes('لابتوب') || lower.includes('laptop') || lower.includes('برمجيات') || lower.includes('برمجة'))
-        return '/images/products/laptop.jpg';
-    if (lower.includes('كتاب') || lower.includes('book') || lower.includes('clean code') || lower.includes('pragmatic'))
-        return '/images/products/book.jpg';
-    if (lower.includes('تي شيرت') || lower.includes('tshirt') || lower.includes('fashion') || lower.includes('قطني'))
-        return '/images/products/tshirt.jpg';
-    if (lower.includes('شعر') || lower.includes('hair') || lower.includes('شامبو'))
-        return '/images/products/haircare.jpg';
-    if (lower.includes('بشرة') || lower.includes('skin') || lower.includes('كريم') || lower.includes('ترطيب'))
-        return '/images/products/skincare.jpg';
-    if (lower.includes('ساعة') || lower.includes('watch') || lower.includes('اكسسوارات') || lower.includes('كلاسيكية'))
-        return '/images/products/watch.jpg';
-    if (lower.includes('حذاء') || lower.includes('shoe') || lower.includes('sneaker'))
-        return '/images/products/shoes.jpg';
-    if (lower.includes('مكمل') || lower.includes('supplement') || lower.includes('فيتامين') || lower.includes('vitamin'))
-        return '/images/products/supplements.jpg';
-    if (lower.includes('أواني') || lower.includes('منزل') || lower.includes('مطبخ') || lower.includes('طقم'))
-        return '/images/products/home.jpg';
-    return 'https://placehold.co/400x400/e0e0e0/666666?text=No+Image';
-};
-
 export default function ProductCard({ product }: ProductCardProps) {
     const [isAdding, setIsAdding] = useState(false);
-    const [imgSrc, setImgSrc] = useState(product.imageUrl || getProductImage(product.name));
+    const [imgSrc, setImgSrc] = useState(product.imageUrl || '/images/placeholder.jpg');
     const [fly, setFly] = useState(false);
     const [flyStart, setFlyStart] = useState({ x: 0, y: 0 });
     const [flyEnd, setFlyEnd] = useState({ x: 0, y: 0 });
@@ -107,7 +83,7 @@ export default function ProductCard({ product }: ProductCardProps) {
     };
 
     const handleImageError = () => {
-        setImgSrc('https://placehold.co/400x400/e0e0e0/666666?text=No+Image');
+        setImgSrc('/images/placeholder.jpg');
     };
 
     return (
@@ -122,115 +98,125 @@ export default function ProductCard({ product }: ProductCardProps) {
                 onHoverEnd={() => setIsHovered(false)}
                 className="group relative bg-white/80 backdrop-blur-sm rounded-2xl shadow-soft hover:shadow-strong transition-all duration-500 overflow-hidden border border-gray-100/50 hover:border-[#0F5C45]/20"
             >
-                {/* Image */}
-                <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100">
-                    <Image
-                        src={imgSrc}
-                        alt={product.name}
-                        fill
-                        className={`object-cover transition-transform duration-700 ${isHovered ? 'scale-110' : 'scale-100'}`}
-                        sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-                        priority={false}
-                        onError={handleImageError}
-                    />
+                <Link href={`/products/${product.id}`} className="block">
+                    {/* Image */}
+                    <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100">
+                        <Image
+                            src={imgSrc}
+                            alt={product.name}
+                            fill
+                            className={`object-cover transition-transform duration-700 ${isHovered ? 'scale-110' : 'scale-100'}`}
+                            sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                            priority={false}
+                            onError={handleImageError}
+                        />
 
-                    {/* Discount Badge */}
-                    {product.discount && product.discount > 0 && (
-                        <motion.span
-                            initial={{ x: 20, opacity: 0 }}
-                            animate={{ x: 0, opacity: 1 }}
-                            className="absolute top-3 right-3 bg-gradient-to-r from-red-500 to-red-600 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-lg z-10"
-                        >
-                            -{product.discount}%
-                        </motion.span>
-                    )}
+                        {/* Discount Badge */}
+                        {product.discount && product.discount > 0 && (
+                            <motion.span
+                                initial={{ x: 20, opacity: 0 }}
+                                animate={{ x: 0, opacity: 1 }}
+                                className="absolute top-3 right-3 bg-gradient-to-r from-red-500 to-red-600 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-lg z-10"
+                            >
+                                -{product.discount}%
+                            </motion.span>
+                        )}
 
-                    {/* Wishlist Button */}
-                    <motion.button
-                        whileHover={{ scale: 1.2, rotate: 10 }}
-                        whileTap={{ scale: 0.8 }}
-                        onClick={handleWishlistToggle}
-                        className={`absolute top-3 left-3 p-2 rounded-full shadow-md transition-all duration-300 z-10 ${isWishlist
+                        {/* Wishlist Button */}
+                        <motion.button
+                            whileHover={{ scale: 1.2, rotate: 10 }}
+                            whileTap={{ scale: 0.8 }}
+                            onClick={handleWishlistToggle}
+                            className={`absolute top-3 left-3 p-2 rounded-full shadow-md transition-all duration-300 z-10 ${isWishlist
                                 ? 'bg-gradient-to-r from-red-500 to-red-600 text-white shadow-red-200'
                                 : 'bg-white/90 backdrop-blur-sm text-gray-600 hover:text-red-500 hover:bg-white'
-                            }`}
-                        aria-label="إضافة إلى المفضلة"
-                    >
-                        <Heart
-                            className={`w-5 h-5 transition ${isWishlist ? 'fill-white' : 'fill-transparent'}`}
-                            strokeWidth={isWishlist ? 0 : 2}
-                        />
-                    </motion.button>
-
-                    {/* Vendor Badge */}
-                    <div className="absolute bottom-3 left-3 right-3">
-                        <span className="inline-block bg-white/90 backdrop-blur-sm text-[#0F5C45] text-xs font-medium px-3 py-1 rounded-full shadow-md border border-white/20">
-                            {product.vendorName || 'متجر Prime'}
-                        </span>
-                    </div>
-                </div>
-
-                {/* Content */}
-                <div className="p-4 text-right">
-                    <Link href={`/products/${product.id}`}>
-                        <motion.h3
-                            whileHover={{ color: '#0F5C45' }}
-                            className="font-semibold text-gray-800 text-base line-clamp-1"
+                                }`}
+                            aria-label="إضافة إلى المفضلة"
                         >
+                            <Heart
+                                className={`w-5 h-5 transition ${isWishlist ? 'fill-white' : 'fill-transparent'}`}
+                                strokeWidth={isWishlist ? 0 : 2}
+                            />
+                        </motion.button>
+
+                        {/* Vendor Badge */}
+                        <div className="absolute bottom-3 left-3 right-3">
+                            <span className="inline-block bg-white/90 backdrop-blur-sm text-[#0F5C45] text-xs font-medium px-3 py-1 rounded-full shadow-md border border-white/20">
+                                {product.vendorName || 'متجر Prime'}
+                            </span>
+                        </div>
+                    </div>
+
+                    {/* Content */}
+                    <div className="p-4 text-right">
+                        <h3 className="font-semibold text-gray-800 text-base line-clamp-1">
                             {product.name}
-                        </motion.h3>
-                    </Link>
+                        </h3>
 
-                    <p className="text-sm text-gray-500 line-clamp-2 mt-1 min-h-[40px]">
-                        {product.description}
-                    </p>
+                        <p className="text-sm text-gray-500 line-clamp-2 mt-1 min-h-[40px]">
+                            {product.description}
+                        </p>
 
-                    {/* Rating */}
-                    {product.rating && (
-                        <div className="flex items-center justify-end gap-1 mt-2">
-                            <div className="flex items-center gap-0.5">
-                                {[...Array(5)].map((_, i) => (
-                                    <Star
-                                        key={i}
-                                        className={`w-3.5 h-3.5 ${i < Math.round(product.rating!)
+                        {/* ✅ Category Link – fully dynamic from database */}
+                        {product.category && (
+                            <Link
+                                href={`/${product.category}`}
+                                className="inline-block mt-1 text-xs text-[#0F5C45] hover:underline bg-[#0F5C45]/5 px-2 py-0.5 rounded-full transition"
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                {product.category}
+                            </Link>
+                        )}
+
+                        {/* Rating */}
+                        {product.rating && (
+                            <div className="flex items-center justify-end gap-1 mt-2">
+                                <div className="flex items-center gap-0.5">
+                                    {[...Array(5)].map((_, i) => (
+                                        <Star
+                                            key={i}
+                                            className={`w-3.5 h-3.5 ${i < Math.round(product.rating!)
                                                 ? 'fill-[#D4A54A] text-[#D4A54A]'
                                                 : 'text-gray-300 fill-gray-300'
-                                            }`}
-                                    />
-                                ))}
+                                                }`}
+                                        />
+                                    ))}
+                                </div>
+                                <span className="text-sm font-semibold text-gray-700 mr-1">
+                                    {product.rating.toFixed(1)}
+                                </span>
+                                {product.reviews && (
+                                    <span className="text-xs text-gray-400">({product.reviews})</span>
+                                )}
                             </div>
-                            <span className="text-sm font-semibold text-gray-700 mr-1">
-                                {product.rating.toFixed(1)}
+                        )}
+
+                        {/* Price */}
+                        <div className="mt-3 flex items-center justify-end gap-2">
+                            <span className="text-xl font-bold text-[#0F5C45]">
+                                £{(discountPrice || product.price).toFixed(2)}
                             </span>
-                            {product.reviews && (
-                                <span className="text-xs text-gray-400">({product.reviews})</span>
+                            {product.discount && product.discount > 0 && (
+                                <span className="text-sm text-gray-400 line-through">
+                                    £{product.price.toFixed(2)}
+                                </span>
                             )}
                         </div>
-                    )}
-
-                    {/* Price */}
-                    <div className="mt-3 flex items-center justify-end gap-2">
-                        <span className="text-xl font-bold text-[#0F5C45]">
-                            £{(discountPrice || product.price).toFixed(2)}
-                        </span>
-                        {product.discount && product.discount > 0 && (
-                            <span className="text-sm text-gray-400 line-through">
-                                £{product.price.toFixed(2)}
-                            </span>
-                        )}
                     </div>
+                </Link>
 
-                    {/* Add to Cart Button */}
+                {/* Add to Cart Button */}
+                <div className="px-4 pb-4">
                     <motion.button
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.97 }}
                         onClick={handleAddToCart}
                         disabled={isAdding || product.stockQuantity === 0}
-                        className={`w-full mt-3 py-2.5 rounded-xl font-medium transition-all duration-300 flex items-center justify-center gap-2 ${product.stockQuantity === 0
-                                ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                                : isAdding
-                                    ? 'bg-[#0F5C45]/70 text-white cursor-wait'
-                                    : 'bg-gradient-to-r from-[#0F5C45] to-[#1A7A5C] text-white hover:shadow-lg hover:shadow-[#0F5C45]/20 hover:scale-105'
+                        className={`w-full py-2.5 rounded-xl font-medium transition-all duration-300 flex items-center justify-center gap-2 ${product.stockQuantity === 0
+                            ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                            : isAdding
+                                ? 'bg-[#0F5C45]/70 text-white cursor-wait'
+                                : 'bg-gradient-to-r from-[#0F5C45] to-[#1A7A5C] text-white hover:shadow-lg hover:shadow-[#0F5C45]/20 hover:scale-105'
                             }`}
                     >
                         <ShoppingBag className="w-4 h-4" />
@@ -243,7 +229,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                 </div>
             </motion.div>
 
-            {/* Flying item */}
+            {/* Flying item animation */}
             <AnimatePresence>
                 {fly && (
                     <motion.div

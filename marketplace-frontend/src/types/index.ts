@@ -14,6 +14,7 @@ export interface Product {
     reviews?: number;
     discount?: number;
     isActive: boolean;
+    category?: string; // ✅ NEW – product category
 }
 
 export interface PagedResult<T> {
@@ -235,7 +236,7 @@ export interface ProductSuggestionResponseDto {
 }
 
 // ============================================================
-// STORE TYPES (NEW)
+// STORE TYPES
 // ============================================================
 export interface StoreResponseDto {
     id: number;

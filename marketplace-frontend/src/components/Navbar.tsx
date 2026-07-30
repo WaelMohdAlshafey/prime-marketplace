@@ -18,9 +18,10 @@ import {
 } from '@heroicons/react/24/outline';
 import { AuthResponse } from '@/types';
 import { motion } from 'framer-motion';
+import api from '@/lib/api';
 
 // ============================================================
-// TOP BAR
+// TOP BAR (unchanged)
 // ============================================================
 const TopBar = () => {
     const { t } = useTranslation('common');
@@ -54,7 +55,7 @@ const TopBar = () => {
 };
 
 // ============================================================
-// MAIN HEADER – Glassmorphism
+// MAIN HEADER (unchanged)
 // ============================================================
 const MainHeader = ({ user }: { user: AuthResponse | null }) => {
     const { t } = useTranslation('common');
@@ -180,20 +181,10 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
 };
 
 // ============================================================
-// NAVIGATION MENU – Premium animated
+// NAV MENU – Dynamic, fetched from API
 // ============================================================
-const NavMenu = () => {
+const NavMenu = ({ categories, loading }: { categories: string[]; loading: boolean }) => {
     const { t } = useTranslation('common');
-    const categories = [
-        { key: 'software', label: t('software'), icon: '💻' },
-        { key: 'hair-care', label: t('hairCare'), icon: '✨' },
-        { key: 'skin-care', label: t('skinCare'), icon: '🌿' },
-        { key: 'fashion', label: t('fashion'), icon: '👗' },
-        { key: 'accessories', label: t('accessories'), icon: '💎' },
-        { key: 'electronics', label: t('electronics'), icon: '📱' },
-        { key: 'supplements', label: t('supplements'), icon: '💊' },
-        { key: 'home', label: t('homeCategory'), icon: '🏠' },
-    ];
 
     return (
         <div className="bg-white/70 backdrop-blur-sm border-b border-gray-100/50 shadow-sm">
@@ -203,44 +194,38 @@ const NavMenu = () => {
                         href="/"
                         className="text-[#0F5C45] font-semibold hover:text-[#0A4735] transition border-b-2 border-[#0F5C45] pb-1 relative group"
                     >
-                        <span className="relative">
-                            {t('home')}
-                            <span className="absolute -bottom-0.5 left-0 w-full h-0.5 bg-gradient-to-r from-[#0F5C45] to-[#D4A54A] scale-x-0 group-hover:scale-x-100 transition duration-300"></span>
-                        </span>
+                        {t('home')}
                     </Link>
-                    {categories.map((cat) => (
-                        <Link
-                            key={cat.key}
-                            href={`/${cat.key}`}
-                            className="text-gray-600 hover:text-[#0F5C45] transition pb-1 relative group"
-                        >
-                            <span className="flex items-center gap-1">
-                                <span className="text-sm">{cat.icon}</span>
-                                {cat.label}
-                            </span>
-                            <span className="absolute -bottom-0.5 left-0 w-full h-0.5 bg-gradient-to-r from-[#0F5C45] to-[#D4A54A] scale-x-0 group-hover:scale-x-100 transition duration-300"></span>
-                        </Link>
-                    ))}
+                    {loading ? (
+                        <span className="text-gray-400">Loading categories…</span>
+                    ) : (
+                        categories.map((cat) => (
+                            <Link
+                                key={cat}
+                                href={`/${cat}`}
+                                className="text-gray-600 hover:text-[#0F5C45] transition pb-1 relative group"
+                            >
+                                <span>{cat.replace(/-/g, ' ')}</span>
+                            </Link>
+                        ))
+                    )}
                     <Link
                         href="/stores"
                         className="text-gray-600 hover:text-[#0F5C45] transition pb-1 relative group"
                     >
                         {t('stores')}
-                        <span className="absolute -bottom-0.5 left-0 w-full h-0.5 bg-gradient-to-r from-[#0F5C45] to-[#D4A54A] scale-x-0 group-hover:scale-x-100 transition duration-300"></span>
                     </Link>
                     <Link
                         href="/offers"
                         className="text-orange-500 font-medium hover:text-orange-600 transition pb-1 relative group"
                     >
                         🔥 {t('offers')}
-                        <span className="absolute -bottom-0.5 left-0 w-full h-0.5 bg-gradient-to-r from-orange-400 to-orange-600 scale-x-0 group-hover:scale-x-100 transition duration-300"></span>
                     </Link>
                     <Link
                         href="/contact"
                         className="text-gray-600 hover:text-[#0F5C45] transition pb-1 relative group"
                     >
                         {t('contact')}
-                        <span className="absolute -bottom-0.5 left-0 w-full h-0.5 bg-gradient-to-r from-[#0F5C45] to-[#D4A54A] scale-x-0 group-hover:scale-x-100 transition duration-300"></span>
                     </Link>
                 </div>
             </div>
@@ -266,7 +251,6 @@ const UserNav = ({ user, logout }: { user: AuthResponse; logout: () => void }) =
                     <Link href="/orders" className="hover:text-yellow-300 transition flex items-center gap-2">
                         <span>📋 {t('orders')}</span>
                     </Link>
-                    {/* ✅ NEW: Suggest link for all logged‑in users */}
                     <Link href="/suggest" className="hover:text-yellow-300 transition flex items-center gap-2">
                         <span>💡 Suggest</span>
                     </Link>
@@ -311,6 +295,22 @@ const UserNav = ({ user, logout }: { user: AuthResponse; logout: () => void }) =
 export default function Navbar() {
     const { user, logout, isLoading } = useAuth();
     const { t } = useTranslation('common');
+    const [categories, setCategories] = useState<string[]>([]);
+    const [loadingCategories, setLoadingCategories] = useState(true);
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const response = await api.get('/api/Categories');
+                setCategories(response.data);
+            } catch (error) {
+                console.error('Failed to fetch categories:', error);
+            } finally {
+                setLoadingCategories(false);
+            }
+        };
+        fetchCategories();
+    }, []);
 
     if (isLoading) {
         return <div className="bg-white shadow-md py-4 text-center text-gray-500 animate-pulse">{t('loading')}</div>;
@@ -320,7 +320,7 @@ export default function Navbar() {
         <header className="sticky top-0 z-50">
             <TopBar />
             <MainHeader user={user} />
-            <NavMenu />
+            <NavMenu categories={categories} loading={loadingCategories} />
             {user && <UserNav user={user} logout={logout} />}
         </header>
     );
