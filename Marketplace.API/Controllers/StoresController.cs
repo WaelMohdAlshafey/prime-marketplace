@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Threading.Tasks;
 using Marketplace.Application.DTOs;
 using Marketplace.Application.Interfaces;
@@ -23,8 +24,15 @@ namespace Marketplace.API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetStores([FromQuery] int page = 1, [FromQuery] int pageSize = 20)
         {
-            var result = await _storeService.GetAllStoresAsync(page, pageSize, isActive: true);
-            return Ok(result);
+            try
+            {
+                var result = await _storeService.GetAllStoresAsync(page, pageSize, isActive: true);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message, stackTrace = ex.StackTrace });
+            }
         }
 
         // ============================================================
@@ -40,7 +48,7 @@ namespace Marketplace.API.Controllers
             }
             catch (Exception ex)
             {
-                return NotFound(new { message = ex.Message });
+                return StatusCode(500, new { message = ex.Message, stackTrace = ex.StackTrace });
             }
         }
 
@@ -57,7 +65,7 @@ namespace Marketplace.API.Controllers
             }
             catch (Exception ex)
             {
-                return NotFound(new { message = ex.Message });
+                return StatusCode(500, new { message = ex.Message, stackTrace = ex.StackTrace });
             }
         }
 
@@ -66,8 +74,11 @@ namespace Marketplace.API.Controllers
         // ============================================================
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> CreateStore(StoreCreateDto dto)
+        public async Task<IActionResult> CreateStore([FromBody] StoreCreateDto dto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             try
             {
                 var result = await _storeService.CreateStoreAsync(dto);
@@ -75,7 +86,7 @@ namespace Marketplace.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return StatusCode(500, new { message = ex.Message, stackTrace = ex.StackTrace });
             }
         }
 
@@ -84,8 +95,11 @@ namespace Marketplace.API.Controllers
         // ============================================================
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UpdateStore(int id, StoreUpdateDto dto)
+        public async Task<IActionResult> UpdateStore(int id, [FromBody] StoreUpdateDto dto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             try
             {
                 var result = await _storeService.UpdateStoreAsync(id, dto);
@@ -93,7 +107,7 @@ namespace Marketplace.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return StatusCode(500, new { message = ex.Message, stackTrace = ex.StackTrace });
             }
         }
 
@@ -111,7 +125,7 @@ namespace Marketplace.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return StatusCode(500, new { message = ex.Message, stackTrace = ex.StackTrace });
             }
         }
     }

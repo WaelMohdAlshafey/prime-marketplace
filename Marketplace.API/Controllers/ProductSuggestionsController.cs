@@ -52,7 +52,7 @@ namespace Marketplace.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return StatusCode(500, new { message = ex.Message, stackTrace = ex.StackTrace });
             }
         }
 
@@ -64,8 +64,15 @@ namespace Marketplace.API.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetSuggestions([FromQuery] int page = 1, [FromQuery] int pageSize = 20, [FromQuery] string? status = null)
         {
-            var result = await _suggestionService.GetSuggestionsAsync(page, pageSize, status);
-            return Ok(result);
+            try
+            {
+                var result = await _suggestionService.GetSuggestionsAsync(page, pageSize, status);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message, stackTrace = ex.StackTrace });
+            }
         }
 
         // ============================================================
@@ -83,7 +90,7 @@ namespace Marketplace.API.Controllers
             }
             catch (Exception ex)
             {
-                return NotFound(new { message = ex.Message });
+                return StatusCode(500, new { message = ex.Message, stackTrace = ex.StackTrace });
             }
         }
 
@@ -103,7 +110,7 @@ namespace Marketplace.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return StatusCode(500, new { message = ex.Message, stackTrace = ex.StackTrace });
             }
         }
 
@@ -123,7 +130,7 @@ namespace Marketplace.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return StatusCode(500, new { message = ex.Message, stackTrace = ex.StackTrace });
             }
         }
     }
