@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -11,42 +10,36 @@ namespace Marketplace.Infrastructure.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.CreateTable(
-                name: "Stores",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Name = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
-                    LogoUrl = table.Column<string>(type: "TEXT", nullable: true),
-                    Description = table.Column<string>(type: "TEXT", nullable: true),
-                    VendorId = table.Column<int>(type: "INTEGER", nullable: false),
-                    IsActive = table.Column<bool>(type: "INTEGER", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Stores", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Stores_Users_VendorId",
-                        column: x => x.VendorId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
+            // Idempotent: create the "Stores" table only if it does not already exist
+            migrationBuilder.Sql(@"
+                CREATE TABLE IF NOT EXISTS ""Stores"" (
+                    ""Id"" INTEGER NOT NULL,
+                    ""Name"" TEXT NOT NULL,
+                    ""LogoUrl"" TEXT NULL,
+                    ""Description"" TEXT NULL,
+                    ""VendorId"" INTEGER NOT NULL,
+                    ""IsActive"" INTEGER NOT NULL,
+                    ""CreatedAt"" TEXT NOT NULL,
+                    CONSTRAINT ""PK_Stores"" PRIMARY KEY (""Id""),
+                    CONSTRAINT ""FK_Stores_Users_VendorId"" FOREIGN KEY (""VendorId"") 
+                        REFERENCES ""Users"" (""Id"") ON DELETE RESTRICT
+                );
+            ");
 
-            migrationBuilder.CreateIndex(
-                name: "IX_Stores_VendorId",
-                table: "Stores",
-                column: "VendorId",
-                unique: true);
+            // Idempotent: create the unique index only if it does not already exist
+            migrationBuilder.Sql(@"
+                CREATE UNIQUE INDEX IF NOT EXISTS ""IX_Stores_VendorId"" 
+                    ON ""Stores"" (""VendorId"");
+            ");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "Stores");
+            // Drop the table only if it exists
+            migrationBuilder.Sql(@"
+                DROP TABLE IF EXISTS ""Stores"";
+            ");
         }
     }
 }
