@@ -10,28 +10,33 @@ namespace Marketplace.Infrastructure.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<string>(
-                name: "Category",
-                table: "Products",
-                type: "TEXT",
-                nullable: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Products_Category",
-                table: "Products",
-                column: "Category");
+            // Idempotent: add "Category" column only if it does not already exist
+            migrationBuilder.Sql(@"
+                DO $$
+                BEGIN
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                                   WHERE table_name='Products' AND column_name='Category') THEN
+                        ALTER TABLE ""Products"" ADD ""Category"" TEXT;
+                    END IF;
+                END
+                $$;
+            ");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropIndex(
-                name: "IX_Products_Category",
-                table: "Products");
-
-            migrationBuilder.DropColumn(
-                name: "Category",
-                table: "Products");
+            // Drop the column only if it exists
+            migrationBuilder.Sql(@"
+                DO $$
+                BEGIN
+                    IF EXISTS (SELECT 1 FROM information_schema.columns 
+                               WHERE table_name='Products' AND column_name='Category') THEN
+                        ALTER TABLE ""Products"" DROP COLUMN ""Category"";
+                    END IF;
+                END
+                $$;
+            ");
         }
     }
 }
