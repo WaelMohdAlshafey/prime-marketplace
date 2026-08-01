@@ -1,7 +1,7 @@
 ﻿import axios from 'axios';
 
-// 🔥 Set to your local backend URL
-const API_BASE_URL = 'https://localhost:7195';   // or 'http://localhost:5019'
+// 🔥 Use the live backend URL for production
+const API_BASE_URL = 'https://prime-marketplace-8hut.onrender.com';
 
 console.log('🔗 API Base URL:', API_BASE_URL);
 
