@@ -32,7 +32,6 @@ namespace Marketplace.API.Controllers
         {
             try
             {
-                // ✅ Query using exact column names from your database
                 var query = _context.Stores
                     .Where(s => s.IsActive)
                     .OrderBy(s => s.Name);
@@ -49,7 +48,7 @@ namespace Marketplace.API.Controllers
                         LogoUrl = s.LogoUrl,
                         Description = s.Description,
                         VendorId = s.VendorId,
-                        VendorUsername = "Unknown", // Fallback until we join Users
+                        VendorUsername = "Unknown",
                         IsActive = s.IsActive,
                         CreatedAt = s.CreatedAt,
                         ProductCount = _context.Products.Count(p => p.VendorId == s.VendorId && p.IsActive)
