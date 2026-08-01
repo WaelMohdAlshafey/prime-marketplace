@@ -25,12 +25,10 @@ namespace Marketplace.Application.Services
         // ============================================================
         public async Task<StoreResponseDto> CreateStoreAsync(StoreCreateDto dto, string? logoUrl = null)
         {
-            // Validate vendor
             var vendor = await _context.Users.FindAsync(dto.VendorId);
             if (vendor == null || vendor.Role != "Vendor")
                 throw new Exception("Invalid vendor user.");
 
-            // Check if vendor already has a store
             var existing = await _context.Stores.FirstOrDefaultAsync(s => s.VendorId == dto.VendorId);
             if (existing != null)
                 throw new Exception("This vendor already has a store.");
@@ -38,7 +36,7 @@ namespace Marketplace.Application.Services
             var store = new Store
             {
                 Name = dto.Name,
-                LogoUrl = logoUrl ?? dto.LogoUrl, // Prefer uploaded file, fallback to URL from DTO
+                LogoUrl = logoUrl ?? dto.LogoUrl,
                 Description = dto.Description,
                 VendorId = dto.VendorId,
                 IsActive = true,
@@ -64,17 +62,10 @@ namespace Marketplace.Application.Services
             store.Description = dto.Description;
             store.IsActive = dto.IsActive;
 
-            // Only update logo if a new one was uploaded
             if (!string.IsNullOrEmpty(logoUrl))
-            {
                 store.LogoUrl = logoUrl;
-            }
             else if (!string.IsNullOrEmpty(dto.LogoUrl))
-            {
-                // Fallback to URL from DTO if provided (e.g., admin wants to set a URL manually)
                 store.LogoUrl = dto.LogoUrl;
-            }
-            // If neither is provided, keep the existing logo
 
             await _context.SaveChangesAsync();
 
@@ -90,7 +81,7 @@ namespace Marketplace.Application.Services
             if (store == null)
                 throw new Exception("Store not found.");
 
-            store.IsActive = false; // Soft delete
+            store.IsActive = false;
             await _context.SaveChangesAsync();
         }
 
@@ -115,7 +106,7 @@ namespace Marketplace.Application.Services
         public async Task<PagedResult<StoreResponseDto>> GetAllStoresAsync(int page, int pageSize, bool? isActive = null)
         {
             var query = _context.Stores
-                .Include(s => s.Vendor)
+                .Include(s => s.Vendor)   // ✅ Include Vendor to avoid null reference
                 .AsQueryable();
 
             if (isActive.HasValue)
@@ -152,7 +143,6 @@ namespace Marketplace.Application.Services
             if (store == null)
                 throw new Exception("Store not found.");
 
-            // Use the product service to get products by vendor ID (which is the store's vendor)
             return await _productService.GetVendorProductsAsync(store.VendorId, page, pageSize);
         }
 
@@ -164,14 +154,17 @@ namespace Marketplace.Application.Services
             var productCount = await _context.Products
                 .CountAsync(p => p.VendorId == store.VendorId && p.IsActive);
 
+            // ✅ Handle null Vendor gracefully
+            string vendorUsername = store.Vendor?.Username ?? "Unknown";
+
             return new StoreResponseDto
             {
                 Id = store.Id,
                 Name = store.Name,
-                LogoUrl = store.LogoUrl, // ✅ Now includes the uploaded logo URL
+                LogoUrl = store.LogoUrl,
                 Description = store.Description,
                 VendorId = store.VendorId,
-                VendorUsername = store.Vendor?.Username ?? "Unknown",
+                VendorUsername = vendorUsername,
                 IsActive = store.IsActive,
                 CreatedAt = store.CreatedAt,
                 ProductCount = productCount
