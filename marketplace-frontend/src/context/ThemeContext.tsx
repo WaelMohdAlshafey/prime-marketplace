@@ -21,7 +21,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         const fetchSettings = async () => {
             try {
                 const settings = await getStoreSettings();
-                console.log('📦 Template from API:', settings.template);
                 setTemplate((settings.template as Template) || 'standard');
             } catch (error) {
                 console.error('Failed to load theme:', error);
@@ -31,6 +30,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         };
         fetchSettings();
     }, []);
+
+    // ✅ ADD THIS: Apply the template to the <html> element
+    useEffect(() => {
+        document.documentElement.setAttribute('data-theme', template);
+        console.log('🎨 Theme applied:', template); // debug
+    }, [template]);
 
     return (
         <ThemeContext.Provider value={{ template, setTemplate, isLoading }}>

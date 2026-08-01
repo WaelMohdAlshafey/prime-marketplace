@@ -35,6 +35,7 @@ export default function AdminSettings() {
         try {
             await updateStoreSettings(settings);
             setMessage('✅ Settings updated successfully!');
+            window.location.reload();   // ✅ Reload to apply the new template
         } catch (error) {
             setMessage('❌ Failed to update settings. Please try again.');
             console.error(error);

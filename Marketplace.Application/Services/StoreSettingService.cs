@@ -18,39 +18,38 @@ public class StoreSettingService : IStoreSettingService
 
     public async Task<StoreSettingDto> GetSettingsAsync()
     {
-        // Get the first settings record, or create a default one if none exists
         var settings = await _context.StoreSettings.FirstOrDefaultAsync();
 
         if (settings == null)
         {
-            // Return default settings if none exist in DB
-            return new StoreSettingDto
+            settings = new StoreSetting
             {
-                Id = settings.Id,
-                StoreName = settings.StoreName,
-                Address = settings.Address,
-                Location = settings.Location,
-                Owners = JsonSerializer.Deserialize<List<OwnerDto>>(settings.OwnersJson) ?? new List<OwnerDto>(),
-                MobileNumbers = JsonSerializer.Deserialize<List<string>>(settings.MobileNumbersJson) ?? new List<string>(),
-                Emails = JsonSerializer.Deserialize<List<string>>(settings.EmailsJson) ?? new List<string>(),
-                Landline = settings.Landline,
-                WhatsApp = settings.WhatsApp,
-                Template = settings.Template   // ✅ ADD THIS
+                StoreName = "Prime",
+                Address = "123 Prime Street",
+                Location = "Downtown",
+                OwnersJson = "[]",
+                MobileNumbersJson = "[]",
+                EmailsJson = "[]",
+                Landline = "",
+                WhatsApp = "",
+                Template = "standard"
             };
+            _context.StoreSettings.Add(settings);
+            await _context.SaveChangesAsync();
         }
 
-        // Map Entity to DTO
         return new StoreSettingDto
         {
             Id = settings.Id,
             StoreName = settings.StoreName,
             Address = settings.Address,
             Location = settings.Location,
-            Owners = JsonSerializer.Deserialize<List<OwnerDto>>(settings.OwnersJson) ?? new List<OwnerDto>(),
-            MobileNumbers = JsonSerializer.Deserialize<List<string>>(settings.MobileNumbersJson) ?? new List<string>(),
-            Emails = JsonSerializer.Deserialize<List<string>>(settings.EmailsJson) ?? new List<string>(),
+            Owners = JsonSerializer.Deserialize<List<OwnerDto>>(settings.OwnersJson) ?? new(),
+            MobileNumbers = JsonSerializer.Deserialize<List<string>>(settings.MobileNumbersJson) ?? new(),
+            Emails = JsonSerializer.Deserialize<List<string>>(settings.EmailsJson) ?? new(),
             Landline = settings.Landline,
-            WhatsApp = settings.WhatsApp
+            WhatsApp = settings.WhatsApp,
+            Template = settings.Template   // ✅ MUST be this
         };
     }
 
@@ -60,12 +59,10 @@ public class StoreSettingService : IStoreSettingService
 
         if (settings == null)
         {
-            // If no settings exist, create a new one
             settings = new StoreSetting();
             _context.StoreSettings.Add(settings);
         }
 
-        // Update fields
         settings.StoreName = dto.StoreName;
         settings.Address = dto.Address;
         settings.Location = dto.Location;
@@ -74,9 +71,22 @@ public class StoreSettingService : IStoreSettingService
         settings.EmailsJson = JsonSerializer.Serialize(dto.Emails);
         settings.Landline = dto.Landline;
         settings.WhatsApp = dto.WhatsApp;
-        settings.Template = dto.Template;   // ✅ ADD THIS
+        settings.Template = dto.Template;   // ✅ MUST save this
+
         await _context.SaveChangesAsync();
 
-        return dto;
+        return new StoreSettingDto
+        {
+            Id = settings.Id,
+            StoreName = settings.StoreName,
+            Address = settings.Address,
+            Location = settings.Location,
+            Owners = JsonSerializer.Deserialize<List<OwnerDto>>(settings.OwnersJson) ?? new(),
+            MobileNumbers = JsonSerializer.Deserialize<List<string>>(settings.MobileNumbersJson) ?? new(),
+            Emails = JsonSerializer.Deserialize<List<string>>(settings.EmailsJson) ?? new(),
+            Landline = settings.Landline,
+            WhatsApp = settings.WhatsApp,
+            Template = settings.Template   // ✅ MUST return this
+        };
     }
 }
