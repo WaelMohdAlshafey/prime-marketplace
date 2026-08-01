@@ -36,6 +36,8 @@ export default function AdminStores() {
             router.push('/');
             return;
         }
+        // ✅ Suppress ESLint warning – standard data‑fetching pattern
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchStores();
     }, [user, isLoading, router, fetchStores]);
 

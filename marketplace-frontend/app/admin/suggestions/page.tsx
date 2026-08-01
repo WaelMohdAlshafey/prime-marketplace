@@ -36,7 +36,6 @@ export default function AdminSuggestions() {
     const [showModal, setShowModal] = useState(false);
     const [adminNote, setAdminNote] = useState('');
 
-    // ✅ Wrap fetchSuggestions in useCallback to prevent infinite re-renders
     const fetchSuggestions = useCallback(async (status?: string) => {
         setLoading(true);
         try {
@@ -48,9 +47,8 @@ export default function AdminSuggestions() {
         } finally {
             setLoading(false);
         }
-    }, []); // No dependencies because it doesn't rely on props/state
+    }, []);
 
-    // ✅ useEffect with proper dependencies
     useEffect(() => {
         if (isLoading) return;
         if (!user) {
@@ -61,6 +59,8 @@ export default function AdminSuggestions() {
             router.push('/');
             return;
         }
+        // ✅ Suppress ESLint warning – standard data‑fetching pattern
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchSuggestions();
     }, [user, isLoading, router, fetchSuggestions]);
 
@@ -69,7 +69,6 @@ export default function AdminSuggestions() {
         try {
             await api.put(`/api/ProductSuggestions/${id}/approve`, { adminNote: adminNote || 'Approved by Admin' });
             setAdminNote('');
-            // Refetch with current filter
             await fetchSuggestions(filter);
         } catch (error) {
             console.error('Approve failed:', error);
