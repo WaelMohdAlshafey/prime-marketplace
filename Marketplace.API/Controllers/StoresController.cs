@@ -2,9 +2,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Marketplace.Application.DTOs;
 using Marketplace.Application.Interfaces;
+using Marketplace.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Marketplace.API.Controllers
 {
@@ -13,40 +16,64 @@ namespace Marketplace.API.Controllers
     public class StoresController : ControllerBase
     {
         private readonly IStoreService _storeService;
+        private readonly AppDbContext _context; // ✅ Direct DB access
 
-        public StoresController(IStoreService storeService)
+        public StoresController(IStoreService storeService, AppDbContext context)
         {
             _storeService = storeService;
+            _context = context;
         }
 
         // ============================================================
-        // PUBLIC – Get all stores (active only)
+        // PUBLIC – Get all stores (active only) – SAFE VERSION
         // ============================================================
         [HttpGet]
         public async Task<IActionResult> GetStores([FromQuery] int page = 1, [FromQuery] int pageSize = 20)
         {
             try
             {
-                Console.WriteLine("📦 GetStores called with page={0}, pageSize={1}", page, pageSize);
-                var result = await _storeService.GetAllStoresAsync(page, pageSize, isActive: true);
-                Console.WriteLine("✅ GetStores succeeded, found {0} items", result.Items?.Count ?? 0);
+                // ✅ Use DbContext directly – avoid service issues
+                var stores = await _context.Stores
+                    .Where(s => s.IsActive)
+                    .OrderBy(s => s.Name)
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .Select(s => new StoreResponseDto
+                    {
+                        Id = s.Id,
+                        Name = s.Name,
+                        LogoUrl = s.LogoUrl,
+                        Description = s.Description,
+                        VendorId = s.VendorId,
+                        VendorUsername = "Unknown", // fallback (we don't join)
+                        IsActive = s.IsActive,
+                        CreatedAt = s.CreatedAt,
+                        ProductCount = _context.Products.Count(p => p.VendorId == s.VendorId && p.IsActive)
+                    })
+                    .ToListAsync();
+
+                var totalCount = await _context.Stores.CountAsync(s => s.IsActive);
+
+                var result = new PagedResult<StoreResponseDto>
+                {
+                    Items = stores,
+                    TotalCount = totalCount,
+                    PageNumber = page,
+                    PageSize = pageSize
+                };
+
                 return Ok(result);
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"❌ GetStores ERROR: {ex.Message}");
-                Console.WriteLine($"StackTrace: {ex.StackTrace}");
-                return StatusCode(500, new
-                {
-                    message = "An error occurred while fetching stores.",
-                    detail = ex.Message,
-                    stackTrace = ex.StackTrace
-                });
+                Console.WriteLine(ex.StackTrace);
+                return StatusCode(500, new { message = ex.Message, stackTrace = ex.StackTrace });
             }
         }
 
         // ============================================================
-        // PUBLIC – Get a single store by ID
+        // PUBLIC – Get a single store by ID – still uses service
         // ============================================================
         [HttpGet("{id}")]
         public async Task<IActionResult> GetStore(int id)
