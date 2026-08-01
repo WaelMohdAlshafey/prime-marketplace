@@ -13,6 +13,7 @@ interface CheckoutError {
         data?: {
             message?: string;
             title?: string;
+            errors?: Record<string, string[]>;
         };
     };
     message?: string;
@@ -66,7 +67,6 @@ export default function CartPage() {
         }
     };
 
-    // 🔍 Frontend validation
     const validateForm = (): string | null => {
         if (!checkoutData.shippingAddress.trim()) {
             return 'Please enter a shipping address.';
@@ -112,12 +112,11 @@ export default function CartPage() {
             return;
         }
 
-        // 🔥 DEBUG: Show payload on mobile
-        alert(JSON.stringify(checkoutData, null, 2));
+        // 🔍 Debug: Checkout payload
+        alert('📦 Checkout Payload:\n' + JSON.stringify(checkoutData, null, 2));
 
         setCheckoutLoading(true);
         try {
-            // ✅ Send ALL fields (even empty) to avoid "missing property" errors
             const payload = {
                 shippingAddress: checkoutData.shippingAddress || '',
                 paymentMethod: checkoutData.paymentMethod || 'CashOnDelivery',
@@ -150,6 +149,9 @@ export default function CartPage() {
                     throw new Error('Unknown payment method');
             }
 
+            // 🔍 Debug: Confirmation payload
+            alert('✅ Confirmation Payload:\n' + JSON.stringify(confirmationData, null, 2));
+
             await api.post(`/api/Orders/${order.id}/confirm-payment`, confirmationData);
 
             alert('🎉 Order placed and payment confirmed successfully!');
@@ -165,6 +167,13 @@ export default function CartPage() {
                     message = `⚠️ ${err.response.data.title}`;
                 } else if (err.message) {
                     message = `⚠️ ${err.message}`;
+                }
+                // If there are validation errors, list them
+                if (err.response?.data?.errors) {
+                    const errorList = Object.entries(err.response.data.errors)
+                        .map(([field, msgs]) => `${field}: ${msgs.join(', ')}`)
+                        .join('\n');
+                    message += `\n\n📋 Details:\n${errorList}`;
                 }
             }
             setError(message);
@@ -356,7 +365,7 @@ export default function CartPage() {
                 <h2 className="text-xl font-bold text-gray-800 mb-4">Checkout</h2>
 
                 {error && (
-                    <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg mb-4">
+                    <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg mb-4 whitespace-pre-line">
                         ⚠️ {error}
                     </div>
                 )}
