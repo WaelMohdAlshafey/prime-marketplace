@@ -16,7 +16,7 @@ namespace Marketplace.API.Controllers
     public class StoresController : ControllerBase
     {
         private readonly IStoreService _storeService;
-        private readonly AppDbContext _context; // ✅ Direct DB access
+        private readonly AppDbContext _context;
 
         public StoresController(IStoreService storeService, AppDbContext context)
         {
@@ -25,17 +25,21 @@ namespace Marketplace.API.Controllers
         }
 
         // ============================================================
-        // PUBLIC – Get all stores (active only) – SAFE VERSION
+        // PUBLIC – Get all stores (active only)
         // ============================================================
         [HttpGet]
         public async Task<IActionResult> GetStores([FromQuery] int page = 1, [FromQuery] int pageSize = 20)
         {
             try
             {
-                // ✅ Use DbContext directly – avoid service issues
-                var stores = await _context.Stores
+                // ✅ Query using exact column names from your database
+                var query = _context.Stores
                     .Where(s => s.IsActive)
-                    .OrderBy(s => s.Name)
+                    .OrderBy(s => s.Name);
+
+                var totalCount = await query.CountAsync();
+
+                var stores = await query
                     .Skip((page - 1) * pageSize)
                     .Take(pageSize)
                     .Select(s => new StoreResponseDto
@@ -45,14 +49,12 @@ namespace Marketplace.API.Controllers
                         LogoUrl = s.LogoUrl,
                         Description = s.Description,
                         VendorId = s.VendorId,
-                        VendorUsername = "Unknown", // fallback (we don't join)
+                        VendorUsername = "Unknown", // Fallback until we join Users
                         IsActive = s.IsActive,
                         CreatedAt = s.CreatedAt,
                         ProductCount = _context.Products.Count(p => p.VendorId == s.VendorId && p.IsActive)
                     })
                     .ToListAsync();
-
-                var totalCount = await _context.Stores.CountAsync(s => s.IsActive);
 
                 var result = new PagedResult<StoreResponseDto>
                 {
@@ -73,14 +75,32 @@ namespace Marketplace.API.Controllers
         }
 
         // ============================================================
-        // PUBLIC – Get a single store by ID – still uses service
+        // PUBLIC – Get a single store by ID
         // ============================================================
         [HttpGet("{id}")]
         public async Task<IActionResult> GetStore(int id)
         {
             try
             {
-                var store = await _storeService.GetStoreByIdAsync(id);
+                var store = await _context.Stores
+                    .Where(s => s.Id == id && s.IsActive)
+                    .Select(s => new StoreResponseDto
+                    {
+                        Id = s.Id,
+                        Name = s.Name,
+                        LogoUrl = s.LogoUrl,
+                        Description = s.Description,
+                        VendorId = s.VendorId,
+                        VendorUsername = "Unknown",
+                        IsActive = s.IsActive,
+                        CreatedAt = s.CreatedAt,
+                        ProductCount = _context.Products.Count(p => p.VendorId == s.VendorId && p.IsActive)
+                    })
+                    .FirstOrDefaultAsync();
+
+                if (store == null)
+                    return NotFound(new { message = "Store not found." });
+
                 return Ok(store);
             }
             catch (Exception ex)
@@ -98,6 +118,10 @@ namespace Marketplace.API.Controllers
         {
             try
             {
+                var store = await _context.Stores.FindAsync(id);
+                if (store == null)
+                    return NotFound(new { message = "Store not found." });
+
                 var result = await _storeService.GetStoreProductsAsync(id, page, pageSize);
                 return Ok(result);
             }
