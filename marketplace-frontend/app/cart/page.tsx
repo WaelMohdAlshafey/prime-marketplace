@@ -1,10 +1,14 @@
-﻿'use client';
+﻿// M:\Marketplace\marketplace-frontend\app\cart\page.tsx
+
+'use client';
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import api from '@/lib/api';
 import { Cart } from '@/types';
 import { useAuth } from '@/context/AuthContext';
+import { useTheme } from '@/context/ThemeContext';
+import { ThemeProvider } from '@/context/ThemeContext';
 import { TrashIcon } from '@heroicons/react/24/outline';
 import { MARKETPLACE } from '@/constants/marketplace';
 
@@ -21,6 +25,7 @@ interface CheckoutError {
 
 export default function CartPage() {
     const { user, isLoading } = useAuth();
+    const { template } = useTheme();
     const router = useRouter();
     const [cart, setCart] = useState<Cart | null>(null);
     const [loading, setLoading] = useState(true);
@@ -112,8 +117,8 @@ export default function CartPage() {
             return;
         }
 
-        // 🔍 Debug: Checkout payload
-        alert('📦 Checkout Payload:\n' + JSON.stringify(checkoutData, null, 2));
+        // Debug: show payload on mobile
+        // alert('📦 Checkout Payload:\n' + JSON.stringify(checkoutData, null, 2));
 
         setCheckoutLoading(true);
         try {
@@ -149,8 +154,7 @@ export default function CartPage() {
                     throw new Error('Unknown payment method');
             }
 
-            // 🔍 Debug: Confirmation payload
-            alert('✅ Confirmation Payload:\n' + JSON.stringify(confirmationData, null, 2));
+            // alert('✅ Confirmation Payload:\n' + JSON.stringify(confirmationData, null, 2));
 
             await api.post(`/api/Orders/${order.id}/confirm-payment`, confirmationData);
 
@@ -168,7 +172,6 @@ export default function CartPage() {
                 } else if (err.message) {
                     message = `⚠️ ${err.message}`;
                 }
-                // If there are validation errors, list them
                 if (err.response?.data?.errors) {
                     const errorList = Object.entries(err.response.data.errors)
                         .map(([field, msgs]) => `${field}: ${msgs.join(', ')}`)
@@ -328,6 +331,94 @@ export default function CartPage() {
         );
     }
 
+    // ============================================================
+    // CONDITIONAL RENDER: Simple vs Standard
+    // ============================================================
+    if (template === 'simple') {
+        return (
+            <div className="container mx-auto px-4 py-12 max-w-3xl bg-white min-h-screen">
+                <h1 className="text-2xl font-bold text-gray-800 mb-6">🛍️ Your Cart</h1>
+
+                <div className="bg-white shadow-sm rounded-xl p-4">
+                    {cart.items.map((item) => (
+                        <div key={item.id} className="flex justify-between items-center py-3 border-b border-gray-100">
+                            <div className="flex-1">
+                                <p className="font-medium text-gray-800">{item.productName}</p>
+                                <p className="text-sm text-gray-500">× {item.quantity}</p>
+                            </div>
+                            <div className="flex items-center gap-4">
+                                <p className="font-bold text-gray-800">£{item.subtotal.toFixed(2)}</p>
+                                <button
+                                    onClick={() => removeFromCart(item.id)}
+                                    className="text-red-400 hover:text-red-600 transition"
+                                >
+                                    <TrashIcon className="w-4 h-4" />
+                                </button>
+                            </div>
+                        </div>
+                    ))}
+
+                    <div className="flex justify-between pt-4 border-t border-gray-200 font-bold text-lg">
+                        <span>Total</span>
+                        <span>£{cart.totalAmount.toFixed(2)}</span>
+                    </div>
+                </div>
+
+                {/* Checkout Form – Simple Template */}
+                <form onSubmit={handleCheckout} className="mt-8 bg-white shadow-sm rounded-xl p-6">
+                    <h2 className="text-lg font-bold text-gray-800 mb-4">Checkout</h2>
+
+                    {error && (
+                        <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg mb-4 whitespace-pre-line">
+                            ⚠️ {error}
+                        </div>
+                    )}
+
+                    <div className="space-y-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Shipping Address *</label>
+                            <input
+                                type="text"
+                                required
+                                value={checkoutData.shippingAddress}
+                                onChange={(e) => setCheckoutData({ ...checkoutData, shippingAddress: e.target.value })}
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="e.g., 123 Maadi Street, Cairo"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Payment Method</label>
+                            <select
+                                value={checkoutData.paymentMethod}
+                                onChange={(e) => setCheckoutData({ ...checkoutData, paymentMethod: e.target.value })}
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                                <option value="CashOnDelivery">💵 Cash on Delivery</option>
+                                <option value="Card">💳 Credit / Debit Card</option>
+                                <option value="PayPal">💰 PayPal</option>
+                                <option value="MobileWallet">📱 Mobile Wallet</option>
+                            </select>
+                        </div>
+
+                        {renderPaymentFields()}
+
+                        <button
+                            type="submit"
+                            disabled={checkoutLoading}
+                            className="w-full py-3 bg-[#0F5C45] text-white font-semibold rounded-lg hover:bg-[#0A4735] transition disabled:opacity-50"
+                        >
+                            {checkoutLoading ? 'Processing...' : '✅ Confirm Order & Pay'}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        );
+    }
+
+    // ============================================================
+    // STANDARD TEMPLATE (existing layout)
+    // ============================================================
     return (
         <div className="container mx-auto px-4 py-12 max-w-4xl">
             <h1 className="text-3xl font-bold text-gray-800 mb-8">🛍️ Your Cart</h1>

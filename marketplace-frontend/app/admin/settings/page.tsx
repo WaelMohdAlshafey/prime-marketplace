@@ -1,3 +1,5 @@
+// M:\Marketplace\marketplace-frontend\app\admin\settings\page.tsx
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -43,9 +45,6 @@ export default function AdminSettings() {
         }
     };
 
-    // ============================================================
-    // FIXED: Replaced `any` with proper types using generics
-    // ============================================================
     const updateField = <K extends keyof StoreSettings>(field: K, value: StoreSettings[K]) => {
         setSettings(prev => prev ? { ...prev, [field]: value } : null);
     };
@@ -165,6 +164,19 @@ export default function AdminSettings() {
                         value={settings.whatsapp}
                         onChange={(e) => updateField('whatsapp', e.target.value)}
                     />
+                </div>
+
+                {/* ✅ Template Selector */}
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Template</label>
+                    <select
+                        value={settings.template}
+                        onChange={(e) => updateField('template', e.target.value)}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    >
+                        <option value="standard">Standard</option>
+                        <option value="simple">Simple (Noon-style)</option>
+                    </select>
                 </div>
 
                 <button

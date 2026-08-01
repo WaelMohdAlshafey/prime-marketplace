@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import api from '@/lib/api';
 import { Product, PagedResult } from '@/types';
-import ProductCard from './ProductCard';
+import ProductCard from '@/components/ProductCard';
 import FilterSidebar from './Filters/FilterSidebar';
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import {

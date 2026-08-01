@@ -1,5 +1,5 @@
 ﻿'use client';
-
+import ProductCard from '@/components/ProductCard';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import api from '@/lib/api';

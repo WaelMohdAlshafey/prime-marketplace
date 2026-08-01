@@ -1,4 +1,6 @@
-﻿// ============================================================
+﻿// M:\Marketplace\marketplace-frontend\types\index.ts
+
+// ============================================================
 // PRODUCT TYPES
 // ============================================================
 export interface Product {
@@ -70,7 +72,7 @@ export interface Order {
     deliveryInstructions?: string;
     isPaymentConfirmed: boolean;
     paymentConfirmedAt?: string;
-    shippingCarrier?: string; // ✅ ADDED – fixes TypeScript error
+    shippingCarrier?: string;
 }
 
 // ============================================================
@@ -112,6 +114,7 @@ export interface StoreSettings {
     emails: string[];
     landline: string;
     whatsapp: string;
+    template: string;   // ✅ ADDED
 }
 
 // ============================================================

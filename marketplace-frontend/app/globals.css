@@ -222,3 +222,78 @@
         touch-action: manipulation;
     }
 }
+
+/* ============================================================
+   SIMPLE TEMPLATE OVERRIDES
+   (activated when <html data-theme="simple"> is set)
+   ============================================================ */
+[data-theme="simple"] {
+    background-color: #FFFFFF;
+}
+
+    [data-theme="simple"] .min-h-screen {
+        background-color: #FFFFFF;
+    }
+
+    [data-theme="simple"] .bg-\[#F8F9FA\] {
+        background-color: #FFFFFF;
+    }
+
+    [data-theme="simple"] .card,
+    [data-theme="simple"] .rounded-xl,
+    [data-theme="simple"] .rounded-2xl {
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+        border: 1px solid #f0f0f0;
+    }
+
+    [data-theme="simple"] .shadow-soft,
+    [data-theme="simple"] .shadow-md,
+    [data-theme="simple"] .shadow-sm {
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    }
+
+    /* Remove heavy gradients and backdrop effects */
+    [data-theme="simple"] .glass-card,
+    [data-theme="simple"] .backdrop-blur-sm,
+    [data-theme="simple"] .backdrop-blur-md {
+        backdrop-filter: none !important;
+        background: white !important;
+    }
+
+    [data-theme="simple"] .btn-primary {
+        background: #0F5C45;
+        box-shadow: none;
+    }
+
+        [data-theme="simple"] .btn-primary:hover {
+            background: #0A4735;
+        }
+
+    [data-theme="simple"] .bg-gradient-to-r,
+    [data-theme="simple"] .bg-gradient-to-br {
+        background: none !important;
+    }
+
+    /* Simple template – remove decorative backgrounds */
+    [data-theme="simple"] body {
+        background-image: none !important;
+        background-color: #FFFFFF !important;
+    }
+
+    [data-theme="simple"] .bg-animated-gradient {
+        background: #0F5C45 !important;
+        animation: none !important;
+    }
+
+    [data-theme="simple"] .pulse-animation {
+        animation: none !important;
+    }
+
+    /* Simple template – cleaner borders & spacing */
+    [data-theme="simple"] .border-gray-100 {
+        border-color: #f0f0f0 !important;
+    }
+
+    [data-theme="simple"] .border-gray-200 {
+        border-color: #e5e5e5 !important;
+    }

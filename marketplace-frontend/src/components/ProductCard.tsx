@@ -3,13 +3,14 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
-import { Heart, Star, ShoppingBag } from 'lucide-react';
+import { Heart, ShoppingBag, Star } from 'lucide-react';
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import { useWishlist } from '@/context/WishlistContext';
 import { useCart } from '@/context/CartContext';
 import { useCartIconRef } from '@/context/CartIconRefContext';
+import { useTheme } from '@/context/ThemeContext';
 
 interface ProductCardProps {
     product: {
@@ -28,6 +29,7 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
+    const { template } = useTheme();
     const pathname = usePathname();
     const [isAdding, setIsAdding] = useState(false);
     const [imgSrc, setImgSrc] = useState(product.imageUrl || '/images/placeholder.jpg');
@@ -44,10 +46,34 @@ export default function ProductCard({ product }: ProductCardProps) {
     const isWishlist = isFavorite(product.id);
     const discountPrice = product.discount ? product.price * (1 - product.discount / 100) : null;
 
-    // ✅ Option B: show category on store page, vendor on category pages
-    const isStorePage = pathname.startsWith('/stores/');
-    const isCategoryPage = pathname.length > 1 && !pathname.startsWith('/stores/') && !pathname.startsWith('/products');
+    // ============================================================
+    // SIMPLE TEMPLATE – Minimal card
+    // ============================================================
+    if (template === 'simple') {
+        return (
+            <Link href={`/products/${product.id}`} className="block">
+                <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
+                    <div className="aspect-square bg-gray-50 overflow-hidden">
+                        <img
+                            src={imgSrc}
+                            alt={product.name}
+                            className="w-full h-full object-cover hover:scale-105 transition duration-500"
+                            onError={() => setImgSrc('/images/placeholder.jpg')}
+                        />
+                    </div>
+                    <div className="p-3">
+                        <h3 className="text-sm font-medium text-gray-800 line-clamp-1">{product.name}</h3>
+                        <p className="text-lg font-bold text-[#0F5C45] mt-1">£{product.price.toFixed(2)}</p>
+                    </div>
+                </div>
+            </Link>
+        );
+    }
 
+    // ============================================================
+    // STANDARD TEMPLATE (existing code)
+    // ============================================================
+    const isStorePage = pathname?.startsWith('/stores/');
     const primaryBadge = isStorePage
         ? product.category || 'Category'
         : product.vendorName || 'Vendor';
@@ -149,7 +175,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                             />
                         </motion.button>
 
-                        {/* Primary Badge – Option B: store → category, category → vendor */}
+                        {/* Primary Badge */}
                         <div className="absolute bottom-3 left-3 right-3">
                             <span className="inline-block bg-white/90 backdrop-blur-sm text-[#0F5C45] text-xs font-medium px-3 py-1 rounded-full shadow-md border border-white/20">
                                 {primaryBadge}
@@ -167,7 +193,6 @@ export default function ProductCard({ product }: ProductCardProps) {
                             {product.description}
                         </p>
 
-                        {/* Category Link – always visible */}
                         {product.category && (
                             <Link
                                 href={`/${product.category}`}

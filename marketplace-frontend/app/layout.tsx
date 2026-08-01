@@ -1,11 +1,14 @@
-﻿import type { Metadata } from 'next';
+﻿// M:\Marketplace\marketplace-frontend\app\layout.tsx
+
+import type { Metadata } from 'next';
 import { Cairo, Inter } from 'next/font/google';
 import './globals.css';
 import { I18nProvider } from '@/providers/I18nProvider';
 import { AuthProvider } from '@/context/AuthContext';
 import { CartProvider } from '@/context/CartContext';
 import { WishlistProvider } from '@/context/WishlistContext';
-import { CartIconRefProvider } from '@/context/CartIconRefContext'; // <-- NEW
+import { CartIconRefProvider } from '@/context/CartIconRefContext';
+import { ThemeProvider } from '@/context/ThemeContext';  // ✅ added
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
@@ -37,10 +40,12 @@ export default function RootLayout({
                     <AuthProvider>
                         <CartProvider>
                             <WishlistProvider>
-                                <CartIconRefProvider>   {/* ← ADD THIS */}
-                                    <Navbar />
-                                    <main className="min-h-screen bg-[#F8F9FA]">{children}</main>
-                                    <Footer />
+                                <CartIconRefProvider>
+                                    <ThemeProvider>   {/* ← ADD THIS */}
+                                        <Navbar />
+                                        <main className="min-h-screen bg-[#F8F9FA]">{children}</main>
+                                        <Footer />
+                                    </ThemeProvider>
                                 </CartIconRefProvider>
                             </WishlistProvider>
                         </CartProvider>
