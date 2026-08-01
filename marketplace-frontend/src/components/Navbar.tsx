@@ -15,13 +15,15 @@ import {
     HeartIcon,
     MagnifyingGlassIcon,
     CurrencyDollarIcon,
+    Bars3Icon,
+    XMarkIcon,
 } from '@heroicons/react/24/outline';
 import { AuthResponse } from '@/types';
 import { motion } from 'framer-motion';
 import api from '@/lib/api';
 
 // ============================================================
-// TOP BAR (unchanged)
+// TOP BAR
 // ============================================================
 const TopBar = () => {
     const { t } = useTranslation('common');
@@ -55,7 +57,7 @@ const TopBar = () => {
 };
 
 // ============================================================
-// MAIN HEADER (unchanged)
+// MAIN HEADER
 // ============================================================
 const MainHeader = ({ user }: { user: AuthResponse | null }) => {
     const { t } = useTranslation('common');
@@ -90,16 +92,11 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
     };
 
     return (
-        <div
-            className={`sticky top-0 z-40 transition-all duration-500 ${isScrolled
-                ? 'bg-white/80 backdrop-blur-xl shadow-lg border-b border-white/20'
-                : 'bg-white/60 backdrop-blur-md shadow-sm border-b border-gray-100/50'
-                }`}
-        >
+        <div className={`sticky top-0 z-40 transition-all duration-500 ${isScrolled ? 'bg-white/80 backdrop-blur-xl shadow-lg border-b border-white/20' : 'bg-white/60 backdrop-blur-md shadow-sm border-b border-gray-100/50'}`}>
             <div className="container mx-auto px-4 flex items-center gap-4 py-3">
                 <Logo />
 
-                <form onSubmit={handleSearch} className="flex-1 max-w-2xl relative group">
+                <form onSubmit={handleSearch} className="flex-1 max-w-2xl relative group hidden sm:block">
                     <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-[#0F5C45]/5 to-[#D4A54A]/5 opacity-0 group-hover:opacity-100 transition duration-500 blur-xl"></div>
                     <input
                         type="text"
@@ -109,68 +106,46 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
                         className="w-full px-5 py-3 pr-12 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#0F5C45]/30 focus:border-[#0F5C45] transition-all duration-300 bg-white/80 backdrop-blur-sm hover:bg-white text-right shadow-soft relative z-10"
                     />
                     <MagnifyingGlassIcon className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-hover:text-[#0F5C45] transition duration-300" />
-                    <button
-                        type="submit"
-                        className="absolute left-1.5 top-1/2 -translate-y-1/2 bg-gradient-to-r from-[#0F5C45] to-[#1A7A5C] text-white px-5 py-1.5 rounded-xl text-sm font-medium hover:shadow-lg hover:scale-105 transition-all duration-300 shadow-soft"
-                    >
+                    <button type="submit" className="absolute left-1.5 top-1/2 -translate-y-1/2 bg-gradient-to-r from-[#0F5C45] to-[#1A7A5C] text-white px-5 py-1.5 rounded-xl text-sm font-medium hover:shadow-lg hover:scale-105 transition-all duration-300 shadow-soft">
                         {t('search')}
                     </button>
                 </form>
 
-                <div className="flex items-center gap-4 flex-shrink-0">
-                    {/* FAVORITES */}
-                    <motion.button
-                        whileHover={{ scale: 1.15, rotate: -5 }}
-                        whileTap={{ scale: 0.9 }}
-                        className="text-gray-600 hover:text-[#0F5C45] transition relative group"
-                    >
+                {/* Mobile search */}
+                <form onSubmit={handleSearch} className="flex-1 sm:hidden">
+                    <input
+                        type="text"
+                        placeholder={t('searchPlaceholder')}
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0F5C45]/30 text-right text-sm"
+                    />
+                </form>
+
+                <div className="flex items-center gap-3 md:gap-4 flex-shrink-0">
+                    <motion.button whileHover={{ scale: 1.15, rotate: -5 }} whileTap={{ scale: 0.9 }} className="text-gray-600 hover:text-[#0F5C45] transition relative group hidden sm:block">
                         <HeartIcon className="w-6 h-6 group-hover:fill-[#0F5C45]/10 transition" />
-                        <motion.span
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            className="absolute -top-1 -right-1 bg-gradient-to-r from-[#0F5C45] to-[#1A7A5C] text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center shadow-md"
-                        >
+                        <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute -top-1 -right-1 bg-gradient-to-r from-[#0F5C45] to-[#1A7A5C] text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center shadow-md">
                             {totalFavorites}
                         </motion.span>
                     </motion.button>
 
-                    {/* CART */}
-                    <Link
-                        href="/cart"
-                        ref={(el) => { cartIconRef.current = el as HTMLElement; }}
-                        className="text-gray-600 hover:text-[#0F5C45] transition relative group"
-                    >
-                        <motion.div
-                            whileHover={{ scale: 1.15, rotate: 8 }}
-                            whileTap={{ scale: 0.9 }}
-                            className="relative"
-                        >
+                    <Link href="/cart" ref={(el) => { cartIconRef.current = el as HTMLElement; }} className="text-gray-600 hover:text-[#0F5C45] transition relative group">
+                        <motion.div whileHover={{ scale: 1.15, rotate: 8 }} whileTap={{ scale: 0.9 }} className="relative">
                             <ShoppingCartIcon className="w-6 h-6 group-hover:fill-[#0F5C45]/10 transition" />
-                            <motion.span
-                                animate={{
-                                    scale: isAnimating ? 1.5 : 1,
-                                }}
-                                transition={{ type: 'spring', stiffness: 400, damping: 10 }}
-                                className={`absolute -top-1 -right-1 bg-gradient-to-r from-[#0F5C45] to-[#1A7A5C] text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center shadow-md`}
-                            >
+                            <motion.span animate={{ scale: isAnimating ? 1.5 : 1 }} transition={{ type: 'spring', stiffness: 400, damping: 10 }} className="absolute -top-1 -right-1 bg-gradient-to-r from-[#0F5C45] to-[#1A7A5C] text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center shadow-md">
                                 {totalItems}
                             </motion.span>
-                            <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 bg-gray-900/90 text-white text-[10px] px-2 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-all duration-300 whitespace-nowrap backdrop-blur-sm">
-                                {totalItems} {totalItems === 1 ? 'item' : 'items'}
-                            </span>
                         </motion.div>
                     </Link>
 
                     {user ? (
-                        <motion.div
-                            whileHover={{ scale: 1.05 }}
-                            className="flex items-center gap-2 bg-[#0F5C45]/5 px-3 py-1.5 rounded-full border border-[#0F5C45]/10"
-                        >
+                        <div className="hidden sm:flex items-center gap-2 bg-[#0F5C45]/5 px-3 py-1.5 rounded-full border border-[#0F5C45]/10">
                             <span className="text-sm text-gray-700 font-medium">{user.username}</span>
                             <UserIcon className="w-4 h-4 text-[#0F5C45]" />
-                        </motion.div>
+                        </div>
                     ) : (
-                        <Link href="/auth/login" className="text-gray-600 hover:text-[#0F5C45] transition">
+                        <Link href="/auth/login" className="text-gray-600 hover:text-[#0F5C45] transition hidden sm:block">
                             <UserIcon className="w-6 h-6 hover:scale-110 transition duration-300" />
                         </Link>
                     )}
@@ -181,60 +156,78 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
 };
 
 // ============================================================
-// NAV MENU – Dynamic, fetched from API
+// NAV MENU – Dynamic with mobile hamburger
 // ============================================================
 const NavMenu = ({ categories, loading }: { categories: string[]; loading: boolean }) => {
     const { t } = useTranslation('common');
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     return (
         <div className="bg-white/70 backdrop-blur-sm border-b border-gray-100/50 shadow-sm">
             <div className="container mx-auto px-4">
-                <div className="flex items-center gap-6 py-2.5 overflow-x-auto whitespace-nowrap text-sm">
-                    <Link
-                        href="/"
-                        className="text-[#0F5C45] font-semibold hover:text-[#0A4735] transition border-b-2 border-[#0F5C45] pb-1 relative group"
+                <div className="flex items-center justify-between gap-6 py-2.5">
+                    <div className="flex items-center gap-6 overflow-x-auto whitespace-nowrap text-sm scrollbar-hide">
+                        <Link href="/" className="text-[#0F5C45] font-semibold hover:text-[#0A4735] transition border-b-2 border-[#0F5C45] pb-1">
+                            {t('home')}
+                        </Link>
+                        {loading ? (
+                            <span className="text-gray-400">Loading categories…</span>
+                        ) : (
+                            categories.map((cat) => (
+                                <Link key={cat} href={`/${cat}`} className="text-gray-600 hover:text-[#0F5C45] transition pb-1">
+                                    {cat.replace(/-/g, ' ')}
+                                </Link>
+                            ))
+                        )}
+                        <Link href="/stores" className="text-gray-600 hover:text-[#0F5C45] transition pb-1">
+                            {t('stores')}
+                        </Link>
+                        <Link href="/offers" className="text-orange-500 font-medium hover:text-orange-600 transition pb-1">
+                            🔥 {t('offers')}
+                        </Link>
+                        <Link href="/contact" className="text-gray-600 hover:text-[#0F5C45] transition pb-1">
+                            {t('contact')}
+                        </Link>
+                    </div>
+
+                    <button
+                        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                        className="lg:hidden p-1 rounded-md hover:bg-gray-100 transition"
+                        aria-label="Toggle menu"
                     >
-                        {t('home')}
-                    </Link>
-                    {loading ? (
-                        <span className="text-gray-400">Loading categories…</span>
-                    ) : (
-                        categories.map((cat) => (
-                            <Link
-                                key={cat}
-                                href={`/${cat}`}
-                                className="text-gray-600 hover:text-[#0F5C45] transition pb-1 relative group"
-                            >
-                                <span>{cat.replace(/-/g, ' ')}</span>
-                            </Link>
-                        ))
-                    )}
-                    <Link
-                        href="/stores"
-                        className="text-gray-600 hover:text-[#0F5C45] transition pb-1 relative group"
-                    >
-                        {t('stores')}
-                    </Link>
-                    <Link
-                        href="/offers"
-                        className="text-orange-500 font-medium hover:text-orange-600 transition pb-1 relative group"
-                    >
-                        🔥 {t('offers')}
-                    </Link>
-                    <Link
-                        href="/contact"
-                        className="text-gray-600 hover:text-[#0F5C45] transition pb-1 relative group"
-                    >
-                        {t('contact')}
-                    </Link>
+                        {mobileMenuOpen ? <XMarkIcon className="w-6 h-6" /> : <Bars3Icon className="w-6 h-6" />}
+                    </button>
                 </div>
+
+                {/* Mobile dropdown */}
+                {mobileMenuOpen && (
+                    <div className="lg:hidden py-3 space-y-2 text-right border-t border-gray-100">
+                        <Link href="/" className="block text-gray-700 hover:text-[#0F5C45] transition py-1" onClick={() => setMobileMenuOpen(false)}>
+                            {t('home')}
+                        </Link>
+                        {categories.map((cat) => (
+                            <Link key={cat} href={`/${cat}`} className="block text-gray-700 hover:text-[#0F5C45] transition py-1" onClick={() => setMobileMenuOpen(false)}>
+                                {cat.replace(/-/g, ' ')}
+                            </Link>
+                        ))}
+                        <Link href="/stores" className="block text-gray-700 hover:text-[#0F5C45] transition py-1" onClick={() => setMobileMenuOpen(false)}>
+                            {t('stores')}
+                        </Link>
+                        <Link href="/offers" className="block text-orange-500 hover:text-orange-600 transition py-1" onClick={() => setMobileMenuOpen(false)}>
+                            🔥 {t('offers')}
+                        </Link>
+                        <Link href="/contact" className="block text-gray-700 hover:text-[#0F5C45] transition py-1" onClick={() => setMobileMenuOpen(false)}>
+                            {t('contact')}
+                        </Link>
+                    </div>
+                )}
             </div>
         </div>
     );
 };
 
 // ============================================================
-// USER NAV – includes chat & suggest links
+// USER NAV
 // ============================================================
 const UserNav = ({ user, logout }: { user: AuthResponse; logout: () => void }) => {
     const { t } = useTranslation('common');
@@ -243,42 +236,42 @@ const UserNav = ({ user, logout }: { user: AuthResponse; logout: () => void }) =
 
     return (
         <div className="bg-gradient-to-r from-[#0F5C45] to-[#1A7A5C] text-white text-sm py-2">
-            <div className="container mx-auto px-4 flex justify-between items-center">
-                <div className="flex items-center gap-6">
-                    <Link href="/cart" className="hover:text-yellow-300 transition flex items-center gap-2">
+            <div className="container mx-auto px-4 flex flex-wrap justify-between items-center gap-2">
+                <div className="flex flex-wrap items-center gap-4">
+                    <Link href="/cart" className="hover:text-yellow-300 transition flex items-center gap-2 text-xs md:text-sm">
                         <ShoppingCartIcon className="w-4 h-4" /> {t('cart')}
                     </Link>
-                    <Link href="/orders" className="hover:text-yellow-300 transition flex items-center gap-2">
+                    <Link href="/orders" className="hover:text-yellow-300 transition flex items-center gap-2 text-xs md:text-sm">
                         <span>📋 {t('orders')}</span>
                     </Link>
-                    <Link href="/suggest" className="hover:text-yellow-300 transition flex items-center gap-2">
+                    <Link href="/suggest" className="hover:text-yellow-300 transition flex items-center gap-2 text-xs md:text-sm">
                         <span>💡 Suggest</span>
                     </Link>
                     {isVendor && (
                         <>
-                            <Link href="/vendor/dashboard" className="hover:text-yellow-300 transition flex items-center gap-2">
+                            <Link href="/vendor/dashboard" className="hover:text-yellow-300 transition flex items-center gap-2 text-xs md:text-sm">
                                 <span>📊 {t('dashboard')}</span>
                             </Link>
-                            <Link href="/admin/orders" className="hover:text-yellow-300 transition flex items-center gap-2">
+                            <Link href="/admin/orders" className="hover:text-yellow-300 transition flex items-center gap-2 text-xs md:text-sm">
                                 <span>📦 Manage Orders</span>
                             </Link>
                         </>
                     )}
                     {isAdmin && (
                         <>
-                            <Link href="/admin/users" className="hover:text-yellow-300 transition flex items-center gap-2">
+                            <Link href="/admin/users" className="hover:text-yellow-300 transition flex items-center gap-2 text-xs md:text-sm">
                                 <span>👥 {t('users')}</span>
                             </Link>
-                            <Link href="/admin" className="hover:text-yellow-300 transition flex items-center gap-2">
+                            <Link href="/admin" className="hover:text-yellow-300 transition flex items-center gap-2 text-xs md:text-sm">
                                 <span>⚙️ {t('admin')}</span>
                             </Link>
                         </>
                     )}
-                    <Link href="/chat" className="hover:text-yellow-300 transition flex items-center gap-2">
+                    <Link href="/chat" className="hover:text-yellow-300 transition flex items-center gap-2 text-xs md:text-sm">
                         <span>💬 Chat</span>
                     </Link>
                 </div>
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3">
                     <span className="text-xs text-white/70">{t('welcome')}، {user.username}</span>
                     <button onClick={logout} className="text-xs bg-white/10 px-3 py-1 rounded-full hover:bg-white/20 transition duration-300 hover:scale-105">
                         {t('logout')}

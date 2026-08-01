@@ -8,9 +8,6 @@ import { useAuth } from '@/context/AuthContext';
 import { TrashIcon } from '@heroicons/react/24/outline';
 import { MARKETPLACE } from '@/constants/marketplace';
 
-// ============================================================
-// TYPES
-// ============================================================
 interface CheckoutError {
     response?: {
         data?: {
@@ -37,6 +34,7 @@ export default function CartPage() {
         deliveryInstructions: '',
     });
     const [checkoutLoading, setCheckoutLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     const fetchCart = async () => {
         try {
@@ -51,12 +49,11 @@ export default function CartPage() {
 
     useEffect(() => {
         if (isLoading) return;
-
         if (!user) {
             router.push('/auth/login');
             return;
         }
-
+        // ✅ Suppress ESLint warning – this is a standard data‑fetching pattern
         // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchCart();
     }, [user, isLoading]);
@@ -72,12 +69,27 @@ export default function CartPage() {
 
     const handleCheckout = async (e: React.FormEvent) => {
         e.preventDefault();
+        setError(null);
         if (!user) return;
 
-        // Check if shipping address is filled
         if (!checkoutData.shippingAddress.trim()) {
-            alert('⚠️ يرجى إدخال عنوان الشحن');
+            setError('يرجى إدخال عنوان الشحن');
             return;
+        }
+
+        if (checkoutData.paymentMethod === 'Card') {
+            if (!checkoutData.cardNumber || checkoutData.cardNumber.replace(/\s/g, '').length < 16) {
+                setError('رقم البطاقة غير صحيح');
+                return;
+            }
+            if (!checkoutData.cardExpiry || !checkoutData.cardExpiry.match(/^\d{2}\/\d{2}$/)) {
+                setError('تاريخ الانتهاء غير صحيح (MM/YY)');
+                return;
+            }
+            if (!checkoutData.cardCvv || checkoutData.cardCvv.length < 3) {
+                setError('رمز CVV غير صحيح');
+                return;
+            }
         }
 
         setCheckoutLoading(true);
@@ -86,27 +98,18 @@ export default function CartPage() {
             const order = response.data;
 
             let confirmationData = {};
-
             switch (checkoutData.paymentMethod) {
                 case 'Card':
-                    confirmationData = {
-                        transactionId: `TXN-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`,
-                    };
+                    confirmationData = { transactionId: `TXN-${Date.now()}` };
                     break;
                 case 'MobileWallet':
-                    confirmationData = {
-                        phoneNumber: checkoutData.phoneNumber,
-                    };
+                    confirmationData = { phoneNumber: checkoutData.phoneNumber };
                     break;
                 case 'PayPal':
-                    confirmationData = {
-                        payPalEmail: checkoutData.payPalEmail,
-                    };
+                    confirmationData = { payPalEmail: checkoutData.payPalEmail };
                     break;
                 case 'CashOnDelivery':
-                    confirmationData = {
-                        deliveryConfirmation: checkoutData.deliveryInstructions || 'في انتظار تأكيد التوصيل',
-                    };
+                    confirmationData = { deliveryConfirmation: checkoutData.deliveryInstructions || 'في انتظار تأكيد التوصيل' };
                     break;
                 default:
                     throw new Error('Unknown payment method');
@@ -118,7 +121,6 @@ export default function CartPage() {
             router.push(`/orders/${order.id}`);
         } catch (error: unknown) {
             console.error('Checkout failed:', error);
-            // Extract the error message safely
             let message = '❌ فشل الطلب. حاول مرة أخرى.';
             if (error && typeof error === 'object' && 'response' in error) {
                 const err = error as CheckoutError;
@@ -130,7 +132,7 @@ export default function CartPage() {
                     message = `⚠️ ${err.message}`;
                 }
             }
-            alert(message);
+            setError(message);
         } finally {
             setCheckoutLoading(false);
         }
@@ -145,11 +147,17 @@ export default function CartPage() {
                             <label className="block text-sm font-medium text-gray-700 mb-1">رقم البطاقة</label>
                             <input
                                 type="text"
-                                required
+                                inputMode="numeric"
+                                pattern="[0-9\s]*"
+                                maxLength={19}
                                 placeholder="4111 1111 1111 1111"
                                 value={checkoutData.cardNumber}
-                                onChange={(e) => setCheckoutData({ ...checkoutData, cardNumber: e.target.value })}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                onChange={(e) => {
+                                    const raw = e.target.value.replace(/\s/g, '');
+                                    const formatted = raw.replace(/(\d{4})/g, '$1 ').trim();
+                                    setCheckoutData({ ...checkoutData, cardNumber: formatted });
+                                }}
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
                             />
                         </div>
                         <div className="grid grid-cols-2 gap-4">
@@ -157,28 +165,36 @@ export default function CartPage() {
                                 <label className="block text-sm font-medium text-gray-700 mb-1">تاريخ الانتهاء (شهر/سنة)</label>
                                 <input
                                     type="text"
-                                    required
+                                    inputMode="numeric"
                                     placeholder="MM/YY"
+                                    maxLength={5}
                                     value={checkoutData.cardExpiry}
-                                    onChange={(e) => setCheckoutData({ ...checkoutData, cardExpiry: e.target.value })}
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    onChange={(e) => {
+                                        let val = e.target.value.replace(/\D/g, '');
+                                        if (val.length >= 2) val = val.slice(0, 2) + '/' + val.slice(2);
+                                        setCheckoutData({ ...checkoutData, cardExpiry: val });
+                                    }}
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
                                 />
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">CVV</label>
                                 <input
                                     type="password"
-                                    required
+                                    inputMode="numeric"
+                                    maxLength={4}
                                     placeholder="123"
                                     value={checkoutData.cardCvv}
-                                    onChange={(e) => setCheckoutData({ ...checkoutData, cardCvv: e.target.value })}
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    onChange={(e) => {
+                                        const val = e.target.value.replace(/\D/g, '');
+                                        setCheckoutData({ ...checkoutData, cardCvv: val });
+                                    }}
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
                                 />
                             </div>
                         </div>
                     </>
                 );
-
             case 'MobileWallet':
                 return (
                     <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
@@ -204,31 +220,28 @@ export default function CartPage() {
                             <label className="block text-sm font-medium text-gray-700 mb-1">رقم هاتفك (للتأكيد)</label>
                             <input
                                 type="tel"
-                                required
+                                inputMode="numeric"
                                 placeholder="+20 100 000 0000"
                                 value={checkoutData.phoneNumber}
                                 onChange={(e) => setCheckoutData({ ...checkoutData, phoneNumber: e.target.value })}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
                             />
                         </div>
                     </div>
                 );
-
             case 'PayPal':
                 return (
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">البريد الإلكتروني لـ PayPal</label>
                         <input
                             type="email"
-                            required
                             placeholder="you@example.com"
                             value={checkoutData.payPalEmail}
                             onChange={(e) => setCheckoutData({ ...checkoutData, payPalEmail: e.target.value })}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
                         />
                     </div>
                 );
-
             case 'CashOnDelivery':
                 return (
                     <div>
@@ -237,12 +250,11 @@ export default function CartPage() {
                             placeholder="أي تعليمات خاصة للتوصيل..."
                             value={checkoutData.deliveryInstructions}
                             onChange={(e) => setCheckoutData({ ...checkoutData, deliveryInstructions: e.target.value })}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                             rows={2}
                         />
                     </div>
                 );
-
             default:
                 return null;
         }
@@ -303,6 +315,12 @@ export default function CartPage() {
             <form onSubmit={handleCheckout} className="mt-8 bg-white rounded-xl shadow-md p-6">
                 <h2 className="text-xl font-bold text-gray-800 mb-4">إتمام الطلب</h2>
 
+                {error && (
+                    <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg mb-4">
+                        ⚠️ {error}
+                    </div>
+                )}
+
                 <div className="space-y-4">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">عنوان الشحن *</label>
@@ -311,7 +329,7 @@ export default function CartPage() {
                             required
                             value={checkoutData.shippingAddress}
                             onChange={(e) => setCheckoutData({ ...checkoutData, shippingAddress: e.target.value })}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
                             placeholder="مثال: 123 شارع المعادي، القاهرة"
                         />
                     </div>
@@ -321,7 +339,7 @@ export default function CartPage() {
                         <select
                             value={checkoutData.paymentMethod}
                             onChange={(e) => setCheckoutData({ ...checkoutData, paymentMethod: e.target.value })}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
                         >
                             <option value="CashOnDelivery">💵 الدفع عند الاستلام</option>
                             <option value="Card">💳 بطاقة ائتمان / خصم</option>
@@ -335,7 +353,7 @@ export default function CartPage() {
                     <button
                         type="submit"
                         disabled={checkoutLoading}
-                        className="w-full py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold rounded-lg hover:from-green-700 hover:to-emerald-700 transition disabled:opacity-50"
+                        className="w-full py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold rounded-lg hover:from-green-700 hover:to-emerald-700 transition disabled:opacity-50 text-lg min-h-[52px]"
                     >
                         {checkoutLoading ? 'جاري المعالجة...' : '✅ تأكيد الطلب والدفع'}
                     </button>

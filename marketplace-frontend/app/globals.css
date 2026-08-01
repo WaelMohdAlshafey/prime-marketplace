@@ -1,9 +1,6 @@
 ﻿@import "tailwindcss";
 
 @theme {
-    /* ============================================================
-       NEW PREMIUM COLOR PALETTE
-       ============================================================ */
     --color-primary: #0F5C45;
     --color-primary-light: #1A7A5C;
     --color-primary-dark: #0A4735;
@@ -29,7 +26,6 @@
         background-image: radial-gradient(ellipse at 10% 20%, rgba(15, 92, 69, 0.03) 0%, transparent 50%), radial-gradient(ellipse at 90% 80%, rgba(212, 165, 74, 0.03) 0%, transparent 50%);
     }
 
-    /* Smooth scrollbar */
     ::-webkit-scrollbar {
         width: 8px;
         height: 8px;
@@ -51,9 +47,6 @@
 }
 
 @layer components {
-    /* ============================================================
-       GLASSMORPHISM CARDS
-       ============================================================ */
     .glass-card {
         background: rgba(255, 255, 255, 0.7);
         backdrop-filter: blur(12px);
@@ -71,9 +64,6 @@
             background: rgba(255, 255, 255, 0.85);
         }
 
-    /* ============================================================
-       PREMIUM BUTTONS
-       ============================================================ */
     .btn-primary {
         background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
         color: white;
@@ -145,9 +135,6 @@
                 transform: scaleX(1);
             }
 
-    /* ============================================================
-       PREMIUM BADGES
-       ============================================================ */
     .badge-premium {
         background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-light) 100%);
         color: #1A1A2E;
@@ -159,9 +146,6 @@
         box-shadow: 0 2px 12px var(--color-accent-glow);
     }
 
-    /* ============================================================
-       ANIMATED GRADIENT BACKGROUND
-       ============================================================ */
     .bg-animated-gradient {
         background: linear-gradient(-45deg, var(--color-primary), var(--color-primary-light), var(--color-accent), var(--color-primary));
         background-size: 400% 400%;
@@ -182,9 +166,6 @@
         }
     }
 
-    /* ============================================================
-       FLOATING ANIMATIONS
-       ============================================================ */
     .float-animation {
         animation: floatY 3s ease-in-out infinite;
     }
@@ -211,5 +192,33 @@
         50% {
             box-shadow: 0 0 40px var(--color-primary-glow), 0 0 60px var(--color-accent-glow);
         }
+    }
+
+    /* === Responsive helpers === */
+    @media (max-width: 640px) {
+        input, select, textarea, button {
+            font-size: 16px !important;
+        }
+
+        .container {
+            padding-left: 12px;
+            padding-right: 12px;
+        }
+    }
+
+    /* Admin table scroll */
+    .admin-table-wrap {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+        .admin-table-wrap table {
+            min-width: 600px;
+        }
+
+    /* Touch-friendly buttons */
+    button, .btn, a.btn {
+        min-height: 44px;
+        touch-action: manipulation;
     }
 }

@@ -14,7 +14,7 @@ export interface Product {
     reviews?: number;
     discount?: number;
     isActive: boolean;
-    category?: string; // ✅ NEW – product category
+    category?: string;
 }
 
 export interface PagedResult<T> {
@@ -70,6 +70,7 @@ export interface Order {
     deliveryInstructions?: string;
     isPaymentConfirmed: boolean;
     paymentConfirmedAt?: string;
+    shippingCarrier?: string; // ✅ ADDED – fixes TypeScript error
 }
 
 // ============================================================

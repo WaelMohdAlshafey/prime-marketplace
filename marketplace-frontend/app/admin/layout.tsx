@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import AdminSidebar from '@/components/admin/AdminSidebar';
+import { Menu, X } from 'lucide-react';
 
 export default function AdminLayout({
     children,
@@ -12,6 +13,7 @@ export default function AdminLayout({
 }) {
     const { user, isLoading } = useAuth();
     const router = useRouter();
+    const [sidebarOpen, setSidebarOpen] = useState(false);
 
     useEffect(() => {
         if (isLoading) return;
@@ -34,9 +36,31 @@ export default function AdminLayout({
     }
 
     return (
-        <div className="flex bg-[#F8F9FA] min-h-screen">
-            <AdminSidebar />
-            <main className="flex-1 p-8 overflow-y-auto">
+        <div className="flex min-h-screen bg-[#F8F9FA]">
+            {/* Mobile hamburger */}
+            <button
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                className="fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-md lg:hidden"
+                aria-label="Toggle sidebar"
+            >
+                {sidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+
+            {/* Sidebar – mobile overlay */}
+            <div
+                className={`fixed inset-0 bg-black/50 z-40 transition-opacity lg:hidden ${sidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+                    }`}
+                onClick={() => setSidebarOpen(false)}
+            />
+
+            <aside
+                className={`fixed top-0 left-0 h-full w-64 bg-gradient-to-b from-gray-900 to-gray-800 p-4 flex flex-col z-40 transition-transform duration-300 lg:static lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+                    }`}
+            >
+                <AdminSidebar />
+            </aside>
+
+            <main className="flex-1 p-4 md:p-8 overflow-y-auto">
                 {children}
             </main>
         </div>

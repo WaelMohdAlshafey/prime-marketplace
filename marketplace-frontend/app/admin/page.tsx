@@ -11,8 +11,6 @@ import {
     Mail,
     Clock,
     TrendingUp,
-    ArrowUp,
-    ArrowDown,
 } from 'lucide-react';
 import { Line } from 'react-chartjs-2';
 import {
@@ -177,27 +175,27 @@ export default function AdminDashboard() {
 
     return (
         <div>
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-                <p className="text-gray-500 mt-1">Overview of your marketplace</p>
+            <div className="mb-6 md:mb-8">
+                <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Dashboard</h1>
+                <p className="text-gray-500 mt-1 text-sm md:text-base">Overview of your marketplace</p>
             </div>
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
                 {statCards.map((card) => {
                     const Icon = card.icon;
                     return (
                         <div
                             key={card.title}
-                            className="bg-white rounded-2xl shadow-soft hover:shadow-strong transition-all duration-300 p-6 hover:-translate-y-1"
+                            className="bg-white rounded-2xl shadow-soft hover:shadow-strong transition-all duration-300 p-4 md:p-6 hover:-translate-y-1"
                         >
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-sm text-gray-500 font-medium">{card.title}</p>
-                                    <p className="text-3xl font-bold text-gray-900 mt-1">{card.value}</p>
+                                    <p className="text-xs md:text-sm text-gray-500 font-medium">{card.title}</p>
+                                    <p className="text-xl md:text-3xl font-bold text-gray-900 mt-1">{card.value}</p>
                                 </div>
-                                <div className={`p-3 rounded-xl ${card.bgColor}`}>
-                                    <Icon className={`w-6 h-6 ${card.textColor}`} />
+                                <div className={`p-2 md:p-3 rounded-xl ${card.bgColor}`}>
+                                    <Icon className={`w-5 h-5 md:w-6 md:h-6 ${card.textColor}`} />
                                 </div>
                             </div>
                         </div>
@@ -206,60 +204,64 @@ export default function AdminDashboard() {
             </div>
 
             {/* Chart */}
-            <div className="bg-white rounded-2xl shadow-soft p-6 mb-8">
+            <div className="bg-white rounded-2xl shadow-soft p-4 md:p-6 mb-6 md:mb-8">
                 {stats.monthlyRevenue.length > 0 ? (
-                    <Line data={chartData} options={chartOptions} height={80} />
+                    <div className="h-64 md:h-80">
+                        <Line data={chartData} options={chartOptions} />
+                    </div>
                 ) : (
                     <p className="text-center text-gray-500 py-8">No revenue data available yet.</p>
                 )}
             </div>
 
             {/* Recent Orders */}
-            <div className="bg-white rounded-2xl shadow-soft p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">Recent Orders</h2>
-                <div className="overflow-x-auto">
-                    <table className="w-full text-right">
-                        <thead className="bg-gray-50 border-b border-gray-200">
-                            <tr>
-                                <th className="px-4 py-3 text-xs font-semibold text-gray-600 uppercase">Order ID</th>
-                                <th className="px-4 py-3 text-xs font-semibold text-gray-600 uppercase">Date</th>
-                                <th className="px-4 py-3 text-xs font-semibold text-gray-600 uppercase">Amount</th>
-                                <th className="px-4 py-3 text-xs font-semibold text-gray-600 uppercase">Status</th>
-                                <th className="px-4 py-3 text-xs font-semibold text-gray-600 uppercase">User</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-200">
-                            {stats.recentOrders.map((order) => (
-                                <tr key={order.id} className="hover:bg-gray-50 transition">
-                                    <td className="px-4 py-3 text-sm text-gray-900">#{order.id}</td>
-                                    <td className="px-4 py-3 text-sm text-gray-600">
-                                        {new Date(order.orderDate).toLocaleDateString()}
-                                    </td>
-                                    <td className="px-4 py-3 text-sm font-semibold text-gray-900">
-                                        £{order.totalAmount.toFixed(2)}
-                                    </td>
-                                    <td className="px-4 py-3 text-sm">
-                                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${order.status === 'Paid'
-                                                ? 'bg-green-100 text-green-800'
-                                                : order.status === 'Pending'
-                                                    ? 'bg-yellow-100 text-yellow-800'
-                                                    : 'bg-gray-100 text-gray-800'
-                                            }`}>
-                                            {order.status}
-                                        </span>
-                                    </td>
-                                    <td className="px-4 py-3 text-sm text-gray-600">User #{order.userId}</td>
-                                </tr>
-                            ))}
-                            {stats.recentOrders.length === 0 && (
+            <div className="bg-white rounded-2xl shadow-soft p-4 md:p-6">
+                <h2 className="text-lg md:text-xl font-bold text-gray-900 mb-4">Recent Orders</h2>
+                <div className="overflow-x-auto -mx-4 md:mx-0">
+                    <div className="inline-block min-w-full align-middle">
+                        <table className="min-w-full divide-y divide-gray-200">
+                            <thead className="bg-gray-50">
                                 <tr>
-                                    <td colSpan={5} className="px-4 py-8 text-center text-gray-500">
-                                        No orders yet.
-                                    </td>
+                                    <th className="px-3 md:px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase">Order ID</th>
+                                    <th className="px-3 md:px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase">Date</th>
+                                    <th className="px-3 md:px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase">Amount</th>
+                                    <th className="px-3 md:px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase">Status</th>
+                                    <th className="px-3 md:px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase">User</th>
                                 </tr>
-                            )}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody className="divide-y divide-gray-200">
+                                {stats.recentOrders.map((order) => (
+                                    <tr key={order.id} className="hover:bg-gray-50 transition">
+                                        <td className="px-3 md:px-4 py-3 text-sm text-gray-900">#{order.id}</td>
+                                        <td className="px-3 md:px-4 py-3 text-sm text-gray-600 whitespace-nowrap">
+                                            {new Date(order.orderDate).toLocaleDateString()}
+                                        </td>
+                                        <td className="px-3 md:px-4 py-3 text-sm font-semibold text-gray-900 whitespace-nowrap">
+                                            £{order.totalAmount.toFixed(2)}
+                                        </td>
+                                        <td className="px-3 md:px-4 py-3 text-sm">
+                                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${order.status === 'Paid'
+                                                    ? 'bg-green-100 text-green-800'
+                                                    : order.status === 'Pending'
+                                                        ? 'bg-yellow-100 text-yellow-800'
+                                                        : 'bg-gray-100 text-gray-800'
+                                                }`}>
+                                                {order.status}
+                                            </span>
+                                        </td>
+                                        <td className="px-3 md:px-4 py-3 text-sm text-gray-600">User #{order.userId}</td>
+                                    </tr>
+                                ))}
+                                {stats.recentOrders.length === 0 && (
+                                    <tr>
+                                        <td colSpan={5} className="px-4 py-8 text-center text-gray-500">
+                                            No orders yet.
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
