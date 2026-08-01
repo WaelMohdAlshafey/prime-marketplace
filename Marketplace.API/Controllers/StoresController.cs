@@ -9,7 +9,7 @@ using Marketplace.Application.Interfaces;
 namespace Marketplace.API.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/stores")]
     public class StoresController : ControllerBase
     {
         private readonly IStoreService _storeService;
@@ -27,12 +27,21 @@ namespace Marketplace.API.Controllers
         {
             try
             {
+                Console.WriteLine("📦 GetStores called with page={0}, pageSize={1}", page, pageSize);
                 var result = await _storeService.GetAllStoresAsync(page, pageSize, isActive: true);
+                Console.WriteLine("✅ GetStores succeeded, found {0} items", result.Items?.Count ?? 0);
                 return Ok(result);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = ex.Message, stackTrace = ex.StackTrace });
+                Console.WriteLine($"❌ GetStores ERROR: {ex.Message}");
+                Console.WriteLine($"StackTrace: {ex.StackTrace}");
+                return StatusCode(500, new
+                {
+                    message = "An error occurred while fetching stores.",
+                    detail = ex.Message,
+                    stackTrace = ex.StackTrace
+                });
             }
         }
 
@@ -49,7 +58,8 @@ namespace Marketplace.API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = ex.Message, stackTrace = ex.StackTrace });
+                Console.WriteLine($"❌ GetStore({id}) ERROR: {ex.Message}");
+                return StatusCode(500, new { message = ex.Message });
             }
         }
 
@@ -66,7 +76,8 @@ namespace Marketplace.API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = ex.Message, stackTrace = ex.StackTrace });
+                Console.WriteLine($"❌ GetStoreProducts({id}) ERROR: {ex.Message}");
+                return StatusCode(500, new { message = ex.Message });
             }
         }
 
@@ -103,7 +114,8 @@ namespace Marketplace.API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = ex.Message, stackTrace = ex.StackTrace });
+                Console.WriteLine($"❌ CreateStore ERROR: {ex.Message}");
+                return StatusCode(500, new { message = ex.Message });
             }
         }
 
@@ -140,7 +152,8 @@ namespace Marketplace.API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = ex.Message, stackTrace = ex.StackTrace });
+                Console.WriteLine($"❌ UpdateStore({id}) ERROR: {ex.Message}");
+                return StatusCode(500, new { message = ex.Message });
             }
         }
 
@@ -158,7 +171,8 @@ namespace Marketplace.API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = ex.Message, stackTrace = ex.StackTrace });
+                Console.WriteLine($"❌ DeleteStore({id}) ERROR: {ex.Message}");
+                return StatusCode(500, new { message = ex.Message });
             }
         }
     }
