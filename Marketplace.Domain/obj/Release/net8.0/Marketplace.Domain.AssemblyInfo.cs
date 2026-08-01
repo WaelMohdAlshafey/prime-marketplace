@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Marketplace.Domain")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+bfb13bba9ab0e7c39bfd77bc4b66b23543c6ed7e")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+317a311b74df6bf24ff9d884f6f3af29745064b7")]
 [assembly: System.Reflection.AssemblyProductAttribute("Marketplace.Domain")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Marketplace.Domain")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

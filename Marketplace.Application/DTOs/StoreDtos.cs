@@ -5,15 +5,15 @@ namespace Marketplace.Application.DTOs
     public class StoreCreateDto
     {
         public string Name { get; set; } = string.Empty;
-        public string? LogoUrl { get; set; }
+        public string? LogoUrl { get; set; }  // Optional URL (fallback)
         public string? Description { get; set; }
-        public int VendorId { get; set; } // The user ID of the vendor who owns the store
+        public int VendorId { get; set; }
     }
 
     public class StoreUpdateDto
     {
         public string Name { get; set; } = string.Empty;
-        public string? LogoUrl { get; set; }
+        public string? LogoUrl { get; set; }  // Optional URL (fallback)
         public string? Description { get; set; }
         public bool IsActive { get; set; }
     }

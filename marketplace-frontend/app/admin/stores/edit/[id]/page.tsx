@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import api from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
@@ -12,31 +12,31 @@ export default function EditStorePage() {
     const [form, setForm] = useState({
         name: '',
         description: '',
-        logoUrl: '',
         isActive: true,
     });
+    const [logoFile, setLogoFile] = useState<File | null>(null);
+    const [currentLogoUrl, setCurrentLogoUrl] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState('');
 
-    // ✅ Move fetchStore BEFORE useEffect
-    const fetchStore = async () => {
+    const fetchStore = useCallback(async () => {
         try {
             const response = await api.get(`/api/Stores/${id}`);
             const store = response.data;
             setForm({
                 name: store.name || '',
                 description: store.description || '',
-                logoUrl: store.logoUrl || '',
                 isActive: store.isActive !== undefined ? store.isActive : true,
             });
+            setCurrentLogoUrl(store.logoUrl || null);
         } catch (error) {
             console.error('Failed to fetch store:', error);
             setError('Store not found.');
         } finally {
             setLoading(false);
         }
-    };
+    }, [id]);
 
     useEffect(() => {
         if (isLoading) return;
@@ -48,10 +48,9 @@ export default function EditStorePage() {
             router.push('/');
             return;
         }
-        // ✅ fetchStore is now defined
         // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchStore();
-    }, [id, user, isLoading, fetchStore]); // ✅ add fetchStore to deps
+    }, [id, user, isLoading, router, fetchStore]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const target = e.target;
@@ -59,12 +58,29 @@ export default function EditStorePage() {
         setForm({ ...form, [target.name]: value });
     };
 
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            setLogoFile(e.target.files[0]);
+        }
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setSaving(true);
         setError('');
+
         try {
-            await api.put(`/api/Stores/${id}`, form);
+            const formData = new FormData();
+            formData.append('name', form.name);
+            formData.append('description', form.description);
+            formData.append('isActive', String(form.isActive));
+            if (logoFile) {
+                formData.append('logo', logoFile);
+            }
+
+            await api.put(`/api/Stores/${id}`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
             router.push('/admin/stores');
         } catch (error) {
             console.error('Update failed:', error);
@@ -111,14 +127,25 @@ export default function EditStorePage() {
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Logo URL</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Current Logo</label>
+                    {currentLogoUrl ? (
+                        <div className="mb-2">
+                            <img
+                                src={currentLogoUrl}
+                                alt="Store logo"
+                                className="w-32 h-32 object-cover rounded-lg border border-gray-200"
+                            />
+                        </div>
+                    ) : (
+                        <p className="text-gray-400 text-sm">No logo uploaded.</p>
+                    )}
                     <input
-                        type="url"
-                        name="logoUrl"
-                        value={form.logoUrl}
-                        onChange={handleChange}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0F5C45] focus:border-transparent"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                        className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#0F5C45] file:text-white hover:file:bg-[#0A4735]"
                     />
+                    {logoFile && <p className="text-sm text-green-600 mt-1">📷 New logo: {logoFile.name}</p>}
                 </div>
 
                 <div className="flex items-center gap-2">

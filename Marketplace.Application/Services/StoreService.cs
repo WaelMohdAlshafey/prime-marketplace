@@ -20,9 +20,12 @@ namespace Marketplace.Application.Services
             _productService = productService;
         }
 
-        public async Task<StoreResponseDto> CreateStoreAsync(StoreCreateDto dto)
+        // ============================================================
+        // CREATE STORE – accepts optional logoUrl from uploaded file
+        // ============================================================
+        public async Task<StoreResponseDto> CreateStoreAsync(StoreCreateDto dto, string? logoUrl = null)
         {
-            // Ensure vendor exists and has Vendor role
+            // Validate vendor
             var vendor = await _context.Users.FindAsync(dto.VendorId);
             if (vendor == null || vendor.Role != "Vendor")
                 throw new Exception("Invalid vendor user.");
@@ -35,7 +38,7 @@ namespace Marketplace.Application.Services
             var store = new Store
             {
                 Name = dto.Name,
-                LogoUrl = dto.LogoUrl,
+                LogoUrl = logoUrl ?? dto.LogoUrl, // Prefer uploaded file, fallback to URL from DTO
                 Description = dto.Description,
                 VendorId = dto.VendorId,
                 IsActive = true,
@@ -48,22 +51,39 @@ namespace Marketplace.Application.Services
             return await MapToDto(store);
         }
 
-        public async Task<StoreResponseDto> UpdateStoreAsync(int storeId, StoreUpdateDto dto)
+        // ============================================================
+        // UPDATE STORE – accepts optional logoUrl from uploaded file
+        // ============================================================
+        public async Task<StoreResponseDto> UpdateStoreAsync(int storeId, StoreUpdateDto dto, string? logoUrl = null)
         {
             var store = await _context.Stores.FindAsync(storeId);
             if (store == null)
                 throw new Exception("Store not found.");
 
             store.Name = dto.Name;
-            store.LogoUrl = dto.LogoUrl;
             store.Description = dto.Description;
             store.IsActive = dto.IsActive;
+
+            // Only update logo if a new one was uploaded
+            if (!string.IsNullOrEmpty(logoUrl))
+            {
+                store.LogoUrl = logoUrl;
+            }
+            else if (!string.IsNullOrEmpty(dto.LogoUrl))
+            {
+                // Fallback to URL from DTO if provided (e.g., admin wants to set a URL manually)
+                store.LogoUrl = dto.LogoUrl;
+            }
+            // If neither is provided, keep the existing logo
 
             await _context.SaveChangesAsync();
 
             return await MapToDto(store);
         }
 
+        // ============================================================
+        // SOFT DELETE STORE
+        // ============================================================
         public async Task DeleteStoreAsync(int storeId)
         {
             var store = await _context.Stores.FindAsync(storeId);
@@ -74,6 +94,9 @@ namespace Marketplace.Application.Services
             await _context.SaveChangesAsync();
         }
 
+        // ============================================================
+        // GET STORE BY ID
+        // ============================================================
         public async Task<StoreResponseDto> GetStoreByIdAsync(int storeId)
         {
             var store = await _context.Stores
@@ -86,6 +109,9 @@ namespace Marketplace.Application.Services
             return await MapToDto(store);
         }
 
+        // ============================================================
+        // GET ALL STORES (with optional active filter)
+        // ============================================================
         public async Task<PagedResult<StoreResponseDto>> GetAllStoresAsync(int page, int pageSize, bool? isActive = null)
         {
             var query = _context.Stores
@@ -117,6 +143,9 @@ namespace Marketplace.Application.Services
             };
         }
 
+        // ============================================================
+        // GET PRODUCTS OF A STORE (using the store's vendor)
+        // ============================================================
         public async Task<PagedResult<ProductDto>> GetStoreProductsAsync(int storeId, int page, int pageSize)
         {
             var store = await _context.Stores.FindAsync(storeId);
@@ -127,14 +156,19 @@ namespace Marketplace.Application.Services
             return await _productService.GetVendorProductsAsync(store.VendorId, page, pageSize);
         }
 
+        // ============================================================
+        // HELPER: Map Store entity to StoreResponseDto
+        // ============================================================
         private async Task<StoreResponseDto> MapToDto(Store store)
         {
-            var productCount = await _context.Products.CountAsync(p => p.VendorId == store.VendorId && p.IsActive);
+            var productCount = await _context.Products
+                .CountAsync(p => p.VendorId == store.VendorId && p.IsActive);
+
             return new StoreResponseDto
             {
                 Id = store.Id,
                 Name = store.Name,
-                LogoUrl = store.LogoUrl,
+                LogoUrl = store.LogoUrl, // ✅ Now includes the uploaded logo URL
                 Description = store.Description,
                 VendorId = store.VendorId,
                 VendorUsername = store.Vendor?.Username ?? "Unknown",

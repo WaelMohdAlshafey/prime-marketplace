@@ -1,11 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import api from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 
-// ✅ Define a proper User type (no `any`)
 interface User {
     id: number;
     username: string;
@@ -19,16 +18,15 @@ export default function CreateStorePage() {
     const [form, setForm] = useState({
         name: '',
         description: '',
-        logoUrl: '',
         vendorId: '',
     });
+    const [logoFile, setLogoFile] = useState<File | null>(null);
     const [vendors, setVendors] = useState<User[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [vendorsLoading, setVendorsLoading] = useState(true);
 
-    // ✅ Move fetchVendors BEFORE useEffect
-    const fetchVendors = async () => {
+    const fetchVendors = useCallback(async () => {
         try {
             const response = await api.get('/api/Users');
             const allUsers: User[] = response.data;
@@ -39,7 +37,7 @@ export default function CreateStorePage() {
         } finally {
             setVendorsLoading(false);
         }
-    };
+    }, []);
 
     useEffect(() => {
         if (isLoading) return;
@@ -51,13 +49,18 @@ export default function CreateStorePage() {
             router.push('/');
             return;
         }
-        // ✅ fetchVendors is now defined
         // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchVendors();
-    }, [user, isLoading, fetchVendors]); // ✅ add fetchVendors to deps
+    }, [user, isLoading, router, fetchVendors]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         setForm({ ...form, [e.target.name]: e.target.value });
+    };
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            setLogoFile(e.target.files[0]);
+        }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -72,11 +75,16 @@ export default function CreateStorePage() {
         }
 
         try {
-            await api.post('/api/Stores', {
-                name: form.name,
-                description: form.description,
-                logoUrl: form.logoUrl || null,
-                vendorId: parseInt(form.vendorId),
+            const formData = new FormData();
+            formData.append('name', form.name);
+            formData.append('description', form.description);
+            formData.append('vendorId', form.vendorId);
+            if (logoFile) {
+                formData.append('logo', logoFile);
+            }
+
+            await api.post('/api/Stores', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
             });
             router.push('/admin/stores');
         } catch (error) {
@@ -126,15 +134,14 @@ export default function CreateStorePage() {
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Logo URL</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Store Logo</label>
                     <input
-                        type="url"
-                        name="logoUrl"
-                        value={form.logoUrl}
-                        onChange={handleChange}
-                        placeholder="https://example.com/logo.png"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0F5C45] focus:border-transparent"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                        className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#0F5C45] file:text-white hover:file:bg-[#0A4735]"
                     />
+                    {logoFile && <p className="text-sm text-green-600 mt-1">📷 {logoFile.name} selected</p>}
                 </div>
 
                 <div>

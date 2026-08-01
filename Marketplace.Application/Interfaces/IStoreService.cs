@@ -5,8 +5,12 @@ namespace Marketplace.Application.Interfaces
 {
     public interface IStoreService
     {
-        Task<StoreResponseDto> CreateStoreAsync(StoreCreateDto dto);
-        Task<StoreResponseDto> UpdateStoreAsync(int storeId, StoreUpdateDto dto);
+        // ✅ Added optional logoUrl parameter
+        Task<StoreResponseDto> CreateStoreAsync(StoreCreateDto dto, string? logoUrl = null);
+
+        // ✅ Added optional logoUrl parameter
+        Task<StoreResponseDto> UpdateStoreAsync(int storeId, StoreUpdateDto dto, string? logoUrl = null);
+
         Task DeleteStoreAsync(int storeId);
         Task<StoreResponseDto> GetStoreByIdAsync(int storeId);
         Task<PagedResult<StoreResponseDto>> GetAllStoresAsync(int page, int pageSize, bool? isActive = null);

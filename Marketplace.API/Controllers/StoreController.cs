@@ -9,12 +9,12 @@ using Marketplace.Application.Interfaces;
 namespace Marketplace.API.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
-    public class StoresController : ControllerBase
+    [Route("api/stores")]
+    public class StoreController : ControllerBase
     {
         private readonly IStoreService _storeService;
 
-        public StoresController(IStoreService storeService)
+        public StoreController(IStoreService storeService)
         {
             _storeService = storeService;
         }
