@@ -21,6 +21,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         const fetchSettings = async () => {
             try {
                 const settings = await getStoreSettings();
+                console.log('📦 Template from API:', settings.template);
                 setTemplate((settings.template as Template) || 'standard');
             } catch (error) {
                 console.error('Failed to load theme:', error);

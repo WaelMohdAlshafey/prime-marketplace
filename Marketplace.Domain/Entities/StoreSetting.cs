@@ -12,5 +12,5 @@ public class StoreSetting
     public string EmailsJson { get; set; } = "[]";
     public string Landline { get; set; } = string.Empty;
     public string WhatsApp { get; set; } = string.Empty;
-    public string Template { get; set; } = "standard"; // <-- NEW
+    public string Template { get; set; } = "standard";   // ✅ ADD THIS
 }

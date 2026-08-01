@@ -26,14 +26,16 @@ public class StoreSettingService : IStoreSettingService
             // Return default settings if none exist in DB
             return new StoreSettingDto
             {
-                StoreName = "Prime",
-                Address = "123 Prime Street, Business District, Cairo, Egypt",
-                Location = "Downtown, near City Mall",
-                Owners = new List<OwnerDto> { new OwnerDto { Name = "Ahmed Mohamed" }, new OwnerDto { Name = "Sara Khaled" } },
-                MobileNumbers = new List<string> { "+20 100 123 4567", "+20 101 234 5678" },
-                Emails = new List<string> { "support@primemarket.com", "info@primemarket.com" },
-                Landline = "+20 2 345 6789",
-                WhatsApp = "+20 100 123 4567"
+                Id = settings.Id,
+                StoreName = settings.StoreName,
+                Address = settings.Address,
+                Location = settings.Location,
+                Owners = JsonSerializer.Deserialize<List<OwnerDto>>(settings.OwnersJson) ?? new List<OwnerDto>(),
+                MobileNumbers = JsonSerializer.Deserialize<List<string>>(settings.MobileNumbersJson) ?? new List<string>(),
+                Emails = JsonSerializer.Deserialize<List<string>>(settings.EmailsJson) ?? new List<string>(),
+                Landline = settings.Landline,
+                WhatsApp = settings.WhatsApp,
+                Template = settings.Template   // ✅ ADD THIS
             };
         }
 
@@ -72,7 +74,7 @@ public class StoreSettingService : IStoreSettingService
         settings.EmailsJson = JsonSerializer.Serialize(dto.Emails);
         settings.Landline = dto.Landline;
         settings.WhatsApp = dto.WhatsApp;
-
+        settings.Template = dto.Template;   // ✅ ADD THIS
         await _context.SaveChangesAsync();
 
         return dto;
