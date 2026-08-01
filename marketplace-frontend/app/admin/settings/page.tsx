@@ -175,6 +175,7 @@ export default function AdminSettings() {
                     >
                         <option value="standard">Standard</option>
                         <option value="simple">Simple</option>
+                        <option value="colored">Colored (Orange)</option>
                     </select>
                 </div>
 

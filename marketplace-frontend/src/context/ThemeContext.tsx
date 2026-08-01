@@ -2,8 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { getStoreSettings } from '@/lib/storeApi';
-
-export type Template = 'standard' | 'simple';
+export type Template = 'standard' | 'simple' | 'colored';
 
 interface ThemeContextType {
     template: Template;

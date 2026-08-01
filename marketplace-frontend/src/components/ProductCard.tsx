@@ -47,12 +47,15 @@ export default function ProductCard({ product }: ProductCardProps) {
     const discountPrice = product.discount ? product.price * (1 - product.discount / 100) : null;
 
     // ============================================================
-    // SIMPLE TEMPLATE – Minimal card
+    // SIMPLE & COLORED TEMPLATES – Minimal card (rating only for colored)
     // ============================================================
-    if (template === 'simple') {
+    if (template === 'simple' || template === 'colored') {
+        const showRating = template === 'colored' && product.rating;
+        const isColored = template === 'colored';
+
         return (
             <Link href={`/products/${product.id}`} className="block">
-                <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
+                <div className={`bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden ${isColored ? 'border border-[#FDE4C8]' : ''}`}>
                     <div className="aspect-square bg-gray-50 overflow-hidden">
                         <img
                             src={imgSrc}
@@ -63,7 +66,27 @@ export default function ProductCard({ product }: ProductCardProps) {
                     </div>
                     <div className="p-3">
                         <h3 className="text-sm font-medium text-gray-800 line-clamp-1">{product.name}</h3>
-                        <p className="text-lg font-bold text-[#0F5C45] mt-1">£{product.price.toFixed(2)}</p>
+                        {showRating && (
+                            <div className="flex items-center gap-1 mt-1">
+                                <div className="flex items-center">
+                                    {[...Array(5)].map((_, i) => (
+                                        <Star
+                                            key={i}
+                                            className={`w-3.5 h-3.5 ${i < Math.round(product.rating!)
+                                                    ? 'fill-[#F59E0B] text-[#F59E0B]'
+                                                    : 'text-gray-300 fill-gray-300'
+                                                }`}
+                                        />
+                                    ))}
+                                </div>
+                                <span className="text-xs font-medium text-gray-600 ml-1">
+                                    {product.rating?.toFixed(1)}
+                                </span>
+                            </div>
+                        )}
+                        <p className={`text-lg font-bold ${isColored ? 'text-[#D97706]' : 'text-[#0F5C45]'} mt-1`}>
+                            £{product.price.toFixed(2)}
+                        </p>
                     </div>
                 </div>
             </Link>
@@ -71,7 +94,7 @@ export default function ProductCard({ product }: ProductCardProps) {
     }
 
     // ============================================================
-    // STANDARD TEMPLATE (existing code)
+    // STANDARD TEMPLATE (full rich design)
     // ============================================================
     const isStorePage = pathname?.startsWith('/stores/');
     const primaryBadge = isStorePage
@@ -211,8 +234,8 @@ export default function ProductCard({ product }: ProductCardProps) {
                                         <Star
                                             key={i}
                                             className={`w-3.5 h-3.5 ${i < Math.round(product.rating!)
-                                                ? 'fill-[#D4A54A] text-[#D4A54A]'
-                                                : 'text-gray-300 fill-gray-300'
+                                                    ? 'fill-[#D4A54A] text-[#D4A54A]'
+                                                    : 'text-gray-300 fill-gray-300'
                                                 }`}
                                         />
                                     ))}
@@ -248,10 +271,10 @@ export default function ProductCard({ product }: ProductCardProps) {
                         onClick={handleAddToCart}
                         disabled={isAdding || product.stockQuantity === 0}
                         className={`w-full py-2.5 rounded-xl font-medium transition-all duration-300 flex items-center justify-center gap-2 ${product.stockQuantity === 0
-                            ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                            : isAdding
-                                ? 'bg-[#0F5C45]/70 text-white cursor-wait'
-                                : 'bg-gradient-to-r from-[#0F5C45] to-[#1A7A5C] text-white hover:shadow-lg hover:shadow-[#0F5C45]/20 hover:scale-105'
+                                ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                                : isAdding
+                                    ? 'bg-[#0F5C45]/70 text-white cursor-wait'
+                                    : 'bg-gradient-to-r from-[#0F5C45] to-[#1A7A5C] text-white hover:shadow-lg hover:shadow-[#0F5C45]/20 hover:scale-105'
                             }`}
                     >
                         <ShoppingBag className="w-4 h-4" />
