@@ -18,7 +18,7 @@ export default function AdminStores() {
         setLoading(true);
         try {
             const response = await api.get('/api/Stores?page=1&pageSize=50');
-            setStores(response.data.items);
+            setStores(response.data.items);   // ✅ Use .items
         } catch (error) {
             console.error('Failed to fetch stores:', error);
         } finally {
