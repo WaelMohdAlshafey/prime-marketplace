@@ -66,7 +66,7 @@ export default function CartPage() {
         }
     };
 
-    // ✅ Frontend validation before submitting
+    // 🔍 Frontend validation
     const validateForm = (): string | null => {
         if (!checkoutData.shippingAddress.trim()) {
             return 'Please enter a shipping address.';
@@ -95,7 +95,6 @@ export default function CartPage() {
                 }
                 break;
             case 'CashOnDelivery':
-                // No extra validation needed
                 break;
             default:
                 return 'Please select a valid payment method.';
@@ -113,9 +112,24 @@ export default function CartPage() {
             return;
         }
 
+        // 🔥 DEBUG: Show payload on mobile
+        alert(JSON.stringify(checkoutData, null, 2));
+
         setCheckoutLoading(true);
         try {
-            const response = await api.post('/api/Orders/checkout', checkoutData);
+            // ✅ Send ALL fields (even empty) to avoid "missing property" errors
+            const payload = {
+                shippingAddress: checkoutData.shippingAddress || '',
+                paymentMethod: checkoutData.paymentMethod || 'CashOnDelivery',
+                cardNumber: checkoutData.cardNumber || '',
+                cardExpiry: checkoutData.cardExpiry || '',
+                cardCvv: checkoutData.cardCvv || '',
+                phoneNumber: checkoutData.phoneNumber || '',
+                payPalEmail: checkoutData.payPalEmail || '',
+                deliveryInstructions: checkoutData.deliveryInstructions || '',
+            };
+
+            const response = await api.post('/api/Orders/checkout', payload);
             const order = response.data;
 
             let confirmationData = {};
