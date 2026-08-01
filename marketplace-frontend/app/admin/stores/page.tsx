@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import api from '@/lib/api';
@@ -14,8 +14,7 @@ export default function AdminStores() {
     const [stores, setStores] = useState<StoreResponseDto[]>([]);
     const [loading, setLoading] = useState(true);
 
-    // ✅ Move fetchStores BEFORE useEffect
-    const fetchStores = async () => {
+    const fetchStores = useCallback(async () => {
         setLoading(true);
         try {
             const response = await api.get('/api/Stores?page=1&pageSize=50');
@@ -25,7 +24,7 @@ export default function AdminStores() {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
     useEffect(() => {
         if (isLoading) return;
@@ -37,10 +36,8 @@ export default function AdminStores() {
             router.push('/');
             return;
         }
-        // ✅ fetchStores is now defined
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchStores();
-    }, [user, isLoading, fetchStores]); // ✅ add fetchStores to deps
+    }, [user, isLoading, router, fetchStores]);
 
     const handleDelete = async (id: number) => {
         if (!confirm('Delete this store?')) return;

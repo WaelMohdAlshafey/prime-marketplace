@@ -1,9 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import api from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
+
+interface Store {
+    id: number;
+    name: string;
+}
 
 export default function SuggestProductPage() {
     const { user, isLoading } = useAuth();
@@ -22,19 +27,30 @@ export default function SuggestProductPage() {
     const [image, setImage] = useState<File | null>(null);
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState('');
+    const [stores, setStores] = useState<Store[]>([]);
+    const [storesLoading, setStoresLoading] = useState(true);
 
-    if (isLoading) {
-        return (
-            <div className="flex justify-center items-center min-h-[60vh]">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0F5C45]"></div>
-            </div>
-        );
-    }
+    // Fetch stores from API
+    useEffect(() => {
+        const fetchStores = async () => {
+            try {
+                const response = await api.get('/api/Stores?page=1&pageSize=100');
+                setStores(response.data.items);
+            } catch (error) {
+                console.error('Failed to fetch stores:', error);
+            } finally {
+                setStoresLoading(false);
+            }
+        };
+        fetchStores();
+    }, []);
 
-    if (!user) {
-        router.push('/auth/login');
-        return null;
-    }
+    useEffect(() => {
+        if (isLoading) return;
+        if (!user) {
+            router.push('/auth/login');
+        }
+    }, [user, isLoading, router]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -93,6 +109,16 @@ export default function SuggestProductPage() {
         }
     };
 
+    if (isLoading || storesLoading) {
+        return (
+            <div className="flex justify-center items-center min-h-[60vh]">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0F5C45]"></div>
+            </div>
+        );
+    }
+
+    if (!user) return null;
+
     return (
         <div className="container mx-auto px-4 py-12 max-w-2xl">
             <h1 className="text-3xl font-bold text-gray-800 mb-2 text-right">Suggest a Product</h1>
@@ -102,13 +128,14 @@ export default function SuggestProductPage() {
 
             {message && (
                 <div className={`p-3 rounded-lg mb-4 text-center ${message.startsWith('✅') ? 'bg-green-50 text-green-700 border border-green-200' :
-                        'bg-red-50 text-red-700 border border-red-200'
+                    'bg-red-50 text-red-700 border border-red-200'
                     }`}>
                     {message}
                 </div>
             )}
 
             <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-md p-6 space-y-4 text-right">
+                {/* Product Name */}
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Product Name</label>
                     <input
@@ -121,6 +148,7 @@ export default function SuggestProductPage() {
                     />
                 </div>
 
+                {/* Description */}
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
                     <textarea
@@ -133,6 +161,7 @@ export default function SuggestProductPage() {
                     />
                 </div>
 
+                {/* Category */}
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
                     <select
@@ -153,23 +182,28 @@ export default function SuggestProductPage() {
                     </select>
                 </div>
 
+                {/* Vendor (Store) dropdown – now dynamic */}
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Suggested Vendor</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Suggested Vendor (Store)</label>
                     <select
                         name="vendorId"
                         value={form.vendorId}
                         onChange={handleChange}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0F5C45] focus:border-transparent"
                     >
-                        <option value="">- Select Vendor -</option>
-                        <option value="1">Software Store</option>
-                        <option value="2">Beauty Store</option>
-                        <option value="3">Fashion Store</option>
-                        <option value="4">Electronics Store</option>
-                        <option value="5">Home Store</option>
+                        <option value="">- Select Store -</option>
+                        {stores.map((store) => (
+                            <option key={store.id} value={store.id}>
+                                {store.name}
+                            </option>
+                        ))}
                     </select>
+                    {stores.length === 0 && (
+                        <p className="text-sm text-yellow-600 mt-1">No stores available yet. Please contact admin.</p>
+                    )}
                 </div>
 
+                {/* Price fields */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Suggested Price (£)</label>
@@ -197,6 +231,7 @@ export default function SuggestProductPage() {
                     </div>
                 </div>
 
+                {/* Stock */}
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Suggested Stock Quantity</label>
                     <input
@@ -209,6 +244,7 @@ export default function SuggestProductPage() {
                     />
                 </div>
 
+                {/* Image */}
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Product Image</label>
                     <input
@@ -220,6 +256,7 @@ export default function SuggestProductPage() {
                     {image && <p className="text-sm text-green-600 mt-1">Image selected: {image.name}</p>}
                 </div>
 
+                {/* Notes */}
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Reason for suggestion</label>
                     <textarea

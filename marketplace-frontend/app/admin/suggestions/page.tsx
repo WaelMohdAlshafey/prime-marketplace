@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import api from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
@@ -36,7 +36,8 @@ export default function AdminSuggestions() {
     const [showModal, setShowModal] = useState(false);
     const [adminNote, setAdminNote] = useState('');
 
-    const fetchSuggestions = async (status?: string) => {
+    // ✅ Wrap fetchSuggestions in useCallback to prevent infinite re-renders
+    const fetchSuggestions = useCallback(async (status?: string) => {
         setLoading(true);
         try {
             const url = status ? `/api/ProductSuggestions?status=${status}` : '/api/ProductSuggestions';
@@ -47,8 +48,9 @@ export default function AdminSuggestions() {
         } finally {
             setLoading(false);
         }
-    };
+    }, []); // No dependencies because it doesn't rely on props/state
 
+    // ✅ useEffect with proper dependencies
     useEffect(() => {
         if (isLoading) return;
         if (!user) {
@@ -59,16 +61,15 @@ export default function AdminSuggestions() {
             router.push('/');
             return;
         }
-        // ✅ Suppress ESLint warning – this is a standard data‑fetching pattern
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchSuggestions();
-    }, [user, isLoading, fetchSuggestions]);
+    }, [user, isLoading, router, fetchSuggestions]);
 
     const handleApprove = async (id: number) => {
         if (!confirm('Approve this suggestion? This will create the product.')) return;
         try {
             await api.put(`/api/ProductSuggestions/${id}/approve`, { adminNote: adminNote || 'Approved by Admin' });
             setAdminNote('');
+            // Refetch with current filter
             await fetchSuggestions(filter);
         } catch (error) {
             console.error('Approve failed:', error);
@@ -108,7 +109,11 @@ export default function AdminSuggestions() {
                 <div className="flex gap-2">
                     <select
                         value={filter}
-                        onChange={(e) => { setFilter(e.target.value); fetchSuggestions(e.target.value); }}
+                        onChange={(e) => {
+                            const newFilter = e.target.value;
+                            setFilter(newFilter);
+                            fetchSuggestions(newFilter);
+                        }}
                         className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0F5C45] focus:border-transparent"
                     >
                         <option value="">All</option>
