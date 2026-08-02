@@ -46,27 +46,34 @@ export default function ProductCard({ product }: ProductCardProps) {
     const isWishlist = isFavorite(product.id);
     const discountPrice = product.discount ? product.price * (1 - product.discount / 100) : null;
 
-    // ============================================================
-    // SIMPLE & COLORED TEMPLATES – Minimal card (rating only for colored)
-    // ============================================================
-    if (template === 'simple' || template === 'colored') {
-        const showRating = template === 'colored' && product.rating;
+    // ----- Image fallback handler -----
+    const handleImageError = () => {
+        setImgSrc('/images/placeholder.jpg');
+    };
+
+    // ----- SIMPLE / COLORED / BLUE templates (minimal card) -----
+    if (template === 'simple' || template === 'colored' || template === 'blue') {
+        const showRating = template !== 'simple' && product.rating; // show rating on colored/blue
         const isColored = template === 'colored';
+        const isBlue = template === 'blue';
+        const isSimple = template === 'simple';
+
+        const primaryColor = isColored ? '#D97706' : isBlue ? '#1D4ED8' : '#0F5C45';
 
         return (
             <Link href={`/products/${product.id}`} className="block">
-                <div className={`bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden ${isColored ? 'border border-[#FDE4C8]' : ''}`}>
+                <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
                     <div className="aspect-square bg-gray-50 overflow-hidden">
                         <img
                             src={imgSrc}
                             alt={product.name}
                             className="w-full h-full object-cover hover:scale-105 transition duration-500"
-                            onError={() => setImgSrc('/images/placeholder.jpg')}
+                            onError={handleImageError}
                         />
                     </div>
                     <div className="p-3">
                         <h3 className="text-sm font-medium text-gray-800 line-clamp-1">{product.name}</h3>
-                        {showRating && (
+                        {showRating && product.rating && (
                             <div className="flex items-center gap-1 mt-1">
                                 <div className="flex items-center">
                                     {[...Array(5)].map((_, i) => (
@@ -84,7 +91,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                                 </span>
                             </div>
                         )}
-                        <p className={`text-lg font-bold ${isColored ? 'text-[#D97706]' : 'text-[#0F5C45]'} mt-1`}>
+                        <p className={`text-lg font-bold mt-1`} style={{ color: primaryColor }}>
                             £{product.price.toFixed(2)}
                         </p>
                     </div>
@@ -139,10 +146,6 @@ export default function ProductCard({ product }: ProductCardProps) {
             await addToCart(product.id, 1);
             setIsAdding(false);
         }
-    };
-
-    const handleImageError = () => {
-        setImgSrc('/images/placeholder.jpg');
     };
 
     return (

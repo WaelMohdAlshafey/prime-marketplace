@@ -2,7 +2,8 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { getStoreSettings } from '@/lib/storeApi';
-export type Template = 'standard' | 'simple' | 'colored';
+
+export type Template = 'standard' | 'simple' | 'colored' | 'blue';
 
 interface ThemeContextType {
     template: Template;
@@ -30,10 +31,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         fetchSettings();
     }, []);
 
-    // ✅ ADD THIS: Apply the template to the <html> element
+    // Apply template to <html> element
     useEffect(() => {
         document.documentElement.setAttribute('data-theme', template);
-        console.log('🎨 Theme applied:', template); // debug
+        console.log('🎨 Theme applied:', template);
     }, [template]);
 
     return (

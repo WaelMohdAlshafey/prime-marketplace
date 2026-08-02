@@ -35,7 +35,7 @@ export default function AdminSettings() {
         try {
             await updateStoreSettings(settings);
             setMessage('✅ Settings updated successfully!');
-            window.location.reload();   // ✅ Reload to apply the new template
+            window.location.reload();
         } catch (error) {
             setMessage('❌ Failed to update settings. Please try again.');
             console.error(error);
@@ -165,7 +165,7 @@ export default function AdminSettings() {
                     />
                 </div>
 
-                {/* ✅ Template Selector – Simple text only */}
+                {/* ✅ Template Selector – 4 options */}
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Template</label>
                     <select
@@ -174,8 +174,9 @@ export default function AdminSettings() {
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                     >
                         <option value="standard">Standard</option>
-                        <option value="simple">Simple</option>
+                        <option value="simple">Simple (Gray)</option>
                         <option value="colored">Colored (Orange)</option>
+                        <option value="blue">Blue (Dark Blue)</option>
                     </select>
                 </div>
 
