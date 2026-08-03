@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import api from '@/lib/api';
 import { Product, PagedResult } from '@/types';
-import ProductCard from '@/components/ProductCard';
+import ProductCard from './ProductCard';
 import FilterSidebar from './Filters/FilterSidebar';
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import {
@@ -23,51 +23,64 @@ interface CategoryPageProps {
     category: string;
 }
 
+// Map frontend slugs to actual database category names
+const categoryNameMap: Record<string, string> = {
+    'software': 'Software',
+    'hair-care': 'Hair Care',
+    'skin-care': 'Skin Care',
+    'fashion': 'Fashion',
+    'accessories': 'Accessories',
+    'electronics': 'Electronics',
+    'supplements': 'Supplements',
+    'home': 'Home'
+};
+
+// Map to icons and colors
 const categoryMap: Record<string, { titleKey: string; icon: React.ReactNode; color: string; vendorId: number }> = {
     software: {
-        titleKey: 'categories.software',
+        titleKey: 'Software',
         icon: <Monitor className="w-16 h-16 text-indigo-600" strokeWidth={1.5} />,
         color: 'from-indigo-500 to-indigo-700',
         vendorId: 1
     },
     'hair-care': {
-        titleKey: 'categories.hairCare',
+        titleKey: 'Hair Care',
         icon: <Sparkles className="w-16 h-16 text-pink-600" strokeWidth={1.5} />,
         color: 'from-pink-500 to-pink-700',
         vendorId: 2
     },
     'skin-care': {
-        titleKey: 'categories.skinCare',
+        titleKey: 'Skin Care',
         icon: <Droplet className="w-16 h-16 text-amber-600" strokeWidth={1.5} />,
         color: 'from-amber-400 to-amber-600',
         vendorId: 2
     },
     fashion: {
-        titleKey: 'categories.fashion',
+        titleKey: 'Fashion',
         icon: <Shirt className="w-16 h-16 text-rose-600" strokeWidth={1.5} />,
         color: 'from-rose-400 to-rose-600',
         vendorId: 3
     },
     accessories: {
-        titleKey: 'categories.accessories',
+        titleKey: 'Accessories',
         icon: <Gem className="w-16 h-16 text-yellow-600" strokeWidth={1.5} />,
         color: 'from-yellow-400 to-yellow-600',
         vendorId: 3
     },
     electronics: {
-        titleKey: 'categories.electronics',
+        titleKey: 'Electronics',
         icon: <Smartphone className="w-16 h-16 text-blue-600" strokeWidth={1.5} />,
         color: 'from-blue-500 to-blue-700',
         vendorId: 4
     },
     supplements: {
-        titleKey: 'categories.supplements',
+        titleKey: 'Supplements',
         icon: <Pill className="w-16 h-16 text-green-600" strokeWidth={1.5} />,
         color: 'from-green-500 to-green-700',
         vendorId: 2
     },
     home: {
-        titleKey: 'categories.homeCategory',
+        titleKey: 'Home',
         icon: <Home className="w-16 h-16 text-gray-600" strokeWidth={1.5} />,
         color: 'from-gray-400 to-gray-600',
         vendorId: 5
@@ -81,6 +94,7 @@ export default function CategoryPage({ category }: CategoryPageProps) {
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
     const catInfo = categoryMap[category];
+    const dbCategory = categoryNameMap[category]; // actual category name in DB
 
     const [activeFilters, setActiveFilters] = useState<{
         minPrice?: number;
@@ -108,7 +122,8 @@ export default function CategoryPage({ category }: CategoryPageProps) {
                 url = `/api/Products/filter?${params.toString()}&page=1&pageSize=20`;
             }
             else {
-                url = `/api/Products/category/${category}?page=1&pageSize=20`;
+                // Use the mapped category name
+                url = `/api/Products/category/${encodeURIComponent(dbCategory || category)}?page=1&pageSize=20`;
             }
 
             const response = await api.get<PagedResult<Product>>(url);
@@ -121,13 +136,13 @@ export default function CategoryPage({ category }: CategoryPageProps) {
     };
 
     useEffect(() => {
-        if (!catInfo) {
+        if (!catInfo || !dbCategory) {
             router.push('/');
             return;
         }
         // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchProducts(undefined, {});
-    }, [category]);
+    }, [category, dbCategory, catInfo]);
 
     const handleApplyFilters = (filters: { minPrice?: number; maxPrice?: number; inStock?: boolean; rating?: number }) => {
         setActiveFilters(filters);
