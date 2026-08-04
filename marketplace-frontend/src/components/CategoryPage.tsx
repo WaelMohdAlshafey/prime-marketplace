@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import api from '@/lib/api';
@@ -23,11 +23,11 @@ interface CategoryPageProps {
     category: string;
 }
 
-// Map frontend slugs to actual database category names
+// ✅ Must match your database exactly (case‑sensitive)
 const categoryNameMap: Record<string, string> = {
     'software': 'Software',
-    'hair-care': 'Hair Care',
-    'skin-care': 'Skin Care',
+    'hair-care': 'Hair-Care',
+    'skin-care': 'Skin-Care',
     'fashion': 'Fashion',
     'accessories': 'Accessories',
     'electronics': 'Electronics',
@@ -35,7 +35,7 @@ const categoryNameMap: Record<string, string> = {
     'home': 'Home'
 };
 
-// Map to icons and colors
+// Icons & display (vendorId = 1 for ALAWEL)
 const categoryMap: Record<string, { titleKey: string; icon: React.ReactNode; color: string; vendorId: number }> = {
     software: {
         titleKey: 'Software',
@@ -47,43 +47,43 @@ const categoryMap: Record<string, { titleKey: string; icon: React.ReactNode; col
         titleKey: 'Hair Care',
         icon: <Sparkles className="w-16 h-16 text-pink-600" strokeWidth={1.5} />,
         color: 'from-pink-500 to-pink-700',
-        vendorId: 2
+        vendorId: 1
     },
     'skin-care': {
         titleKey: 'Skin Care',
         icon: <Droplet className="w-16 h-16 text-amber-600" strokeWidth={1.5} />,
         color: 'from-amber-400 to-amber-600',
-        vendorId: 2
+        vendorId: 1
     },
     fashion: {
         titleKey: 'Fashion',
         icon: <Shirt className="w-16 h-16 text-rose-600" strokeWidth={1.5} />,
         color: 'from-rose-400 to-rose-600',
-        vendorId: 3
+        vendorId: 1
     },
     accessories: {
         titleKey: 'Accessories',
         icon: <Gem className="w-16 h-16 text-yellow-600" strokeWidth={1.5} />,
         color: 'from-yellow-400 to-yellow-600',
-        vendorId: 3
+        vendorId: 1
     },
     electronics: {
         titleKey: 'Electronics',
         icon: <Smartphone className="w-16 h-16 text-blue-600" strokeWidth={1.5} />,
         color: 'from-blue-500 to-blue-700',
-        vendorId: 4
+        vendorId: 1
     },
     supplements: {
         titleKey: 'Supplements',
         icon: <Pill className="w-16 h-16 text-green-600" strokeWidth={1.5} />,
         color: 'from-green-500 to-green-700',
-        vendorId: 2
+        vendorId: 1
     },
     home: {
         titleKey: 'Home',
         icon: <Home className="w-16 h-16 text-gray-600" strokeWidth={1.5} />,
         color: 'from-gray-400 to-gray-600',
-        vendorId: 5
+        vendorId: 1
     },
 };
 
@@ -94,7 +94,7 @@ export default function CategoryPage({ category }: CategoryPageProps) {
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
     const catInfo = categoryMap[category];
-    const dbCategory = categoryNameMap[category]; // actual category name in DB
+    const dbCategory = categoryNameMap[category];
 
     const [activeFilters, setActiveFilters] = useState<{
         minPrice?: number;
@@ -103,7 +103,8 @@ export default function CategoryPage({ category }: CategoryPageProps) {
         rating?: number;
     }>({});
 
-    const fetchProducts = async (q?: string, filters?: typeof activeFilters) => {
+    // ✅ Memoized fetch function
+    const fetchProducts = useCallback(async (q?: string, filters?: typeof activeFilters) => {
         setLoading(true);
         try {
             const finalFilters = filters || activeFilters;
@@ -122,7 +123,6 @@ export default function CategoryPage({ category }: CategoryPageProps) {
                 url = `/api/Products/filter?${params.toString()}&page=1&pageSize=20`;
             }
             else {
-                // Use the mapped category name
                 url = `/api/Products/category/${encodeURIComponent(dbCategory || category)}?page=1&pageSize=20`;
             }
 
@@ -133,8 +133,9 @@ export default function CategoryPage({ category }: CategoryPageProps) {
         } finally {
             setLoading(false);
         }
-    };
+    }, [activeFilters, catInfo, dbCategory, category]);
 
+    // ✅ Effect loads data – ESLint warning suppressed because it's a deliberate side effect
     useEffect(() => {
         if (!catInfo || !dbCategory) {
             router.push('/');
@@ -142,7 +143,7 @@ export default function CategoryPage({ category }: CategoryPageProps) {
         }
         // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchProducts(undefined, {});
-    }, [category, dbCategory, catInfo]);
+    }, [fetchProducts, catInfo, dbCategory, router]);
 
     const handleApplyFilters = (filters: { minPrice?: number; maxPrice?: number; inStock?: boolean; rating?: number }) => {
         setActiveFilters(filters);
@@ -167,7 +168,6 @@ export default function CategoryPage({ category }: CategoryPageProps) {
 
     return (
         <div>
-            {/* Category Hero */}
             <section className="bg-gradient-to-r from-[#0F5C45]/10 to-[#0F5C45]/5 py-16">
                 <div className="container mx-auto px-4 text-center">
                     <div className="flex justify-center mb-4">
@@ -200,7 +200,6 @@ export default function CategoryPage({ category }: CategoryPageProps) {
                 </div>
             </section>
 
-            {/* Main Content */}
             <div className="container mx-auto px-4 py-8">
                 <div className="flex flex-col md:flex-row gap-8">
                     <div className="md:w-1/4">

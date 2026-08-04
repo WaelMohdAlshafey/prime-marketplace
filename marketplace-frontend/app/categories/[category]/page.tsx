@@ -1,11 +1,11 @@
 import CategoryPage from '@/components/CategoryPage';
 
-interface CategoryPageProps {
+interface PageProps {
     params: {
         category: string;
     };
 }
 
-export default function CategoryRoute({ params }: CategoryPageProps) {
+export default function CategoryRoute({ params }: PageProps) {
     return <CategoryPage category={params.category} />;
 }
