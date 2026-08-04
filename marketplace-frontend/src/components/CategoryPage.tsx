@@ -1,3 +1,4 @@
+// marketplace-frontend/components/CategoryPage.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -94,7 +95,7 @@ export default function CategoryPage({ category }: CategoryPageProps) {
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
     const catInfo = categoryMap[category];
-    const dbCategory = categoryNameMap[category]; // actual category name in DB
+    const dbCategory = categoryNameMap[category];
 
     const [activeFilters, setActiveFilters] = useState<{
         minPrice?: number;
@@ -110,7 +111,7 @@ export default function CategoryPage({ category }: CategoryPageProps) {
             let url = '';
 
             if (q) {
-                url = `/api/Products/search?q=${encodeURIComponent(q)}&page=1&pageSize=20`;
+                url = `/api/Products/search?q=${encodeURIComponent(q)}&page=1&pageSize=100`;
             }
             else if (finalFilters && Object.keys(finalFilters).length > 0) {
                 const params = new URLSearchParams();
@@ -119,11 +120,10 @@ export default function CategoryPage({ category }: CategoryPageProps) {
                 if (finalFilters.maxPrice !== undefined) params.append('maxPrice', finalFilters.maxPrice.toString());
                 if (finalFilters.inStock !== undefined) params.append('inStock', finalFilters.inStock.toString());
                 if (finalFilters.rating !== undefined) params.append('rating', finalFilters.rating.toString());
-                url = `/api/Products/filter?${params.toString()}&page=1&pageSize=20`;
+                url = `/api/Products/filter?${params.toString()}&page=1&pageSize=100`;
             }
             else {
-                // Use the mapped category name
-                url = `/api/Products/category/${encodeURIComponent(dbCategory || category)}?page=1&pageSize=20`;
+                url = `/api/Products/category/${encodeURIComponent(dbCategory || category)}?page=1&pageSize=100`;
             }
 
             const response = await api.get<PagedResult<Product>>(url);

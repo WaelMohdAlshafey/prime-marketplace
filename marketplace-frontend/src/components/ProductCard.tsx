@@ -1,3 +1,4 @@
+// marketplace-frontend/components/ProductCard.tsx
 'use client';
 
 import Link from 'next/link';
@@ -11,6 +12,8 @@ import { useWishlist } from '@/context/WishlistContext';
 import { useCart } from '@/context/CartContext';
 import { useCartIconRef } from '@/context/CartIconRefContext';
 import { useTheme } from '@/context/ThemeContext';
+import { getImageUrl } from '@/lib/getImageUrl';
+import { getProductImage } from '@/lib/productImages';
 
 interface ProductCardProps {
     product: {
@@ -32,7 +35,13 @@ export default function ProductCard({ product }: ProductCardProps) {
     const { template } = useTheme();
     const pathname = usePathname();
     const [isAdding, setIsAdding] = useState(false);
-    const [imgSrc, setImgSrc] = useState(product.imageUrl || '/images/placeholder.jpg');
+
+    // Use real image URL from backend, fallback to name-based image
+    const initialImage = product.imageUrl
+        ? getImageUrl(product.imageUrl)
+        : getProductImage(product.name);
+
+    const [imgSrc, setImgSrc] = useState(initialImage);
     const [fly, setFly] = useState(false);
     const [flyStart, setFlyStart] = useState({ x: 0, y: 0 });
     const [flyEnd, setFlyEnd] = useState({ x: 0, y: 0 });
@@ -46,18 +55,16 @@ export default function ProductCard({ product }: ProductCardProps) {
     const isWishlist = isFavorite(product.id);
     const discountPrice = product.discount ? product.price * (1 - product.discount / 100) : null;
 
-    // ----- Image fallback handler -----
     const handleImageError = () => {
+        // If real image fails, try fallback, then placeholder
         setImgSrc('/images/placeholder.jpg');
     };
 
-    // ----- SIMPLE / COLORED / BLUE templates (minimal card) -----
+    // SIMPLE / COLORED / BLUE templates
     if (template === 'simple' || template === 'colored' || template === 'blue') {
-        const showRating = template !== 'simple' && product.rating; // show rating on colored/blue
+        const showRating = template !== 'simple' && product.rating;
         const isColored = template === 'colored';
         const isBlue = template === 'blue';
-        const isSimple = template === 'simple';
-
         const primaryColor = isColored ? '#D97706' : isBlue ? '#1D4ED8' : '#0F5C45';
 
         return (
@@ -80,8 +87,8 @@ export default function ProductCard({ product }: ProductCardProps) {
                                         <Star
                                             key={i}
                                             className={`w-3.5 h-3.5 ${i < Math.round(product.rating!)
-                                                    ? 'fill-[#F59E0B] text-[#F59E0B]'
-                                                    : 'text-gray-300 fill-gray-300'
+                                                ? 'fill-[#F59E0B] text-[#F59E0B]'
+                                                : 'text-gray-300 fill-gray-300'
                                                 }`}
                                         />
                                     ))}
@@ -100,9 +107,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         );
     }
 
-    // ============================================================
-    // STANDARD TEMPLATE (full rich design)
-    // ============================================================
+    // STANDARD TEMPLATE
     const isStorePage = pathname?.startsWith('/stores/');
     const primaryBadge = isStorePage
         ? product.category || 'Category'
@@ -173,7 +178,6 @@ export default function ProductCard({ product }: ProductCardProps) {
                             onError={handleImageError}
                         />
 
-                        {/* Discount Badge */}
                         {product.discount && product.discount > 0 && (
                             <motion.span
                                 initial={{ x: 20, opacity: 0 }}
@@ -184,7 +188,6 @@ export default function ProductCard({ product }: ProductCardProps) {
                             </motion.span>
                         )}
 
-                        {/* Wishlist Button */}
                         <motion.button
                             whileHover={{ scale: 1.2, rotate: 10 }}
                             whileTap={{ scale: 0.8 }}
@@ -201,7 +204,6 @@ export default function ProductCard({ product }: ProductCardProps) {
                             />
                         </motion.button>
 
-                        {/* Primary Badge */}
                         <div className="absolute bottom-3 left-3 right-3">
                             <span className="inline-block bg-white/90 backdrop-blur-sm text-[#0F5C45] text-xs font-medium px-3 py-1 rounded-full shadow-md border border-white/20">
                                 {primaryBadge}
@@ -209,7 +211,6 @@ export default function ProductCard({ product }: ProductCardProps) {
                         </div>
                     </div>
 
-                    {/* Content */}
                     <div className="p-4 text-right">
                         <h3 className="font-semibold text-gray-800 text-base line-clamp-1">
                             {product.name}
@@ -229,7 +230,6 @@ export default function ProductCard({ product }: ProductCardProps) {
                             </Link>
                         )}
 
-                        {/* Rating */}
                         {product.rating && (
                             <div className="flex items-center justify-end gap-1 mt-2">
                                 <div className="flex items-center gap-0.5">
@@ -237,8 +237,8 @@ export default function ProductCard({ product }: ProductCardProps) {
                                         <Star
                                             key={i}
                                             className={`w-3.5 h-3.5 ${i < Math.round(product.rating!)
-                                                    ? 'fill-[#D4A54A] text-[#D4A54A]'
-                                                    : 'text-gray-300 fill-gray-300'
+                                                ? 'fill-[#D4A54A] text-[#D4A54A]'
+                                                : 'text-gray-300 fill-gray-300'
                                                 }`}
                                         />
                                     ))}
@@ -252,7 +252,6 @@ export default function ProductCard({ product }: ProductCardProps) {
                             </div>
                         )}
 
-                        {/* Price */}
                         <div className="mt-3 flex items-center justify-end gap-2">
                             <span className="text-xl font-bold text-[#0F5C45]">
                                 £{(discountPrice || product.price).toFixed(2)}
@@ -266,7 +265,6 @@ export default function ProductCard({ product }: ProductCardProps) {
                     </div>
                 </Link>
 
-                {/* Add to Cart */}
                 <div className="px-4 pb-4">
                     <motion.button
                         whileHover={{ scale: 1.02 }}
@@ -274,10 +272,10 @@ export default function ProductCard({ product }: ProductCardProps) {
                         onClick={handleAddToCart}
                         disabled={isAdding || product.stockQuantity === 0}
                         className={`w-full py-2.5 rounded-xl font-medium transition-all duration-300 flex items-center justify-center gap-2 ${product.stockQuantity === 0
-                                ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                                : isAdding
-                                    ? 'bg-[#0F5C45]/70 text-white cursor-wait'
-                                    : 'bg-gradient-to-r from-[#0F5C45] to-[#1A7A5C] text-white hover:shadow-lg hover:shadow-[#0F5C45]/20 hover:scale-105'
+                            ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                            : isAdding
+                                ? 'bg-[#0F5C45]/70 text-white cursor-wait'
+                                : 'bg-gradient-to-r from-[#0F5C45] to-[#1A7A5C] text-white hover:shadow-lg hover:shadow-[#0F5C45]/20 hover:scale-105'
                             }`}
                     >
                         <ShoppingBag className="w-4 h-4" />

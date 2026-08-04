@@ -1,10 +1,12 @@
-﻿'use client';
+﻿// marketplace-frontend/app/stores/page.tsx
+'use client';
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import api from '@/lib/api';
 import { StoreResponseDto } from '@/types';
+import { getImageUrl } from '@/lib/getImageUrl';
 
 export default function StoresPage() {
     const [stores, setStores] = useState<StoreResponseDto[]>([]);
@@ -47,7 +49,12 @@ export default function StoresPage() {
                         >
                             <div className="relative w-24 h-24 mx-auto rounded-full overflow-hidden bg-gray-100 border-2 border-[#0F5C45]/20 group-hover:border-[#0F5C45] transition">
                                 {store.logoUrl ? (
-                                    <Image src={store.logoUrl} alt={store.name} fill className="object-cover" />
+                                    <Image
+                                        src={getImageUrl(store.logoUrl)}
+                                        alt={store.name}
+                                        fill
+                                        className="object-cover"
+                                    />
                                 ) : (
                                     <div className="w-full h-full flex items-center justify-center text-4xl bg-[#0F5C45]/10">🏪</div>
                                 )}

@@ -1,3 +1,4 @@
+// marketplace-frontend/app/stores/[id]/page.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -6,6 +7,7 @@ import Image from 'next/image';
 import api from '@/lib/api';
 import ProductCard from '@/components/ProductCard';
 import { StoreResponseDto, Product } from '@/types';
+import { getImageUrl } from '@/lib/getImageUrl';
 
 export default function StoreDetailPage() {
     const { id } = useParams();
@@ -19,7 +21,7 @@ export default function StoreDetailPage() {
             try {
                 const storeRes = await api.get(`/api/Stores/${id}`);
                 setStore(storeRes.data);
-                const productsRes = await api.get(`/api/Stores/${id}/products?page=1&pageSize=50`);
+                const productsRes = await api.get(`/api/Stores/${id}/products?page=1&pageSize=100`);
                 setProducts(productsRes.data.items);
             } catch (err) {
                 console.error('Failed to fetch store:', err);
@@ -48,7 +50,12 @@ export default function StoreDetailPage() {
             <div className="bg-white rounded-2xl shadow-soft p-8 mb-8 text-center">
                 <div className="relative w-32 h-32 mx-auto rounded-full overflow-hidden border-4 border-[#0F5C45]/20">
                     {store.logoUrl ? (
-                        <Image src={store.logoUrl} alt={store.name} fill className="object-cover" />
+                        <Image
+                            src={getImageUrl(store.logoUrl)}
+                            alt={store.name}
+                            fill
+                            className="object-cover"
+                        />
                     ) : (
                         <div className="w-full h-full flex items-center justify-center text-5xl bg-[#0F5C45]/10">🏪</div>
                     )}
