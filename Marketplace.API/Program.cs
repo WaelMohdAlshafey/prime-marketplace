@@ -70,7 +70,7 @@ builder.Services.AddScoped<IStoreSettingService, StoreSettingService>();
 builder.Services.AddScoped<IWishlistService, WishlistService>();
 builder.Services.AddScoped<IChatService, ChatService>();
 builder.Services.AddScoped<IProductSuggestionService, ProductSuggestionService>();
-builder.Services.AddScoped<IStoreService, StoreService>(); // ✅ ADDED
+builder.Services.AddScoped<IStoreService, StoreService>();
 
 // ============================================================
 // 6. Database Context (SQLite locally, PostgreSQL on Render)
@@ -157,10 +157,7 @@ app.UseCors("AllowAll");
 // ============================================================
 app.UseAuthentication();
 app.UseAuthorization();
-/ ============================================================
-// 14. Map StaticFiles
-// ============================================================
-app.UseStaticFiles(); // This must be BEFORE app.MapControllers()
+
 // ============================================================
 // 14. Map Controllers
 // ============================================================
