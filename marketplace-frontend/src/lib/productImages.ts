@@ -1,5 +1,3 @@
-// marketplace-frontend/lib/productImages.ts
-
 export const getProductImage = (name: string): string => {
     const lower = name.toLowerCase();
 

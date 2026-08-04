@@ -1,5 +1,3 @@
-// marketplace-frontend/lib/getImageUrl.ts
-
 const BACKEND_BASE_URL = 'https://prime-marketplace-8hut.onrender.com';
 
 export const getImageUrl = (path?: string): string => {
@@ -11,5 +9,7 @@ export const getImageUrl = (path?: string): string => {
         return path;
     }
 
-    return `${BACKEND_BASE_URL}${path.startsWith('/') ? path : `/${path}`}`;
+    // Remove any leading/trailing slashes to avoid double slashes
+    const cleanPath = path.startsWith('/') ? path : `/${path}`;
+    return `${BACKEND_BASE_URL}${cleanPath}`;
 };

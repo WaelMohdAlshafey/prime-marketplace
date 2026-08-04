@@ -1,4 +1,3 @@
-// marketplace-frontend/components/ProductCard.tsx
 'use client';
 
 import Link from 'next/link';
@@ -36,12 +35,15 @@ export default function ProductCard({ product }: ProductCardProps) {
     const pathname = usePathname();
     const [isAdding, setIsAdding] = useState(false);
 
-    // Use real image URL from backend, fallback to name-based image
-    const initialImage = product.imageUrl
-        ? getImageUrl(product.imageUrl)
-        : getProductImage(product.name);
+    // TRY: Backend image -> Fallback name-based image -> Placeholder
+    const getFinalImage = (): string => {
+        if (product.imageUrl) {
+            return getImageUrl(product.imageUrl);
+        }
+        return getProductImage(product.name);
+    };
 
-    const [imgSrc, setImgSrc] = useState(initialImage);
+    const [imgSrc, setImgSrc] = useState(getFinalImage());
     const [fly, setFly] = useState(false);
     const [flyStart, setFlyStart] = useState({ x: 0, y: 0 });
     const [flyEnd, setFlyEnd] = useState({ x: 0, y: 0 });
@@ -56,7 +58,7 @@ export default function ProductCard({ product }: ProductCardProps) {
     const discountPrice = product.discount ? product.price * (1 - product.discount / 100) : null;
 
     const handleImageError = () => {
-        // If real image fails, try fallback, then placeholder
+        // Final fallback: placeholder
         setImgSrc('/images/placeholder.jpg');
     };
 
@@ -166,7 +168,6 @@ export default function ProductCard({ product }: ProductCardProps) {
                 className="group relative bg-white/80 backdrop-blur-sm rounded-2xl shadow-soft hover:shadow-strong transition-all duration-500 overflow-hidden border border-gray-100/50 hover:border-[#0F5C45]/20"
             >
                 <Link href={`/products/${product.id}`} className="block">
-                    {/* Image */}
                     <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100">
                         <Image
                             src={imgSrc}

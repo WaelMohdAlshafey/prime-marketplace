@@ -1,4 +1,3 @@
-// marketplace-frontend/app/[category]/page.tsx
 import CategoryPage from '@/components/CategoryPage';
 
 export default function CategoryRoute({ params }: { params: { category: string } }) {
