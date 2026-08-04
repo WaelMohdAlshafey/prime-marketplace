@@ -1,22 +1,24 @@
-﻿@import "tailwindcss";
-
-@theme {
-    --color-primary: #0F5C45;
-    --color-primary-light: #1A7A5C;
-    --color-primary-dark: #0A4735;
-    --color-primary-glow: rgba(15, 92, 69, 0.15);
-    --color-accent: #D4A54A;
-    --color-accent-light: #E8C97A;
-    --color-accent-glow: rgba(212, 165, 74, 0.2);
-    --color-background: #F7F8FA;
-    --color-surface: #FFFFFF;
-    --shadow-soft: 0 8px 32px rgba(15, 92, 69, 0.08);
-    --shadow-medium: 0 12px 48px rgba(15, 92, 69, 0.12);
-    --shadow-strong: 0 20px 60px rgba(15, 92, 69, 0.18);
-    --shadow-glow: 0 0 40px rgba(15, 92, 69, 0.06);
-}
+﻿@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 @layer base {
+    :root {
+        --color-primary: #0F5C45;
+        --color-primary-light: #1A7A5C;
+        --color-primary-dark: #0A4735;
+        --color-primary-glow: rgba(15, 92, 69, 0.15);
+        --color-accent: #D4A54A;
+        --color-accent-light: #E8C97A;
+        --color-accent-glow: rgba(212, 165, 74, 0.2);
+        --color-background: #F7F8FA;
+        --color-surface: #FFFFFF;
+        --shadow-soft: 0 8px 32px rgba(15, 92, 69, 0.08);
+        --shadow-medium: 0 12px 48px rgba(15, 92, 69, 0.12);
+        --shadow-strong: 0 20px 60px rgba(15, 92, 69, 0.18);
+        --shadow-glow: 0 0 40px rgba(15, 92, 69, 0.06);
+    }
+
     body {
         background-color: var(--color-background);
         color: #1A1A2E;
@@ -194,7 +196,6 @@
         }
     }
 
-    /* === Responsive helpers === */
     @media (max-width: 640px) {
         input, select, textarea, button {
             font-size: 16px !important;
@@ -221,11 +222,7 @@
     }
 }
 
-/* ============================================================
-   TEMPLATE OVERRIDES
-   ============================================================ */
-
-/* --- Simple (Gray) --- */
+/* Template overrides (keep the same) */
 [data-theme="simple"] {
     background-color: #E5E7EB;
 }
@@ -281,7 +278,6 @@
         animation: none !important;
     }
 
-/* --- Colored (Dark Orange) --- */
 [data-theme="colored"] {
     background-color: #F97316;
 }
@@ -337,7 +333,6 @@
         animation: none !important;
     }
 
-/* --- Blue (Dark Blue) --- */
 [data-theme="blue"] {
     background-color: #1E3A8A;
 }
@@ -393,9 +388,6 @@
         animation: none !important;
     }
 
-    /* ============================================================
-   NAVBAR – dim text/icons, brighten on hover (public only)
-   ============================================================ */
     [data-theme="simple"] .navbar-link,
     [data-theme="colored"] .navbar-link,
     [data-theme="blue"] .navbar-link {
