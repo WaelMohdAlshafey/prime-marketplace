@@ -4,6 +4,19 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import api from '@/lib/api';
 
+// Map category slugs to translation keys (already in common.json)
+// This is just a fallback in case the translation key is missing.
+const getCategoryDisplayName = (slug: string, t: (key: string) => string): string => {
+    // Try to get translation from common.json
+    const translationKey = `categories.${slug}`;
+    const translated = t(translationKey);
+    // If translation returns the key itself (not found), fallback to slug
+    if (translated === translationKey) {
+        return slug.replace(/-/g, ' ');
+    }
+    return translated;
+};
+
 export default function CategoryGrid() {
     const { t } = useTranslation('common');
     const [categories, setCategories] = useState<string[]>([]);
@@ -25,7 +38,6 @@ export default function CategoryGrid() {
 
     const handleCategoryClick = (category: string) => {
         console.log(`🔗 Navigating to /${category}`);
-        // Force full page navigation – guaranteed to work
         window.location.href = `/${category}`;
     };
 
@@ -59,10 +71,11 @@ export default function CategoryGrid() {
                         className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition p-5 text-center hover:-translate-y-1 duration-300 border border-gray-50 cursor-pointer w-full"
                     >
                         <div className="text-4xl mb-2">
-                            {cat.replace(/-/g, ' ')}
+                            {/* ✅ Use translation for the category name */}
+                            {getCategoryDisplayName(cat, t)}
                         </div>
                         <h3 className="font-semibold text-gray-800 text-sm">
-                            {cat.replace(/-/g, ' ')}
+                            {getCategoryDisplayName(cat, t)}
                         </h3>
                     </button>
                 ))}

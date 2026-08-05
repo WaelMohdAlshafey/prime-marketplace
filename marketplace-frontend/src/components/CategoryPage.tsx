@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import api from '@/lib/api';
 import { Product, PagedResult } from '@/types';
@@ -12,7 +13,7 @@ import {
 } from 'lucide-react';
 
 // ============================================================
-// Category mapping – KEYS ARE LOWERCASE
+// Category mapping – SLUG → DATABASE NAME (case-sensitive)
 // ============================================================
 const categoryNameMap: Record<string, string> = {
     software: 'Software',
@@ -25,34 +26,75 @@ const categoryNameMap: Record<string, string> = {
     home: 'Home',
 };
 
-const categoryMap: Record<string, { titleKey: string; icon: React.ReactNode; color: string; vendorId: number }> = {
-    software: { titleKey: 'Software', icon: <Monitor className="w-16 h-16" />, color: 'from-indigo-500 to-indigo-700', vendorId: 1 },
-    'hair-care': { titleKey: 'Hair Care', icon: <Sparkles className="w-16 h-16" />, color: 'from-pink-500 to-pink-700', vendorId: 2 },
-    'skin-care': { titleKey: 'Skin Care', icon: <Droplet className="w-16 h-16" />, color: 'from-amber-400 to-amber-600', vendorId: 2 },
-    fashion: { titleKey: 'Fashion', icon: <Shirt className="w-16 h-16" />, color: 'from-rose-400 to-rose-600', vendorId: 3 },
-    accessories: { titleKey: 'Accessories', icon: <Gem className="w-16 h-16" />, color: 'from-yellow-400 to-yellow-600', vendorId: 3 },
-    electronics: { titleKey: 'Electronics', icon: <Smartphone className="w-16 h-16" />, color: 'from-blue-500 to-blue-700', vendorId: 4 },
-    supplements: { titleKey: 'Supplements', icon: <Pill className="w-16 h-16" />, color: 'from-green-500 to-green-700', vendorId: 2 },
-    home: { titleKey: 'Home', icon: <Home className="w-16 h-16" />, color: 'from-gray-400 to-gray-600', vendorId: 5 },
+// Map for icons and colors (used for hero section)
+const categoryMap: Record<string, { icon: React.ReactNode; color: string; vendorId: number }> = {
+    software: {
+        icon: <Monitor className="w-16 h-16" />,
+        color: 'from-indigo-500 to-indigo-700',
+        vendorId: 1,
+    },
+    'hair-care': {
+        icon: <Sparkles className="w-16 h-16" />,
+        color: 'from-pink-500 to-pink-700',
+        vendorId: 2,
+    },
+    'skin-care': {
+        icon: <Droplet className="w-16 h-16" />,
+        color: 'from-amber-400 to-amber-600',
+        vendorId: 2,
+    },
+    fashion: {
+        icon: <Shirt className="w-16 h-16" />,
+        color: 'from-rose-400 to-rose-600',
+        vendorId: 3,
+    },
+    accessories: {
+        icon: <Gem className="w-16 h-16" />,
+        color: 'from-yellow-400 to-yellow-600',
+        vendorId: 3,
+    },
+    electronics: {
+        icon: <Smartphone className="w-16 h-16" />,
+        color: 'from-blue-500 to-blue-700',
+        vendorId: 4,
+    },
+    supplements: {
+        icon: <Pill className="w-16 h-16" />,
+        color: 'from-green-500 to-green-700',
+        vendorId: 2,
+    },
+    home: {
+        icon: <Home className="w-16 h-16" />,
+        color: 'from-gray-400 to-gray-600',
+        vendorId: 5,
+    },
+};
+
+// Helper to get the display name from translation keys
+const getCategoryDisplayName = (slug: string, t: (key: string) => string): string => {
+    const key = `categories.${slug}`;
+    const translated = t(key);
+    // If translation returns the key itself, fallback to slug formatted
+    if (translated === key) {
+        return slug.replace(/-/g, ' ');
+    }
+    return translated;
 };
 
 export default function CategoryPage({ category }: { category: string }) {
     const { t } = useTranslation('common');
+    const router = useRouter();
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [search, setSearch] = useState('');
     const [filters, setFilters] = useState<{ minPrice?: number; maxPrice?: number; inStock?: boolean; rating?: number }>({});
 
-    // 🔥 FIX: Normalize category to lowercase for mapping
+    // Normalize category to lowercase for mapping
     const normalizedCategory = category.toLowerCase();
     const catInfo = categoryMap[normalizedCategory];
     const dbCategory = categoryNameMap[normalizedCategory];
-
-    console.log('📦 CategoryPage received:', category);
-    console.log('📦 Normalized:', normalizedCategory);
-    console.log('📦 catInfo:', catInfo);
-    console.log('📦 dbCategory:', dbCategory);
+    const displayName = getCategoryDisplayName(normalizedCategory, t);
 
     const fetchProducts = async (q?: string, filterOverrides?: typeof filters) => {
         setLoading(true);
@@ -72,6 +114,7 @@ export default function CategoryPage({ category }: { category: string }) {
                 if (finalFilters.rating !== undefined) params.append('rating', finalFilters.rating.toString());
                 url = `/api/Products/filter?${params.toString()}&page=1&pageSize=100`;
             } else {
+                // Use the mapped database name, or fallback to normalized slug
                 const categoryName = dbCategory || normalizedCategory;
                 url = `/api/Products/category/${encodeURIComponent(categoryName)}?page=1&pageSize=100`;
             }
@@ -114,7 +157,7 @@ export default function CategoryPage({ category }: { category: string }) {
         fetchProducts();
     };
 
-    // If category not supported, show friendly message – NO REDIRECT
+    // If category not supported, show a friendly message
     if (!catInfo) {
         return (
             <div className="container mx-auto px-4 py-20 text-center">
@@ -138,22 +181,25 @@ export default function CategoryPage({ category }: { category: string }) {
                     <div className={`p-4 rounded-2xl bg-gradient-to-br ${catInfo.color} text-white shadow-lg inline-block mb-4`}>
                         {catInfo.icon}
                     </div>
-                    <h1 className="text-5xl font-bold text-gray-900">{catInfo.titleKey}</h1>
+                    <h1 className="text-5xl font-bold text-gray-900">{displayName}</h1>
                     <p className="text-gray-600 mt-4 text-lg">
-                        {t('categories.discover', { category: catInfo.titleKey })}
+                        {t('categories.discover', { category: displayName })}
                     </p>
                     <form onSubmit={handleSearch} className="max-w-2xl mx-auto mt-6 flex gap-2">
                         <div className="relative flex-1">
                             <MagnifyingGlassIcon className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                             <input
                                 type="text"
-                                placeholder={t('categories.searchPlaceholder', { category: catInfo.titleKey })}
+                                placeholder={t('categories.searchPlaceholder', { category: displayName })}
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                                 className="w-full pr-10 pl-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#0F5C45] text-right"
                             />
                         </div>
-                        <button type="submit" className="px-8 py-3 bg-[#0F5C45] text-white rounded-xl font-medium hover:bg-[#0A4735] transition">
+                        <button
+                            type="submit"
+                            className="px-8 py-3 bg-[#0F5C45] text-white rounded-xl font-medium hover:bg-[#0A4735] transition"
+                        >
                             {t('search')}
                         </button>
                     </form>
