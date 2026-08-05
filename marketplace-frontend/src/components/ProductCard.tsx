@@ -35,15 +35,12 @@ export default function ProductCard({ product }: ProductCardProps) {
     const pathname = usePathname();
     const [isAdding, setIsAdding] = useState(false);
 
-    // TRY: Backend image -> Fallback name-based image -> Placeholder
-    const getFinalImage = (): string => {
-        if (product.imageUrl) {
-            return getImageUrl(product.imageUrl);
-        }
-        return getProductImage(product.name);
-    };
+    // Use real image URL from backend, fallback to name-based image
+    const initialImage = product.imageUrl
+        ? getImageUrl(product.imageUrl)
+        : getProductImage(product.name);
 
-    const [imgSrc, setImgSrc] = useState(getFinalImage());
+    const [imgSrc, setImgSrc] = useState(initialImage);
     const [fly, setFly] = useState(false);
     const [flyStart, setFlyStart] = useState({ x: 0, y: 0 });
     const [flyEnd, setFlyEnd] = useState({ x: 0, y: 0 });
@@ -58,11 +55,11 @@ export default function ProductCard({ product }: ProductCardProps) {
     const discountPrice = product.discount ? product.price * (1 - product.discount / 100) : null;
 
     const handleImageError = () => {
-        // Final fallback: placeholder
+        // If real image fails, try fallback, then placeholder
         setImgSrc('/images/placeholder.jpg');
     };
 
-    // SIMPLE / COLORED / BLUE templates
+    // ----- SIMPLE / COLORED / BLUE templates (minimal card) -----
     if (template === 'simple' || template === 'colored' || template === 'blue') {
         const showRating = template !== 'simple' && product.rating;
         const isColored = template === 'colored';
@@ -109,7 +106,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         );
     }
 
-    // STANDARD TEMPLATE
+    // ----- STANDARD TEMPLATE (full design) -----
     const isStorePage = pathname?.startsWith('/stores/');
     const primaryBadge = isStorePage
         ? product.category || 'Category'
@@ -155,6 +152,15 @@ export default function ProductCard({ product }: ProductCardProps) {
         }
     };
 
+    // ----- Category navigation (no nested <a>) -----
+    const handleCategoryClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (product.category) {
+            // Force full page navigation for reliability
+            window.location.href = `/${product.category}`;
+        }
+    };
+
     return (
         <>
             <motion.div
@@ -168,6 +174,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                 className="group relative bg-white/80 backdrop-blur-sm rounded-2xl shadow-soft hover:shadow-strong transition-all duration-500 overflow-hidden border border-gray-100/50 hover:border-[#0F5C45]/20"
             >
                 <Link href={`/products/${product.id}`} className="block">
+                    {/* Image */}
                     <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100">
                         <Image
                             src={imgSrc}
@@ -212,6 +219,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                         </div>
                     </div>
 
+                    {/* Content */}
                     <div className="p-4 text-right">
                         <h3 className="font-semibold text-gray-800 text-base line-clamp-1">
                             {product.name}
@@ -221,16 +229,17 @@ export default function ProductCard({ product }: ProductCardProps) {
                             {product.description}
                         </p>
 
+                        {/* Category badge – using span with onClick to prevent nested <a> */}
                         {product.category && (
-                            <Link
-                                href={`/${product.category}`}
-                                className="inline-block mt-1 text-xs text-[#0F5C45] hover:underline bg-[#0F5C45]/5 px-2 py-0.5 rounded-full transition"
-                                onClick={(e) => e.stopPropagation()}
+                            <span
+                                className="inline-block mt-1 text-xs text-[#0F5C45] hover:underline bg-[#0F5C45]/5 px-2 py-0.5 rounded-full transition cursor-pointer"
+                                onClick={handleCategoryClick}
                             >
                                 {product.category}
-                            </Link>
+                            </span>
                         )}
 
+                        {/* Rating */}
                         {product.rating && (
                             <div className="flex items-center justify-end gap-1 mt-2">
                                 <div className="flex items-center gap-0.5">
@@ -253,6 +262,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                             </div>
                         )}
 
+                        {/* Price */}
                         <div className="mt-3 flex items-center justify-end gap-2">
                             <span className="text-xl font-bold text-[#0F5C45]">
                                 £{(discountPrice || product.price).toFixed(2)}
@@ -266,6 +276,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                     </div>
                 </Link>
 
+                {/* Add to Cart button */}
                 <div className="px-4 pb-4">
                     <motion.button
                         whileHover={{ scale: 1.02 }}
@@ -289,6 +300,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                 </div>
             </motion.div>
 
+            {/* Fly animation */}
             <AnimatePresence>
                 {fly && (
                     <motion.div
