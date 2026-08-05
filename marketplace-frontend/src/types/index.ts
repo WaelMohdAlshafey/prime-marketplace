@@ -1,4 +1,4 @@
-﻿// M:\Marketplace\marketplace-frontend\types\index.ts
+﻿// M:\Marketplace\marketplace-frontend\src\types\index.ts
 
 // ============================================================
 // PRODUCT TYPES
@@ -17,6 +17,11 @@ export interface Product {
     discount?: number;
     isActive: boolean;
     category?: string;
+    // Bilingual fields (optional, may be set by API)
+    nameAr?: string;
+    nameEn?: string;
+    descriptionAr?: string;
+    descriptionEn?: string;
 }
 
 export interface PagedResult<T> {
@@ -98,7 +103,7 @@ export interface RegisterRequest {
 }
 
 // ============================================================
-// STORE SETTINGS TYPES
+// STORE SETTINGS TYPES (with full theming)
 // ============================================================
 export interface Owner {
     name: string;
@@ -114,7 +119,68 @@ export interface StoreSettings {
     emails: string[];
     landline: string;
     whatsapp: string;
-    template: string;   // ✅ ADDED
+    template: string;
+
+    // ============================================================
+    // THEME COLORS
+    // ============================================================
+    primaryColor?: string;
+    primaryLight?: string;
+    primaryDark?: string;
+    secondaryColor?: string;
+    secondaryLight?: string;
+    backgroundColor?: string;
+    surfaceColor?: string;
+    textColor?: string;
+    textMuted?: string;
+
+    // ============================================================
+    // NAVBAR & FOOTER
+    // ============================================================
+    navbarBg?: string;
+    navbarText?: string;
+    navbarHover?: string;
+    footerBg?: string;
+    footerText?: string;
+
+    // ============================================================
+    // BUTTONS
+    // ============================================================
+    buttonPrimaryBg?: string;
+    buttonPrimaryHover?: string;
+    buttonPrimaryText?: string;
+    buttonSecondaryBg?: string;
+    buttonSecondaryHover?: string;
+    buttonSecondaryText?: string;
+
+    // ============================================================
+    // CARDS
+    // ============================================================
+    cardBg?: string;
+    cardBorder?: string;
+    cardShadow?: string;
+    cardHoverShadow?: string;
+    cardBorderRadius?: string;
+
+    // ============================================================
+    // FONTS & TYPOGRAPHY
+    // ============================================================
+    fontFamily?: string;
+    headingFont?: string;
+    bodyFont?: string;
+
+    // ============================================================
+    // EMOJIS / SITE ICON
+    // ============================================================
+    siteEmoji?: string;
+    faviconEmoji?: string;
+
+    // ============================================================
+    // ADVANCED
+    // ============================================================
+    customCss?: string;
+    customHeaderHtml?: string;
+    customFooterHtml?: string;
 }
 
 // ============================================================

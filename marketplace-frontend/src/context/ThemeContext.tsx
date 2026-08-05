@@ -2,26 +2,93 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { getStoreSettings } from '@/lib/storeApi';
+import { StoreSettings } from '@/types';
 
 export type Template = 'standard' | 'simple' | 'colored' | 'blue';
 
 interface ThemeContextType {
     template: Template;
     setTemplate: (template: Template) => void;
+    settings: StoreSettings | null;
     isLoading: boolean;
+    applyTheme: (settings: StoreSettings) => void;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
     const [template, setTemplate] = useState<Template>('standard');
+    const [settings, setSettings] = useState<StoreSettings | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+
+    // Apply theme to document root
+    const applyTheme = (themeSettings: StoreSettings) => {
+        const root = document.documentElement;
+
+        // Set data attribute for template
+        root.setAttribute('data-theme', themeSettings.template || 'standard');
+
+        // Apply all CSS variables
+        const cssVars: Record<string, string | undefined> = {
+            '--color-primary': themeSettings.primaryColor,
+            '--color-primary-light': themeSettings.primaryLight,
+            '--color-primary-dark': themeSettings.primaryDark,
+            '--color-secondary': themeSettings.secondaryColor,
+            '--color-secondary-light': themeSettings.secondaryLight,
+            '--color-background': themeSettings.backgroundColor,
+            '--color-surface': themeSettings.surfaceColor,
+            '--color-text': themeSettings.textColor,
+            '--color-text-muted': themeSettings.textMuted,
+            '--color-navbar-bg': themeSettings.navbarBg,
+            '--color-navbar-text': themeSettings.navbarText,
+            '--color-navbar-hover': themeSettings.navbarHover,
+            '--color-footer-bg': themeSettings.footerBg,
+            '--color-footer-text': themeSettings.footerText,
+            '--color-button-primary-bg': themeSettings.buttonPrimaryBg,
+            '--color-button-primary-hover': themeSettings.buttonPrimaryHover,
+            '--color-button-primary-text': themeSettings.buttonPrimaryText,
+            '--color-button-secondary-bg': themeSettings.buttonSecondaryBg,
+            '--color-button-secondary-hover': themeSettings.buttonSecondaryHover,
+            '--color-button-secondary-text': themeSettings.buttonSecondaryText,
+            '--color-card-bg': themeSettings.cardBg,
+            '--color-card-border': themeSettings.cardBorder,
+            '--shadow-card': themeSettings.cardShadow,
+            '--shadow-card-hover': themeSettings.cardHoverShadow,
+            '--radius-card': themeSettings.cardBorderRadius,
+            '--font-family': themeSettings.fontFamily,
+            '--font-heading': themeSettings.headingFont,
+            '--font-body': themeSettings.bodyFont,
+            '--emoji-site': themeSettings.siteEmoji,
+            '--emoji-favicon': themeSettings.faviconEmoji,
+        };
+
+        Object.entries(cssVars).forEach(([key, value]) => {
+            if (value) {
+                root.style.setProperty(key, value);
+            }
+        });
+
+        // Apply custom CSS if provided
+        const customStyleId = 'custom-theme-css';
+        let customStyle = document.getElementById(customStyleId) as HTMLStyleElement;
+        if (!customStyle) {
+            customStyle = document.createElement('style');
+            customStyle.id = customStyleId;
+            document.head.appendChild(customStyle);
+        }
+        customStyle.textContent = themeSettings.customCss || '';
+
+        // Apply custom header/footer HTML via meta tags or other methods
+        // (implementation depends on where you want to inject them)
+    };
 
     useEffect(() => {
         const fetchSettings = async () => {
             try {
-                const settings = await getStoreSettings();
-                setTemplate((settings.template as Template) || 'standard');
+                const data = await getStoreSettings();
+                setSettings(data);
+                setTemplate((data.template as Template) || 'standard');
+                applyTheme(data);
             } catch (error) {
                 console.error('Failed to load theme:', error);
             } finally {
@@ -31,14 +98,15 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         fetchSettings();
     }, []);
 
-    // Apply template to <html> element
+    // Re-apply when template or settings change
     useEffect(() => {
-        document.documentElement.setAttribute('data-theme', template);
-        console.log('🎨 Theme applied:', template);
-    }, [template]);
+        if (settings) {
+            applyTheme(settings);
+        }
+    }, [template, settings]);
 
     return (
-        <ThemeContext.Provider value={{ template, setTemplate, isLoading }}>
+        <ThemeContext.Provider value={{ template, setTemplate, settings, isLoading, applyTheme }}>
             {children}
         </ThemeContext.Provider>
     );

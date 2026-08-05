@@ -3,29 +3,54 @@
 @tailwind utilities;
 
 @layer base {
+    /* ============================================================
+     CSS VARIABLES – Set defaults, overridden by ThemeContext
+     ============================================================ */
     :root {
+        /* Colors – will be overridden by ThemeContext */
         --color-primary: #0F5C45;
         --color-primary-light: #1A7A5C;
         --color-primary-dark: #0A4735;
-        --color-primary-glow: rgba(15, 92, 69, 0.15);
-        --color-accent: #D4A54A;
-        --color-accent-light: #E8C97A;
-        --color-accent-glow: rgba(212, 165, 74, 0.2);
+        --color-secondary: #D4A54A;
+        --color-secondary-light: #E8C97A;
         --color-background: #F7F8FA;
         --color-surface: #FFFFFF;
-        --shadow-soft: 0 8px 32px rgba(15, 92, 69, 0.08);
-        --shadow-medium: 0 12px 48px rgba(15, 92, 69, 0.12);
-        --shadow-strong: 0 20px 60px rgba(15, 92, 69, 0.18);
-        --shadow-glow: 0 0 40px rgba(15, 92, 69, 0.06);
+        --color-text: #1A1A2E;
+        --color-text-muted: #6B7280;
+        /* Navbar & Footer */
+        --color-navbar-bg: #0F5C45;
+        --color-navbar-text: #FFFFFF;
+        --color-navbar-hover: #D4A54A;
+        --color-footer-bg: #111827;
+        --color-footer-text: #9CA3AF;
+        /* Buttons */
+        --color-button-primary-bg: #0F5C45;
+        --color-button-primary-hover: #0A4735;
+        --color-button-primary-text: #FFFFFF;
+        --color-button-secondary-bg: transparent;
+        --color-button-secondary-hover: #0F5C45;
+        --color-button-secondary-text: #0F5C45;
+        /* Cards */
+        --color-card-bg: #FFFFFF;
+        --color-card-border: #E5E7EB;
+        --shadow-card: 0 8px 32px rgba(15, 92, 69, 0.08);
+        --shadow-card-hover: 0 20px 60px rgba(15, 92, 69, 0.18);
+        --radius-card: 16px;
+        /* Fonts */
+        --font-family: 'Cairo', 'Inter', sans-serif;
+        --font-heading: 'Cairo', sans-serif;
+        --font-body: 'Cairo', sans-serif;
+        /* Emojis */
+        --emoji-site: '🛍️';
+        --emoji-favicon: '🏪';
     }
 
     body {
         background-color: var(--color-background);
-        color: #1A1A2E;
-        font-family: 'Cairo', 'Inter', sans-serif;
+        color: var(--color-text);
+        font-family: var(--font-family);
         -webkit-font-smoothing: antialiased;
         direction: rtl;
-        background-image: radial-gradient(ellipse at 10% 20%, rgba(15, 92, 69, 0.03) 0%, transparent 50%), radial-gradient(ellipse at 90% 80%, rgba(212, 165, 74, 0.03) 0%, transparent 50%);
     }
 
     ::-webkit-scrollbar {
@@ -54,29 +79,29 @@
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
         border: 1px solid rgba(255, 255, 255, 0.3);
-        border-radius: 24px;
-        box-shadow: var(--shadow-soft);
+        border-radius: var(--radius-card);
+        box-shadow: var(--shadow-card);
         transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
         .glass-card:hover {
             transform: translateY(-6px) scale(1.01);
-            box-shadow: var(--shadow-strong);
+            box-shadow: var(--shadow-card-hover);
             border-color: rgba(15, 92, 69, 0.15);
             background: rgba(255, 255, 255, 0.85);
         }
 
     .btn-primary {
-        background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
-        color: white;
+        background: var(--color-button-primary-bg);
+        color: var(--color-button-primary-text);
         font-weight: 600;
         padding: 0.75rem 2rem;
-        border-radius: 16px;
-        box-shadow: 0 4px 20px var(--color-primary-glow);
+        border-radius: var(--radius-card);
+        box-shadow: 0 4px 20px rgba(15, 92, 69, 0.15);
         transition: all 0.3s ease;
         border: none;
         cursor: pointer;
-        font-family: 'Cairo', sans-serif;
+        font-family: var(--font-family);
         position: relative;
         overflow: hidden;
     }
@@ -92,7 +117,8 @@
 
         .btn-primary:hover {
             transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 8px 30px var(--color-primary-glow);
+            background: var(--color-button-primary-hover);
+            box-shadow: 0 8px 30px rgba(15, 92, 69, 0.2);
         }
 
             .btn-primary:hover::before {
@@ -104,15 +130,15 @@
         }
 
     .btn-secondary {
-        background: transparent;
-        color: var(--color-primary);
+        background: var(--color-button-secondary-bg);
+        color: var(--color-button-secondary-text);
         font-weight: 600;
         padding: 0.75rem 2rem;
-        border-radius: 16px;
+        border-radius: var(--radius-card);
         border: 2px solid var(--color-primary);
         transition: all 0.3s ease;
         cursor: pointer;
-        font-family: 'Cairo', sans-serif;
+        font-family: var(--font-family);
         position: relative;
         overflow: hidden;
     }
@@ -121,7 +147,7 @@
             content: '';
             position: absolute;
             inset: 0;
-            background: var(--color-primary);
+            background: var(--color-button-secondary-hover);
             transform: scaleX(0);
             transform-origin: right;
             transition: transform 0.3s ease;
@@ -129,7 +155,7 @@
         }
 
         .btn-secondary:hover {
-            color: white;
+            color: #FFFFFF;
             border-color: var(--color-primary);
         }
 
@@ -138,18 +164,17 @@
             }
 
     .badge-premium {
-        background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-light) 100%);
+        background: linear-gradient(135deg, var(--color-secondary) 0%, var(--color-secondary-light) 100%);
         color: #1A1A2E;
         font-weight: 700;
         padding: 0.25rem 0.75rem;
         border-radius: 20px;
         font-size: 0.7rem;
         letter-spacing: 0.5px;
-        box-shadow: 0 2px 12px var(--color-accent-glow);
     }
 
     .bg-animated-gradient {
-        background: linear-gradient(-45deg, var(--color-primary), var(--color-primary-light), var(--color-accent), var(--color-primary));
+        background: linear-gradient(-45deg, var(--color-primary), var(--color-primary-light), var(--color-secondary), var(--color-primary));
         background-size: 400% 400%;
         animation: gradientMove 8s ease infinite;
     }
@@ -188,11 +213,11 @@
 
     @keyframes pulseGlow {
         0%, 100% {
-            box-shadow: 0 0 20px var(--color-primary-glow);
+            box-shadow: 0 0 20px rgba(15, 92, 69, 0.15);
         }
 
         50% {
-            box-shadow: 0 0 40px var(--color-primary-glow), 0 0 60px var(--color-accent-glow);
+            box-shadow: 0 0 40px rgba(15, 92, 69, 0.15), 0 0 60px rgba(212, 165, 74, 0.15);
         }
     }
 
@@ -220,36 +245,50 @@
         min-height: 44px;
         touch-action: manipulation;
     }
+
+    /* ============================================================
+     CARDS – using CSS variables
+     ============================================================ */
+    .card {
+        background: var(--color-card-bg);
+        border: 1px solid var(--color-card-border);
+        border-radius: var(--radius-card);
+        box-shadow: var(--shadow-card);
+        transition: all 0.3s ease;
+    }
+
+        .card:hover {
+            box-shadow: var(--shadow-card-hover);
+            transform: translateY(-4px);
+        }
 }
 
 /* ============================================================
-   TEMPLATE OVERRIDES (Adjusted colors)
+   TEMPLATE OVERRIDES – Minimal, just for template-specific tweaks
    ============================================================ */
 
-/* --- Simple (Gray) – now slightly darker --- */
+/* Simple (Gray) */
 [data-theme="simple"] {
-    background-color: #D1D5DB; /* was #E5E7EB */
+    background-color: #D8D8D8;
 }
 
     [data-theme="simple"] .min-h-screen {
-        background-color: #D1D5DB;
+        background-color: #D8D8D8;
     }
 
     [data-theme="simple"] .bg-\[#F8F9FA\] {
-        background-color: #D1D5DB;
+        background-color: #D8D8D8;
     }
 
     [data-theme="simple"] .card,
     [data-theme="simple"] .rounded-xl,
     [data-theme="simple"] .rounded-2xl {
         background: white;
-        border: 1px solid #9CA3AF; /* was #D1D5DB */
-        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        border: 1px solid #A0A0A0;
     }
 
     [data-theme="simple"] .btn-primary {
         background: #6B7280 !important;
-        box-shadow: none !important;
     }
 
         [data-theme="simple"] .btn-primary:hover {
@@ -270,7 +309,7 @@
 
     [data-theme="simple"] body {
         background-image: none !important;
-        background-color: #D1D5DB !important;
+        background-color: #D8D8D8 !important;
     }
 
     [data-theme="simple"] .bg-animated-gradient {
@@ -290,30 +329,30 @@
             color: white !important;
         }
 
-/* --- Colored (Orange) – slightly brighter --- */
+/* Colored (Orange) */
 [data-theme="colored"] {
-    background-color: #FF8C00; /* was #F97316 */
+    background-color: #FF9A00;
 }
 
     [data-theme="colored"] .min-h-screen {
-        background-color: #FF8C00;
+        background-color: #FF9A00;
     }
 
     [data-theme="colored"] .bg-\[#F8F9FA\] {
-        background-color: #FF8C00;
+        background-color: #FF9A00;
     }
 
     [data-theme="colored"] .card,
     [data-theme="colored"] .rounded-xl,
     [data-theme="colored"] .rounded-2xl {
         background: white;
-        border: 1px solid #E67E22; /* was #EA580C */
-        box-shadow: 0 4px 12px rgba(255, 140, 0, 0.25);
+        border: 1px solid #E67E22;
+        box-shadow: 0 4px 12px rgba(255, 154, 0, 0.25);
     }
 
     [data-theme="colored"] .btn-primary {
-        background: #E67E22 !important; /* was #EA580C */
-        box-shadow: 0 4px 20px rgba(255, 140, 0, 0.35) !important;
+        background: #E67E22 !important;
+        box-shadow: 0 4px 20px rgba(255, 154, 0, 0.35) !important;
     }
 
         [data-theme="colored"] .btn-primary:hover {
@@ -334,7 +373,7 @@
 
     [data-theme="colored"] body {
         background-image: none !important;
-        background-color: #FF8C00 !important;
+        background-color: #FF9A00 !important;
     }
 
     [data-theme="colored"] .bg-animated-gradient {
@@ -354,9 +393,9 @@
             color: white !important;
         }
 
-/* --- Blue (Dark Blue) – slightly brighter --- */
+/* Blue */
 [data-theme="blue"] {
-    background-color: #2563EB; /* was #1E3A8A */
+    background-color: #2563EB;
 }
 
     [data-theme="blue"] .min-h-screen {
