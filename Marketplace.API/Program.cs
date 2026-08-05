@@ -177,7 +177,9 @@ using (var scope = app.Services.CreateScope())
     catch (Exception ex)
     {
         Console.WriteLine($"❌ Database migration error: {ex.Message}");
-        throw;
+        Console.WriteLine($"Stack trace: {ex.StackTrace}");
+        // Don't throw - allow app to start even if migration fails
+        // This helps with read-only databases or permission issues
     }
 }
 
