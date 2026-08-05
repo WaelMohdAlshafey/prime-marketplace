@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -121,9 +121,7 @@ export default function AdminSettings() {
 
             <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-md p-6">
 
-                {/* ============================================================
-                    TAB 1: BASIC INFO
-                    ============================================================ */}
+                {/* TAB 1: BASIC INFO */}
                 {activeTab === 'basic' && (
                     <div className="space-y-4">
                         <div>
@@ -225,13 +223,10 @@ export default function AdminSettings() {
                     </div>
                 )}
 
-                {/* ============================================================
-                    TAB 2: THEME CUSTOMIZATION
-                    ============================================================ */}
+                {/* TAB 2: THEME */}
                 {activeTab === 'theme' && (
                     <div className="space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {/* Colors */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">اللون الأساسي</label>
                                 <div className="flex gap-2">
@@ -427,9 +422,7 @@ export default function AdminSettings() {
                     </div>
                 )}
 
-                {/* ============================================================
-                    TAB 3: ADVANCED
-                    ============================================================ */}
+                {/* TAB 3: ADVANCED */}
                 {activeTab === 'advanced' && (
                     <div className="space-y-4">
                         <div>
@@ -480,4 +473,5 @@ export default function AdminSettings() {
             </form>
         </div>
     );
+
 }
