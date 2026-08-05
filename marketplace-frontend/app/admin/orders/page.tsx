@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import api from '@/lib/api';
 import { Order } from '@/types';
-import { Eye, CheckCircle, Clock, Send, ArrowLeftCircle } from 'lucide-react';
+import { Eye, CheckCircle, Clock, Send, ArrowLeftCircle, ShoppingBag } from 'lucide-react';
 
 interface ApiError {
     response?: {
@@ -50,7 +50,6 @@ export default function AdminOrders() {
     };
 
     useEffect(() => {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchOrders();
     }, []);
 
@@ -158,9 +157,14 @@ export default function AdminOrders() {
     return (
         <div>
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 md:mb-8 gap-3">
-                <div>
-                    <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Orders</h1>
-                    <p className="text-gray-500 mt-1 text-sm">Manage all orders</p>
+                <div className="flex items-center gap-3">
+                    <div className="p-2 bg-[#0F5C45]/10 rounded-xl">
+                        <ShoppingBag className="w-7 h-7 text-[#0F5C45]" />
+                    </div>
+                    <div>
+                        <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Orders</h1>
+                        <p className="text-gray-500 mt-1 text-sm">Manage all orders</p>
+                    </div>
                 </div>
                 <span className="text-sm text-gray-500">{orders.length} orders</span>
             </div>

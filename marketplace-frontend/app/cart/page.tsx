@@ -1,16 +1,16 @@
-﻿// M:\Marketplace\marketplace-frontend\app\cart\page.tsx
-
-'use client';
+﻿'use client';
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import api from '@/lib/api';
 import { Cart } from '@/types';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
-import { ThemeProvider } from '@/context/ThemeContext';
-import { TrashIcon } from '@heroicons/react/24/outline';
+import { ShoppingBag, TrashIcon, ArrowLeft, Package } from 'lucide-react';
 import { MARKETPLACE } from '@/constants/marketplace';
+
+const CURRENCY = '£';
 
 interface CheckoutError {
     response?: {
@@ -59,7 +59,6 @@ export default function CartPage() {
             router.push('/auth/login');
             return;
         }
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchCart();
     }, [user, isLoading]);
 
@@ -117,9 +116,6 @@ export default function CartPage() {
             return;
         }
 
-        // Debug: show payload on mobile
-        // alert('📦 Checkout Payload:\n' + JSON.stringify(checkoutData, null, 2));
-
         setCheckoutLoading(true);
         try {
             const payload = {
@@ -153,8 +149,6 @@ export default function CartPage() {
                 default:
                     throw new Error('Unknown payment method');
             }
-
-            // alert('✅ Confirmation Payload:\n' + JSON.stringify(confirmationData, null, 2));
 
             await api.post(`/api/Orders/${order.id}/confirm-payment`, confirmationData);
 
@@ -323,21 +317,28 @@ export default function CartPage() {
     if (!cart || cart.items.length === 0) {
         return (
             <div className="container mx-auto px-4 py-20 text-center">
-                <div className="text-6xl mb-4">🛒</div>
+                <div className="p-6 bg-gray-50 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-4">
+                    <ShoppingBag className="w-12 h-12 text-gray-300" />
+                </div>
                 <h2 className="text-2xl font-bold text-gray-800">Your cart is empty</h2>
                 <p className="text-gray-500 mt-2">Start shopping to add items to your cart</p>
-                <a href="/" className="btn-primary inline-block mt-6">Browse Products</a>
+                <Link href="/" className="inline-block mt-6 bg-[#0F5C45] text-white px-6 py-3 rounded-xl hover:bg-[#0A4735] transition">
+                    Browse Products
+                </Link>
             </div>
         );
     }
 
-    // ============================================================
-    // CONDITIONAL RENDER: Simple vs Standard
-    // ============================================================
+    // Simple Template
     if (template === 'simple') {
         return (
             <div className="container mx-auto px-4 py-12 max-w-3xl bg-white min-h-screen">
-                <h1 className="text-2xl font-bold text-gray-800 mb-6">🛍️ Your Cart</h1>
+                <div className="flex items-center gap-3 mb-6">
+                    <div className="p-2 bg-[#0F5C45]/10 rounded-xl">
+                        <ShoppingBag className="w-6 h-6 text-[#0F5C45]" />
+                    </div>
+                    <h1 className="text-2xl font-bold text-gray-800">Your Cart</h1>
+                </div>
 
                 <div className="bg-white shadow-sm rounded-xl p-4">
                     {cart.items.map((item) => (
@@ -347,7 +348,7 @@ export default function CartPage() {
                                 <p className="text-sm text-gray-500">× {item.quantity}</p>
                             </div>
                             <div className="flex items-center gap-4">
-                                <p className="font-bold text-gray-800">£{item.subtotal.toFixed(2)}</p>
+                                <p className="font-bold text-gray-800">{CURRENCY}{item.subtotal.toFixed(2)}</p>
                                 <button
                                     onClick={() => removeFromCart(item.id)}
                                     className="text-red-400 hover:text-red-600 transition"
@@ -360,11 +361,10 @@ export default function CartPage() {
 
                     <div className="flex justify-between pt-4 border-t border-gray-200 font-bold text-lg">
                         <span>Total</span>
-                        <span>£{cart.totalAmount.toFixed(2)}</span>
+                        <span>{CURRENCY}{cart.totalAmount.toFixed(2)}</span>
                     </div>
                 </div>
 
-                {/* Checkout Form – Simple Template */}
                 <form onSubmit={handleCheckout} className="mt-8 bg-white shadow-sm rounded-xl p-6">
                     <h2 className="text-lg font-bold text-gray-800 mb-4">Checkout</h2>
 
@@ -416,12 +416,15 @@ export default function CartPage() {
         );
     }
 
-    // ============================================================
-    // STANDARD TEMPLATE (existing layout)
-    // ============================================================
+    // STANDARD TEMPLATE
     return (
         <div className="container mx-auto px-4 py-12 max-w-4xl">
-            <h1 className="text-3xl font-bold text-gray-800 mb-8">🛍️ Your Cart</h1>
+            <div className="flex items-center gap-3 mb-8">
+                <div className="p-2 bg-[#0F5C45]/10 rounded-xl">
+                    <ShoppingBag className="w-7 h-7 text-[#0F5C45]" />
+                </div>
+                <h1 className="text-3xl font-bold text-gray-800">Your Cart</h1>
+            </div>
 
             <div className="bg-white rounded-xl shadow-md overflow-hidden">
                 <div className="divide-y divide-gray-200">
@@ -430,8 +433,8 @@ export default function CartPage() {
                             <div>
                                 <h3 className="font-semibold text-gray-800">{item.productName}</h3>
                                 <p className="text-gray-500 text-sm">
-                                    £{item.unitPrice.toFixed(2)} × {item.quantity} =
-                                    <span className="font-semibold text-gray-700 ml-1">£{item.subtotal.toFixed(2)}</span>
+                                    {CURRENCY}{item.unitPrice.toFixed(2)} × {item.quantity} =
+                                    <span className="font-semibold text-gray-700 ml-1">{CURRENCY}{item.subtotal.toFixed(2)}</span>
                                 </p>
                             </div>
                             <button
@@ -447,7 +450,7 @@ export default function CartPage() {
                 <div className="bg-gray-50 p-4 border-t border-gray-200 flex justify-between items-center">
                     <div>
                         <p className="text-sm text-gray-500">{cart.totalItems} items</p>
-                        <p className="text-2xl font-bold text-gray-800">£{cart.totalAmount.toFixed(2)}</p>
+                        <p className="text-2xl font-bold text-gray-800">{CURRENCY}{cart.totalAmount.toFixed(2)}</p>
                     </div>
                 </div>
             </div>

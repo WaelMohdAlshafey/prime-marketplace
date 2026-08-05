@@ -6,6 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import { getStoreSettings, updateStoreSettings } from '@/lib/storeApi';
 import { StoreSettings, Owner } from '@/types';
 import { useTheme } from '@/context/ThemeContext';
+import { Settings, Building, Palette, Code, Save } from 'lucide-react';
 
 export default function AdminSettings() {
     const { user, isLoading } = useAuth();
@@ -89,7 +90,12 @@ export default function AdminSettings() {
 
     return (
         <div className="container mx-auto px-4 py-12 max-w-5xl">
-            <h1 className="text-3xl font-bold text-gray-800 mb-8">⚙️ إعدادات الموقع</h1>
+            <div className="flex items-center gap-3 mb-8">
+                <div className="p-2 bg-[#0F5C45]/10 rounded-xl">
+                    <Settings className="w-7 h-7 text-[#0F5C45]" />
+                </div>
+                <h1 className="text-3xl font-bold text-gray-800">إعدادات الموقع</h1>
+            </div>
 
             {message && (
                 <div className={`p-3 rounded-lg mb-4 ${message.startsWith('✅') ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
@@ -101,21 +107,24 @@ export default function AdminSettings() {
             <div className="flex gap-2 mb-6 border-b border-gray-200 pb-2">
                 <button
                     onClick={() => setActiveTab('basic')}
-                    className={`px-4 py-2 rounded-lg transition ${activeTab === 'basic' ? 'bg-[#0F5C45] text-white' : 'text-gray-600 hover:bg-gray-100'}`}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg transition ${activeTab === 'basic' ? 'bg-[#0F5C45] text-white' : 'text-gray-600 hover:bg-gray-100'}`}
                 >
-                    📋 معلومات أساسية
+                    <Building className="w-4 h-4" />
+                    معلومات أساسية
                 </button>
                 <button
                     onClick={() => setActiveTab('theme')}
-                    className={`px-4 py-2 rounded-lg transition ${activeTab === 'theme' ? 'bg-[#0F5C45] text-white' : 'text-gray-600 hover:bg-gray-100'}`}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg transition ${activeTab === 'theme' ? 'bg-[#0F5C45] text-white' : 'text-gray-600 hover:bg-gray-100'}`}
                 >
-                    🎨 تخصيص المظهر
+                    <Palette className="w-4 h-4" />
+                    تخصيص المظهر
                 </button>
                 <button
                     onClick={() => setActiveTab('advanced')}
-                    className={`px-4 py-2 rounded-lg transition ${activeTab === 'advanced' ? 'bg-[#0F5C45] text-white' : 'text-gray-600 hover:bg-gray-100'}`}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg transition ${activeTab === 'advanced' ? 'bg-[#0F5C45] text-white' : 'text-gray-600 hover:bg-gray-100'}`}
                 >
-                    ⚡ متقدم
+                    <Code className="w-4 h-4" />
+                    متقدم
                 </button>
             </div>
 
@@ -466,12 +475,12 @@ export default function AdminSettings() {
                 <button
                     type="submit"
                     disabled={saving}
-                    className="w-full mt-6 py-3 bg-[#0F5C45] text-white font-semibold rounded-lg hover:bg-[#0A4735] transition disabled:opacity-50"
+                    className="w-full mt-6 py-3 bg-[#0F5C45] text-white font-semibold rounded-lg hover:bg-[#0A4735] transition disabled:opacity-50 flex items-center justify-center gap-2"
                 >
-                    {saving ? 'جاري الحفظ...' : '💾 حفظ الإعدادات'}
+                    <Save className="w-5 h-5" />
+                    {saving ? 'جاري الحفظ...' : 'حفظ الإعدادات'}
                 </button>
             </form>
         </div>
     );
-
 }

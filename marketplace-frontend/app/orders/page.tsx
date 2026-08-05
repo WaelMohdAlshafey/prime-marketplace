@@ -1,5 +1,3 @@
-// M:\Marketplace\marketplace-frontend\app\orders\page.tsx
-
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
@@ -9,6 +7,7 @@ import api from '@/lib/api';
 import { Order } from '@/types';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
+import { Package, ShoppingBag } from 'lucide-react';
 
 interface ApiError {
     response?: {
@@ -44,7 +43,6 @@ export default function Orders() {
             router.push('/auth/login');
             return;
         }
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchOrders();
     }, [user, isLoading, router, fetchOrders]);
 
@@ -86,7 +84,9 @@ export default function Orders() {
     if (orders.length === 0) {
         return (
             <div className="container mx-auto px-4 py-20 text-center">
-                <div className="text-6xl mb-4">📦</div>
+                <div className="p-6 bg-gray-50 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-4">
+                    <Package className="w-12 h-12 text-gray-300" />
+                </div>
                 <h2 className="text-2xl font-bold text-gray-800">No orders found</h2>
                 <p className="text-gray-500 mt-2">Start shopping to create your first order</p>
                 <Link href="/" className="inline-block mt-6 bg-[#0F5C45] text-white px-6 py-3 rounded-xl hover:bg-[#0A4735] transition">
@@ -96,13 +96,16 @@ export default function Orders() {
         );
     }
 
-    // ============================================================
-    // CONDITIONAL RENDER: Simple vs Standard (only for the list)
-    // ============================================================
+    // Simple Template
     if (template === 'simple') {
         return (
             <div className="container mx-auto px-4 py-12 max-w-3xl bg-white min-h-screen">
-                <h1 className="text-2xl font-bold text-gray-800 mb-6">📦 My Orders</h1>
+                <div className="flex items-center gap-3 mb-6">
+                    <div className="p-2 bg-[#0F5C45]/10 rounded-xl">
+                        <ShoppingBag className="w-6 h-6 text-[#0F5C45]" />
+                    </div>
+                    <h1 className="text-2xl font-bold text-gray-800">My Orders</h1>
+                </div>
                 <div className="space-y-4">
                     {orders.map((order) => {
                         const isCancellable = order.status === 'Pending' || order.status === 'Paid';
@@ -147,12 +150,15 @@ export default function Orders() {
         );
     }
 
-    // ============================================================
-    // STANDARD TEMPLATE (existing)
-    // ============================================================
+    // STANDARD TEMPLATE
     return (
         <div className="container mx-auto px-4 py-12 max-w-4xl">
-            <h1 className="text-3xl font-bold text-gray-800 mb-8">📦 My Orders</h1>
+            <div className="flex items-center gap-3 mb-8">
+                <div className="p-2 bg-[#0F5C45]/10 rounded-xl">
+                    <ShoppingBag className="w-7 h-7 text-[#0F5C45]" />
+                </div>
+                <h1 className="text-3xl font-bold text-gray-800">My Orders</h1>
+            </div>
 
             <div className="space-y-6">
                 {orders.map((order) => {

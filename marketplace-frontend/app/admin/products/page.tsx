@@ -1,13 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next'; // ✅ FIXED: space after 'from'
+import { useTranslation } from 'react-i18next';
 import api from '@/lib/api';
 import { Product } from '@/types';
-import { Edit, Trash2, Eye, EyeOff, Plus } from 'lucide-react';
+import { Edit, Trash2, Eye, EyeOff, Plus, Package } from 'lucide-react';
 import Link from 'next/link';
 
-// Define proper error type
 interface ApiError {
     response?: {
         data?: {
@@ -65,7 +64,6 @@ export default function AdminProducts() {
     };
 
     useEffect(() => {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchProducts();
     }, []);
 
@@ -119,12 +117,17 @@ export default function AdminProducts() {
     return (
         <div>
             <div className="flex justify-between items-center mb-8">
-                <div>
-                    <h1 className="text-3xl font-bold text-gray-900">Products</h1>
-                    <p className="text-gray-500 mt-1">Manage all products</p>
-                    {error && (
-                        <p className="text-sm text-yellow-600 mt-1">⚠️ {error}</p>
-                    )}
+                <div className="flex items-center gap-3">
+                    <div className="p-2 bg-[#0F5C45]/10 rounded-xl">
+                        <Package className="w-7 h-7 text-[#0F5C45]" />
+                    </div>
+                    <div>
+                        <h1 className="text-3xl font-bold text-gray-900">Products</h1>
+                        <p className="text-gray-500 mt-1">Manage all products</p>
+                        {error && (
+                            <p className="text-sm text-yellow-600 mt-1">⚠️ {error}</p>
+                        )}
+                    </div>
                 </div>
                 <Link
                     href="/vendor/products/create"
@@ -160,8 +163,8 @@ export default function AdminProducts() {
                                     <td className="px-6 py-4 text-sm text-gray-600">{product.vendorName || 'N/A'}</td>
                                     <td className="px-6 py-4 text-sm">
                                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${product.isActive !== false
-                                                ? 'bg-green-100 text-green-800'
-                                                : 'bg-gray-100 text-gray-800'
+                                            ? 'bg-green-100 text-green-800'
+                                            : 'bg-gray-100 text-gray-800'
                                             }`}>
                                             {product.isActive !== false ? 'Active' : 'Inactive'}
                                         </span>
