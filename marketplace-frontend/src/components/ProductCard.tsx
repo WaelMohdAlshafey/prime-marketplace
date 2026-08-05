@@ -14,6 +14,11 @@ import { useTheme } from '@/context/ThemeContext';
 import { getImageUrl } from '@/lib/getImageUrl';
 import { getProductImage } from '@/lib/productImages';
 
+// ============================================================
+// CURRENCY SYMBOL – Change this to 'ج.م' if you prefer
+// ============================================================
+const CURRENCY = '£';
+
 interface ProductCardProps {
     product: {
         id: number;
@@ -34,8 +39,8 @@ export default function ProductCard({ product }: ProductCardProps) {
     const { template } = useTheme();
     const pathname = usePathname();
     const [isAdding, setIsAdding] = useState(false);
+    const [quantity, setQuantity] = useState(1); // ← NEW: local quantity state
 
-    // Use real image URL from backend, fallback to name-based image
     const initialImage = product.imageUrl
         ? getImageUrl(product.imageUrl)
         : getProductImage(product.name);
@@ -55,11 +60,12 @@ export default function ProductCard({ product }: ProductCardProps) {
     const discountPrice = product.discount ? product.price * (1 - product.discount / 100) : null;
 
     const handleImageError = () => {
-        // If real image fails, try fallback, then placeholder
         setImgSrc('/images/placeholder.jpg');
     };
 
-    // ----- SIMPLE / COLORED / BLUE templates (minimal card) -----
+    // ============================================================
+    // SIMPLE / COLORED / BLUE templates (minimal card)
+    // ============================================================
     if (template === 'simple' || template === 'colored' || template === 'blue') {
         const showRating = template !== 'simple' && product.rating;
         const isColored = template === 'colored';
@@ -98,7 +104,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                             </div>
                         )}
                         <p className={`text-lg font-bold mt-1`} style={{ color: primaryColor }}>
-                            £{product.price.toFixed(2)}
+                            {CURRENCY}{product.price.toFixed(2)}
                         </p>
                     </div>
                 </div>
@@ -106,7 +112,9 @@ export default function ProductCard({ product }: ProductCardProps) {
         );
     }
 
-    // ----- STANDARD TEMPLATE (full design) -----
+    // ============================================================
+    // STANDARD TEMPLATE (full design) – WITH QUANTITY CONTROLS
+    // ============================================================
     const isStorePage = pathname?.startsWith('/stores/');
     const primaryBadge = isStorePage
         ? product.category || 'Category'
@@ -118,7 +126,8 @@ export default function ProductCard({ product }: ProductCardProps) {
         toggleFavorite(product.id);
     };
 
-    const handleAddToCart = async (e: React.MouseEvent) => {
+    // Modified to accept quantity
+    const handleAddToCart = async (e: React.MouseEvent, qty: number) => {
         e.preventDefault();
         e.stopPropagation();
 
@@ -143,21 +152,36 @@ export default function ProductCard({ product }: ProductCardProps) {
             setTimeout(() => {
                 setFly(false);
                 setIsAdding(true);
-                addToCart(product.id, 1).finally(() => setIsAdding(false));
+                addToCart(product.id, qty).finally(() => setIsAdding(false));
             }, 800);
         } else {
             setIsAdding(true);
-            await addToCart(product.id, 1);
+            await addToCart(product.id, qty);
             setIsAdding(false);
         }
     };
 
-    // ----- Category navigation (no nested <a>) -----
     const handleCategoryClick = (e: React.MouseEvent) => {
         e.stopPropagation();
         if (product.category) {
-            // Force full page navigation for reliability
             window.location.href = `/${product.category}`;
+        }
+    };
+
+    // Increment / Decrement handlers
+    const increment = (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (quantity < product.stockQuantity) {
+            setQuantity(q => q + 1);
+        }
+    };
+
+    const decrement = (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (quantity > 1) {
+            setQuantity(q => q - 1);
         }
     };
 
@@ -229,7 +253,6 @@ export default function ProductCard({ product }: ProductCardProps) {
                             {product.description}
                         </p>
 
-                        {/* Category badge – using span with onClick to prevent nested <a> */}
                         {product.category && (
                             <span
                                 className="inline-block mt-1 text-xs text-[#0F5C45] hover:underline bg-[#0F5C45]/5 px-2 py-0.5 rounded-full transition cursor-pointer"
@@ -262,26 +285,56 @@ export default function ProductCard({ product }: ProductCardProps) {
                             </div>
                         )}
 
-                        {/* Price */}
-                        <div className="mt-3 flex items-center justify-end gap-2">
-                            <span className="text-xl font-bold text-[#0F5C45]">
-                                £{(discountPrice || product.price).toFixed(2)}
-                            </span>
-                            {product.discount && product.discount > 0 && (
-                                <span className="text-sm text-gray-400 line-through">
-                                    £{product.price.toFixed(2)}
-                                </span>
+                        {/* ============================================================
+                        PRICE + QUANTITY CONTROLS (beside each other)
+                        ============================================================ */}
+                        <div className="mt-3 flex items-center justify-between gap-2">
+                            {/* Quantity Controls */}
+                            {product.stockQuantity > 0 && (
+                                <div
+                                    className="flex items-center gap-1 bg-gray-50 rounded-lg p-1 border border-gray-200"
+                                    onClick={(e) => e.stopPropagation()}
+                                >
+                                    <button
+                                        onClick={decrement}
+                                        disabled={quantity <= 1}
+                                        className="w-7 h-7 rounded-md flex items-center justify-center text-gray-600 hover:bg-white hover:shadow-sm transition disabled:opacity-30 disabled:cursor-not-allowed text-lg font-bold"
+                                    >
+                                        −
+                                    </button>
+                                    <span className="w-6 text-center text-sm font-medium text-gray-800">
+                                        {quantity}
+                                    </span>
+                                    <button
+                                        onClick={increment}
+                                        disabled={quantity >= product.stockQuantity}
+                                        className="w-7 h-7 rounded-md flex items-center justify-center text-gray-600 hover:bg-white hover:shadow-sm transition disabled:opacity-30 disabled:cursor-not-allowed text-lg font-bold"
+                                    >
+                                        +
+                                    </button>
+                                </div>
                             )}
+
+                            <div className="flex items-center gap-1">
+                                <span className="text-xl font-bold text-[#0F5C45]">
+                                    {CURRENCY}{(discountPrice || product.price).toFixed(2)}
+                                </span>
+                                {product.discount && product.discount > 0 && (
+                                    <span className="text-sm text-gray-400 line-through mr-1">
+                                        {CURRENCY}{product.price.toFixed(2)}
+                                    </span>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </Link>
 
-                {/* Add to Cart button */}
+                {/* Add to Cart button – uses the local quantity */}
                 <div className="px-4 pb-4">
                     <motion.button
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.97 }}
-                        onClick={handleAddToCart}
+                        onClick={(e) => handleAddToCart(e, quantity)}
                         disabled={isAdding || product.stockQuantity === 0}
                         className={`w-full py-2.5 rounded-xl font-medium transition-all duration-300 flex items-center justify-center gap-2 ${product.stockQuantity === 0
                             ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
@@ -295,7 +348,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                             ? 'جاري الإضافة...'
                             : product.stockQuantity === 0
                                 ? 'غير متوفر'
-                                : 'إضافة إلى السلة'}
+                                : `إضافة (${quantity}) إلى السلة`}
                     </motion.button>
                 </div>
             </motion.div>
