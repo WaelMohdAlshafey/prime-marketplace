@@ -70,7 +70,7 @@ export default function ProductDetail() {
                 <h1 className="text-3xl font-bold text-gray-800">{product.name}</h1>
                 <p className="text-gray-600 mt-4 text-lg">{product.description}</p>
                 <div className="mt-6 flex items-center gap-8">
-                    <p className="text-4xl font-bold text-blue-600">${product.price.toFixed(2)}</p>
+                    <p className="text-4xl font-bold text-blue-600">£{product.price.toFixed(2)}</p>
                     <p className="text-sm text-gray-500">In stock: {product.stockQuantity}</p>
                 </div>
 
