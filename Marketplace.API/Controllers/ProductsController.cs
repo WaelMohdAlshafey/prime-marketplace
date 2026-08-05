@@ -98,14 +98,17 @@ public class ProductsController : ControllerBase
                     select new ProductDto
                     {
                         Id = p.Id,
-                        Name = p.Name,
-                        Description = p.Description,
+                        NameAr = p.NameAr,
+                        NameEn = p.NameEn,
+                        DescriptionAr = p.DescriptionAr,
+                        DescriptionEn = p.DescriptionEn,
                         Price = p.Price,
                         StockQuantity = p.StockQuantity,
                         ImageUrl = p.ImageUrl,
                         VendorName = u != null ? u.Username : "بائع",
                         IsActive = p.IsActive,
-                        Rating = p.Rating
+                        Rating = p.Rating,
+                        Category = p.Category
                     };
 
         var totalCount = await query.CountAsync();
@@ -172,8 +175,14 @@ public class ProductsController : ControllerBase
 
         var product = new Product
         {
-            Name = productDto.Name,
-            Description = productDto.Description,
+            // Use the bilingual fields
+            NameAr = productDto.NameAr,
+            NameEn = productDto.NameEn,
+            DescriptionAr = productDto.DescriptionAr,
+            DescriptionEn = productDto.DescriptionEn,
+            // For backward compatibility, keep the old fields filled (optional)
+            Name = productDto.NameAr,
+            Description = productDto.DescriptionAr,
             Price = productDto.Price,
             CostPrice = productDto.CostPrice,
             StockQuantity = productDto.StockQuantity,
@@ -181,7 +190,8 @@ public class ProductsController : ControllerBase
             IsActive = true,
             CreatedAt = DateTime.UtcNow,
             ImageUrl = imageUrl,
-            Rating = null
+            Rating = null,
+            Category = productDto.Category
         };
 
         var createdProduct = await _productService.CreateProductAsync(product, vendorId);
@@ -237,14 +247,19 @@ public class ProductsController : ControllerBase
         var product = new Product
         {
             Id = id,
-            Name = productDto.Name,
-            Description = productDto.Description,
+            NameAr = productDto.NameAr,
+            NameEn = productDto.NameEn,
+            DescriptionAr = productDto.DescriptionAr,
+            DescriptionEn = productDto.DescriptionEn,
+            Name = productDto.NameAr, // optional fallback
+            Description = productDto.DescriptionAr,
             Price = productDto.Price,
             CostPrice = productDto.CostPrice,
             StockQuantity = productDto.StockQuantity,
             IsActive = productDto.IsActive,
             ImageUrl = newImageUrl ?? productDto.ExistingImageUrl,
-            Rating = null
+            Rating = null,
+            Category = productDto.Category
         };
 
         try

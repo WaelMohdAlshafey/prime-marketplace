@@ -222,24 +222,28 @@
     }
 }
 
-/* Template overrides (keep the same) */
+/* ============================================================
+   TEMPLATE OVERRIDES (Adjusted colors)
+   ============================================================ */
+
+/* --- Simple (Gray) – now slightly darker --- */
 [data-theme="simple"] {
-    background-color: #E5E7EB;
+    background-color: #D1D5DB; /* was #E5E7EB */
 }
 
     [data-theme="simple"] .min-h-screen {
-        background-color: #E5E7EB;
+        background-color: #D1D5DB;
     }
 
     [data-theme="simple"] .bg-\[#F8F9FA\] {
-        background-color: #E5E7EB;
+        background-color: #D1D5DB;
     }
 
     [data-theme="simple"] .card,
     [data-theme="simple"] .rounded-xl,
     [data-theme="simple"] .rounded-2xl {
         background: white;
-        border: 1px solid #D1D5DB;
+        border: 1px solid #9CA3AF; /* was #D1D5DB */
         box-shadow: 0 1px 3px rgba(0,0,0,0.08);
     }
 
@@ -266,7 +270,7 @@
 
     [data-theme="simple"] body {
         background-image: none !important;
-        background-color: #E5E7EB !important;
+        background-color: #D1D5DB !important;
     }
 
     [data-theme="simple"] .bg-animated-gradient {
@@ -278,33 +282,42 @@
         animation: none !important;
     }
 
+    [data-theme="simple"] .navbar-link {
+        color: rgba(255,255,255,0.3) !important;
+    }
+
+        [data-theme="simple"] .navbar-link:hover {
+            color: white !important;
+        }
+
+/* --- Colored (Orange) – slightly brighter --- */
 [data-theme="colored"] {
-    background-color: #F97316;
+    background-color: #FF8C00; /* was #F97316 */
 }
 
     [data-theme="colored"] .min-h-screen {
-        background-color: #F97316;
+        background-color: #FF8C00;
     }
 
     [data-theme="colored"] .bg-\[#F8F9FA\] {
-        background-color: #F97316;
+        background-color: #FF8C00;
     }
 
     [data-theme="colored"] .card,
     [data-theme="colored"] .rounded-xl,
     [data-theme="colored"] .rounded-2xl {
         background: white;
-        border: 1px solid #EA580C;
-        box-shadow: 0 4px 12px rgba(234, 88, 12, 0.2);
+        border: 1px solid #E67E22; /* was #EA580C */
+        box-shadow: 0 4px 12px rgba(255, 140, 0, 0.25);
     }
 
     [data-theme="colored"] .btn-primary {
-        background: #EA580C !important;
-        box-shadow: 0 4px 20px rgba(234, 88, 12, 0.3) !important;
+        background: #E67E22 !important; /* was #EA580C */
+        box-shadow: 0 4px 20px rgba(255, 140, 0, 0.35) !important;
     }
 
         [data-theme="colored"] .btn-primary:hover {
-            background: #C2410C !important;
+            background: #D35400 !important;
         }
 
     [data-theme="colored"] .glass-card,
@@ -321,11 +334,11 @@
 
     [data-theme="colored"] body {
         background-image: none !important;
-        background-color: #F97316 !important;
+        background-color: #FF8C00 !important;
     }
 
     [data-theme="colored"] .bg-animated-gradient {
-        background: #EA580C !important;
+        background: #E67E22 !important;
         animation: none !important;
     }
 
@@ -333,16 +346,25 @@
         animation: none !important;
     }
 
+    [data-theme="colored"] .navbar-link {
+        color: rgba(255,255,255,0.25) !important;
+    }
+
+        [data-theme="colored"] .navbar-link:hover {
+            color: white !important;
+        }
+
+/* --- Blue (Dark Blue) – slightly brighter --- */
 [data-theme="blue"] {
-    background-color: #1E3A8A;
+    background-color: #2563EB; /* was #1E3A8A */
 }
 
     [data-theme="blue"] .min-h-screen {
-        background-color: #1E3A8A;
+        background-color: #2563EB;
     }
 
     [data-theme="blue"] .bg-\[#F8F9FA\] {
-        background-color: #1E3A8A;
+        background-color: #2563EB;
     }
 
     [data-theme="blue"] .card,
@@ -350,12 +372,12 @@
     [data-theme="blue"] .rounded-2xl {
         background: white;
         border: 1px solid #1D4ED8;
-        box-shadow: 0 4px 12px rgba(29, 78, 216, 0.2);
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
     }
 
     [data-theme="blue"] .btn-primary {
         background: #1D4ED8 !important;
-        box-shadow: 0 4px 20px rgba(29, 78, 216, 0.3) !important;
+        box-shadow: 0 4px 20px rgba(37, 99, 235, 0.35) !important;
     }
 
         [data-theme="blue"] .btn-primary:hover {
@@ -376,7 +398,7 @@
 
     [data-theme="blue"] body {
         background-image: none !important;
-        background-color: #1E3A8A !important;
+        background-color: #2563EB !important;
     }
 
     [data-theme="blue"] .bg-animated-gradient {
@@ -388,28 +410,10 @@
         animation: none !important;
     }
 
-    [data-theme="simple"] .navbar-link,
-    [data-theme="colored"] .navbar-link,
     [data-theme="blue"] .navbar-link {
-        color: rgba(255,255,255,0.2);
-        transition: color 0.2s;
+        color: rgba(255,255,255,0.25) !important;
     }
 
-        [data-theme="simple"] .navbar-link:hover,
-        [data-theme="colored"] .navbar-link:hover,
         [data-theme="blue"] .navbar-link:hover {
-            color: white;
-        }
-
-        [data-theme="simple"] .navbar-link .icon,
-        [data-theme="colored"] .navbar-link .icon,
-        [data-theme="blue"] .navbar-link .icon {
-            opacity: 0.2;
-            transition: opacity 0.2s;
-        }
-
-        [data-theme="simple"] .navbar-link:hover .icon,
-        [data-theme="colored"] .navbar-link:hover .icon,
-        [data-theme="blue"] .navbar-link:hover .icon {
-            opacity: 1;
+            color: white !important;
         }

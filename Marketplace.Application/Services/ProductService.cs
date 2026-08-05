@@ -18,19 +18,26 @@ public class ProductService : IProductService
         _cache = cache;
     }
 
+    // Map to DTO – now includes bilingual fields
     private static ProductDto MapToDto(Product product, string? vendorName = null)
     {
         return new ProductDto
         {
             Id = product.Id,
-            Name = product.Name,
-            Description = product.Description,
+            NameAr = product.NameAr,
+            NameEn = product.NameEn,
+            DescriptionAr = product.DescriptionAr,
+            DescriptionEn = product.DescriptionEn,
+            // For backward compatibility, set Name = NameAr and Description = DescriptionAr (default)
+            Name = product.NameAr,
+            Description = product.DescriptionAr,
             Price = product.Price,
             StockQuantity = product.StockQuantity,
             ImageUrl = product.ImageUrl,
             VendorName = vendorName ?? "بائع",
             Rating = product.Rating,
-            Category = product.Category // ✅ NEW
+            IsActive = product.IsActive,
+            Category = product.Category
         };
     }
 
@@ -72,14 +79,19 @@ public class ProductService : IProductService
             .Select(x => new ProductDto
             {
                 Id = x.p.Id,
-                Name = x.p.Name,
-                Description = x.p.Description,
+                NameAr = x.p.NameAr,
+                NameEn = x.p.NameEn,
+                DescriptionAr = x.p.DescriptionAr,
+                DescriptionEn = x.p.DescriptionEn,
+                Name = x.p.NameAr,
+                Description = x.p.DescriptionAr,
                 Price = x.p.Price,
                 StockQuantity = x.p.StockQuantity,
                 ImageUrl = x.p.ImageUrl,
                 VendorName = x.VendorName,
                 Rating = x.p.Rating,
-                Category = x.p.Category // ✅ NEW
+                IsActive = x.p.IsActive,
+                Category = x.p.Category
             })
             .ToListAsync();
 
@@ -120,8 +132,10 @@ public class ProductService : IProductService
         {
             var term = searchTerm.ToLower();
             query = query.Where(x =>
-                x.p.Name.ToLower().Contains(term) ||
-                x.p.Description.ToLower().Contains(term));
+                x.p.NameAr.ToLower().Contains(term) ||
+                x.p.NameEn.ToLower().Contains(term) ||
+                x.p.DescriptionAr.ToLower().Contains(term) ||
+                x.p.DescriptionEn.ToLower().Contains(term));
         }
 
         var totalCount = await query.CountAsync();
@@ -133,14 +147,19 @@ public class ProductService : IProductService
             .Select(x => new ProductDto
             {
                 Id = x.p.Id,
-                Name = x.p.Name,
-                Description = x.p.Description,
+                NameAr = x.p.NameAr,
+                NameEn = x.p.NameEn,
+                DescriptionAr = x.p.DescriptionAr,
+                DescriptionEn = x.p.DescriptionEn,
+                Name = x.p.NameAr,
+                Description = x.p.DescriptionAr,
                 Price = x.p.Price,
                 StockQuantity = x.p.StockQuantity,
                 ImageUrl = x.p.ImageUrl,
                 VendorName = x.VendorName,
                 Rating = x.p.Rating,
-                Category = x.p.Category // ✅ NEW
+                IsActive = x.p.IsActive,
+                Category = x.p.Category
             })
             .ToListAsync();
 
@@ -157,7 +176,7 @@ public class ProductService : IProductService
     }
 
     // ============================================================
-    // FILTER PRODUCTS (WITH RATING)
+    // FILTER PRODUCTS
     // ============================================================
     public async Task<PagedResult<ProductDto>> GetProductsFilteredAsync(
         string? searchTerm,
@@ -189,8 +208,10 @@ public class ProductService : IProductService
         {
             var term = searchTerm.ToLower();
             query = query.Where(x =>
-                x.p.Name.ToLower().Contains(term) ||
-                x.p.Description.ToLower().Contains(term));
+                x.p.NameAr.ToLower().Contains(term) ||
+                x.p.NameEn.ToLower().Contains(term) ||
+                x.p.DescriptionAr.ToLower().Contains(term) ||
+                x.p.DescriptionEn.ToLower().Contains(term));
         }
 
         if (minPrice.HasValue)
@@ -206,9 +227,7 @@ public class ProductService : IProductService
             query = query.Where(x => x.p.StockQuantity > 0);
 
         if (rating.HasValue && rating.Value > 0)
-        {
             query = query.Where(x => x.p.Rating >= rating.Value);
-        }
 
         var totalCount = await query.CountAsync();
 
@@ -219,14 +238,19 @@ public class ProductService : IProductService
             .Select(x => new ProductDto
             {
                 Id = x.p.Id,
-                Name = x.p.Name,
-                Description = x.p.Description,
+                NameAr = x.p.NameAr,
+                NameEn = x.p.NameEn,
+                DescriptionAr = x.p.DescriptionAr,
+                DescriptionEn = x.p.DescriptionEn,
+                Name = x.p.NameAr,
+                Description = x.p.DescriptionAr,
                 Price = x.p.Price,
                 StockQuantity = x.p.StockQuantity,
                 ImageUrl = x.p.ImageUrl,
                 VendorName = x.VendorName,
                 Rating = x.p.Rating,
-                Category = x.p.Category // ✅ NEW
+                IsActive = x.p.IsActive,
+                Category = x.p.Category
             })
             .ToListAsync();
 
@@ -254,14 +278,19 @@ public class ProductService : IProductService
                              select new ProductDto
                              {
                                  Id = p.Id,
-                                 Name = p.Name,
-                                 Description = p.Description,
+                                 NameAr = p.NameAr,
+                                 NameEn = p.NameEn,
+                                 DescriptionAr = p.DescriptionAr,
+                                 DescriptionEn = p.DescriptionEn,
+                                 Name = p.NameAr,
+                                 Description = p.DescriptionAr,
                                  Price = p.Price,
                                  StockQuantity = p.StockQuantity,
                                  ImageUrl = p.ImageUrl,
                                  VendorName = u != null ? u.Username : "بائع",
                                  Rating = p.Rating,
-                                 Category = p.Category // ✅ NEW
+                                 IsActive = p.IsActive,
+                                 Category = p.Category
                              }).FirstOrDefaultAsync();
 
         if (product == null)
@@ -271,7 +300,7 @@ public class ProductService : IProductService
     }
 
     // ============================================================
-    // GET PRODUCTS BY CATEGORY – NOW USES CATEGORY COLUMN
+    // GET PRODUCTS BY CATEGORY
     // ============================================================
     public async Task<PagedResult<ProductDto>> GetProductsByCategoryAsync(string categoryName, int page, int pageSize)
     {
@@ -285,7 +314,6 @@ public class ProductService : IProductService
         page = Math.Max(1, page);
         pageSize = Math.Max(1, pageSize);
 
-        // ✅ Filter by the Category column directly
         var query = from p in _context.Products
                     join u in _context.Users on p.VendorId equals u.Id into vendorGroup
                     from u in vendorGroup.DefaultIfEmpty()
@@ -301,14 +329,19 @@ public class ProductService : IProductService
             .Select(x => new ProductDto
             {
                 Id = x.p.Id,
-                Name = x.p.Name,
-                Description = x.p.Description,
+                NameAr = x.p.NameAr,
+                NameEn = x.p.NameEn,
+                DescriptionAr = x.p.DescriptionAr,
+                DescriptionEn = x.p.DescriptionEn,
+                Name = x.p.NameAr,
+                Description = x.p.DescriptionAr,
                 Price = x.p.Price,
                 StockQuantity = x.p.StockQuantity,
                 ImageUrl = x.p.ImageUrl,
                 VendorName = x.VendorName,
                 Rating = x.p.Rating,
-                Category = x.p.Category // ✅ NEW
+                IsActive = x.p.IsActive,
+                Category = x.p.Category
             })
             .ToListAsync();
 
@@ -354,14 +387,19 @@ public class ProductService : IProductService
             .Select(x => new ProductDto
             {
                 Id = x.p.Id,
-                Name = x.p.Name,
-                Description = x.p.Description,
+                NameAr = x.p.NameAr,
+                NameEn = x.p.NameEn,
+                DescriptionAr = x.p.DescriptionAr,
+                DescriptionEn = x.p.DescriptionEn,
+                Name = x.p.NameAr,
+                Description = x.p.DescriptionAr,
                 Price = x.p.Price,
                 StockQuantity = x.p.StockQuantity,
                 ImageUrl = x.p.ImageUrl,
                 VendorName = x.VendorName,
                 Rating = x.p.Rating,
-                Category = x.p.Category // ✅ NEW
+                IsActive = x.p.IsActive,
+                Category = x.p.Category
             })
             .ToListAsync();
 
@@ -403,14 +441,22 @@ public class ProductService : IProductService
         if (existing == null)
             throw new Exception("Product not found or you do not have permission to edit it.");
 
-        existing.Name = product.Name;
-        existing.Description = product.Description;
+        // Update bilingual fields
+        existing.NameAr = product.NameAr;
+        existing.NameEn = product.NameEn;
+        existing.DescriptionAr = product.DescriptionAr;
+        existing.DescriptionEn = product.DescriptionEn;
+
+        // Keep old fields for backward compatibility
+        existing.Name = product.NameAr; // or keep the original
+        existing.Description = product.DescriptionAr;
+
         existing.Price = product.Price;
         existing.CostPrice = product.CostPrice;
         existing.StockQuantity = product.StockQuantity;
         existing.IsActive = product.IsActive;
         existing.Rating = product.Rating;
-        existing.Category = product.Category; // ✅ Allow updating category
+        existing.Category = product.Category;
 
         if (!string.IsNullOrEmpty(product.ImageUrl))
             existing.ImageUrl = product.ImageUrl;

@@ -14,7 +14,7 @@ public interface IProductService
         decimal? maxPrice,
         int? vendorId,
         bool? inStock,
-        double? rating, // NEW: Filter by minimum rating
+        double? rating,
         int page,
         int pageSize);
     Task<ProductDto> GetProductByIdAsync(int id);

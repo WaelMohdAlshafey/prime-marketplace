@@ -1,15 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import api from '@/lib/api';
 
 export default function CategoryGrid() {
     const { t } = useTranslation('common');
-    const pathname = usePathname();
-    const router = useRouter();
     const [categories, setCategories] = useState<string[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -27,6 +23,12 @@ export default function CategoryGrid() {
         fetchCategories();
     }, []);
 
+    const handleCategoryClick = (category: string) => {
+        console.log(`🔗 Navigating to /${category}`);
+        // Force full page navigation – guaranteed to work
+        window.location.href = `/${category}`;
+    };
+
     if (loading) {
         return (
             <section className="container mx-auto px-4 py-12">
@@ -37,13 +39,6 @@ export default function CategoryGrid() {
         );
     }
 
-    const handleCategoryClick = (e: React.MouseEvent, category: string) => {
-        e.preventDefault(); // Prevent default Link behavior
-        console.log(`🔗 Navigating to /${category}`);
-        // Force navigation using router
-        router.push(`/${category}`);
-    };
-
     return (
         <section className="container mx-auto px-4 py-12">
             <div className="flex justify-between items-center mb-6">
@@ -51,39 +46,26 @@ export default function CategoryGrid() {
                     <h2 className="text-3xl font-bold text-gray-900">{t('categories.title')}</h2>
                     <p className="text-sm text-gray-500 mt-1">{t('categories.subtitle')}</p>
                 </div>
-                <Link
-                    href="/categories"
-                    className="text-[#0F5C45] font-medium hover:underline"
-                >
+                <span className="text-[#0F5C45] font-medium">
                     {t('categories.viewAll')} ←
-                </Link>
+                </span>
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                {categories.map((cat) => {
-                    const href = `/${cat}`;
-                    const isActive = pathname === href;
-
-                    return (
-                        <Link
-                            key={cat}
-                            href={href}
-                            onClick={(e) => handleCategoryClick(e, cat)}
-                            className={`
-                bg-white rounded-2xl shadow-sm hover:shadow-lg transition
-                p-5 text-center hover:-translate-y-1 duration-300 border
-                ${isActive ? 'border-[#0F5C45] shadow-md' : 'border-gray-50'}
-              `}
-                        >
-                            <div className="text-4xl mb-2">
-                                {cat.replace(/-/g, ' ')}
-                            </div>
-                            <h3 className="font-semibold text-gray-800 text-sm">
-                                {cat.replace(/-/g, ' ')}
-                            </h3>
-                        </Link>
-                    );
-                })}
+                {categories.map((cat) => (
+                    <button
+                        key={cat}
+                        onClick={() => handleCategoryClick(cat)}
+                        className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition p-5 text-center hover:-translate-y-1 duration-300 border border-gray-50 cursor-pointer w-full"
+                    >
+                        <div className="text-4xl mb-2">
+                            {cat.replace(/-/g, ' ')}
+                        </div>
+                        <h3 className="font-semibold text-gray-800 text-sm">
+                            {cat.replace(/-/g, ' ')}
+                        </h3>
+                    </button>
+                ))}
             </div>
         </section>
     );
