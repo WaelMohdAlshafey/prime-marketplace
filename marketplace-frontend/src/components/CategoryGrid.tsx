@@ -61,8 +61,8 @@ export default function CategoryGrid() {
 
     if (loading) {
         return (
-            <section className="container mx-auto px-4 py-12">
-                <div className="flex justify-center">
+            <section className="category-section">
+                <div className="flex justify-center py-8">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0A6C44]" />
                 </div>
             </section>
@@ -70,35 +70,32 @@ export default function CategoryGrid() {
     }
 
     return (
-        <section className="container mx-auto px-4 py-12">
-            <div className="flex justify-between items-center mb-6">
-                <div className="text-right">
-                    <h2 className="text-2xl md:text-3xl font-bold text-[#1A1A1A]">{t('categories.title')}</h2>
+        <section className="category-section">
+            <div className="section-header">
+                <span className="view-all">{t('categories.viewAll')} ←</span>
+                <div>
+                    <h2>{t('categories.title')}</h2>
                     <p className="text-sm text-[#757575] mt-1">{t('categories.subtitle')}</p>
                 </div>
-                <span className="text-[#0A6C44] font-medium text-sm">
-                    {t('categories.viewAll')} ←
-                </span>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            <div className="category-grid">
                 {categories.map((cat) => {
                     const Icon = categoryIcons[cat] || Home;
                     const colorClass = categoryColors[cat] || 'bg-gray-50 text-gray-600';
                     const displayName = getCategoryDisplayName(cat, t);
-                    const count = Math.floor(Math.random() * 80) + 20; // Placeholder count – you can replace with real data
 
                     return (
                         <button
                             key={cat}
                             onClick={() => handleCategoryClick(cat)}
-                            className="category-card hover:border-[#0A6C44] hover:shadow-card-hover group"
+                            className="category-card hover:border-[#0A6C44]"
                         >
                             <div className={`w-14 h-14 rounded-full ${colorClass} flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-300`}>
                                 <Icon className="w-7 h-7" />
                             </div>
-                            <h3 className="font-semibold text-[#1A1A1A] text-sm">{displayName}</h3>
-                            <p className="text-xs text-[#757575] mt-1">{count} {t('productCount')}</p>
+                            <h3 className="title">{displayName}</h3>
+                            <p className="subtitle">+20 منتج</p>
                         </button>
                     );
                 })}

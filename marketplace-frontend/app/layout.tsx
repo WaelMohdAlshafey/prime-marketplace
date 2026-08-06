@@ -8,7 +8,7 @@ import { AuthProvider } from '@/context/AuthContext';
 import { CartProvider } from '@/context/CartContext';
 import { WishlistProvider } from '@/context/WishlistContext';
 import { CartIconRefProvider } from '@/context/CartIconRefContext';
-import { ThemeProvider } from '@/context/ThemeContext';  // ✅ added
+import { ThemeProvider } from '@/context/ThemeContext';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
@@ -41,9 +41,9 @@ export default function RootLayout({
                         <CartProvider>
                             <WishlistProvider>
                                 <CartIconRefProvider>
-                                    <ThemeProvider>   {/* ← ADD THIS */}
+                                    <ThemeProvider>
                                         <Navbar />
-                                        <main className="min-h-screen bg-[#F8F9FA] container mx-auto max-w-[1320px] px-4">
+                                        <main className="min-h-screen bg-[#F8F9FA]">
                                             {children}
                                         </main>
                                         <Footer />

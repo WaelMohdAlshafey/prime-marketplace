@@ -14,14 +14,6 @@ interface FilterSidebarProps {
     onResetFilters: () => void;
 }
 
-const renderStars = (count: number, selected: boolean) => {
-    return (
-        <span className={`${selected ? 'text-[#FFB400]' : 'text-[#E0E0E0]'}`}>
-            {'★'.repeat(count)}{'★'.repeat(5 - count)}
-        </span>
-    );
-};
-
 export default function FilterSidebar({
     onApplyFilters,
     onResetFilters,
@@ -62,10 +54,10 @@ export default function FilterSidebar({
     const FilterContent = () => (
         <>
             {/* Price Range */}
-            <div className="border-b border-[#E0E0E0] py-4">
+            <div className="filter-section">
                 <button
                     onClick={() => toggleSection('نطاق السعر')}
-                    className="flex justify-between items-center w-full text-right font-semibold text-[#1A1A1A] hover:text-[#0A6C44] transition"
+                    className="filter-header"
                 >
                     <span>نطاق السعر</span>
                     {openSections.has('نطاق السعر') ? (
@@ -76,8 +68,8 @@ export default function FilterSidebar({
                 </button>
 
                 {openSections.has('نطاق السعر') && (
-                    <div className="mt-3">
-                        <div className="flex gap-2 items-center">
+                    <div className="filter-content">
+                        <div className="price-inputs">
                             <input
                                 type="number"
                                 placeholder="الحد الأدنى"
@@ -87,9 +79,8 @@ export default function FilterSidebar({
                                 }
                                 min="0"
                                 step="1"
-                                className="w-1/2 px-3 py-2 border border-[#E0E0E0] rounded-button text-sm focus:ring-2 focus:ring-[#0A6C44] focus:border-transparent"
                             />
-                            <span className="text-[#9E9E9E]">—</span>
+                            <span className="separator">—</span>
                             <input
                                 type="number"
                                 placeholder="الحد الأقصى"
@@ -99,7 +90,6 @@ export default function FilterSidebar({
                                 }
                                 min="0"
                                 step="1"
-                                className="w-1/2 px-3 py-2 border border-[#E0E0E0] rounded-button text-sm focus:ring-2 focus:ring-[#0A6C44] focus:border-transparent"
                             />
                         </div>
                     </div>
@@ -107,10 +97,10 @@ export default function FilterSidebar({
             </div>
 
             {/* Rating */}
-            <div className="border-b border-[#E0E0E0] py-4">
+            <div className="filter-section">
                 <button
                     onClick={() => toggleSection('التقييم')}
-                    className="flex justify-between items-center w-full text-right font-semibold text-[#1A1A1A] hover:text-[#0A6C44] transition"
+                    className="filter-header"
                 >
                     <span>التقييم</span>
                     {openSections.has('التقييم') ? (
@@ -121,12 +111,9 @@ export default function FilterSidebar({
                 </button>
 
                 {openSections.has('التقييم') && (
-                    <div className="mt-3 space-y-2">
+                    <div className="filter-content space-y-2">
                         {[5, 4, 3, 2, 1].map((stars) => (
-                            <label
-                                key={stars}
-                                className="flex items-center gap-2 text-sm text-[#757575] hover:text-[#1A1A1A] cursor-pointer justify-end"
-                            >
+                            <label key={stars}>
                                 <span className={`${rating === stars ? 'text-[#FFB400]' : 'text-[#E0E0E0]'}`}>
                                     {'★'.repeat(stars)}{'★'.repeat(5 - stars)}
                                 </span>
@@ -136,11 +123,10 @@ export default function FilterSidebar({
                                     value={stars}
                                     checked={rating === stars}
                                     onChange={() => setRating(stars)}
-                                    className="w-4 h-4 accent-[#0A6C44]"
                                 />
                             </label>
                         ))}
-                        <label className="flex items-center gap-2 text-sm text-[#757575] hover:text-[#1A1A1A] cursor-pointer justify-end">
+                        <label>
                             <span>الكل</span>
                             <input
                                 type="radio"
@@ -148,7 +134,6 @@ export default function FilterSidebar({
                                 value={0}
                                 checked={rating === undefined}
                                 onChange={() => setRating(undefined)}
-                                className="w-4 h-4 accent-[#0A6C44]"
                             />
                         </label>
                     </div>
@@ -156,10 +141,10 @@ export default function FilterSidebar({
             </div>
 
             {/* Availability */}
-            <div className="border-b border-[#E0E0E0] py-4">
+            <div className="filter-section">
                 <button
                     onClick={() => toggleSection('التوفر')}
-                    className="flex justify-between items-center w-full text-right font-semibold text-[#1A1A1A] hover:text-[#0A6C44] transition"
+                    className="filter-header"
                 >
                     <span>التوفر</span>
                     {openSections.has('التوفر') ? (
@@ -170,42 +155,32 @@ export default function FilterSidebar({
                 </button>
 
                 {openSections.has('التوفر') && (
-                    <div className="mt-3">
-                        <label className="flex items-center gap-2 text-sm text-[#757575] hover:text-[#1A1A1A] cursor-pointer justify-end">
+                    <div className="filter-content">
+                        <label>
                             <span>متوفر فقط</span>
                             <input
                                 type="checkbox"
                                 checked={inStock === true}
                                 onChange={(e) => setInStock(e.target.checked ? true : undefined)}
-                                className="w-4 h-4 accent-[#0A6C44]"
                             />
                         </label>
                     </div>
                 )}
             </div>
 
-            {/* Actions */}
-            <div className="mt-6 flex flex-col gap-3">
-                <button
-                    onClick={handleApply}
-                    className="w-full bg-[#0A6C44] text-white py-3 rounded-button font-medium hover:bg-[#06452A] transition"
-                >
-                    تطبيق الفلاتر
-                </button>
-                <button
-                    onClick={handleReset}
-                    className="w-full text-[#757575] text-sm hover:text-[#1A1A1A] transition"
-                >
-                    إعادة تعيين
-                </button>
-            </div>
+            {/* Apply Buttons */}
+            <button onClick={handleApply} className="filter-apply-btn">
+                تطبيق الفلاتر
+            </button>
+            <button onClick={handleReset} className="filter-reset-btn">
+                إعادة تعيين
+            </button>
         </>
     );
 
-    // Mobile: Floating Filter Button
     return (
         <>
-            {/* Mobile Toggle Button */}
+            {/* Mobile Toggle */}
             <button
                 onClick={() => setIsMobileOpen(true)}
                 className="md:hidden fixed bottom-6 left-6 z-40 bg-[#0A6C44] text-white p-4 rounded-full shadow-lg hover:bg-[#06452A] transition flex items-center gap-2"
@@ -215,10 +190,10 @@ export default function FilterSidebar({
             </button>
 
             {/* Desktop Sidebar */}
-            <aside className="hidden md:block bg-white rounded-card shadow-card p-6 sticky top-24 h-fit text-right">
-                <div className="flex items-center gap-2 mb-4">
+            <aside className="sidebar hidden md:block">
+                <div className="sidebar-title">
                     <Filter className="w-5 h-5 text-[#0A6C44]" />
-                    <h2 className="text-xl font-bold text-[#1A1A1A]">الفلاتر</h2>
+                    الفلاتر
                 </div>
                 <FilterContent />
             </aside>
@@ -230,7 +205,7 @@ export default function FilterSidebar({
                         className="fixed inset-0 bg-black/50"
                         onClick={() => setIsMobileOpen(false)}
                     />
-                    <div className="fixed inset-y-0 left-0 w-80 bg-white shadow-xl p-6 overflow-y-auto animate-slide-in-right">
+                    <div className="fixed inset-y-0 left-0 w-80 bg-white shadow-xl p-6 overflow-y-auto">
                         <div className="flex justify-between items-center mb-6">
                             <button
                                 onClick={() => setIsMobileOpen(false)}

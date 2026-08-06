@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
-import { Heart, ShoppingBag, Star, Store } from 'lucide-react';
+import { Heart, ShoppingBag, Star } from 'lucide-react';
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
@@ -29,7 +29,6 @@ interface ProductCardProps {
         reviews?: number;
         discount?: number;
         category?: string;
-        isVerified?: boolean;
     };
 }
 
@@ -72,7 +71,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
         return (
             <Link href={`/products/${product.id}`} className="block">
-                <div className="bg-white rounded-xl shadow-card hover:shadow-card-hover transition-all duration-300 overflow-hidden">
+                <div className="bg-white rounded-card shadow-card hover:shadow-card-hover transition-all duration-300 overflow-hidden">
                     <div className="aspect-square bg-gray-50 overflow-hidden relative">
                         <img
                             src={imgSrc}
@@ -90,7 +89,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                         <h3 className="text-sm font-medium text-[#1A1A1A] line-clamp-1">{product.name}</h3>
                         {showRating && product.rating && (
                             <div className="flex items-center gap-1 mt-1">
-                                <div className="flex items-center">
+                                <div className="stars">
                                     {[...Array(5)].map((_, i) => (
                                         <Star
                                             key={i}
@@ -183,7 +182,6 @@ export default function ProductCard({ product }: ProductCardProps) {
         }
     };
 
-    // Render rating stars
     const renderStars = (rating: number) => {
         const fullStars = Math.round(rating);
         return (
@@ -217,11 +215,28 @@ export default function ProductCard({ product }: ProductCardProps) {
                 whileHover={{ y: -8 }}
                 onHoverStart={() => setIsHovered(true)}
                 onHoverEnd={() => setIsHovered(false)}
-                className="group bg-white rounded-card shadow-card hover:shadow-card-hover transition-all duration-500 overflow-hidden border border-[#E0E0E0]/50 hover:border-[#0A6C44]/20"
+                className="product-card"
             >
                 <Link href={`/products/${product.id}`} className="block">
-                    {/* Image */}
-                    <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100">
+                    {/* Wishlist Button */}
+                    <motion.button
+                        whileHover={{ scale: 1.2 }}
+                        whileTap={{ scale: 0.8 }}
+                        onClick={handleWishlistToggle}
+                        className="wishlist-btn"
+                    >
+                        <Heart
+                            className={`w-4 h-4 transition ${isWishlist ? 'fill-red-500 text-red-500' : 'text-[#757575]'}`}
+                        />
+                    </motion.button>
+
+                    {/* Discount Badge */}
+                    {hasDiscount && (
+                        <span className="discount-badge">-{product.discount}%</span>
+                    )}
+
+                    {/* Product Image */}
+                    <div className="relative w-full h-48 bg-gray-50 rounded-md overflow-hidden">
                         <Image
                             src={imgSrc}
                             alt={product.name}
@@ -231,131 +246,69 @@ export default function ProductCard({ product }: ProductCardProps) {
                             priority={false}
                             onError={handleImageError}
                         />
-
-                        {hasDiscount && (
-                            <span className="absolute top-3 right-3 bg-[#4CAF50] text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-lg z-10">
-                                -{product.discount}%
-                            </span>
-                        )}
-
-                        {product.isVerified && (
-                            <span className="absolute top-3 left-3 bg-[#2196F3] text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-lg z-10 flex items-center gap-1">
-                                <Store className="w-3 h-3" /> Verified
-                            </span>
-                        )}
-
-                        <motion.button
-                            whileHover={{ scale: 1.2 }}
-                            whileTap={{ scale: 0.8 }}
-                            onClick={handleWishlistToggle}
-                            className={`absolute top-3 left-3 p-2 rounded-full shadow-md transition-all duration-300 z-10 ${isWishlist
-                                ? 'bg-red-500 text-white shadow-red-200'
-                                : 'bg-white/90 backdrop-blur-sm text-[#757575] hover:text-red-500 hover:bg-white'
-                                }`}
-                            aria-label="Add to wishlist"
-                        >
-                            <Heart
-                                className={`w-5 h-5 transition ${isWishlist ? 'fill-white' : 'fill-transparent'}`}
-                                strokeWidth={isWishlist ? 0 : 2}
-                            />
-                        </motion.button>
-
-                        <div className="absolute bottom-3 left-3 right-3">
-                            <span className="inline-block bg-white/90 backdrop-blur-sm text-[#0A6C44] text-xs font-medium px-3 py-1 rounded-full shadow-md border border-white/20">
-                                {primaryBadge}
-                            </span>
-                        </div>
                     </div>
 
-                    {/* Content */}
-                    <div className="p-4 text-right">
-                        <h3 className="font-semibold text-[#1A1A1A] text-base line-clamp-1">
-                            {product.name}
-                        </h3>
+                    {/* Product Info */}
+                    <h3 className="product-title">{product.name}</h3>
+                    <p className="product-desc">{product.description}</p>
 
-                        <p className="text-sm text-[#757575] line-clamp-2 mt-1 min-h-[40px]">
-                            {product.description}
-                        </p>
-
-                        {product.category && (
-                            <span
-                                className="inline-block mt-1 text-xs text-[#0A6C44] hover:underline bg-[#0A6C44]/5 px-2 py-0.5 rounded-full transition cursor-pointer"
-                                onClick={handleCategoryClick}
-                            >
-                                {product.category}
-                            </span>
-                        )}
-
-                        {/* Rating */}
-                        {product.rating && (
-                            <div className="mt-2 flex items-center justify-end">
-                                {renderStars(product.rating)}
-                            </div>
-                        )}
-
-                        {/* Price + Quantity Controls */}
-                        <div className="mt-3 flex items-center justify-between gap-2">
-                            {/* Quantity Controls */}
-                            {product.stockQuantity > 0 && (
-                                <div
-                                    className="flex items-center gap-1 bg-[#F8F9FA] rounded-lg p-1 border border-[#E0E0E0]"
-                                    onClick={(e) => e.stopPropagation()}
-                                >
-                                    <button
-                                        onClick={decrement}
-                                        disabled={quantity <= 1}
-                                        className="w-7 h-7 rounded-md flex items-center justify-center text-[#757575] hover:bg-white hover:shadow-sm transition disabled:opacity-30 disabled:cursor-not-allowed text-lg font-bold"
-                                    >
-                                        −
-                                    </button>
-                                    <span className="w-6 text-center text-sm font-medium text-[#1A1A1A]">
-                                        {quantity}
-                                    </span>
-                                    <button
-                                        onClick={increment}
-                                        disabled={quantity >= product.stockQuantity}
-                                        className="w-7 h-7 rounded-md flex items-center justify-center text-[#757575] hover:bg-white hover:shadow-sm transition disabled:opacity-30 disabled:cursor-not-allowed text-lg font-bold"
-                                    >
-                                        +
-                                    </button>
-                                </div>
-                            )}
-
-                            <div className="flex items-center gap-2">
-                                <span className="text-xl font-bold text-[#0A6C44]">
-                                    {CURRENCY}{(discountPrice || product.price).toFixed(2)}
-                                </span>
-                                {hasDiscount && (
-                                    <span className="text-sm text-[#9E9E9E] line-through">
-                                        {CURRENCY}{product.price.toFixed(2)}
-                                    </span>
-                                )}
-                            </div>
+                    {/* Rating */}
+                    {product.rating && (
+                        <div className="product-rating">
+                            {renderStars(product.rating)}
                         </div>
+                    )}
+
+                    {/* Price Row */}
+                    <div className="price-row">
+                        <span className="current-price">
+                            {CURRENCY}{(discountPrice || product.price).toFixed(2)}
+                        </span>
+                        {hasDiscount && (
+                            <>
+                                <span className="old-price">{CURRENCY}{product.price.toFixed(2)}</span>
+                                <span className="discount-tag">-{product.discount}%</span>
+                            </>
+                        )}
                     </div>
                 </Link>
 
-                {/* Add to Cart */}
-                <div className="px-4 pb-4">
-                    <motion.button
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.97 }}
+                {/* Quantity Controls + Add to Cart */}
+                <div className="flex items-center gap-2">
+                    {product.stockQuantity > 0 && (
+                        <div className="flex items-center gap-1 bg-[#F8F9FA] rounded-lg p-0.5 border border-[#E0E0E0] flex-shrink-0">
+                            <button
+                                onClick={decrement}
+                                disabled={quantity <= 1}
+                                className="w-7 h-7 rounded-md flex items-center justify-center text-[#757575] hover:bg-white hover:shadow-sm transition disabled:opacity-30 disabled:cursor-not-allowed text-lg font-bold"
+                            >
+                                −
+                            </button>
+                            <span className="w-6 text-center text-sm font-medium text-[#1A1A1A]">
+                                {quantity}
+                            </span>
+                            <button
+                                onClick={increment}
+                                disabled={quantity >= product.stockQuantity}
+                                className="w-7 h-7 rounded-md flex items-center justify-center text-[#757575] hover:bg-white hover:shadow-sm transition disabled:opacity-30 disabled:cursor-not-allowed text-lg font-bold"
+                            >
+                                +
+                            </button>
+                        </div>
+                    )}
+
+                    <button
                         onClick={(e) => handleAddToCart(e, quantity)}
                         disabled={isAdding || product.stockQuantity === 0}
-                        className={`w-full py-2.5 rounded-button font-medium transition-all duration-300 flex items-center justify-center gap-2 ${product.stockQuantity === 0
-                                ? 'bg-gray-100 text-[#9E9E9E] cursor-not-allowed'
-                                : isAdding
-                                    ? 'bg-[#0A6C44]/70 text-white cursor-wait'
-                                    : 'bg-[#0A6C44] text-white hover:bg-[#06452A] hover:shadow-lg hover:shadow-[#0A6C44]/20 hover:scale-105'
-                            }`}
+                        className="add-to-cart-btn flex-1"
                     >
                         <ShoppingBag className="w-4 h-4" />
                         {isAdding
                             ? 'جاري الإضافة...'
                             : product.stockQuantity === 0
                                 ? 'غير متوفر'
-                                : `إضافة (${quantity}) إلى السلة`}
-                    </motion.button>
+                                : `إضافة (${quantity})`}
+                    </button>
                 </div>
             </motion.div>
 
