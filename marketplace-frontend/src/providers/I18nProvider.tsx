@@ -22,16 +22,14 @@ const resources = {
     },
 };
 
-// Try to get saved language from localStorage
 const getSavedLanguage = (): string => {
     if (typeof window !== 'undefined') {
         const saved = localStorage.getItem('i18nextLng');
         if (saved === 'ar' || saved === 'en') return saved;
     }
-    return 'ar'; // Default to Arabic
+    return 'ar';
 };
 
-// Initialize i18n (only once)
 if (!i18n.isInitialized) {
     i18n
         .use(initReactI18next)
@@ -41,40 +39,30 @@ if (!i18n.isInitialized) {
             lng: getSavedLanguage(),
             fallbackLng: 'ar',
             defaultNS: 'common',
-            interpolation: {
-                escapeValue: false,
-            },
+            interpolation: { escapeValue: false },
         });
 }
 
 export function I18nProvider({ children }: { children: React.ReactNode }) {
-    const [langKey, setLangKey] = useState(i18n.language);
+    const [lang, setLang] = useState(i18n.language);
     const [isReady, setIsReady] = useState(false);
 
     useEffect(() => {
-        // Update HTML dir attribute based on language
-        const updateDir = (lng: string) => {
+        const handleLanguageChanged = (lng: string) => {
+            localStorage.setItem('i18nextLng', lng);
+            setLang(lng);
             document.documentElement.dir = lng === 'ar' ? 'rtl' : 'ltr';
             document.documentElement.lang = lng;
         };
 
-        // Handle language change
-        const handleLanguageChanged = (lng: string) => {
-            localStorage.setItem('i18nextLng', lng);
-            setLangKey(lng); // Force re‑render of the provider
-            updateDir(lng);
-        };
-
         i18n.on('languageChanged', handleLanguageChanged);
 
-        // Set initial language and dir
+        // Initial setup
         const saved = localStorage.getItem('i18nextLng');
         if (saved && (saved === 'ar' || saved === 'en')) {
             i18n.changeLanguage(saved);
-            updateDir(saved);
-        } else {
-            updateDir(i18n.language);
         }
+        handleLanguageChanged(i18n.language);
 
         setIsReady(true);
 
@@ -84,17 +72,15 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
     }, []);
 
     if (!isReady) {
-        return (
-            <div className="bg-white shadow-md py-4 text-center text-gray-500">
-                جاري التحميل...
-            </div>
-        );
+        return <div className="bg-white shadow-md py-4 text-center text-gray-500">جاري التحميل...</div>;
     }
 
-    // ✅ Key forces all children to re‑mount when language changes (no page reload)
+    // ✅ Force re‑render by using the language as a key on a wrapper
     return (
-        <I18nextProvider i18n={i18n} key={langKey}>
-            {children}
+        <I18nextProvider i18n={i18n}>
+            <div key={lang}>
+                {children}
+            </div>
         </I18nextProvider>
     );
 }

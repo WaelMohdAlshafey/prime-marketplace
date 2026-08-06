@@ -17,18 +17,14 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-    const [template, setTemplate] = useState<Template>('standard');
+    const [template, setTemplate] = useState<Template>('standard'); // ✅ Default to standard
     const [settings, setSettings] = useState<StoreSettings | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
-    // Apply theme to document root
     const applyTheme = (themeSettings: StoreSettings) => {
         const root = document.documentElement;
-
-        // Set data attribute for template
         root.setAttribute('data-theme', themeSettings.template || 'standard');
 
-        // Apply all CSS variables
         const cssVars: Record<string, string | undefined> = {
             '--color-primary': themeSettings.primaryColor,
             '--color-primary-light': themeSettings.primaryLight,
@@ -68,7 +64,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
             }
         });
 
-        // Apply custom CSS if provided
+        // Apply custom CSS
         const customStyleId = 'custom-theme-css';
         let customStyle = document.getElementById(customStyleId) as HTMLStyleElement;
         if (!customStyle) {
@@ -77,9 +73,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
             document.head.appendChild(customStyle);
         }
         customStyle.textContent = themeSettings.customCss || '';
-
-        // Apply custom header/footer HTML via meta tags or other methods
-        // (implementation depends on where you want to inject them)
     };
 
     useEffect(() => {
@@ -87,10 +80,13 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
             try {
                 const data = await getStoreSettings();
                 setSettings(data);
-                setTemplate((data.template as Template) || 'standard');
+                const templateVal = data.template as Template || 'standard';
+                setTemplate(templateVal);
                 applyTheme(data);
             } catch (error) {
                 console.error('Failed to load theme:', error);
+                // Fallback to default theme
+                setTemplate('standard');
             } finally {
                 setIsLoading(false);
             }
@@ -98,7 +94,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         fetchSettings();
     }, []);
 
-    // Re-apply when template or settings change
     useEffect(() => {
         if (settings) {
             applyTheme(settings);

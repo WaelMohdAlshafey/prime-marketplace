@@ -33,7 +33,7 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-    const { template } = useTheme();
+    const { template = 'standard' } = useTheme(); // ✅ Fallback to 'standard'
     const pathname = usePathname();
     const [isAdding, setIsAdding] = useState(false);
     const [quantity, setQuantity] = useState(1);
@@ -115,10 +115,6 @@ export default function ProductCard({ product }: ProductCardProps) {
     }
 
     // ----- STANDARD TEMPLATE (Full Prime Design) -----
-    const primaryBadge = isStorePage
-        ? product.category || 'Category'
-        : product.vendorName || 'Vendor';
-
     const handleWishlistToggle = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
@@ -156,13 +152,6 @@ export default function ProductCard({ product }: ProductCardProps) {
             setIsAdding(true);
             await addToCart(product.id, qty);
             setIsAdding(false);
-        }
-    };
-
-    const handleCategoryClick = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        if (product.category) {
-            window.location.href = `/${product.category}`;
         }
     };
 
