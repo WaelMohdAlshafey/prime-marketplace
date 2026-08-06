@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import api from '@/lib/api';
 import { Monitor, Sparkles, Droplet, Shirt, Gem, Smartphone, Pill, Home } from 'lucide-react';
 
+// Map of icon keys (lowercase-dash) to Lucide components
 const categoryIcons: Record<string, any> = {
     software: Monitor,
     'hair-care': Sparkles,
@@ -27,11 +28,18 @@ const categoryColors: Record<string, string> = {
     home: 'bg-gray-50 text-gray-600',
 };
 
-const getCategoryDisplayName = (slug: string, t: (key: string) => string): string => {
-    const key = `categories.${slug}`;
+// Helper: convert "Skin Care" → "skin-care"
+const normalizeCategory = (cat: string): string => {
+    return cat.toLowerCase().replace(/\s+/g, '-');
+};
+
+// Helper: get display name from translation (or fallback)
+const getCategoryDisplayName = (cat: string, t: (key: string) => string): string => {
+    const key = `categories.${normalizeCategory(cat)}`;
     const translated = t(key);
+    // If translation returns the key itself, fallback to the original name
     if (translated === key) {
-        return slug.replace(/-/g, ' ');
+        return cat;
     }
     return translated;
 };
@@ -56,7 +64,9 @@ export default function CategoryGrid() {
     }, []);
 
     const handleCategoryClick = (category: string) => {
-        window.location.href = `/${category}`;
+        // Use the normalized slug for routing
+        const slug = normalizeCategory(category);
+        window.location.href = `/${slug}`;
     };
 
     if (loading) {
@@ -81,8 +91,9 @@ export default function CategoryGrid() {
 
             <div className="category-grid">
                 {categories.map((cat) => {
-                    const Icon = categoryIcons[cat] || Home;
-                    const colorClass = categoryColors[cat] || 'bg-gray-50 text-gray-600';
+                    const key = normalizeCategory(cat);
+                    const Icon = categoryIcons[key] || Home;
+                    const colorClass = categoryColors[key] || 'bg-gray-50 text-gray-600';
                     const displayName = getCategoryDisplayName(cat, t);
 
                     return (

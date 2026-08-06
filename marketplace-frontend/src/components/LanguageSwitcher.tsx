@@ -9,13 +9,10 @@ export default function LanguageSwitcher() {
     const toggleLanguage = () => {
         const newLang = i18n.language === 'ar' ? 'en' : 'ar';
         i18n.changeLanguage(newLang);
-        // localStorage will be updated automatically by the I18nProvider listener
-        // but we also update it here directly for immediate persistence
-        localStorage.setItem('i18nextLng', newLang);
-        // Optionally, you can reload the page to refresh server-rendered content
-        // but if you use client-side i18n only, you don't need to reload.
-        // For consistency, we reload to ensure all components re-render with the new language.
-        window.location.reload();
+        // The I18nProvider will automatically:
+        // - Save the language to localStorage
+        // - Update the <html> dir and lang attributes
+        // - Force a re‑render via the key prop
     };
 
     return (
