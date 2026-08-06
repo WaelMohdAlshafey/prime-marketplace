@@ -29,7 +29,6 @@ export default function Home() {
             const finalFilters = filterOverrides || filters;
             let url = '/api/Products?page=1&pageSize=12';
 
-            // If filters are applied, use the filter endpoint
             if (Object.keys(finalFilters).length > 0) {
                 const params = new URLSearchParams();
                 if (finalFilters.minPrice !== undefined) params.append('minPrice', finalFilters.minPrice.toString());
@@ -63,9 +62,7 @@ export default function Home() {
         fetchProducts({});
     };
 
-    // ============================================================
-    // SERVICE BANNERS
-    // ============================================================
+    // Service banners data
     const services = [
         { icon: <Truck className="w-8 h-8" />, title: 'شحن سريع', subtitle: 'توصيل خلال 2-5 أيام' },
         { icon: <Shield className="w-8 h-8" />, title: 'ضمان الجودة', subtitle: 'منتجات أصلية 100%' },
@@ -111,7 +108,8 @@ export default function Home() {
                 {/* Product Grid */}
                 <div className="flex-1">
                     <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-2xl font-bold text-[#1A1A1A]">
+                        <h2 className="text-2xl font-bold text-[#1A1A1A] flex items-center gap-2">
+                            <ShoppingBag className="w-6 h-6 text-[#0A6C44]" />
                             {t('featuredProducts')}
                         </h2>
                         <span className="text-sm text-[#757575]">

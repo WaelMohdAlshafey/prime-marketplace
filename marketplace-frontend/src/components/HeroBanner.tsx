@@ -125,6 +125,10 @@ export default function HeroBanner() {
                     height={400}
                     className="hero-image object-contain"
                     priority
+                    onError={(e) => {
+                        // Fallback to a placeholder if image fails
+                        (e.target as HTMLImageElement).src = '/images/placeholder.jpg';
+                    }}
                 />
             </div>
 
