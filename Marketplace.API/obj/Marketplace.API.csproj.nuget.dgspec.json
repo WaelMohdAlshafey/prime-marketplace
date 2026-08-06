@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "M:\\Marketplace\\Marketplace.API\\Marketplace.API.csproj": {}
+    "E:\\prime-marketplace\\Marketplace.API\\Marketplace.API.csproj": {}
   },
   "projects": {
-    "M:\\Marketplace\\Marketplace.API\\Marketplace.API.csproj": {
+    "E:\\prime-marketplace\\Marketplace.API\\Marketplace.API.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "M:\\Marketplace\\Marketplace.API\\Marketplace.API.csproj",
+        "projectUniqueName": "E:\\prime-marketplace\\Marketplace.API\\Marketplace.API.csproj",
         "projectName": "Marketplace.API",
-        "projectPath": "M:\\Marketplace\\Marketplace.API\\Marketplace.API.csproj",
+        "projectPath": "E:\\prime-marketplace\\Marketplace.API\\Marketplace.API.csproj",
         "packagesPath": "C:\\Users\\Andalus\\.nuget\\packages\\",
-        "outputPath": "M:\\Marketplace\\Marketplace.API\\obj\\",
+        "outputPath": "E:\\prime-marketplace\\Marketplace.API\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -32,14 +32,14 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "M:\\Marketplace\\Marketplace.Application\\Marketplace.Application.csproj": {
-                "projectPath": "M:\\Marketplace\\Marketplace.Application\\Marketplace.Application.csproj"
+              "E:\\prime-marketplace\\Marketplace.Application\\Marketplace.Application.csproj": {
+                "projectPath": "E:\\prime-marketplace\\Marketplace.Application\\Marketplace.Application.csproj"
               },
-              "M:\\Marketplace\\Marketplace.Domain\\Marketplace.Domain.csproj": {
-                "projectPath": "M:\\Marketplace\\Marketplace.Domain\\Marketplace.Domain.csproj"
+              "E:\\prime-marketplace\\Marketplace.Domain\\Marketplace.Domain.csproj": {
+                "projectPath": "E:\\prime-marketplace\\Marketplace.Domain\\Marketplace.Domain.csproj"
               },
-              "M:\\Marketplace\\Marketplace.Infrastructure\\Marketplace.Infrastructure.csproj": {
-                "projectPath": "M:\\Marketplace\\Marketplace.Infrastructure\\Marketplace.Infrastructure.csproj"
+              "E:\\prime-marketplace\\Marketplace.Infrastructure\\Marketplace.Infrastructure.csproj": {
+                "projectPath": "E:\\prime-marketplace\\Marketplace.Infrastructure\\Marketplace.Infrastructure.csproj"
               }
             }
           }
@@ -120,14 +120,14 @@
         }
       }
     },
-    "M:\\Marketplace\\Marketplace.Application\\Marketplace.Application.csproj": {
+    "E:\\prime-marketplace\\Marketplace.Application\\Marketplace.Application.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "M:\\Marketplace\\Marketplace.Application\\Marketplace.Application.csproj",
+        "projectUniqueName": "E:\\prime-marketplace\\Marketplace.Application\\Marketplace.Application.csproj",
         "projectName": "Marketplace.Application",
-        "projectPath": "M:\\Marketplace\\Marketplace.Application\\Marketplace.Application.csproj",
+        "projectPath": "E:\\prime-marketplace\\Marketplace.Application\\Marketplace.Application.csproj",
         "packagesPath": "C:\\Users\\Andalus\\.nuget\\packages\\",
-        "outputPath": "M:\\Marketplace\\Marketplace.Application\\obj\\",
+        "outputPath": "E:\\prime-marketplace\\Marketplace.Application\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -148,11 +148,11 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "M:\\Marketplace\\Marketplace.Domain\\Marketplace.Domain.csproj": {
-                "projectPath": "M:\\Marketplace\\Marketplace.Domain\\Marketplace.Domain.csproj"
+              "E:\\prime-marketplace\\Marketplace.Domain\\Marketplace.Domain.csproj": {
+                "projectPath": "E:\\prime-marketplace\\Marketplace.Domain\\Marketplace.Domain.csproj"
               },
-              "M:\\Marketplace\\Marketplace.Infrastructure\\Marketplace.Infrastructure.csproj": {
-                "projectPath": "M:\\Marketplace\\Marketplace.Infrastructure\\Marketplace.Infrastructure.csproj"
+              "E:\\prime-marketplace\\Marketplace.Infrastructure\\Marketplace.Infrastructure.csproj": {
+                "projectPath": "E:\\prime-marketplace\\Marketplace.Infrastructure\\Marketplace.Infrastructure.csproj"
               }
             }
           }
@@ -202,14 +202,14 @@
         }
       }
     },
-    "M:\\Marketplace\\Marketplace.Domain\\Marketplace.Domain.csproj": {
+    "E:\\prime-marketplace\\Marketplace.Domain\\Marketplace.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "M:\\Marketplace\\Marketplace.Domain\\Marketplace.Domain.csproj",
+        "projectUniqueName": "E:\\prime-marketplace\\Marketplace.Domain\\Marketplace.Domain.csproj",
         "projectName": "Marketplace.Domain",
-        "projectPath": "M:\\Marketplace\\Marketplace.Domain\\Marketplace.Domain.csproj",
+        "projectPath": "E:\\prime-marketplace\\Marketplace.Domain\\Marketplace.Domain.csproj",
         "packagesPath": "C:\\Users\\Andalus\\.nuget\\packages\\",
-        "outputPath": "M:\\Marketplace\\Marketplace.Domain\\obj\\",
+        "outputPath": "E:\\prime-marketplace\\Marketplace.Domain\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -267,14 +267,14 @@
         }
       }
     },
-    "M:\\Marketplace\\Marketplace.Infrastructure\\Marketplace.Infrastructure.csproj": {
+    "E:\\prime-marketplace\\Marketplace.Infrastructure\\Marketplace.Infrastructure.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "M:\\Marketplace\\Marketplace.Infrastructure\\Marketplace.Infrastructure.csproj",
+        "projectUniqueName": "E:\\prime-marketplace\\Marketplace.Infrastructure\\Marketplace.Infrastructure.csproj",
         "projectName": "Marketplace.Infrastructure",
-        "projectPath": "M:\\Marketplace\\Marketplace.Infrastructure\\Marketplace.Infrastructure.csproj",
+        "projectPath": "E:\\prime-marketplace\\Marketplace.Infrastructure\\Marketplace.Infrastructure.csproj",
         "packagesPath": "C:\\Users\\Andalus\\.nuget\\packages\\",
-        "outputPath": "M:\\Marketplace\\Marketplace.Infrastructure\\obj\\",
+        "outputPath": "E:\\prime-marketplace\\Marketplace.Infrastructure\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -295,8 +295,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "M:\\Marketplace\\Marketplace.Domain\\Marketplace.Domain.csproj": {
-                "projectPath": "M:\\Marketplace\\Marketplace.Domain\\Marketplace.Domain.csproj"
+              "E:\\prime-marketplace\\Marketplace.Domain\\Marketplace.Domain.csproj": {
+                "projectPath": "E:\\prime-marketplace\\Marketplace.Domain\\Marketplace.Domain.csproj"
               }
             }
           }

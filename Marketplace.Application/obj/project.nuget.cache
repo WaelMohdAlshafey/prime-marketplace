@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "MdwTUsI4jSU=",
+  "dgSpecHash": "ZTDoZjA99m0=",
   "success": true,
-  "projectFilePath": "M:\\Marketplace\\Marketplace.Application\\Marketplace.Application.csproj",
+  "projectFilePath": "E:\\prime-marketplace\\Marketplace.Application\\Marketplace.Application.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Andalus\\.nuget\\packages\\azure.core\\1.25.0\\azure.core.1.25.0.nupkg.sha512",
     "C:\\Users\\Andalus\\.nuget\\packages\\azure.identity\\1.7.0\\azure.identity.1.7.0.nupkg.sha512",

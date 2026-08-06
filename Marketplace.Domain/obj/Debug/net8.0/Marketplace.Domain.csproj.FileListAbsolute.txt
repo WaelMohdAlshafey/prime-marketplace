@@ -10,3 +10,15 @@ M:\Marketplace\Marketplace.Domain\obj\Debug\net8.0\Marketplace.Domain.dll
 M:\Marketplace\Marketplace.Domain\obj\Debug\net8.0\refint\Marketplace.Domain.dll
 M:\Marketplace\Marketplace.Domain\obj\Debug\net8.0\Marketplace.Domain.pdb
 M:\Marketplace\Marketplace.Domain\obj\Debug\net8.0\ref\Marketplace.Domain.dll
+E:\prime-marketplace\Marketplace.Domain\bin\Debug\net8.0\Marketplace.Domain.deps.json
+E:\prime-marketplace\Marketplace.Domain\bin\Debug\net8.0\Marketplace.Domain.dll
+E:\prime-marketplace\Marketplace.Domain\bin\Debug\net8.0\Marketplace.Domain.pdb
+E:\prime-marketplace\Marketplace.Domain\obj\Debug\net8.0\Marketplace.Domain.GeneratedMSBuildEditorConfig.editorconfig
+E:\prime-marketplace\Marketplace.Domain\obj\Debug\net8.0\Marketplace.Domain.AssemblyInfoInputs.cache
+E:\prime-marketplace\Marketplace.Domain\obj\Debug\net8.0\Marketplace.Domain.AssemblyInfo.cs
+E:\prime-marketplace\Marketplace.Domain\obj\Debug\net8.0\Marketplace.Domain.csproj.CoreCompileInputs.cache
+E:\prime-marketplace\Marketplace.Domain\obj\Debug\net8.0\Marketplace.Domain.sourcelink.json
+E:\prime-marketplace\Marketplace.Domain\obj\Debug\net8.0\Marketplace.Domain.dll
+E:\prime-marketplace\Marketplace.Domain\obj\Debug\net8.0\refint\Marketplace.Domain.dll
+E:\prime-marketplace\Marketplace.Domain\obj\Debug\net8.0\Marketplace.Domain.pdb
+E:\prime-marketplace\Marketplace.Domain\obj\Debug\net8.0\ref\Marketplace.Domain.dll

@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Marketplace.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260730141118_AddCategoryToProduct")]
-    partial class AddCategoryToProduct
+    [Migration("20260806130823_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -249,6 +249,14 @@ namespace Marketplace.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("DescriptionAr")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DescriptionEn")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("ImageUrl")
                         .HasColumnType("TEXT");
 
@@ -256,6 +264,14 @@ namespace Marketplace.Infrastructure.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("NameAr")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("NameEn")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -420,8 +436,71 @@ namespace Marketplace.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("BackgroundColor")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("BodyFont")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ButtonPrimaryBg")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ButtonPrimaryHover")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ButtonPrimaryText")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ButtonSecondaryBg")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ButtonSecondaryHover")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ButtonSecondaryText")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CardBg")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CardBorder")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CardBorderRadius")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CardHoverShadow")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CardShadow")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CustomCss")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CustomFooterHtml")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CustomHeaderHtml")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("EmailsJson")
                         .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FaviconEmoji")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FontFamily")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FooterBg")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FooterText")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("HeadingFont")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Landline")
@@ -436,12 +515,52 @@ namespace Marketplace.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("NavbarBg")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("NavbarHover")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("NavbarText")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("OwnersJson")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("PrimaryColor")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PrimaryDark")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PrimaryLight")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SecondaryColor")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SecondaryLight")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SiteEmoji")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("StoreName")
                         .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SurfaceColor")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Template")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("TextColor")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("TextMuted")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("WhatsApp")
