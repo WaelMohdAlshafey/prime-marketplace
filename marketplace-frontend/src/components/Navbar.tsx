@@ -7,281 +7,353 @@ import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
 import { useTranslation } from 'react-i18next';
 import { useCartIconRef } from '@/context/CartIconRefContext';
+import Logo from './Logo';
+import LanguageSwitcher from './LanguageSwitcher';
 import {
-    ShoppingCart,
-    Heart,
-    User,
-    Search,
-    Menu,
-    X,
-    Globe,
-    Phone,
-    Truck,
-    Store,
-    Package,
-    ShoppingBag,
-    Settings,
-    UserPlus,
-} from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+    ShoppingCartIcon,
+    UserIcon,
+    HeartIcon,
+    MagnifyingGlassIcon,
+    CurrencyDollarIcon,
+    Bars3Icon,
+    XMarkIcon,
+    UserPlusIcon,
+    Cog6ToothIcon,
+} from '@heroicons/react/24/outline';
+import { AuthResponse } from '@/types';
+import { motion } from 'framer-motion';
+import api from '@/lib/api';
 
-export default function Navbar() {
-    const { user, logout, isLoading } = useAuth();
+// ============================================================
+// TOP BAR
+// ============================================================
+const TopBar = () => {
     const { t } = useTranslation('common');
+    return (
+        <div className="bg-gradient-to-r from-[#0F5C45] to-[#1A7A5C] text-white text-xs py-1.5 relative overflow-hidden">
+            <div className="absolute inset-0 opacity-10 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDM0djItSDI0di0yaDEyek0zNiAyNHYySDI0di0yaDEyeiIvPjwvZz48L2c+PC9zdmc+')]"></div>
+            <div className="container mx-auto px-4 flex justify-between items-center relative z-10">
+                <div className="flex items-center gap-4">
+                    <span className="flex items-center gap-1.5">
+                        <span className="text-yellow-400 animate-pulse">✦</span>
+                        {t('freeShipping')}
+                    </span>
+                    <span className="text-white/30">|</span>
+                    <Link href="/tracking" className="hover:text-yellow-300 transition duration-300">
+                        {t('trackOrder')}
+                    </Link>
+                </div>
+                <div className="flex items-center gap-3">
+                    <LanguageSwitcher />
+                    <button className="flex items-center gap-1 hover:text-yellow-300 transition duration-300">
+                        <CurrencyDollarIcon className="w-3.5 h-3.5" />
+                        {t('currency')}
+                    </button>
+                    <button className="hover:text-yellow-300 transition duration-300">
+                        {t('support')}
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// ============================================================
+// MAIN HEADER
+// ============================================================
+const MainHeader = ({ user }: { user: AuthResponse | null }) => {
+    const { t } = useTranslation('common');
+    const [searchTerm, setSearchTerm] = useState('');
+    const [isScrolled, setIsScrolled] = useState(false);
     const { totalItems } = useCart();
     const { totalFavorites } = useWishlist();
     const { cartIconRef } = useCartIconRef();
-    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const [searchQuery, setSearchQuery] = useState('');
-    const [isScrolled, setIsScrolled] = useState(false);
+    const [isAnimating, setIsAnimating] = useState(false);
+    const prevTotalRef = useRef(totalItems);
 
     useEffect(() => {
-        const handleScroll = () => {
-            setIsScrolled(window.scrollY > 20);
-        };
+        const handleScroll = () => setIsScrolled(window.scrollY > 20);
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
+    useEffect(() => {
+        if (totalItems > prevTotalRef.current) {
+            setIsAnimating(true);
+            const timer = setTimeout(() => setIsAnimating(false), 300);
+            return () => clearTimeout(timer);
+        }
+        prevTotalRef.current = totalItems;
+    }, [totalItems]);
+
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
-        if (searchQuery.trim()) {
-            window.location.href = `/?q=${encodeURIComponent(searchQuery.trim())}`;
+        if (searchTerm.trim()) {
+            window.location.href = `/?q=${encodeURIComponent(searchTerm.trim())}`;
         }
     };
 
-    const handleLogout = () => {
-        logout();
-        window.location.href = '/';
-    };
-
     return (
-        <>
-            {/* TOP BAR */}
-            <div className="top-bar">
-                <div className="container">
-                    <div className="left">
-                        <Link href="/contact">
-                            <Phone className="w-4 h-4" />
-                            <span>اتصل بنا</span>
-                        </Link>
-                        <span className="divider">|</span>
-                        <Link href="/tracking">
-                            <Truck className="w-4 h-4" />
-                            <span>{t('trackOrder')}</span>
-                        </Link>
-                        <span className="divider">|</span>
-                        <Link href="/stores">
-                            <Store className="w-4 h-4" />
-                            <span>{t('stores')}</span>
-                        </Link>
-                    </div>
-                    <div className="right">
-                        <Link href="/offers">
-                            🔥 {t('offers')}
-                        </Link>
-                        <span className="divider">|</span>
-                        <button className="hover:opacity-80 transition flex items-center gap-1">
-                            <Globe className="w-4 h-4" />
-                            <span>English</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
+        <div className={`sticky top-0 z-40 transition-all duration-500 ${isScrolled ? 'bg-white/80 backdrop-blur-xl shadow-lg border-b border-white/20' : 'bg-white/60 backdrop-blur-md shadow-sm border-b border-gray-100/50'}`}>
+            <div className="container mx-auto px-4 flex items-center gap-4 py-3">
+                <Logo />
 
-            {/* MAIN NAVBAR */}
-            <nav className={`navbar ${isScrolled ? 'shadow-md' : ''}`}>
-                <div className="container">
-                    {/* Logo */}
-                    <Link href="/" className="logo">
-                        <ShoppingBag className="w-6 h-6 text-[#0F5C45]" />
-                        <span>Prime</span>
+                <form onSubmit={handleSearch} className="flex-1 max-w-2xl relative group hidden sm:block">
+                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-[#0F5C45]/5 to-[#D4A54A]/5 opacity-0 group-hover:opacity-100 transition duration-500 blur-xl"></div>
+                    <input
+                        type="text"
+                        placeholder={t('searchPlaceholder')}
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full px-5 py-3 pr-12 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#0F5C45]/30 focus:border-[#0F5C45] transition-all duration-300 bg-white/80 backdrop-blur-sm hover:bg-white text-right shadow-soft relative z-10"
+                    />
+                    <MagnifyingGlassIcon className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-hover:text-[#0F5C45] transition duration-300" />
+                    <button type="submit" className="absolute left-1.5 top-1/2 -translate-y-1/2 bg-gradient-to-r from-[#0F5C45] to-[#1A7A5C] text-white px-5 py-1.5 rounded-xl text-sm font-medium hover:shadow-lg hover:scale-105 transition-all duration-300 shadow-soft">
+                        {t('search')}
+                    </button>
+                </form>
+
+                {/* Mobile search */}
+                <form onSubmit={handleSearch} className="flex-1 sm:hidden">
+                    <input
+                        type="text"
+                        placeholder={t('searchPlaceholder')}
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0F5C45]/30 text-right text-sm"
+                    />
+                </form>
+
+                <div className="flex items-center gap-3 md:gap-4 flex-shrink-0">
+                    <motion.button whileHover={{ scale: 1.15, rotate: -5 }} whileTap={{ scale: 0.9 }} className="text-gray-600 hover:text-[#0F5C45] transition relative group hidden sm:block">
+                        <HeartIcon className="w-6 h-6 group-hover:fill-[#0F5C45]/10 transition" />
+                        <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute -top-1 -right-1 bg-gradient-to-r from-[#0F5C45] to-[#1A7A5C] text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center shadow-md">
+                            {totalFavorites}
+                        </motion.span>
+                    </motion.button>
+
+                    <Link href="/cart" ref={(el) => { cartIconRef.current = el as HTMLElement; }} className="text-gray-600 hover:text-[#0F5C45] transition relative group">
+                        <motion.div whileHover={{ scale: 1.15, rotate: 8 }} whileTap={{ scale: 0.9 }} className="relative">
+                            <ShoppingCartIcon className="w-6 h-6 group-hover:fill-[#0F5C45]/10 transition" />
+                            <motion.span animate={{ scale: isAnimating ? 1.5 : 1 }} transition={{ type: 'spring', stiffness: 400, damping: 10 }} className="absolute -top-1 -right-1 bg-gradient-to-r from-[#0F5C45] to-[#1A7A5C] text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center shadow-md">
+                                {totalItems}
+                            </motion.span>
+                        </motion.div>
                     </Link>
 
-                    {/* Search Bar */}
-                    <form onSubmit={handleSearch} className="search-bar">
-                        <select className="search-dropdown">
-                            <option>الكل</option>
-                            <option>برامج</option>
-                            <option>تجميل</option>
-                            <option>أزياء</option>
-                        </select>
-                        <input
-                            type="text"
-                            placeholder={t('searchPlaceholder')}
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                        />
-                        <button type="submit" className="search-btn">
-                            <Search className="w-4 h-4" />
-                            <span>{t('search')}</span>
-                        </button>
-                    </form>
-
-                    {/* Nav Icons */}
-                    <div className="nav-icons">
-                        <Link href="/wishlist" className="icon-link">
-                            <Heart className="w-6 h-6" />
-                            {totalFavorites > 0 && (
-                                <span className="badge">{totalFavorites}</span>
-                            )}
+                    {/* ✅ Admin Settings – visible only for Admin */}
+                    {user && user.role === 'Admin' && (
+                        <Link href="/admin" className="text-gray-600 hover:text-[#0F5C45] transition relative group">
+                            <Cog6ToothIcon className="w-6 h-6 group-hover:fill-[#0F5C45]/10 transition" />
                         </Link>
+                    )}
 
-                        <Link
-                            href="/cart"
-                            ref={(el) => { cartIconRef.current = el as HTMLElement; }}
-                            className="icon-link"
-                        >
-                            <ShoppingCart className="w-6 h-6" />
-                            {totalItems > 0 && (
-                                <span className="badge">{totalItems}</span>
-                            )}
-                        </Link>
-
-                        {/* Admin Settings – desktop (only for Admin) */}
-                        {!isLoading && user && user.role === 'Admin' && (
-                            <Link href="/admin" className="icon-link">
-                                <Settings className="w-6 h-6" />
-                                <span className="sr-only">Admin</span>
+                    {user ? (
+                        <div className="hidden sm:flex items-center gap-2 bg-[#0F5C45]/5 px-3 py-1.5 rounded-full border border-[#0F5C45]/10">
+                            <span className="text-sm text-gray-700 font-medium">{user.username}</span>
+                            <UserIcon className="w-4 h-4 text-[#0F5C45]" />
+                        </div>
+                    ) : (
+                        <>
+                            {/* ✅ Register link */}
+                            <Link href="/auth/register" className="text-sm font-medium text-[#0F5C45] hover:text-[#0A4735] transition flex items-center gap-1">
+                                <UserPlusIcon className="w-5 h-5" />
+                                <span className="hidden sm:inline">{t('registerTitle')}</span>
                             </Link>
-                        )}
+                            <Link href="/auth/login" className="text-gray-600 hover:text-[#0F5C45] transition hidden sm:block">
+                                <UserIcon className="w-6 h-6 hover:scale-110 transition duration-300" />
+                            </Link>
+                        </>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+};
 
-                        {isLoading ? (
-                            <div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse"></div>
-                        ) : user ? (
-                            <div className="user-info">
-                                <span>{user.username}</span>
-                                <button
-                                    onClick={handleLogout}
-                                    className="text-sm text-[#757575] hover:text-[#0A6C44] transition"
-                                >
-                                    {t('logout')}
-                                </button>
-                            </div>
+// ============================================================
+// NAV MENU – Dynamic with mobile hamburger
+// ============================================================
+const NavMenu = ({ categories, loading }: { categories: string[]; loading: boolean }) => {
+    const { t } = useTranslation('common');
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+    return (
+        <div className="bg-white/70 backdrop-blur-sm border-b border-gray-100/50 shadow-sm">
+            <div className="container mx-auto px-4">
+                <div className="flex items-center justify-between gap-6 py-2.5">
+                    <div className="flex items-center gap-6 overflow-x-auto whitespace-nowrap text-sm scrollbar-hide">
+                        <Link href="/" className="text-[#0F5C45] font-semibold hover:text-[#0A4735] transition border-b-2 border-[#0F5C45] pb-1">
+                            {t('home')}
+                        </Link>
+                        {loading ? (
+                            <span className="text-gray-400">Loading categories…</span>
                         ) : (
-                            <>
-                                {/* ✅ Register Link (new) */}
-                                <Link
-                                    href="/auth/register"
-                                    className="text-sm font-medium text-[#0A6C44] hover:underline transition flex items-center gap-1"
-                                >
-                                    <UserPlus className="w-4 h-4" />
-                                    <span>{t('registerTitle')}</span>
+                            categories.map((cat) => (
+                                <Link key={cat} href={`/${cat}`} className="text-gray-600 hover:text-[#0F5C45] transition pb-1">
+                                    {cat.replace(/-/g, ' ')}
                                 </Link>
-                                {/* Login Icon */}
-                                <Link href="/auth/login" className="icon-link">
-                                    <User className="w-6 h-6" />
+                            ))
+                        )}
+                        <Link href="/stores" className="text-gray-600 hover:text-[#0F5C45] transition pb-1">
+                            {t('stores')}
+                        </Link>
+                        <Link href="/offers" className="text-orange-500 font-medium hover:text-orange-600 transition pb-1">
+                            🔥 {t('offers')}
+                        </Link>
+                        <Link href="/contact" className="text-gray-600 hover:text-[#0F5C45] transition pb-1">
+                            {t('contact')}
+                        </Link>
+                    </div>
+
+                    <button
+                        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                        className="lg:hidden p-1 rounded-md hover:bg-gray-100 transition"
+                        aria-label="Toggle menu"
+                    >
+                        {mobileMenuOpen ? <XMarkIcon className="w-6 h-6" /> : <Bars3Icon className="w-6 h-6" />}
+                    </button>
+                </div>
+
+                {/* Mobile dropdown */}
+                {mobileMenuOpen && (
+                    <div className="lg:hidden py-3 space-y-2 text-right border-t border-gray-100">
+                        <Link href="/" className="block text-gray-700 hover:text-[#0F5C45] transition py-1" onClick={() => setMobileMenuOpen(false)}>
+                            {t('home')}
+                        </Link>
+                        {categories.map((cat) => (
+                            <Link key={cat} href={`/${cat}`} className="block text-gray-700 hover:text-[#0F5C45] transition py-1" onClick={() => setMobileMenuOpen(false)}>
+                                {cat.replace(/-/g, ' ')}
+                            </Link>
+                        ))}
+                        <Link href="/stores" className="block text-gray-700 hover:text-[#0F5C45] transition py-1" onClick={() => setMobileMenuOpen(false)}>
+                            {t('stores')}
+                        </Link>
+                        <Link href="/offers" className="block text-orange-500 hover:text-orange-600 transition py-1" onClick={() => setMobileMenuOpen(false)}>
+                            🔥 {t('offers')}
+                        </Link>
+                        <Link href="/contact" className="block text-gray-700 hover:text-[#0F5C45] transition py-1" onClick={() => setMobileMenuOpen(false)}>
+                            {t('contact')}
+                        </Link>
+
+                        {/* Mobile auth links */}
+                        {!loading && !user && (
+                            <>
+                                <Link href="/auth/register" className="block text-[#0F5C45] font-medium hover:underline transition py-1" onClick={() => setMobileMenuOpen(false)}>
+                                    {t('registerTitle')}
+                                </Link>
+                                <Link href="/auth/login" className="block text-[#0F5C45] font-medium hover:underline transition py-1" onClick={() => setMobileMenuOpen(false)}>
+                                    {t('loginTitle')}
                                 </Link>
                             </>
                         )}
-
-                        {/* Mobile Menu Toggle */}
-                        <button
-                            className="lg:hidden p-2 hover:bg-gray-100 rounded-lg transition"
-                            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                        >
-                            {isMobileMenuOpen ? (
-                                <X className="w-6 h-6" />
-                            ) : (
-                                <Menu className="w-6 h-6" />
-                            )}
-                        </button>
+                        {user && (
+                            <button
+                                onClick={() => {
+                                    // handle logout here
+                                    setMobileMenuOpen(false);
+                                }}
+                                className="block w-full text-right text-red-500 hover:text-red-700 transition py-1"
+                            >
+                                {t('logout')}
+                            </button>
+                        )}
                     </div>
-                </div>
+                )}
+            </div>
+        </div>
+    );
+};
 
-                {/* Mobile Menu Dropdown */}
-                <AnimatePresence>
-                    {isMobileMenuOpen && (
-                        <motion.div
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: 'auto' }}
-                            exit={{ opacity: 0, height: 0 }}
-                            className="lg:hidden bg-white border-t border-gray-200 overflow-hidden"
-                        >
-                            <div className="container py-4 space-y-2">
-                                <Link
-                                    href="/"
-                                    className="block py-2 hover:text-[#0A6C44] transition"
-                                    onClick={() => setIsMobileMenuOpen(false)}
-                                >
-                                    {t('home')}
-                                </Link>
-                                <Link
-                                    href="/products"
-                                    className="block py-2 hover:text-[#0A6C44] transition"
-                                    onClick={() => setIsMobileMenuOpen(false)}
-                                >
-                                    {t('products')}
-                                </Link>
-                                <Link
-                                    href="/stores"
-                                    className="block py-2 hover:text-[#0A6C44] transition"
-                                    onClick={() => setIsMobileMenuOpen(false)}
-                                >
-                                    {t('stores')}
-                                </Link>
-                                <Link
-                                    href="/offers"
-                                    className="block py-2 text-orange-500 hover:text-orange-600 transition"
-                                    onClick={() => setIsMobileMenuOpen(false)}
-                                >
-                                    🔥 {t('offers')}
-                                </Link>
-                                <Link
-                                    href="/contact"
-                                    className="block py-2 hover:text-[#0A6C44] transition"
-                                    onClick={() => setIsMobileMenuOpen(false)}
-                                >
-                                    {t('contact')}
-                                </Link>
+// ============================================================
+// USER NAV (bottom bar for logged-in users)
+// ============================================================
+const UserNav = ({ user, logout }: { user: AuthResponse; logout: () => void }) => {
+    const { t } = useTranslation('common');
+    const isVendor = user.role === 'Vendor' || user.role === 'Admin';
+    const isAdmin = user.role === 'Admin';
 
-                                {/* Admin Settings – mobile */}
-                                {!isLoading && user && user.role === 'Admin' && (
-                                    <Link
-                                        href="/admin"
-                                        className="block py-2 text-[#0A6C44] font-medium hover:underline transition flex items-center gap-2"
-                                        onClick={() => setIsMobileMenuOpen(false)}
-                                    >
-                                        <Settings className="w-4 h-4" /> {t('admin')}
-                                    </Link>
-                                )}
-
-                                {/* Authentication links for mobile */}
-                                {!user && !isLoading && (
-                                    <>
-                                        <Link
-                                            href="/auth/register"
-                                            className="block py-2 text-[#0A6C44] font-medium hover:underline transition flex items-center gap-2"
-                                            onClick={() => setIsMobileMenuOpen(false)}
-                                        >
-                                            <UserPlus className="w-4 h-4" /> {t('registerTitle')}
-                                        </Link>
-                                        <Link
-                                            href="/auth/login"
-                                            className="block py-2 text-[#0A6C44] font-medium hover:underline transition flex items-center gap-2"
-                                            onClick={() => setIsMobileMenuOpen(false)}
-                                        >
-                                            <User className="w-4 h-4" /> {t('loginTitle')}
-                                        </Link>
-                                    </>
-                                )}
-
-                                {user && (
-                                    <button
-                                        onClick={() => {
-                                            handleLogout();
-                                            setIsMobileMenuOpen(false);
-                                        }}
-                                        className="block w-full text-right py-2 text-red-500 hover:text-red-700 transition"
-                                    >
-                                        {t('logout')}
-                                    </button>
-                                )}
-                            </div>
-                        </motion.div>
+    return (
+        <div className="bg-gradient-to-r from-[#0F5C45] to-[#1A7A5C] text-white text-sm py-2">
+            <div className="container mx-auto px-4 flex flex-wrap justify-between items-center gap-2">
+                <div className="flex flex-wrap items-center gap-4">
+                    <Link href="/cart" className="hover:text-yellow-300 transition flex items-center gap-2 text-xs md:text-sm">
+                        <ShoppingCartIcon className="w-4 h-4" /> {t('cart')}
+                    </Link>
+                    <Link href="/orders" className="hover:text-yellow-300 transition flex items-center gap-2 text-xs md:text-sm">
+                        <span>📋 {t('orders')}</span>
+                    </Link>
+                    <Link href="/suggest" className="hover:text-yellow-300 transition flex items-center gap-2 text-xs md:text-sm">
+                        <span>💡 Suggest</span>
+                    </Link>
+                    {isVendor && (
+                        <>
+                            <Link href="/vendor/dashboard" className="hover:text-yellow-300 transition flex items-center gap-2 text-xs md:text-sm">
+                                <span>📊 {t('dashboard')}</span>
+                            </Link>
+                            <Link href="/admin/orders" className="hover:text-yellow-300 transition flex items-center gap-2 text-xs md:text-sm">
+                                <span>📦 Manage Orders</span>
+                            </Link>
+                        </>
                     )}
-                </AnimatePresence>
-            </nav>
-        </>
+                    {isAdmin && (
+                        <>
+                            <Link href="/admin/users" className="hover:text-yellow-300 transition flex items-center gap-2 text-xs md:text-sm">
+                                <span>👥 {t('users')}</span>
+                            </Link>
+                            <Link href="/admin" className="hover:text-yellow-300 transition flex items-center gap-2 text-xs md:text-sm">
+                                <span>⚙️ {t('admin')}</span>
+                            </Link>
+                        </>
+                    )}
+                    <Link href="/chat" className="hover:text-yellow-300 transition flex items-center gap-2 text-xs md:text-sm">
+                        <span>💬 Chat</span>
+                    </Link>
+                </div>
+                <div className="flex items-center gap-3">
+                    <span className="text-xs text-white/70">{t('welcome')}، {user.username}</span>
+                    <button onClick={logout} className="text-xs bg-white/10 px-3 py-1 rounded-full hover:bg-white/20 transition duration-300 hover:scale-105">
+                        {t('logout')}
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// ============================================================
+// MAIN EXPORT
+// ============================================================
+export default function Navbar() {
+    const { user, logout, isLoading } = useAuth();
+    const { t } = useTranslation('common');
+    const [categories, setCategories] = useState<string[]>([]);
+    const [loadingCategories, setLoadingCategories] = useState(true);
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const response = await api.get('/api/Categories');
+                setCategories(response.data);
+            } catch (error) {
+                console.error('Failed to fetch categories:', error);
+            } finally {
+                setLoadingCategories(false);
+            }
+        };
+        fetchCategories();
+    }, []);
+
+    if (isLoading) {
+        return <div className="bg-white shadow-md py-4 text-center text-gray-500 animate-pulse">{t('loading')}</div>;
+    }
+
+    return (
+        <header className="sticky top-0 z-50">
+            <TopBar />
+            <MainHeader user={user} />
+            <NavMenu categories={categories} loading={loadingCategories} />
+            {user && <UserNav user={user} logout={logout} />}
+        </header>
     );
 }

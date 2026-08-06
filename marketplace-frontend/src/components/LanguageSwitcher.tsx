@@ -10,7 +10,7 @@ export default function LanguageSwitcher() {
         const newLang = i18n.language === 'ar' ? 'en' : 'ar';
         console.log('🔁 Toggling language to:', newLang);
         i18n.changeLanguage(newLang);
-        // The I18nProvider will handle the rest (localStorage, dir, re‑render)
+        // The I18nProvider will handle localStorage, dir, and re‑render
     };
 
     return (

@@ -78,7 +78,7 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
         return <div className="bg-white shadow-md py-4 text-center text-gray-500">جاري التحميل...</div>;
     }
 
-    // ✅ Force full re‑render by using language as key on the children wrapper
+    // ✅ Force full re‑render by using language as a key on the children wrapper
     return (
         <I18nextProvider i18n={i18n}>
             <div key={lang}>

@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import api from '@/lib/api';
 import { Monitor, Sparkles, Droplet, Shirt, Gem, Smartphone, Pill, Home } from 'lucide-react';
 
-// Map of icon keys (lowercase-dash) to Lucide components
+// Map normalized category keys to icons
 const categoryIcons: Record<string, any> = {
     software: Monitor,
     'hair-care': Sparkles,
@@ -28,20 +28,12 @@ const categoryColors: Record<string, string> = {
     home: 'bg-gray-50 text-gray-600',
 };
 
-// Helper: convert "Skin Care" → "skin-care"
-const normalizeCategory = (cat: string): string => {
-    return cat.toLowerCase().replace(/\s+/g, '-');
-};
+const normalizeCategory = (cat: string): string => cat.toLowerCase().replace(/\s+/g, '-');
 
-// Helper: get display name from translation (or fallback)
 const getCategoryDisplayName = (cat: string, t: (key: string) => string): string => {
     const key = `categories.${normalizeCategory(cat)}`;
     const translated = t(key);
-    // If translation returns the key itself, fallback to the original name
-    if (translated === key) {
-        return cat;
-    }
-    return translated;
+    return translated === key ? cat : translated;
 };
 
 export default function CategoryGrid() {
@@ -64,32 +56,33 @@ export default function CategoryGrid() {
     }, []);
 
     const handleCategoryClick = (category: string) => {
-        // Use the normalized slug for routing
         const slug = normalizeCategory(category);
         window.location.href = `/${slug}`;
     };
 
     if (loading) {
         return (
-            <section className="category-section">
-                <div className="flex justify-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0A6C44]" />
+            <section className="container mx-auto px-4 py-12">
+                <div className="flex justify-center">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0F5C45]" />
                 </div>
             </section>
         );
     }
 
     return (
-        <section className="category-section">
-            <div className="section-header">
-                <span className="view-all">{t('categories.viewAll')} ←</span>
-                <div>
-                    <h2>{t('categories.title')}</h2>
-                    <p className="text-sm text-[#757575] mt-1">{t('categories.subtitle')}</p>
+        <section className="container mx-auto px-4 py-12">
+            <div className="flex justify-between items-center mb-6">
+                <div className="text-right">
+                    <h2 className="text-3xl font-bold text-gray-900">{t('categories.title')}</h2>
+                    <p className="text-sm text-gray-500 mt-1">{t('categories.subtitle')}</p>
                 </div>
+                <span className="text-[#0F5C45] font-medium">
+                    {t('categories.viewAll')} ←
+                </span>
             </div>
 
-            <div className="category-grid">
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
                 {categories.map((cat) => {
                     const key = normalizeCategory(cat);
                     const Icon = categoryIcons[key] || Home;
@@ -100,13 +93,12 @@ export default function CategoryGrid() {
                         <button
                             key={cat}
                             onClick={() => handleCategoryClick(cat)}
-                            className="category-card hover:border-[#0A6C44]"
+                            className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition p-5 text-center hover:-translate-y-1 duration-300 border border-gray-50 cursor-pointer w-full group"
                         >
                             <div className={`w-14 h-14 rounded-full ${colorClass} flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-300`}>
                                 <Icon className="w-7 h-7" />
                             </div>
-                            <h3 className="title">{displayName}</h3>
-                            <p className="subtitle">+20 منتج</p>
+                            <h3 className="font-semibold text-gray-800 text-sm">{displayName}</h3>
                         </button>
                     );
                 })}

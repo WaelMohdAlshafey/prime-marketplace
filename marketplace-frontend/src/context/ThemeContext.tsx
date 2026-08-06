@@ -17,7 +17,7 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-    // ✅ Always start with 'standard' – safe default
+    // ✅ Always start with 'standard' as default
     const [template, setTemplate] = useState<Template>('standard');
     const [settings, setSettings] = useState<StoreSettings | null>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -67,7 +67,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
             }
         });
 
-        // Custom CSS
         const customStyleId = 'custom-theme-css';
         let customStyle = document.getElementById(customStyleId) as HTMLStyleElement;
         if (!customStyle) {
@@ -84,7 +83,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
                 const data = await getStoreSettings();
                 console.log('🏪 Store settings loaded:', data);
                 setSettings(data);
-                // ✅ Force to 'standard' if template is missing or not recognized
+                // ✅ Force standard if template is missing or not recognized
                 const templateVal = (data.template as Template) || 'standard';
                 if (!['standard', 'simple', 'colored', 'blue'].includes(templateVal)) {
                     console.warn('⚠️ Unknown template, using standard');
@@ -95,8 +94,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
                 applyTheme(data);
             } catch (error) {
                 console.error('❌ Failed to load theme:', error);
-                // Fallback to default theme
-                setTemplate('standard');
+                setTemplate('standard'); // fallback
             } finally {
                 setIsLoading(false);
             }
@@ -104,7 +102,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         fetchSettings();
     }, []);
 
-    // Re-apply when template or settings change
     useEffect(() => {
         if (settings) {
             applyTheme(settings);

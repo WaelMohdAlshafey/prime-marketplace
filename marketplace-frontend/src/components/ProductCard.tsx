@@ -33,7 +33,8 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-    const { template = 'standard' } = useTheme(); // ✅ Fallback to 'standard' if undefined
+    // ✅ Fallback to 'standard' if template is undefined
+    const { template = 'standard' } = useTheme();
     console.log('🃏 ProductCard template:', template);
 
     const pathname = usePathname();
@@ -69,11 +70,11 @@ export default function ProductCard({ product }: ProductCardProps) {
         const showRating = template !== 'simple' && product.rating;
         const isColored = template === 'colored';
         const isBlue = template === 'blue';
-        const primaryColor = isColored ? '#D97706' : isBlue ? '#1D4ED8' : '#0A6C44';
+        const primaryColor = isColored ? '#D97706' : isBlue ? '#1D4ED8' : '#0F5C45';
 
         return (
             <Link href={`/products/${product.id}`} className="block">
-                <div className="bg-white rounded-card shadow-card hover:shadow-card-hover transition-all duration-300 overflow-hidden">
+                <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
                     <div className="aspect-square bg-gray-50 overflow-hidden relative">
                         <img
                             src={imgSrc}
