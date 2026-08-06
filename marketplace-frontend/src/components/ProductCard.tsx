@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
-import { Heart, ShoppingBag, Star } from 'lucide-react';
+import { Heart, ShoppingBag, Star, Store } from 'lucide-react';
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
@@ -14,9 +14,6 @@ import { useTheme } from '@/context/ThemeContext';
 import { getImageUrl } from '@/lib/getImageUrl';
 import { getProductImage } from '@/lib/productImages';
 
-// ============================================================
-// CURRENCY SYMBOL – Change this to 'ج.م' if you prefer
-// ============================================================
 const CURRENCY = '£';
 
 interface ProductCardProps {
@@ -32,6 +29,7 @@ interface ProductCardProps {
         reviews?: number;
         discount?: number;
         category?: string;
+        isVerified?: boolean;
     };
 }
 
@@ -39,7 +37,7 @@ export default function ProductCard({ product }: ProductCardProps) {
     const { template } = useTheme();
     const pathname = usePathname();
     const [isAdding, setIsAdding] = useState(false);
-    const [quantity, setQuantity] = useState(1); // ← NEW: local quantity state
+    const [quantity, setQuantity] = useState(1);
 
     const initialImage = product.imageUrl
         ? getImageUrl(product.imageUrl)
@@ -58,33 +56,38 @@ export default function ProductCard({ product }: ProductCardProps) {
 
     const isWishlist = isFavorite(product.id);
     const discountPrice = product.discount ? product.price * (1 - product.discount / 100) : null;
+    const hasDiscount = product.discount && product.discount > 0;
+    const isStorePage = pathname?.startsWith('/stores/');
 
     const handleImageError = () => {
         setImgSrc('/images/placeholder.jpg');
     };
 
-    // ============================================================
-    // SIMPLE / COLORED / BLUE templates (minimal card)
-    // ============================================================
+    // ----- SIMPLE / COLORED / BLUE templates (minimal card) -----
     if (template === 'simple' || template === 'colored' || template === 'blue') {
         const showRating = template !== 'simple' && product.rating;
         const isColored = template === 'colored';
         const isBlue = template === 'blue';
-        const primaryColor = isColored ? '#D97706' : isBlue ? '#1D4ED8' : '#0F5C45';
+        const primaryColor = isColored ? '#D97706' : isBlue ? '#1D4ED8' : '#0A6C44';
 
         return (
             <Link href={`/products/${product.id}`} className="block">
-                <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
-                    <div className="aspect-square bg-gray-50 overflow-hidden">
+                <div className="bg-white rounded-xl shadow-card hover:shadow-card-hover transition-all duration-300 overflow-hidden">
+                    <div className="aspect-square bg-gray-50 overflow-hidden relative">
                         <img
                             src={imgSrc}
                             alt={product.name}
                             className="w-full h-full object-cover hover:scale-105 transition duration-500"
                             onError={handleImageError}
                         />
+                        {hasDiscount && (
+                            <span className="absolute top-2 right-2 bg-[#4CAF50] text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                                -{product.discount}%
+                            </span>
+                        )}
                     </div>
                     <div className="p-3">
-                        <h3 className="text-sm font-medium text-gray-800 line-clamp-1">{product.name}</h3>
+                        <h3 className="text-sm font-medium text-[#1A1A1A] line-clamp-1">{product.name}</h3>
                         {showRating && product.rating && (
                             <div className="flex items-center gap-1 mt-1">
                                 <div className="flex items-center">
@@ -92,13 +95,13 @@ export default function ProductCard({ product }: ProductCardProps) {
                                         <Star
                                             key={i}
                                             className={`w-3.5 h-3.5 ${i < Math.round(product.rating!)
-                                                ? 'fill-[#F59E0B] text-[#F59E0B]'
-                                                : 'text-gray-300 fill-gray-300'
+                                                ? 'fill-[#FFB400] text-[#FFB400]'
+                                                : 'text-[#E0E0E0] fill-[#E0E0E0]'
                                                 }`}
                                         />
                                     ))}
                                 </div>
-                                <span className="text-xs font-medium text-gray-600 ml-1">
+                                <span className="text-xs font-medium text-[#757575] mr-1">
                                     {product.rating?.toFixed(1)}
                                 </span>
                             </div>
@@ -112,10 +115,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         );
     }
 
-    // ============================================================
-    // STANDARD TEMPLATE (full design) – WITH QUANTITY CONTROLS
-    // ============================================================
-    const isStorePage = pathname?.startsWith('/stores/');
+    // ----- STANDARD TEMPLATE (Full Prime Design) -----
     const primaryBadge = isStorePage
         ? product.category || 'Category'
         : product.vendorName || 'Vendor';
@@ -126,7 +126,6 @@ export default function ProductCard({ product }: ProductCardProps) {
         toggleFavorite(product.id);
     };
 
-    // Modified to accept quantity
     const handleAddToCart = async (e: React.MouseEvent, qty: number) => {
         e.preventDefault();
         e.stopPropagation();
@@ -168,7 +167,6 @@ export default function ProductCard({ product }: ProductCardProps) {
         }
     };
 
-    // Increment / Decrement handlers
     const increment = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
@@ -185,6 +183,30 @@ export default function ProductCard({ product }: ProductCardProps) {
         }
     };
 
+    // Render rating stars
+    const renderStars = (rating: number) => {
+        const fullStars = Math.round(rating);
+        return (
+            <div className="flex items-center gap-1">
+                {[...Array(5)].map((_, i) => (
+                    <Star
+                        key={i}
+                        className={`w-3.5 h-3.5 ${i < fullStars
+                            ? 'fill-[#FFB400] text-[#FFB400]'
+                            : 'text-[#E0E0E0] fill-[#E0E0E0]'
+                            }`}
+                    />
+                ))}
+                <span className="text-xs font-medium text-[#757575] mr-1">
+                    {rating.toFixed(1)}
+                </span>
+                {product.reviews && (
+                    <span className="text-xs text-[#9E9E9E]">({product.reviews})</span>
+                )}
+            </div>
+        );
+    };
+
     return (
         <>
             <motion.div
@@ -195,7 +217,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                 whileHover={{ y: -8 }}
                 onHoverStart={() => setIsHovered(true)}
                 onHoverEnd={() => setIsHovered(false)}
-                className="group relative bg-white/80 backdrop-blur-sm rounded-2xl shadow-soft hover:shadow-strong transition-all duration-500 overflow-hidden border border-gray-100/50 hover:border-[#0F5C45]/20"
+                className="group bg-white rounded-card shadow-card hover:shadow-card-hover transition-all duration-500 overflow-hidden border border-[#E0E0E0]/50 hover:border-[#0A6C44]/20"
             >
                 <Link href={`/products/${product.id}`} className="block">
                     {/* Image */}
@@ -210,25 +232,27 @@ export default function ProductCard({ product }: ProductCardProps) {
                             onError={handleImageError}
                         />
 
-                        {product.discount && product.discount > 0 && (
-                            <motion.span
-                                initial={{ x: 20, opacity: 0 }}
-                                animate={{ x: 0, opacity: 1 }}
-                                className="absolute top-3 right-3 bg-gradient-to-r from-red-500 to-red-600 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-lg z-10"
-                            >
+                        {hasDiscount && (
+                            <span className="absolute top-3 right-3 bg-[#4CAF50] text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-lg z-10">
                                 -{product.discount}%
-                            </motion.span>
+                            </span>
+                        )}
+
+                        {product.isVerified && (
+                            <span className="absolute top-3 left-3 bg-[#2196F3] text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-lg z-10 flex items-center gap-1">
+                                <Store className="w-3 h-3" /> Verified
+                            </span>
                         )}
 
                         <motion.button
-                            whileHover={{ scale: 1.2, rotate: 10 }}
+                            whileHover={{ scale: 1.2 }}
                             whileTap={{ scale: 0.8 }}
                             onClick={handleWishlistToggle}
                             className={`absolute top-3 left-3 p-2 rounded-full shadow-md transition-all duration-300 z-10 ${isWishlist
-                                ? 'bg-gradient-to-r from-red-500 to-red-600 text-white shadow-red-200'
-                                : 'bg-white/90 backdrop-blur-sm text-gray-600 hover:text-red-500 hover:bg-white'
+                                ? 'bg-red-500 text-white shadow-red-200'
+                                : 'bg-white/90 backdrop-blur-sm text-[#757575] hover:text-red-500 hover:bg-white'
                                 }`}
-                            aria-label="إضافة إلى المفضلة"
+                            aria-label="Add to wishlist"
                         >
                             <Heart
                                 className={`w-5 h-5 transition ${isWishlist ? 'fill-white' : 'fill-transparent'}`}
@@ -237,7 +261,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                         </motion.button>
 
                         <div className="absolute bottom-3 left-3 right-3">
-                            <span className="inline-block bg-white/90 backdrop-blur-sm text-[#0F5C45] text-xs font-medium px-3 py-1 rounded-full shadow-md border border-white/20">
+                            <span className="inline-block bg-white/90 backdrop-blur-sm text-[#0A6C44] text-xs font-medium px-3 py-1 rounded-full shadow-md border border-white/20">
                                 {primaryBadge}
                             </span>
                         </div>
@@ -245,17 +269,17 @@ export default function ProductCard({ product }: ProductCardProps) {
 
                     {/* Content */}
                     <div className="p-4 text-right">
-                        <h3 className="font-semibold text-gray-800 text-base line-clamp-1">
+                        <h3 className="font-semibold text-[#1A1A1A] text-base line-clamp-1">
                             {product.name}
                         </h3>
 
-                        <p className="text-sm text-gray-500 line-clamp-2 mt-1 min-h-[40px]">
+                        <p className="text-sm text-[#757575] line-clamp-2 mt-1 min-h-[40px]">
                             {product.description}
                         </p>
 
                         {product.category && (
                             <span
-                                className="inline-block mt-1 text-xs text-[#0F5C45] hover:underline bg-[#0F5C45]/5 px-2 py-0.5 rounded-full transition cursor-pointer"
+                                className="inline-block mt-1 text-xs text-[#0A6C44] hover:underline bg-[#0A6C44]/5 px-2 py-0.5 rounded-full transition cursor-pointer"
                                 onClick={handleCategoryClick}
                             >
                                 {product.category}
@@ -264,63 +288,45 @@ export default function ProductCard({ product }: ProductCardProps) {
 
                         {/* Rating */}
                         {product.rating && (
-                            <div className="flex items-center justify-end gap-1 mt-2">
-                                <div className="flex items-center gap-0.5">
-                                    {[...Array(5)].map((_, i) => (
-                                        <Star
-                                            key={i}
-                                            className={`w-3.5 h-3.5 ${i < Math.round(product.rating!)
-                                                ? 'fill-[#D4A54A] text-[#D4A54A]'
-                                                : 'text-gray-300 fill-gray-300'
-                                                }`}
-                                        />
-                                    ))}
-                                </div>
-                                <span className="text-sm font-semibold text-gray-700 mr-1">
-                                    {product.rating.toFixed(1)}
-                                </span>
-                                {product.reviews && (
-                                    <span className="text-xs text-gray-400">({product.reviews})</span>
-                                )}
+                            <div className="mt-2 flex items-center justify-end">
+                                {renderStars(product.rating)}
                             </div>
                         )}
 
-                        {/* ============================================================
-                        PRICE + QUANTITY CONTROLS (beside each other)
-                        ============================================================ */}
+                        {/* Price + Quantity Controls */}
                         <div className="mt-3 flex items-center justify-between gap-2">
                             {/* Quantity Controls */}
                             {product.stockQuantity > 0 && (
                                 <div
-                                    className="flex items-center gap-1 bg-gray-50 rounded-lg p-1 border border-gray-200"
+                                    className="flex items-center gap-1 bg-[#F8F9FA] rounded-lg p-1 border border-[#E0E0E0]"
                                     onClick={(e) => e.stopPropagation()}
                                 >
                                     <button
                                         onClick={decrement}
                                         disabled={quantity <= 1}
-                                        className="w-7 h-7 rounded-md flex items-center justify-center text-gray-600 hover:bg-white hover:shadow-sm transition disabled:opacity-30 disabled:cursor-not-allowed text-lg font-bold"
+                                        className="w-7 h-7 rounded-md flex items-center justify-center text-[#757575] hover:bg-white hover:shadow-sm transition disabled:opacity-30 disabled:cursor-not-allowed text-lg font-bold"
                                     >
                                         −
                                     </button>
-                                    <span className="w-6 text-center text-sm font-medium text-gray-800">
+                                    <span className="w-6 text-center text-sm font-medium text-[#1A1A1A]">
                                         {quantity}
                                     </span>
                                     <button
                                         onClick={increment}
                                         disabled={quantity >= product.stockQuantity}
-                                        className="w-7 h-7 rounded-md flex items-center justify-center text-gray-600 hover:bg-white hover:shadow-sm transition disabled:opacity-30 disabled:cursor-not-allowed text-lg font-bold"
+                                        className="w-7 h-7 rounded-md flex items-center justify-center text-[#757575] hover:bg-white hover:shadow-sm transition disabled:opacity-30 disabled:cursor-not-allowed text-lg font-bold"
                                     >
                                         +
                                     </button>
                                 </div>
                             )}
 
-                            <div className="flex items-center gap-1">
-                                <span className="text-xl font-bold text-[#0F5C45]">
+                            <div className="flex items-center gap-2">
+                                <span className="text-xl font-bold text-[#0A6C44]">
                                     {CURRENCY}{(discountPrice || product.price).toFixed(2)}
                                 </span>
-                                {product.discount && product.discount > 0 && (
-                                    <span className="text-sm text-gray-400 line-through mr-1">
+                                {hasDiscount && (
+                                    <span className="text-sm text-[#9E9E9E] line-through">
                                         {CURRENCY}{product.price.toFixed(2)}
                                     </span>
                                 )}
@@ -329,18 +335,18 @@ export default function ProductCard({ product }: ProductCardProps) {
                     </div>
                 </Link>
 
-                {/* Add to Cart button – uses the local quantity */}
+                {/* Add to Cart */}
                 <div className="px-4 pb-4">
                     <motion.button
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.97 }}
                         onClick={(e) => handleAddToCart(e, quantity)}
                         disabled={isAdding || product.stockQuantity === 0}
-                        className={`w-full py-2.5 rounded-xl font-medium transition-all duration-300 flex items-center justify-center gap-2 ${product.stockQuantity === 0
-                            ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                            : isAdding
-                                ? 'bg-[#0F5C45]/70 text-white cursor-wait'
-                                : 'bg-gradient-to-r from-[#0F5C45] to-[#1A7A5C] text-white hover:shadow-lg hover:shadow-[#0F5C45]/20 hover:scale-105'
+                        className={`w-full py-2.5 rounded-button font-medium transition-all duration-300 flex items-center justify-center gap-2 ${product.stockQuantity === 0
+                                ? 'bg-gray-100 text-[#9E9E9E] cursor-not-allowed'
+                                : isAdding
+                                    ? 'bg-[#0A6C44]/70 text-white cursor-wait'
+                                    : 'bg-[#0A6C44] text-white hover:bg-[#06452A] hover:shadow-lg hover:shadow-[#0A6C44]/20 hover:scale-105'
                             }`}
                     >
                         <ShoppingBag className="w-4 h-4" />

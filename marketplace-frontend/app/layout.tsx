@@ -43,7 +43,9 @@ export default function RootLayout({
                                 <CartIconRefProvider>
                                     <ThemeProvider>   {/* ← ADD THIS */}
                                         <Navbar />
-                                        <main className="min-h-screen bg-[#F8F9FA]">{children}</main>
+                                        <main className="min-h-screen bg-[#F8F9FA] container mx-auto max-w-[1320px] px-4">
+                                            {children}
+                                        </main>
                                         <Footer />
                                     </ThemeProvider>
                                 </CartIconRefProvider>

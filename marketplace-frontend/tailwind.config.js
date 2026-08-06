@@ -2,46 +2,48 @@
 module.exports = {
     content: [
         './app/**/*.{js,ts,jsx,tsx,mdx}',
-        './components/**/*.{js,ts,jsx,tsx,mdx}',
         './src/**/*.{js,ts,jsx,tsx,mdx}',
+        './components/**/*.{js,ts,jsx,tsx,mdx}',
     ],
     theme: {
         extend: {
             colors: {
                 primary: {
-                    DEFAULT: '#0F5C45',
-                    light: '#1A7A5C',
-                    dark: '#093B2D',
-                    soft: '#DDEFE7',
+                    DEFAULT: '#0A6C44',
+                    dark: '#06452A',
+                    light: '#4CAF50',
+                    surface: '#F8F9FA',
                 },
-                background: {
-                    DEFAULT: '#F8F9FA',
-                    white: '#FFFFFF',
-                    warm: '#FDF7F2',
+                secondary: {
+                    DEFAULT: '#FFB400',
                 },
-                border: '#E9ECEF',
                 text: {
-                    primary: '#1F2937',
-                    secondary: '#6B7280',
+                    DEFAULT: '#1A1A1A',
+                    muted: '#757575',
+                    light: '#9E9E9E',
                 },
-                gold: '#D4AF37',
-                orange: '#F59E0B',
-                red: '#DC3545',
+                border: {
+                    DEFAULT: '#E0E0E0',
+                },
             },
             fontFamily: {
-                sans: ['Inter', 'Cairo', 'sans-serif'],
+                cairo: ['Cairo', 'sans-serif'],
             },
             borderRadius: {
-                'xl': '18px',
-                '2xl': '24px',
+                card: '12px',
+                pill: '24px',
+                button: '8px',
             },
             boxShadow: {
-                'soft': '0 4px 15px rgba(15,92,69,0.25)',
-                'card': '0 8px 30px rgba(0,0,0,0.08)',
-                'hover': '0 15px 40px rgba(0,0,0,0.12)',
-                'header': '0 2px 10px rgba(0,0,0,0.05)',
+                card: '0 4px 12px rgba(0, 0, 0, 0.05)',
+                'card-hover': '0 8px 24px rgba(0, 0, 0, 0.10)',
+                soft: '0 2px 8px rgba(0, 0, 0, 0.04)',
+                strong: '0 8px 32px rgba(0, 0, 0, 0.12)',
+            },
+            maxWidth: {
+                container: '1320px',
             },
         },
     },
     plugins: [],
-}
+};
