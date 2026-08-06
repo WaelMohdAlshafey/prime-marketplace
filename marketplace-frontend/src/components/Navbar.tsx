@@ -141,7 +141,7 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
                         </motion.div>
                     </Link>
 
-                    {/* ✅ Admin Settings – visible only for Admin */}
+                    {/* Admin Settings – visible only for Admin */}
                     {user && user.role === 'Admin' && (
                         <Link href="/admin" className="text-gray-600 hover:text-[#0F5C45] transition relative group">
                             <Cog6ToothIcon className="w-6 h-6 group-hover:fill-[#0F5C45]/10 transition" />
@@ -155,7 +155,6 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
                         </div>
                     ) : (
                         <>
-                            {/* ✅ Register link */}
                             <Link href="/auth/register" className="text-sm font-medium text-[#0F5C45] hover:text-[#0A4735] transition flex items-center gap-1">
                                 <UserPlusIcon className="w-5 h-5" />
                                 <span className="hidden sm:inline">{t('registerTitle')}</span>
@@ -173,8 +172,9 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
 
 // ============================================================
 // NAV MENU – Dynamic with mobile hamburger
+// ✅ Now accepts user and logout as props
 // ============================================================
-const NavMenu = ({ categories, loading }: { categories: string[]; loading: boolean }) => {
+const NavMenu = ({ categories, loading, user, logout }: { categories: string[]; loading: boolean; user: AuthResponse | null; logout: () => void }) => {
     const { t } = useTranslation('common');
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -236,7 +236,7 @@ const NavMenu = ({ categories, loading }: { categories: string[]; loading: boole
                             {t('contact')}
                         </Link>
 
-                        {/* Mobile auth links */}
+                        {/* Mobile auth links – using props */}
                         {!loading && !user && (
                             <>
                                 <Link href="/auth/register" className="block text-[#0F5C45] font-medium hover:underline transition py-1" onClick={() => setMobileMenuOpen(false)}>
@@ -250,7 +250,7 @@ const NavMenu = ({ categories, loading }: { categories: string[]; loading: boole
                         {user && (
                             <button
                                 onClick={() => {
-                                    // handle logout here
+                                    logout();
                                     setMobileMenuOpen(false);
                                 }}
                                 className="block w-full text-right text-red-500 hover:text-red-700 transition py-1"
@@ -352,7 +352,8 @@ export default function Navbar() {
         <header className="sticky top-0 z-50">
             <TopBar />
             <MainHeader user={user} />
-            <NavMenu categories={categories} loading={loadingCategories} />
+            {/* ✅ Pass user and logout to NavMenu */}
+            <NavMenu categories={categories} loading={loadingCategories} user={user} logout={logout} />
             {user && <UserNav user={user} logout={logout} />}
         </header>
     );
