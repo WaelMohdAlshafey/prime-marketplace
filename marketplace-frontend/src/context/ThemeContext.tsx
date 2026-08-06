@@ -17,13 +17,16 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-    const [template, setTemplate] = useState<Template>('standard'); // ✅ Default to standard
+    // ✅ Always start with 'standard' – safe default
+    const [template, setTemplate] = useState<Template>('standard');
     const [settings, setSettings] = useState<StoreSettings | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
     const applyTheme = (themeSettings: StoreSettings) => {
+        console.log('🎨 Applying theme:', themeSettings.template);
         const root = document.documentElement;
-        root.setAttribute('data-theme', themeSettings.template || 'standard');
+        const templateVal = (themeSettings.template as Template) || 'standard';
+        root.setAttribute('data-theme', templateVal);
 
         const cssVars: Record<string, string | undefined> = {
             '--color-primary': themeSettings.primaryColor,
@@ -64,7 +67,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
             }
         });
 
-        // Apply custom CSS
+        // Custom CSS
         const customStyleId = 'custom-theme-css';
         let customStyle = document.getElementById(customStyleId) as HTMLStyleElement;
         if (!customStyle) {
@@ -79,12 +82,19 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         const fetchSettings = async () => {
             try {
                 const data = await getStoreSettings();
+                console.log('🏪 Store settings loaded:', data);
                 setSettings(data);
-                const templateVal = data.template as Template || 'standard';
-                setTemplate(templateVal);
+                // ✅ Force to 'standard' if template is missing or not recognized
+                const templateVal = (data.template as Template) || 'standard';
+                if (!['standard', 'simple', 'colored', 'blue'].includes(templateVal)) {
+                    console.warn('⚠️ Unknown template, using standard');
+                    setTemplate('standard');
+                } else {
+                    setTemplate(templateVal);
+                }
                 applyTheme(data);
             } catch (error) {
-                console.error('Failed to load theme:', error);
+                console.error('❌ Failed to load theme:', error);
                 // Fallback to default theme
                 setTemplate('standard');
             } finally {
@@ -94,6 +104,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         fetchSettings();
     }, []);
 
+    // Re-apply when template or settings change
     useEffect(() => {
         if (settings) {
             applyTheme(settings);

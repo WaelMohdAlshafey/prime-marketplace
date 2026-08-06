@@ -33,7 +33,9 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-    const { template = 'standard' } = useTheme(); // ✅ Fallback to 'standard'
+    const { template = 'standard' } = useTheme(); // ✅ Fallback to 'standard' if undefined
+    console.log('🃏 ProductCard template:', template);
+
     const pathname = usePathname();
     const [isAdding, setIsAdding] = useState(false);
     const [quantity, setQuantity] = useState(1);

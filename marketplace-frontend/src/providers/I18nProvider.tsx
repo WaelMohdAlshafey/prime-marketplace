@@ -30,6 +30,7 @@ const getSavedLanguage = (): string => {
     return 'ar';
 };
 
+// Initialize i18n only once
 if (!i18n.isInitialized) {
     i18n
         .use(initReactI18next)
@@ -41,6 +42,7 @@ if (!i18n.isInitialized) {
             defaultNS: 'common',
             interpolation: { escapeValue: false },
         });
+    console.log('🌐 i18n initialized with language:', i18n.language);
 }
 
 export function I18nProvider({ children }: { children: React.ReactNode }) {
@@ -49,6 +51,7 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
 
     useEffect(() => {
         const handleLanguageChanged = (lng: string) => {
+            console.log('🔄 Language changed to:', lng);
             localStorage.setItem('i18nextLng', lng);
             setLang(lng);
             document.documentElement.dir = lng === 'ar' ? 'rtl' : 'ltr';
@@ -75,7 +78,7 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
         return <div className="bg-white shadow-md py-4 text-center text-gray-500">جاري التحميل...</div>;
     }
 
-    // ✅ Force re‑render by using the language as a key on a wrapper
+    // ✅ Force full re‑render by using language as key on the children wrapper
     return (
         <I18nextProvider i18n={i18n}>
             <div key={lang}>
