@@ -1,21 +1,23 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import api from '@/lib/api';
 import { Cart } from '@/types';
 import { useAuth } from '@/context/AuthContext';
-import { TrashIcon } from '@heroicons/react/24/outline';
+import { useTheme } from '@/context/ThemeContext';
+import { ShoppingBag, TrashIcon, ArrowLeft, Package } from 'lucide-react';
 import { MARKETPLACE } from '@/constants/marketplace';
 
-// ============================================================
-// TYPES
-// ============================================================
+const CURRENCY = '£';
+
 interface CheckoutError {
     response?: {
         data?: {
             message?: string;
             title?: string;
+            errors?: Record<string, string[]>;
         };
     };
     message?: string;
@@ -23,6 +25,7 @@ interface CheckoutError {
 
 export default function CartPage() {
     const { user, isLoading } = useAuth();
+    const { template } = useTheme();
     const router = useRouter();
     const [cart, setCart] = useState<Cart | null>(null);
     const [loading, setLoading] = useState(true);
@@ -37,6 +40,7 @@ export default function CartPage() {
         deliveryInstructions: '',
     });
     const [checkoutLoading, setCheckoutLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     const fetchCart = async () => {
         try {
@@ -51,13 +55,10 @@ export default function CartPage() {
 
     useEffect(() => {
         if (isLoading) return;
-
         if (!user) {
             router.push('/auth/login');
             return;
         }
-
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchCart();
     }, [user, isLoading]);
 
@@ -70,43 +71,80 @@ export default function CartPage() {
         }
     };
 
+    const validateForm = (): string | null => {
+        if (!checkoutData.shippingAddress.trim()) {
+            return 'Please enter a shipping address.';
+        }
+
+        switch (checkoutData.paymentMethod) {
+            case 'Card':
+                if (!checkoutData.cardNumber.replace(/\s/g, '').match(/^\d{16}$/)) {
+                    return 'Please enter a valid 16-digit card number.';
+                }
+                if (!checkoutData.cardExpiry.match(/^\d{2}\/\d{2}$/)) {
+                    return 'Please enter a valid expiry date (MM/YY).';
+                }
+                if (!checkoutData.cardCvv.match(/^\d{3,4}$/)) {
+                    return 'Please enter a valid CVV (3 or 4 digits).';
+                }
+                break;
+            case 'MobileWallet':
+                if (!checkoutData.phoneNumber || checkoutData.phoneNumber.replace(/\D/g, '').length < 10) {
+                    return 'Please enter a valid phone number (at least 10 digits).';
+                }
+                break;
+            case 'PayPal':
+                if (!checkoutData.payPalEmail || !checkoutData.payPalEmail.includes('@')) {
+                    return 'Please enter a valid PayPal email address.';
+                }
+                break;
+            case 'CashOnDelivery':
+                break;
+            default:
+                return 'Please select a valid payment method.';
+        }
+        return null;
+    };
+
     const handleCheckout = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!user) return;
+        setError(null);
 
-        // Check if shipping address is filled
-        if (!checkoutData.shippingAddress.trim()) {
-            alert('⚠️ يرجى إدخال عنوان الشحن');
+        const validationError = validateForm();
+        if (validationError) {
+            setError(validationError);
             return;
         }
 
         setCheckoutLoading(true);
         try {
-            const response = await api.post('/api/Orders/checkout', checkoutData);
+            const payload = {
+                shippingAddress: checkoutData.shippingAddress || '',
+                paymentMethod: checkoutData.paymentMethod || 'CashOnDelivery',
+                cardNumber: checkoutData.cardNumber || '',
+                cardExpiry: checkoutData.cardExpiry || '',
+                cardCvv: checkoutData.cardCvv || '',
+                phoneNumber: checkoutData.phoneNumber || '',
+                payPalEmail: checkoutData.payPalEmail || '',
+                deliveryInstructions: checkoutData.deliveryInstructions || '',
+            };
+
+            const response = await api.post('/api/Orders/checkout', payload);
             const order = response.data;
 
             let confirmationData = {};
-
             switch (checkoutData.paymentMethod) {
                 case 'Card':
-                    confirmationData = {
-                        transactionId: `TXN-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`,
-                    };
+                    confirmationData = { transactionId: `TXN-${Date.now()}-${Math.random().toString(36).substring(2, 8)}` };
                     break;
                 case 'MobileWallet':
-                    confirmationData = {
-                        phoneNumber: checkoutData.phoneNumber,
-                    };
+                    confirmationData = { phoneNumber: checkoutData.phoneNumber };
                     break;
                 case 'PayPal':
-                    confirmationData = {
-                        payPalEmail: checkoutData.payPalEmail,
-                    };
+                    confirmationData = { payPalEmail: checkoutData.payPalEmail };
                     break;
                 case 'CashOnDelivery':
-                    confirmationData = {
-                        deliveryConfirmation: checkoutData.deliveryInstructions || 'في انتظار تأكيد التوصيل',
-                    };
+                    confirmationData = { deliveryConfirmation: checkoutData.deliveryInstructions || 'Pending delivery confirmation' };
                     break;
                 default:
                     throw new Error('Unknown payment method');
@@ -114,12 +152,11 @@ export default function CartPage() {
 
             await api.post(`/api/Orders/${order.id}/confirm-payment`, confirmationData);
 
-            alert('🎉 تم الطلب والدفع بنجاح!');
+            alert('🎉 Order placed and payment confirmed successfully!');
             router.push(`/orders/${order.id}`);
         } catch (error: unknown) {
             console.error('Checkout failed:', error);
-            // Extract the error message safely
-            let message = '❌ فشل الطلب. حاول مرة أخرى.';
+            let message = '❌ Failed to complete order. Please try again.';
             if (error && typeof error === 'object' && 'response' in error) {
                 const err = error as CheckoutError;
                 if (err.response?.data?.message) {
@@ -129,8 +166,14 @@ export default function CartPage() {
                 } else if (err.message) {
                     message = `⚠️ ${err.message}`;
                 }
+                if (err.response?.data?.errors) {
+                    const errorList = Object.entries(err.response.data.errors)
+                        .map(([field, msgs]) => `${field}: ${msgs.join(', ')}`)
+                        .join('\n');
+                    message += `\n\n📋 Details:\n${errorList}`;
+                }
             }
-            alert(message);
+            setError(message);
         } finally {
             setCheckoutLoading(false);
         }
@@ -142,52 +185,69 @@ export default function CartPage() {
                 return (
                     <>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">رقم البطاقة</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Card Number *</label>
                             <input
                                 type="text"
-                                required
+                                inputMode="numeric"
+                                pattern="[0-9\s]*"
+                                maxLength={19}
                                 placeholder="4111 1111 1111 1111"
                                 value={checkoutData.cardNumber}
-                                onChange={(e) => setCheckoutData({ ...checkoutData, cardNumber: e.target.value })}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                onChange={(e) => {
+                                    const raw = e.target.value.replace(/\s/g, '');
+                                    const formatted = raw.replace(/(\d{4})/g, '$1 ').trim();
+                                    setCheckoutData({ ...checkoutData, cardNumber: formatted });
+                                }}
+                                required
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
                             />
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">تاريخ الانتهاء (شهر/سنة)</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Expiry (MM/YY) *</label>
                                 <input
                                     type="text"
-                                    required
+                                    inputMode="numeric"
                                     placeholder="MM/YY"
+                                    maxLength={5}
                                     value={checkoutData.cardExpiry}
-                                    onChange={(e) => setCheckoutData({ ...checkoutData, cardExpiry: e.target.value })}
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    onChange={(e) => {
+                                        let val = e.target.value.replace(/\D/g, '');
+                                        if (val.length >= 2) val = val.slice(0, 2) + '/' + val.slice(2);
+                                        setCheckoutData({ ...checkoutData, cardExpiry: val });
+                                    }}
+                                    required
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">CVV</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">CVV *</label>
                                 <input
                                     type="password"
-                                    required
+                                    inputMode="numeric"
+                                    maxLength={4}
                                     placeholder="123"
                                     value={checkoutData.cardCvv}
-                                    onChange={(e) => setCheckoutData({ ...checkoutData, cardCvv: e.target.value })}
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    onChange={(e) => {
+                                        const val = e.target.value.replace(/\D/g, '');
+                                        setCheckoutData({ ...checkoutData, cardCvv: val });
+                                    }}
+                                    required
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
                                 />
                             </div>
                         </div>
                     </>
                 );
-
             case 'MobileWallet':
                 return (
                     <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-                        <h3 className="font-semibold text-blue-800 mb-2">📱 الدفع عبر المحفظة الإلكترونية</h3>
+                        <h3 className="font-semibold text-blue-800 mb-2">📱 Mobile Wallet Payment</h3>
                         <p className="text-sm text-gray-700 mb-3">
-                            قم بتحويل المبلغ إلى أحد أرقام المحافظ الرسمية. سنقوم بتأكيد الدفع يدوياً.
+                            Transfer the exact amount to one of the official wallet numbers below. We will manually confirm your payment.
                         </p>
                         <div className="space-y-2">
-                            <p className="text-sm font-medium text-gray-700">أرقام المحفظة:</p>
+                            <p className="text-sm font-medium text-gray-700">Wallet Numbers:</p>
                             {MARKETPLACE.mobileNumbers.map((num: string, idx: number) => (
                                 <div key={idx} className="flex items-center gap-2 bg-white p-2 rounded border border-gray-200">
                                     <span className="text-sm font-mono text-blue-600">{num}</span>
@@ -195,54 +255,52 @@ export default function CartPage() {
                                         onClick={() => navigator.clipboard.writeText(num)}
                                         className="text-xs text-blue-500 hover:text-blue-700 transition"
                                     >
-                                        📋 نسخ
+                                        📋 Copy
                                     </button>
                                 </div>
                             ))}
                         </div>
                         <div className="mt-3">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">رقم هاتفك (للتأكيد)</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Your Phone Number (for confirmation) *</label>
                             <input
                                 type="tel"
-                                required
+                                inputMode="numeric"
                                 placeholder="+20 100 000 0000"
                                 value={checkoutData.phoneNumber}
                                 onChange={(e) => setCheckoutData({ ...checkoutData, phoneNumber: e.target.value })}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                required
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
                             />
                         </div>
                     </div>
                 );
-
             case 'PayPal':
                 return (
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">البريد الإلكتروني لـ PayPal</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">PayPal Email *</label>
                         <input
                             type="email"
-                            required
                             placeholder="you@example.com"
                             value={checkoutData.payPalEmail}
                             onChange={(e) => setCheckoutData({ ...checkoutData, payPalEmail: e.target.value })}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            required
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
                         />
                     </div>
                 );
-
             case 'CashOnDelivery':
                 return (
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">تعليمات التوصيل</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Delivery Instructions (optional)</label>
                         <textarea
-                            placeholder="أي تعليمات خاصة للتوصيل..."
+                            placeholder="Any special delivery instructions…"
                             value={checkoutData.deliveryInstructions}
                             onChange={(e) => setCheckoutData({ ...checkoutData, deliveryInstructions: e.target.value })}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                             rows={2}
                         />
                     </div>
                 );
-
             default:
                 return null;
         }
@@ -259,17 +317,114 @@ export default function CartPage() {
     if (!cart || cart.items.length === 0) {
         return (
             <div className="container mx-auto px-4 py-20 text-center">
-                <div className="text-6xl mb-4">🛒</div>
-                <h2 className="text-2xl font-bold text-gray-800">سلتك فارغة</h2>
-                <p className="text-gray-500 mt-2">ابدأ التسوق لإضافة المنتجات إلى سلتك</p>
-                <a href="/" className="btn-primary inline-block mt-6">تصفح المنتجات</a>
+                <div className="p-6 bg-gray-50 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-4">
+                    <ShoppingBag className="w-12 h-12 text-gray-300" />
+                </div>
+                <h2 className="text-2xl font-bold text-gray-800">Your cart is empty</h2>
+                <p className="text-gray-500 mt-2">Start shopping to add items to your cart</p>
+                <Link href="/" className="inline-block mt-6 bg-[#0F5C45] text-white px-6 py-3 rounded-xl hover:bg-[#0A4735] transition">
+                    Browse Products
+                </Link>
             </div>
         );
     }
 
+    // Simple Template
+    if (template === 'simple') {
+        return (
+            <div className="container mx-auto px-4 py-12 max-w-3xl bg-white min-h-screen">
+                <div className="flex items-center gap-3 mb-6">
+                    <div className="p-2 bg-[#0F5C45]/10 rounded-xl">
+                        <ShoppingBag className="w-6 h-6 text-[#0F5C45]" />
+                    </div>
+                    <h1 className="text-2xl font-bold text-gray-800">Your Cart</h1>
+                </div>
+
+                <div className="bg-white shadow-sm rounded-xl p-4">
+                    {cart.items.map((item) => (
+                        <div key={item.id} className="flex justify-between items-center py-3 border-b border-gray-100">
+                            <div className="flex-1">
+                                <p className="font-medium text-gray-800">{item.productName}</p>
+                                <p className="text-sm text-gray-500">× {item.quantity}</p>
+                            </div>
+                            <div className="flex items-center gap-4">
+                                <p className="font-bold text-gray-800">{CURRENCY}{item.subtotal.toFixed(2)}</p>
+                                <button
+                                    onClick={() => removeFromCart(item.id)}
+                                    className="text-red-400 hover:text-red-600 transition"
+                                >
+                                    <TrashIcon className="w-4 h-4" />
+                                </button>
+                            </div>
+                        </div>
+                    ))}
+
+                    <div className="flex justify-between pt-4 border-t border-gray-200 font-bold text-lg">
+                        <span>Total</span>
+                        <span>{CURRENCY}{cart.totalAmount.toFixed(2)}</span>
+                    </div>
+                </div>
+
+                <form onSubmit={handleCheckout} className="mt-8 bg-white shadow-sm rounded-xl p-6">
+                    <h2 className="text-lg font-bold text-gray-800 mb-4">Checkout</h2>
+
+                    {error && (
+                        <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg mb-4 whitespace-pre-line">
+                            ⚠️ {error}
+                        </div>
+                    )}
+
+                    <div className="space-y-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Shipping Address *</label>
+                            <input
+                                type="text"
+                                required
+                                value={checkoutData.shippingAddress}
+                                onChange={(e) => setCheckoutData({ ...checkoutData, shippingAddress: e.target.value })}
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="e.g., 123 Maadi Street, Cairo"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Payment Method</label>
+                            <select
+                                value={checkoutData.paymentMethod}
+                                onChange={(e) => setCheckoutData({ ...checkoutData, paymentMethod: e.target.value })}
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                                <option value="CashOnDelivery">💵 Cash on Delivery</option>
+                                <option value="Card">💳 Credit / Debit Card</option>
+                                <option value="PayPal">💰 PayPal</option>
+                                <option value="MobileWallet">📱 Mobile Wallet</option>
+                            </select>
+                        </div>
+
+                        {renderPaymentFields()}
+
+                        <button
+                            type="submit"
+                            disabled={checkoutLoading}
+                            className="w-full py-3 bg-[#0F5C45] text-white font-semibold rounded-lg hover:bg-[#0A4735] transition disabled:opacity-50"
+                        >
+                            {checkoutLoading ? 'Processing...' : '✅ Confirm Order & Pay'}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        );
+    }
+
+    // STANDARD TEMPLATE
     return (
         <div className="container mx-auto px-4 py-12 max-w-4xl">
-            <h1 className="text-3xl font-bold text-gray-800 mb-8">🛍️ سلتك</h1>
+            <div className="flex items-center gap-3 mb-8">
+                <div className="p-2 bg-[#0F5C45]/10 rounded-xl">
+                    <ShoppingBag className="w-7 h-7 text-[#0F5C45]" />
+                </div>
+                <h1 className="text-3xl font-bold text-gray-800">Your Cart</h1>
+            </div>
 
             <div className="bg-white rounded-xl shadow-md overflow-hidden">
                 <div className="divide-y divide-gray-200">
@@ -278,8 +433,8 @@ export default function CartPage() {
                             <div>
                                 <h3 className="font-semibold text-gray-800">{item.productName}</h3>
                                 <p className="text-gray-500 text-sm">
-                                    £{item.unitPrice.toFixed(2)} × {item.quantity} =
-                                    <span className="font-semibold text-gray-700 ml-1">£{item.subtotal.toFixed(2)}</span>
+                                    {CURRENCY}{item.unitPrice.toFixed(2)} × {item.quantity} =
+                                    <span className="font-semibold text-gray-700 ml-1">{CURRENCY}{item.subtotal.toFixed(2)}</span>
                                 </p>
                             </div>
                             <button
@@ -294,39 +449,45 @@ export default function CartPage() {
 
                 <div className="bg-gray-50 p-4 border-t border-gray-200 flex justify-between items-center">
                     <div>
-                        <p className="text-sm text-gray-500">{cart.totalItems} منتج</p>
-                        <p className="text-2xl font-bold text-gray-800">£{cart.totalAmount.toFixed(2)}</p>
+                        <p className="text-sm text-gray-500">{cart.totalItems} items</p>
+                        <p className="text-2xl font-bold text-gray-800">{CURRENCY}{cart.totalAmount.toFixed(2)}</p>
                     </div>
                 </div>
             </div>
 
             <form onSubmit={handleCheckout} className="mt-8 bg-white rounded-xl shadow-md p-6">
-                <h2 className="text-xl font-bold text-gray-800 mb-4">إتمام الطلب</h2>
+                <h2 className="text-xl font-bold text-gray-800 mb-4">Checkout</h2>
+
+                {error && (
+                    <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg mb-4 whitespace-pre-line">
+                        ⚠️ {error}
+                    </div>
+                )}
 
                 <div className="space-y-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">عنوان الشحن *</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Shipping Address *</label>
                         <input
                             type="text"
                             required
                             value={checkoutData.shippingAddress}
                             onChange={(e) => setCheckoutData({ ...checkoutData, shippingAddress: e.target.value })}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            placeholder="مثال: 123 شارع المعادي، القاهرة"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
+                            placeholder="e.g., 123 Maadi Street, Cairo"
                         />
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">طريقة الدفع</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Payment Method</label>
                         <select
                             value={checkoutData.paymentMethod}
                             onChange={(e) => setCheckoutData({ ...checkoutData, paymentMethod: e.target.value })}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
                         >
-                            <option value="CashOnDelivery">💵 الدفع عند الاستلام</option>
-                            <option value="Card">💳 بطاقة ائتمان / خصم</option>
+                            <option value="CashOnDelivery">💵 Cash on Delivery</option>
+                            <option value="Card">💳 Credit / Debit Card</option>
                             <option value="PayPal">💰 PayPal</option>
-                            <option value="MobileWallet">📱 محفظة جوال</option>
+                            <option value="MobileWallet">📱 Mobile Wallet</option>
                         </select>
                     </div>
 
@@ -335,9 +496,9 @@ export default function CartPage() {
                     <button
                         type="submit"
                         disabled={checkoutLoading}
-                        className="w-full py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold rounded-lg hover:from-green-700 hover:to-emerald-700 transition disabled:opacity-50"
+                        className="w-full py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold rounded-lg hover:from-green-700 hover:to-emerald-700 transition disabled:opacity-50 text-lg min-h-[52px]"
                     >
-                        {checkoutLoading ? 'جاري المعالجة...' : '✅ تأكيد الطلب والدفع'}
+                        {checkoutLoading ? 'Processing...' : '✅ Confirm Order & Pay'}
                     </button>
                 </div>
             </form>
