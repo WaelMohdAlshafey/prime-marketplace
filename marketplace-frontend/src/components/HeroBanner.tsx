@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, ArrowRight, ShoppingBag } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -21,7 +22,7 @@ export default function HeroBanner() {
                 'من البرامج والتقنية إلى التجميل، الأزياء، والإلكترونيات. كل ما تحتاجه في مكان واحد، بأسعار تنافسية وشحن سريع لجميع المحافظات.',
             cta: 'تسوق الآن',
             link: '/products',
-            image: '🛍️',
+            image: '/images/hero/slide1.jpg',
         },
         {
             id: 2,
@@ -32,7 +33,7 @@ export default function HeroBanner() {
                 'احصل على أدوات التطوير، برامج التصميم الجرافيكي، حلول الأمن السيبراني، والذكاء الاصطناعي. تراخيص أصلية ودعم فني متواصل.',
             cta: 'استكشف البرامج',
             link: '/software',
-            image: '💻',
+            image: '/images/hero/slide2.jpg',
         },
         {
             id: 3,
@@ -43,7 +44,7 @@ export default function HeroBanner() {
                 'شامبو عضوي، كريمات مرطبة للبشرة الحساسة، زيوت مغربية أصلية. منتجات معتمدة من أفضل الماركات العالمية، مناسبة لجميع أنواع البشرة.',
             cta: 'تسوق التجميل',
             link: '/hair-care',
-            image: '✨',
+            image: '/images/hero/slide3.jpg',
         },
         {
             id: 4,
@@ -54,7 +55,7 @@ export default function HeroBanner() {
                 'تشكيلة مميزة من الملابس القطنية، الأحذية الرياضية، الساعات الكلاسيكية، والمجوهرات. نناسب جميع المناسبات بأفضل جودة وأسعار لا تقبل المنافسة.',
             cta: 'تسوق الأزياء',
             link: '/fashion',
-            image: '👗',
+            image: '/images/hero/slide4.jpg',
         },
     ];
 
@@ -89,7 +90,7 @@ export default function HeroBanner() {
     };
 
     return (
-        <div className="hero">
+        <div className="hero relative overflow-hidden">
             <AnimatePresence mode="wait" custom={direction}>
                 {slides.map((slide, index) => (
                     index === current && (
@@ -117,9 +118,14 @@ export default function HeroBanner() {
             </AnimatePresence>
 
             <div className="hero-visual">
-                <span className="hero-image text-8xl">
-                    {slides[current].image}
-                </span>
+                <Image
+                    src={slides[current].image}
+                    alt={slides[current].title}
+                    width={400}
+                    height={400}
+                    className="hero-image object-contain"
+                    priority
+                />
             </div>
 
             {/* Navigation Arrows */}
@@ -146,8 +152,8 @@ export default function HeroBanner() {
                             setCurrent(index);
                         }}
                         className={`transition-all duration-300 rounded-full ${current === index
-                                ? 'w-8 h-2.5 bg-[#0A6C44]'
-                                : 'w-2.5 h-2.5 bg-gray-300 hover:bg-[#0A6C44]/50'
+                            ? 'w-8 h-2.5 bg-[#0A6C44]'
+                            : 'w-2.5 h-2.5 bg-gray-300 hover:bg-[#0A6C44]/50'
                             }`}
                     />
                 ))}

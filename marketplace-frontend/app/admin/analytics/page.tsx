@@ -1,3 +1,4 @@
+// app/admin/analytics/page.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -14,6 +15,7 @@ import {
     Legend,
     ArcElement,
 } from 'chart.js';
+import { BarChart3 } from 'lucide-react';
 
 ChartJS.register(
     CategoryScale,
@@ -72,7 +74,6 @@ export default function AdminAnalytics() {
         );
     }
 
-    // Users by role chart
     const usersChartData = {
         labels: data.usersByRole.map((item) => item.role),
         datasets: [
@@ -85,7 +86,6 @@ export default function AdminAnalytics() {
         ],
     };
 
-    // Orders by status chart
     const ordersChartData = {
         labels: data.ordersByStatus.map((item) => item.status),
         datasets: [
@@ -98,7 +98,6 @@ export default function AdminAnalytics() {
         ],
     };
 
-    // Monthly revenue chart
     const revenueChartData = {
         labels: data.monthlyRevenue.map((item) =>
             `${item.month}/${item.year}`
@@ -125,9 +124,12 @@ export default function AdminAnalytics() {
 
     return (
         <div>
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900">Analytics</h1>
-                <p className="text-gray-500 mt-1">Visual insights into your marketplace</p>
+            <div className="flex items-center gap-3 mb-8">
+                <BarChart3 className="w-8 h-8 text-[#0F5C45]" />
+                <div>
+                    <h1 className="text-3xl font-bold text-gray-900">Analytics</h1>
+                    <p className="text-gray-500 mt-1">Visual insights into your marketplace</p>
+                </div>
             </div>
 
             {/* Summary */}

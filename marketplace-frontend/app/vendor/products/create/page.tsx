@@ -1,9 +1,11 @@
+// app/vendor/products/create/page.tsx
 'use client';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/api';
+import { Plus, Save, X } from 'lucide-react';
 
 export default function CreateProductPage() {
     const { user, isLoading } = useAuth();
@@ -69,7 +71,10 @@ export default function CreateProductPage() {
 
     return (
         <div className="container mx-auto px-4 py-12 max-w-3xl">
-            <h1 className="text-3xl font-bold text-gray-800 mb-8 text-right">➕ إضافة منتج جديد</h1>
+            <div className="flex items-center gap-3 mb-8">
+                <Plus className="w-8 h-8 text-[#0F5C45]" />
+                <h1 className="text-3xl font-bold text-gray-800">إضافة منتج جديد</h1>
+            </div>
 
             {error && (
                 <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl mb-6 text-right">
@@ -212,9 +217,10 @@ export default function CreateProductPage() {
                 <button
                     type="submit"
                     disabled={loading}
-                    className="w-full py-3 bg-[#0F5C45] text-white rounded-xl font-semibold hover:bg-[#0A4735] transition disabled:opacity-50"
+                    className="w-full py-3 bg-[#0F5C45] text-white rounded-xl font-semibold hover:bg-[#0A4735] transition disabled:opacity-50 flex items-center justify-center gap-2"
                 >
-                    {loading ? 'جاري الإضافة...' : '➕ إضافة المنتج'}
+                    <Save className="w-5 h-5" />
+                    {loading ? 'جاري الإضافة...' : 'إضافة المنتج'}
                 </button>
             </form>
         </div>

@@ -1,3 +1,4 @@
+// app/admin/products/page.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -118,9 +119,7 @@ export default function AdminProducts() {
         <div>
             <div className="flex justify-between items-center mb-8">
                 <div className="flex items-center gap-3">
-                    <div className="p-2 bg-[#0F5C45]/10 rounded-xl">
-                        <Package className="w-7 h-7 text-[#0F5C45]" />
-                    </div>
+                    <Package className="w-8 h-8 text-[#0F5C45]" />
                     <div>
                         <h1 className="text-3xl font-bold text-gray-900">Products</h1>
                         <p className="text-gray-500 mt-1">Manage all products</p>

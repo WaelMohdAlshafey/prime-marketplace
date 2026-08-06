@@ -19,6 +19,8 @@ import {
     Truck,
     Store,
     Package,
+    ShoppingBag,
+    Settings,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -54,9 +56,7 @@ export default function Navbar() {
 
     return (
         <>
-            {/* ============================================================
-                TOP BAR
-                ============================================================ */}
+            {/* TOP BAR */}
             <div className="top-bar">
                 <div className="container">
                     <div className="left">
@@ -88,14 +88,12 @@ export default function Navbar() {
                 </div>
             </div>
 
-            {/* ============================================================
-                MAIN NAVBAR
-                ============================================================ */}
+            {/* MAIN NAVBAR */}
             <nav className={`navbar ${isScrolled ? 'shadow-md' : ''}`}>
                 <div className="container">
                     {/* Logo */}
                     <Link href="/" className="logo">
-                        <span>🛍️</span>
+                        <ShoppingBag className="w-6 h-6 text-[#0F5C45]" />
                         <span>Prime</span>
                     </Link>
 
@@ -138,6 +136,14 @@ export default function Navbar() {
                                 <span className="badge">{totalItems}</span>
                             )}
                         </Link>
+
+                        {/* ✅ Admin Settings – desktop (only for Admin) */}
+                        {!isLoading && user && user.role === 'Admin' && (
+                            <Link href="/admin" className="icon-link">
+                                <Settings className="w-6 h-6" />
+                                <span className="sr-only">Admin</span>
+                            </Link>
+                        )}
 
                         {isLoading ? (
                             <div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse"></div>
@@ -216,15 +222,18 @@ export default function Navbar() {
                                 >
                                     {t('contact')}
                                 </Link>
-                                {user && user.role === 'Admin' && (
+
+                                {/* ✅ Admin Settings – mobile */}
+                                {!isLoading && user && user.role === 'Admin' && (
                                     <Link
                                         href="/admin"
-                                        className="block py-2 text-[#0A6C44] font-medium hover:underline transition"
+                                        className="block py-2 text-[#0A6C44] font-medium hover:underline transition flex items-center gap-2"
                                         onClick={() => setIsMobileMenuOpen(false)}
                                     >
-                                        ⚙️ {t('admin')}
+                                        <Settings className="w-4 h-4" /> {t('admin')}
                                     </Link>
                                 )}
+
                                 {user && (
                                     <button
                                         onClick={() => {

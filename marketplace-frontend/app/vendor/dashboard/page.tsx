@@ -1,3 +1,4 @@
+// app/vendor/dashboard/page.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -6,10 +7,8 @@ import Link from 'next/link';
 import api from '@/lib/api';
 import { Product } from '@/types';
 import { useAuth } from '@/context/AuthContext';
+import { LayoutDashboard, Plus, Edit, Trash2 } from 'lucide-react';
 
-// ============================================================
-// Type for error responses
-// ============================================================
 interface ApiError {
     response?: {
         data?: {
@@ -51,24 +50,19 @@ export default function VendorDashboard() {
 
     useEffect(() => {
         if (isLoading) return;
-
         if (!user) {
             router.push('/auth/login');
             return;
         }
-
         if (user.role !== 'Vendor' && user.role !== 'Admin') {
             router.push('/');
             return;
         }
-
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchProducts();
     }, [user, isLoading]);
 
     const handleDelete = async (productId: number) => {
         if (!confirm('هل أنت متأكد من حذف هذا المنتج؟')) return;
-
         try {
             await api.delete(`/api/Products/${productId}`);
             setProducts(products.filter((p) => p.id !== productId));
@@ -116,12 +110,18 @@ export default function VendorDashboard() {
     return (
         <div className="container mx-auto px-4 py-12">
             <div className="flex justify-between items-center mb-8">
-                <h1 className="text-3xl font-bold text-gray-800">📊 لوحة تحكم البائع</h1>
+                <div className="flex items-center gap-3">
+                    <LayoutDashboard className="w-8 h-8 text-[#0F5C45]" />
+                    <div>
+                        <h1 className="text-3xl font-bold text-gray-800">لوحة تحكم البائع</h1>
+                        <p className="text-gray-500 mt-1">إدارة منتجاتك ومخزونك</p>
+                    </div>
+                </div>
                 <Link
                     href="/vendor/products/create"
-                    className="bg-[#0F5C45] text-white px-6 py-2 rounded-xl hover:bg-[#0A4735] transition"
+                    className="bg-[#0F5C45] text-white px-6 py-2 rounded-xl hover:bg-[#0A4735] transition flex items-center gap-2"
                 >
-                    + إضافة منتج جديد
+                    <Plus className="w-5 h-5" /> إضافة منتج
                 </Link>
             </div>
 
@@ -130,9 +130,9 @@ export default function VendorDashboard() {
                     <p className="text-lg">لا توجد منتجات مضافة بعد.</p>
                     <Link
                         href="/vendor/products/create"
-                        className="inline-block mt-4 text-[#0F5C45] hover:underline"
+                        className="inline-block mt-4 text-[#0F5C45] hover:underline flex items-center gap-2"
                     >
-                        أضف منتجك الأول
+                        <Plus className="w-4 h-4" /> أضف منتجك الأول
                     </Link>
                 </div>
             ) : (
@@ -146,15 +146,15 @@ export default function VendorDashboard() {
                                 <div className="flex flex-col gap-2">
                                     <Link
                                         href={`/vendor/products/edit/${product.id}`}
-                                        className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                                        className="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center gap-1"
                                     >
-                                        تعديل
+                                        <Edit className="w-4 h-4" /> تعديل
                                     </Link>
                                     <button
                                         onClick={() => handleDelete(product.id)}
-                                        className="text-red-600 hover:text-red-800 text-sm font-medium"
+                                        className="text-red-600 hover:text-red-800 text-sm font-medium flex items-center gap-1"
                                     >
-                                        حذف
+                                        <Trash2 className="w-4 h-4" /> حذف
                                     </button>
                                 </div>
                                 <div>

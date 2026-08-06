@@ -1,10 +1,11 @@
+// app/admin/suggestions/page.tsx
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import api from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
-import { CheckCircle, XCircle, Eye } from 'lucide-react';
+import { CheckCircle, XCircle, Eye, Lightbulb } from 'lucide-react';
 
 interface Suggestion {
     id: number;
@@ -59,8 +60,6 @@ export default function AdminSuggestions() {
             router.push('/');
             return;
         }
-        // ✅ Suppress ESLint warning – standard data‑fetching pattern
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchSuggestions();
     }, [user, isLoading, router, fetchSuggestions]);
 
@@ -103,24 +102,29 @@ export default function AdminSuggestions() {
 
     return (
         <div className="container mx-auto px-4 py-12">
-            <div className="flex justify-between items-center mb-8">
-                <h1 className="text-3xl font-bold text-gray-800">Product Suggestions</h1>
-                <div className="flex gap-2">
-                    <select
-                        value={filter}
-                        onChange={(e) => {
-                            const newFilter = e.target.value;
-                            setFilter(newFilter);
-                            fetchSuggestions(newFilter);
-                        }}
-                        className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0F5C45] focus:border-transparent"
-                    >
-                        <option value="">All</option>
-                        <option value="Pending">Pending</option>
-                        <option value="Approved">Approved</option>
-                        <option value="Rejected">Rejected</option>
-                    </select>
+            <div className="flex items-center gap-3 mb-8">
+                <Lightbulb className="w-8 h-8 text-[#0F5C45]" />
+                <div>
+                    <h1 className="text-3xl font-bold text-gray-800">Product Suggestions</h1>
+                    <p className="text-gray-500 mt-1">Review and manage product suggestions</p>
                 </div>
+            </div>
+
+            <div className="flex justify-end mb-6">
+                <select
+                    value={filter}
+                    onChange={(e) => {
+                        const newFilter = e.target.value;
+                        setFilter(newFilter);
+                        fetchSuggestions(newFilter);
+                    }}
+                    className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0F5C45] focus:border-transparent"
+                >
+                    <option value="">All</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Approved">Approved</option>
+                    <option value="Rejected">Rejected</option>
+                </select>
             </div>
 
             <div className="bg-white rounded-xl shadow-md overflow-hidden">
@@ -146,8 +150,8 @@ export default function AdminSuggestions() {
                                     <td className="px-6 py-4 text-sm text-gray-600">£{s.suggestedPrice?.toFixed(2) || 'N/A'}</td>
                                     <td className="px-6 py-4 text-sm">
                                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${s.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
-                                                s.status === 'Approved' ? 'bg-green-100 text-green-800' :
-                                                    'bg-red-100 text-red-800'
+                                            s.status === 'Approved' ? 'bg-green-100 text-green-800' :
+                                                'bg-red-100 text-red-800'
                                             }`}>
                                             {s.status}
                                         </span>
@@ -158,23 +162,23 @@ export default function AdminSuggestions() {
                                             <>
                                                 <button
                                                     onClick={() => handleApprove(s.id)}
-                                                    className="text-green-600 hover:text-green-800 font-medium"
+                                                    className="text-green-600 hover:text-green-800 font-medium flex items-center gap-1"
                                                 >
-                                                    <CheckCircle className="w-4 h-4 inline" /> Approve
+                                                    <CheckCircle className="w-4 h-4" /> Approve
                                                 </button>
                                                 <button
                                                     onClick={() => handleReject(s.id)}
-                                                    className="text-red-600 hover:text-red-800 font-medium"
+                                                    className="text-red-600 hover:text-red-800 font-medium flex items-center gap-1"
                                                 >
-                                                    <XCircle className="w-4 h-4 inline" /> Reject
+                                                    <XCircle className="w-4 h-4" /> Reject
                                                 </button>
                                             </>
                                         )}
                                         <button
                                             onClick={() => viewDetails(s)}
-                                            className="text-blue-600 hover:text-blue-800 font-medium"
+                                            className="text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1"
                                         >
-                                            <Eye className="w-4 h-4 inline" /> View
+                                            <Eye className="w-4 h-4" /> View
                                         </button>
                                     </td>
                                 </tr>
@@ -191,6 +195,7 @@ export default function AdminSuggestions() {
                 </div>
             </div>
 
+            {/* Modal for viewing suggestion details */}
             {showModal && selectedSuggestion && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
                     <div className="bg-white rounded-2xl p-8 max-w-2xl w-full max-h-[80vh] overflow-y-auto">
@@ -221,8 +226,8 @@ export default function AdminSuggestions() {
                                 <div>
                                     <p className="text-sm text-gray-500">Status</p>
                                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${selectedSuggestion.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
-                                            selectedSuggestion.status === 'Approved' ? 'bg-green-100 text-green-800' :
-                                                'bg-red-100 text-red-800'
+                                        selectedSuggestion.status === 'Approved' ? 'bg-green-100 text-green-800' :
+                                            'bg-red-100 text-red-800'
                                         }`}>
                                         {selectedSuggestion.status}
                                     </span>
@@ -282,15 +287,15 @@ export default function AdminSuggestions() {
                                         />
                                         <button
                                             onClick={() => handleApprove(selectedSuggestion.id)}
-                                            className="px-6 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700 transition"
+                                            className="px-6 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700 transition flex items-center gap-2"
                                         >
-                                            <CheckCircle className="w-4 h-4 inline" /> Approve
+                                            <CheckCircle className="w-4 h-4" /> Approve
                                         </button>
                                         <button
                                             onClick={() => handleReject(selectedSuggestion.id)}
-                                            className="px-6 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 transition"
+                                            className="px-6 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 transition flex items-center gap-2"
                                         >
-                                            <XCircle className="w-4 h-4 inline" /> Reject
+                                            <XCircle className="w-4 h-4" /> Reject
                                         </button>
                                     </div>
                                 </div>

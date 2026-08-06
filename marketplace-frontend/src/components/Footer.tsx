@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Heart, Mail, Phone, MapPin, Apple, Smartphone } from 'lucide-react';
+import { Heart, Mail, Phone, MapPin, Apple, Smartphone, ShoppingBag } from 'lucide-react';
 import api from '@/lib/api';
 
 interface ApiError {
@@ -57,7 +57,10 @@ export default function Footer() {
             <div className="container">
                 {/* Column 1: About & App Downloads */}
                 <div>
-                    <h4 className="footer-title">🛍️ Prime</h4>
+                    <h4 className="footer-title flex items-center gap-2">
+                        <ShoppingBag className="w-5 h-5" />
+                        Prime
+                    </h4>
                     <p className="text-[#9E9E9E] text-sm leading-relaxed mb-4">
                         منصة تسوق فاخرة تقدم أفضل المنتجات من برامج، تجميل، أزياء، وإكسسوارات.
                     </p>

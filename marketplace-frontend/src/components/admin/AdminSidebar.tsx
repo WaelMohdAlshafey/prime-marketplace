@@ -1,4 +1,3 @@
-// components/admin/AdminSidebar.tsx
 'use client';
 
 import Link from 'next/link';
@@ -18,7 +17,7 @@ import {
 } from 'lucide-react';
 
 interface AdminSidebarProps {
-    onLinkClick?: () => void;   // ✅ Accept the prop
+    onLinkClick?: () => void;
 }
 
 export default function AdminSidebar({ onLinkClick }: AdminSidebarProps) {
@@ -57,10 +56,10 @@ export default function AdminSidebar({ onLinkClick }: AdminSidebarProps) {
                         <Link
                             key={item.href}
                             href={item.href}
-                            onClick={onLinkClick}   // ✅ Close sidebar on navigation
+                            onClick={onLinkClick}
                             className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${isActive
-                                    ? 'bg-[#0F5C45] text-white shadow-lg shadow-[#0F5C45]/20'
-                                    : 'text-gray-400 hover:text-white hover:bg-white/10'
+                                ? 'bg-[#0F5C45] text-white shadow-lg shadow-[#0F5C45]/20'
+                                : 'text-gray-400 hover:text-white hover:bg-white/10'
                                 }`}
                         >
                             {item.icon}

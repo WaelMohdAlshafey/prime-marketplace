@@ -1,10 +1,11 @@
+// app/admin/settings/page.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { getStoreSettings, updateStoreSettings } from '@/lib/storeApi';
-import { StoreSettings, Owner } from '@/types';
+import { StoreSettings } from '@/types';
 import { useTheme } from '@/context/ThemeContext';
 import { Settings, Building, Palette, Code, Save } from 'lucide-react';
 
@@ -91,10 +92,11 @@ export default function AdminSettings() {
     return (
         <div className="container mx-auto px-4 py-12 max-w-5xl">
             <div className="flex items-center gap-3 mb-8">
-                <div className="p-2 bg-[#0F5C45]/10 rounded-xl">
-                    <Settings className="w-7 h-7 text-[#0F5C45]" />
+                <Settings className="w-8 h-8 text-[#0F5C45]" />
+                <div>
+                    <h1 className="text-3xl font-bold text-gray-800">إعدادات الموقع</h1>
+                    <p className="text-gray-500 mt-1">إدارة معلومات المتجر والمظهر العام</p>
                 </div>
-                <h1 className="text-3xl font-bold text-gray-800">إعدادات الموقع</h1>
             </div>
 
             {message && (
@@ -109,22 +111,19 @@ export default function AdminSettings() {
                     onClick={() => setActiveTab('basic')}
                     className={`flex items-center gap-2 px-4 py-2 rounded-lg transition ${activeTab === 'basic' ? 'bg-[#0F5C45] text-white' : 'text-gray-600 hover:bg-gray-100'}`}
                 >
-                    <Building className="w-4 h-4" />
-                    معلومات أساسية
+                    <Building className="w-4 h-4" /> معلومات أساسية
                 </button>
                 <button
                     onClick={() => setActiveTab('theme')}
                     className={`flex items-center gap-2 px-4 py-2 rounded-lg transition ${activeTab === 'theme' ? 'bg-[#0F5C45] text-white' : 'text-gray-600 hover:bg-gray-100'}`}
                 >
-                    <Palette className="w-4 h-4" />
-                    تخصيص المظهر
+                    <Palette className="w-4 h-4" /> تخصيص المظهر
                 </button>
                 <button
                     onClick={() => setActiveTab('advanced')}
                     className={`flex items-center gap-2 px-4 py-2 rounded-lg transition ${activeTab === 'advanced' ? 'bg-[#0F5C45] text-white' : 'text-gray-600 hover:bg-gray-100'}`}
                 >
-                    <Code className="w-4 h-4" />
-                    متقدم
+                    <Code className="w-4 h-4" /> متقدم
                 </button>
             </div>
 

@@ -1,3 +1,4 @@
+// app/admin/orders/page.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -158,9 +159,7 @@ export default function AdminOrders() {
         <div>
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 md:mb-8 gap-3">
                 <div className="flex items-center gap-3">
-                    <div className="p-2 bg-[#0F5C45]/10 rounded-xl">
-                        <ShoppingBag className="w-7 h-7 text-[#0F5C45]" />
-                    </div>
+                    <ShoppingBag className="w-8 h-8 text-[#0F5C45]" />
                     <div>
                         <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Orders</h1>
                         <p className="text-gray-500 mt-1 text-sm">Manage all orders</p>
@@ -231,7 +230,7 @@ export default function AdminOrders() {
                 </div>
             </div>
 
-            {/* Modal – responsive */}
+            {/* Modal – same as before, no changes needed */}
             {showModal && selectedOrder && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
                     <div className="bg-white rounded-2xl p-4 md:p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
@@ -244,7 +243,7 @@ export default function AdminOrders() {
                                 ×
                             </button>
                         </div>
-
+                        {/* ... rest of modal (unchanged) ... */}
                         <div className="space-y-4">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>

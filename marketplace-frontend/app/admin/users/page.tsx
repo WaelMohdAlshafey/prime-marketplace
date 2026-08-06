@@ -1,13 +1,12 @@
+// app/admin/users/page.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import api from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
+import { Users, UserPlus, Pencil, KeyRound, Trash2 } from 'lucide-react';
 
-// ============================================================
-// TYPES
-// ============================================================
 interface User {
     id: number;
     username: string;
@@ -32,7 +31,6 @@ export default function AdminUsersPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    // State for modals
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [showEditRoleModal, setShowEditRoleModal] = useState(false);
     const [showResetPasswordModal, setShowResetPasswordModal] = useState(false);
@@ -40,7 +38,6 @@ export default function AdminUsersPage() {
     const [newPassword, setNewPassword] = useState('');
     const [newRole, setNewRole] = useState('');
 
-    // State for creating a new user
     const [newUser, setNewUser] = useState({
         username: '',
         email: '',
@@ -48,9 +45,6 @@ export default function AdminUsersPage() {
         role: 'Customer',
     });
 
-    // ============================================================
-    // FETCH USERS
-    // ============================================================
     const fetchUsers = async () => {
         setLoading(true);
         setError(null);
@@ -74,28 +68,19 @@ export default function AdminUsersPage() {
         }
     };
 
-    // ============================================================
-    // AUTH CHECK
-    // ============================================================
     useEffect(() => {
         if (isLoading) return;
-
         if (!user) {
             router.push('/auth/login');
             return;
         }
-
         if (user.role !== 'Admin') {
             router.push('/');
             return;
         }
-
         fetchUsers();
     }, [user, isLoading]);
 
-    // ============================================================
-    // HANDLERS
-    // ============================================================
     const handleUpdateRole = async () => {
         if (!selectedUser) return;
         try {
@@ -185,9 +170,6 @@ export default function AdminUsersPage() {
         }
     };
 
-    // ============================================================
-    // RENDER
-    // ============================================================
     if (isLoading || loading) {
         return (
             <div className="flex justify-center items-center min-h-[60vh]">
@@ -216,12 +198,18 @@ export default function AdminUsersPage() {
     return (
         <div className="container mx-auto px-4 py-12">
             <div className="flex justify-between items-center mb-8">
-                <h1 className="text-3xl font-bold text-gray-800">👥 إدارة المستخدمين</h1>
+                <div className="flex items-center gap-3">
+                    <Users className="w-8 h-8 text-[#0F5C45]" />
+                    <div>
+                        <h1 className="text-3xl font-bold text-gray-800">إدارة المستخدمين</h1>
+                        <p className="text-gray-500 mt-1">إدارة جميع المستخدمين والأدوار</p>
+                    </div>
+                </div>
                 <button
                     onClick={() => setShowCreateUserModal(true)}
-                    className="bg-[#0F5C45] text-white px-6 py-2 rounded-xl hover:bg-[#0A4735] transition"
+                    className="bg-[#0F5C45] text-white px-6 py-2 rounded-xl hover:bg-[#0A4735] transition flex items-center gap-2"
                 >
-                    + إضافة مستخدم جديد
+                    <UserPlus className="w-5 h-5" /> إضافة مستخدم
                 </button>
             </div>
 
@@ -247,10 +235,10 @@ export default function AdminUsersPage() {
                                     <td className="px-6 py-4 text-sm">
                                         <span
                                             className={`px-2 py-1 rounded-full text-xs font-medium ${u.role === 'Admin'
-                                                    ? 'bg-red-100 text-red-800'
-                                                    : u.role === 'Vendor'
-                                                        ? 'bg-blue-100 text-blue-800'
-                                                        : 'bg-gray-100 text-gray-800'
+                                                ? 'bg-red-100 text-red-800'
+                                                : u.role === 'Vendor'
+                                                    ? 'bg-blue-100 text-blue-800'
+                                                    : 'bg-gray-100 text-gray-800'
                                                 }`}
                                         >
                                             {u.role}
@@ -266,24 +254,24 @@ export default function AdminUsersPage() {
                                                 setNewRole(u.role);
                                                 setShowEditRoleModal(true);
                                             }}
-                                            className="text-blue-600 hover:text-blue-800 font-medium"
+                                            className="text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1"
                                         >
-                                            تعديل الدور
+                                            <Pencil className="w-4 h-4" /> تعديل الدور
                                         </button>
                                         <button
                                             onClick={() => {
                                                 setSelectedUser(u);
                                                 setShowResetPasswordModal(true);
                                             }}
-                                            className="text-yellow-600 hover:text-yellow-800 font-medium"
+                                            className="text-yellow-600 hover:text-yellow-800 font-medium flex items-center gap-1"
                                         >
-                                            إعادة تعيين كلمة المرور
+                                            <KeyRound className="w-4 h-4" /> إعادة تعيين
                                         </button>
                                         <button
                                             onClick={() => handleDeleteUser(u.id, u.username)}
-                                            className="text-red-600 hover:text-red-800 font-medium"
+                                            className="text-red-600 hover:text-red-800 font-medium flex items-center gap-1"
                                         >
-                                            حذف
+                                            <Trash2 className="w-4 h-4" /> حذف
                                         </button>
                                     </td>
                                 </tr>
@@ -293,22 +281,16 @@ export default function AdminUsersPage() {
                 </div>
             </div>
 
-            {/* ============================================================
-          MODAL: Edit Role
-          ============================================================ */}
+            {/* Edit Role Modal */}
             {showEditRoleModal && selectedUser && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
                     <div className="bg-white rounded-2xl p-8 max-w-md w-full">
-                        <h2 className="text-2xl font-bold text-gray-800 mb-4 text-right">
-                            تعديل دور المستخدم
-                        </h2>
+                        <h2 className="text-2xl font-bold text-gray-800 mb-4 text-right">تعديل دور المستخدم</h2>
                         <p className="text-gray-600 mb-4 text-right">
                             المستخدم: <strong>{selectedUser.username}</strong>
                         </p>
                         <div className="mb-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-1 text-right">
-                                الدور الجديد
-                            </label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1 text-right">الدور الجديد</label>
                             <select
                                 value={newRole}
                                 onChange={(e) => setNewRole(e.target.value)}
@@ -337,22 +319,16 @@ export default function AdminUsersPage() {
                 </div>
             )}
 
-            {/* ============================================================
-          MODAL: Reset Password
-          ============================================================ */}
+            {/* Reset Password Modal */}
             {showResetPasswordModal && selectedUser && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
                     <div className="bg-white rounded-2xl p-8 max-w-md w-full">
-                        <h2 className="text-2xl font-bold text-gray-800 mb-4 text-right">
-                            إعادة تعيين كلمة المرور
-                        </h2>
+                        <h2 className="text-2xl font-bold text-gray-800 mb-4 text-right">إعادة تعيين كلمة المرور</h2>
                         <p className="text-gray-600 mb-4 text-right">
                             المستخدم: <strong>{selectedUser.username}</strong>
                         </p>
                         <div className="mb-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-1 text-right">
-                                كلمة المرور الجديدة
-                            </label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1 text-right">كلمة المرور الجديدة</label>
                             <input
                                 type="text"
                                 value={newPassword}
@@ -382,20 +358,14 @@ export default function AdminUsersPage() {
                 </div>
             )}
 
-            {/* ============================================================
-          MODAL: Create New User
-          ============================================================ */}
+            {/* Create User Modal */}
             {showCreateUserModal && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
                     <div className="bg-white rounded-2xl p-8 max-w-md w-full">
-                        <h2 className="text-2xl font-bold text-gray-800 mb-4 text-right">
-                            إضافة مستخدم جديد
-                        </h2>
+                        <h2 className="text-2xl font-bold text-gray-800 mb-4 text-right">إضافة مستخدم جديد</h2>
                         <div className="space-y-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1 text-right">
-                                    اسم المستخدم *
-                                </label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1 text-right">اسم المستخدم *</label>
                                 <input
                                     type="text"
                                     value={newUser.username}
@@ -404,9 +374,7 @@ export default function AdminUsersPage() {
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1 text-right">
-                                    البريد الإلكتروني *
-                                </label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1 text-right">البريد الإلكتروني *</label>
                                 <input
                                     type="email"
                                     value={newUser.email}
@@ -415,9 +383,7 @@ export default function AdminUsersPage() {
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1 text-right">
-                                    كلمة المرور *
-                                </label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1 text-right">كلمة المرور *</label>
                                 <input
                                     type="text"
                                     value={newUser.password}
@@ -427,9 +393,7 @@ export default function AdminUsersPage() {
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1 text-right">
-                                    الدور
-                                </label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1 text-right">الدور</label>
                                 <select
                                     value={newUser.role}
                                     onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}

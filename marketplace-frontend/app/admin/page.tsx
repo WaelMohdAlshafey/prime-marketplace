@@ -1,3 +1,4 @@
+// app/admin/page.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -11,6 +12,7 @@ import {
     Mail,
     Clock,
     TrendingUp,
+    LayoutDashboard,
 } from 'lucide-react';
 import { Line } from 'react-chartjs-2';
 import {
@@ -71,7 +73,6 @@ export default function AdminDashboard() {
                 setLoading(false);
             }
         };
-
         fetchStats();
     }, []);
 
@@ -92,7 +93,6 @@ export default function AdminDashboard() {
         );
     }
 
-    // Chart data
     const chartData = {
         labels: stats.monthlyRevenue.map((item) =>
             `${item.month}/${item.year}`
@@ -175,9 +175,12 @@ export default function AdminDashboard() {
 
     return (
         <div>
-            <div className="mb-6 md:mb-8">
-                <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Dashboard</h1>
-                <p className="text-gray-500 mt-1 text-sm md:text-base">Overview of your marketplace</p>
+            <div className="flex items-center gap-3 mb-8">
+                <LayoutDashboard className="w-8 h-8 text-[#0F5C45]" />
+                <div>
+                    <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+                    <p className="text-gray-500 mt-1">Overview of your marketplace</p>
+                </div>
             </div>
 
             {/* Stats Cards */}
@@ -241,10 +244,10 @@ export default function AdminDashboard() {
                                         </td>
                                         <td className="px-3 md:px-4 py-3 text-sm">
                                             <span className={`px-2 py-1 rounded-full text-xs font-medium ${order.status === 'Paid'
-                                                    ? 'bg-green-100 text-green-800'
-                                                    : order.status === 'Pending'
-                                                        ? 'bg-yellow-100 text-yellow-800'
-                                                        : 'bg-gray-100 text-gray-800'
+                                                ? 'bg-green-100 text-green-800'
+                                                : order.status === 'Pending'
+                                                    ? 'bg-yellow-100 text-yellow-800'
+                                                    : 'bg-gray-100 text-gray-800'
                                                 }`}>
                                                 {order.status}
                                             </span>

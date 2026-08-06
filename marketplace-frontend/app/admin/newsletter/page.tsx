@@ -1,9 +1,10 @@
+// app/admin/newsletter/page.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import api from '@/lib/api';
-import { Download, Trash2, CheckCircle, XCircle } from 'lucide-react';
+import { Download, Trash2, CheckCircle, XCircle, Mail } from 'lucide-react';
 
 interface Subscriber {
     id: number;
@@ -31,7 +32,6 @@ export default function AdminNewsletter() {
     };
 
     useEffect(() => {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchSubscribers();
     }, []);
 
@@ -83,18 +83,19 @@ export default function AdminNewsletter() {
     return (
         <div>
             <div className="flex justify-between items-center mb-8">
-                <div>
-                    <h1 className="text-3xl font-bold text-gray-900">Newsletter Subscribers</h1>
-                    <p className="text-gray-500 mt-1">Manage your email subscribers</p>
+                <div className="flex items-center gap-3">
+                    <Mail className="w-8 h-8 text-[#0F5C45]" />
+                    <div>
+                        <h1 className="text-3xl font-bold text-gray-900">Newsletter Subscribers</h1>
+                        <p className="text-gray-500 mt-1">Manage your email subscribers</p>
+                    </div>
                 </div>
-                <div className="flex gap-3">
-                    <button
-                        onClick={handleExportCSV}
-                        className="flex items-center gap-2 bg-[#0F5C45] text-white px-4 py-2 rounded-xl hover:bg-[#0A4735] transition"
-                    >
-                        <Download className="w-4 h-4" /> Export CSV
-                    </button>
-                </div>
+                <button
+                    onClick={handleExportCSV}
+                    className="flex items-center gap-2 bg-[#0F5C45] text-white px-4 py-2 rounded-xl hover:bg-[#0A4735] transition"
+                >
+                    <Download className="w-4 h-4" /> Export CSV
+                </button>
             </div>
 
             {/* Stats */}
