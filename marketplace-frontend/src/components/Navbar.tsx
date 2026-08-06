@@ -21,6 +21,7 @@ import {
     Package,
     ShoppingBag,
     Settings,
+    UserPlus,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -137,7 +138,7 @@ export default function Navbar() {
                             )}
                         </Link>
 
-                        {/* ✅ Admin Settings – desktop (only for Admin) */}
+                        {/* Admin Settings – desktop (only for Admin) */}
                         {!isLoading && user && user.role === 'Admin' && (
                             <Link href="/admin" className="icon-link">
                                 <Settings className="w-6 h-6" />
@@ -158,9 +159,20 @@ export default function Navbar() {
                                 </button>
                             </div>
                         ) : (
-                            <Link href="/auth/login" className="icon-link">
-                                <User className="w-6 h-6" />
-                            </Link>
+                            <>
+                                {/* ✅ Register Link (new) */}
+                                <Link
+                                    href="/auth/register"
+                                    className="text-sm font-medium text-[#0A6C44] hover:underline transition flex items-center gap-1"
+                                >
+                                    <UserPlus className="w-4 h-4" />
+                                    <span>{t('registerTitle')}</span>
+                                </Link>
+                                {/* Login Icon */}
+                                <Link href="/auth/login" className="icon-link">
+                                    <User className="w-6 h-6" />
+                                </Link>
+                            </>
                         )}
 
                         {/* Mobile Menu Toggle */}
@@ -223,7 +235,7 @@ export default function Navbar() {
                                     {t('contact')}
                                 </Link>
 
-                                {/* ✅ Admin Settings – mobile */}
+                                {/* Admin Settings – mobile */}
                                 {!isLoading && user && user.role === 'Admin' && (
                                     <Link
                                         href="/admin"
@@ -232,6 +244,26 @@ export default function Navbar() {
                                     >
                                         <Settings className="w-4 h-4" /> {t('admin')}
                                     </Link>
+                                )}
+
+                                {/* Authentication links for mobile */}
+                                {!user && !isLoading && (
+                                    <>
+                                        <Link
+                                            href="/auth/register"
+                                            className="block py-2 text-[#0A6C44] font-medium hover:underline transition flex items-center gap-2"
+                                            onClick={() => setIsMobileMenuOpen(false)}
+                                        >
+                                            <UserPlus className="w-4 h-4" /> {t('registerTitle')}
+                                        </Link>
+                                        <Link
+                                            href="/auth/login"
+                                            className="block py-2 text-[#0A6C44] font-medium hover:underline transition flex items-center gap-2"
+                                            onClick={() => setIsMobileMenuOpen(false)}
+                                        >
+                                            <User className="w-4 h-4" /> {t('loginTitle')}
+                                        </Link>
+                                    </>
                                 )}
 
                                 {user && (
