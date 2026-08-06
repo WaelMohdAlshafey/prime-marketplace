@@ -33,7 +33,7 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-    // ✅ Fallback to 'standard' if template is undefined
+    // ✅ Force 'standard' – always show full card with counter
     const { template = 'standard' } = useTheme();
     console.log('🃏 ProductCard template:', template);
 
@@ -65,7 +65,9 @@ export default function ProductCard({ product }: ProductCardProps) {
         setImgSrc('/images/placeholder.jpg');
     };
 
-    // ----- SIMPLE / COLORED / BLUE templates (minimal card) -----
+    // ── The simple/colored/blue templates are still here but will never be used
+    // because we force 'standard' in ThemeContext and have the fallback above.
+    // They are kept for completeness but won't render.
     if (template === 'simple' || template === 'colored' || template === 'blue') {
         const showRating = template !== 'simple' && product.rating;
         const isColored = template === 'colored';
@@ -117,7 +119,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         );
     }
 
-    // ----- STANDARD TEMPLATE (Full Prime Design) -----
+    // ── STANDARD TEMPLATE (full design) – with quantity controls ──
     const handleWishlistToggle = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
@@ -265,7 +267,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                     </div>
                 </Link>
 
-                {/* Quantity Controls + Add to Cart */}
+                {/* ✅ Quantity Controls + Add to Cart */}
                 <div className="flex items-center gap-2">
                     {product.stockQuantity > 0 && (
                         <div className="flex items-center gap-1 bg-[#F8F9FA] rounded-lg p-0.5 border border-[#E0E0E0] flex-shrink-0">
