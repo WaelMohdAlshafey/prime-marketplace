@@ -1,16 +1,13 @@
 ﻿/* ============================================================
-   PRIME DESIGN SYSTEM – THEME-AWARE CSS
+   THEME-AWARE GLOBALS.CSS
    ============================================================ */
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ============================================================
-   DEFAULT THEME (Standard – Green)
-   ============================================================ */
+/* Default theme (Standard – Green) */
 :root {
-    /* Core theme variables – these change based on data-theme */
     --color-primary: #0A6C44;
     --color-primary-dark: #06452A;
     --color-secondary: #4CAF50;
@@ -36,8 +33,6 @@
     --radius-card: 16px;
     --font-family: 'Cairo', 'Inter', sans-serif;
     --star-gold: #FFB400;
-    --border-color: #E0E0E0;
-    --white: #FFFFFF;
     --radius-sm: 4px;
     --radius-md: 8px;
     --radius-lg: 12px;
@@ -46,11 +41,7 @@
     --container-width: 1320px;
 }
 
-/* ============================================================
-   TEMPLATE THEMES
-   ============================================================ */
-
-/* SIMPLE – Gray */
+/* Simple (Gray) */
 [data-theme="simple"] {
     --color-primary: #6B7280;
     --color-primary-dark: #4B5563;
@@ -77,7 +68,7 @@
     --radius-card: 8px;
 }
 
-/* COLORED – Orange/Amber */
+/* Colored (Orange) */
 [data-theme="colored"] {
     --color-primary: #D97706;
     --color-primary-dark: #B45309;
@@ -104,7 +95,7 @@
     --radius-card: 16px;
 }
 
-/* BLUE – Blue */
+/* Blue */
 [data-theme="blue"] {
     --color-primary: #1D4ED8;
     --color-primary-dark: #1E3A8A;
@@ -131,9 +122,7 @@
     --radius-card: 12px;
 }
 
-/* ============================================================
-   GLOBAL RESET & BASE
-   ============================================================ */
+/* ========== Global Reset & Base ========== */
 * {
     margin: 0;
     padding: 0;
@@ -153,7 +142,6 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
-/* Custom scrollbar */
 ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
@@ -172,9 +160,7 @@ body {
         background: var(--color-primary-dark);
     }
 
-/* ============================================================
-   CONTAINER
-   ============================================================ */
+/* ========== Container ========== */
 .container {
     max-width: var(--container-width);
     margin: 0 auto;
@@ -206,9 +192,7 @@ body {
     }
 }
 
-/* ============================================================
-   TOP BAR
-   ============================================================ */
+/* ========== Top Bar ========== */
 .top-bar {
     background-color: var(--color-navbar-bg);
     color: var(--color-navbar-text);
@@ -242,9 +226,7 @@ body {
         color: rgba(255,255,255,0.3);
     }
 
-/* ============================================================
-   NAVBAR
-   ============================================================ */
+/* ========== Navbar ========== */
 .navbar {
     background: var(--color-surface);
     padding: 16px 0;
@@ -272,9 +254,7 @@ body {
         flex-shrink: 0;
     }
 
-/* ============================================================
-   SEARCH BAR
-   ============================================================ */
+/* ========== Search Bar ========== */
 .search-bar {
     flex: 1;
     display: flex;
@@ -333,9 +313,7 @@ body {
             background: var(--color-button-primary-hover);
         }
 
-/* ============================================================
-   NAV ICONS
-   ============================================================ */
+/* ========== Nav Icons ========== */
 .nav-icons {
     display: flex;
     align-items: center;
@@ -380,9 +358,7 @@ body {
         color: var(--color-text);
     }
 
-/* ============================================================
-   HERO BANNER
-   ============================================================ */
+/* ========== Hero Banner ========== */
 .hero {
     background: var(--color-background);
     border-radius: var(--radius-lg);
@@ -484,9 +460,7 @@ body {
         height: auto;
     }
 
-/* ============================================================
-   CATEGORY GRID
-   ============================================================ */
+/* ========== Category Grid ========== */
 .category-section {
     padding: 24px 0;
 }
@@ -555,18 +529,14 @@ body {
         margin-top: 2px;
     }
 
-/* ============================================================
-   MAIN LAYOUT
-   ============================================================ */
+/* ========== Main Layout ========== */
 .main-layout {
     display: flex;
     gap: 30px;
     margin: 30px 0;
 }
 
-/* ============================================================
-   SIDEBAR
-   ============================================================ */
+/* ========== Sidebar ========== */
 .sidebar {
     width: 280px;
     flex-shrink: 0;
@@ -702,9 +672,7 @@ body {
         color: var(--color-text);
     }
 
-/* ============================================================
-   PRODUCT GRID
-   ============================================================ */
+/* ========== Product Grid ========== */
 .product-grid {
     flex: 1;
     display: grid;
@@ -712,9 +680,7 @@ body {
     gap: 20px;
 }
 
-/* ============================================================
-   PRODUCT CARD (THEME-AWARE)
-   ============================================================ */
+/* ========== Product Card ========== */
 .product-card {
     background: var(--color-card-bg);
     border-radius: var(--radius-card);
@@ -870,9 +836,7 @@ body {
             transform: none;
         }
 
-/* ============================================================
-   SHOPS SECTION
-   ============================================================ */
+/* ========== Shops Section ========== */
 .shops-section {
     padding: 24px 0;
 }
@@ -958,9 +922,7 @@ body {
             color: var(--white);
         }
 
-/* ============================================================
-   SERVICE BANNERS
-   ============================================================ */
+/* ========== Service Banners ========== */
 .service-banners {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -1000,9 +962,7 @@ body {
         margin-top: 4px;
     }
 
-/* ============================================================
-   FOOTER (THEME-AWARE)
-   ============================================================ */
+/* ========== Footer ========== */
 .footer {
     background: var(--color-footer-bg);
     color: var(--color-footer-text);
@@ -1104,9 +1064,7 @@ body {
         color: var(--color-footer-text);
     }
 
-/* ============================================================
-   RESPONSIVE BREAKPOINTS
-   ============================================================ */
+/* ========== Responsive ========== */
 @media (max-width: 1200px) {
     .product-grid {
         grid-template-columns: repeat(3, 1fr);
