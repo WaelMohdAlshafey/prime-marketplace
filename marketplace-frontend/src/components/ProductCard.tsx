@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import { Heart, ShoppingBag, Star } from 'lucide-react';
@@ -57,13 +56,11 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
     const isWishlist = isFavorite(product.id);
     const discountPrice = product.discount ? product.price * (1 - product.discount / 100) : null;
     const hasDiscount = product.discount && product.discount > 0;
-    const isStorePage = pathname?.startsWith('/stores/');
 
     const handleImageError = () => {
         setImgSrc('/images/placeholder.jpg');
     };
 
-    // ── STANDARD TEMPLATE (full design) with quantity controls ──
     const handleWishlistToggle = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
@@ -155,11 +152,17 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
                 onHoverEnd={() => setIsHovered(false)}
                 className="product-card cursor-pointer"
                 onClick={(e) => {
-                    if ((e.target as HTMLElement).closest('button, a')) return;
-                    onCardClick?.();
+                    // Only trigger if the click is not on a button
+                    if ((e.target as HTMLElement).closest('button')) return;
+                    if (onCardClick) {
+                        e.preventDefault();
+                        onCardClick();
+                    }
                 }}
             >
-                <Link href={`/products/${product.id}`} className="block">
+                {/* Card content – without Link */}
+                <div className="block">
+                    {/* Wishlist Button */}
                     <motion.button
                         whileHover={{ scale: 1.2 }}
                         whileTap={{ scale: 0.8 }}
@@ -175,6 +178,7 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
                         <span className="discount-badge">-{product.discount}%</span>
                     )}
 
+                    {/* Product Image */}
                     <div className="relative w-full h-48 bg-gray-50 rounded-md overflow-hidden">
                         <Image
                             src={imgSrc}
@@ -187,6 +191,7 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
                         />
                     </div>
 
+                    {/* Product Info */}
                     <h3 className="product-title">{product.name}</h3>
                     <p className="product-desc">{product.description}</p>
 
@@ -207,9 +212,10 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
                             </>
                         )}
                     </div>
-                </Link>
+                </div>
 
-                <div className="flex items-center gap-2">
+                {/* Quantity Controls + Add to Cart */}
+                <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
                     {product.stockQuantity > 0 && (
                         <div className="flex items-center gap-1 bg-[#F8F9FA] rounded-lg p-0.5 border border-[#E0E0E0] flex-shrink-0">
                             <button
