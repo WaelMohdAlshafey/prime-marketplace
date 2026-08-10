@@ -6,6 +6,7 @@ import { X, Star, ShoppingBag } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
+import { useTranslation } from 'react-i18next';
 import { getImageUrl } from '@/lib/getImageUrl';
 import api from '@/lib/api';
 
@@ -43,6 +44,7 @@ interface ProductDetail {
 export default function ProductDetailModal({ productId, isOpen, onClose }: ProductDetailModalProps) {
     const { user } = useAuth();
     const { addToCart } = useCart();
+    const { i18n } = useTranslation();
     const [product, setProduct] = useState<ProductDetail | null>(null);
     const [loading, setLoading] = useState(true);
     const [quantity, setQuantity] = useState(1);
@@ -139,9 +141,14 @@ export default function ProductDetailModal({ productId, isOpen, onClose }: Produ
 
     if (!isOpen) return null;
 
-    // ✅ Try name, nameAr, nameEn – fallback to "Untitled Product"
-    const displayName = product?.name || product?.nameAr || product?.nameEn || 'Untitled Product';
-    const displayDescription = product?.description || product?.descriptionAr || product?.descriptionEn || 'No description available.';
+    // 🌐 Language-aware display
+    const lang = i18n.language || 'en';
+    const displayName = lang === 'en'
+        ? (product?.nameEn || product?.name || product?.nameAr || `Product #${productId}`)
+        : (product?.nameAr || product?.name || product?.nameEn || `Product #${productId}`);
+    const displayDescription = lang === 'en'
+        ? (product?.descriptionEn || product?.description || product?.descriptionAr || 'No description available.')
+        : (product?.descriptionAr || product?.description || product?.descriptionEn || 'لا يوجد وصف.');
 
     return (
         <AnimatePresence>

@@ -10,6 +10,7 @@ import { useWishlist } from '@/context/WishlistContext';
 import { useCart } from '@/context/CartContext';
 import { useCartIconRef } from '@/context/CartIconRefContext';
 import { useTheme } from '@/context/ThemeContext';
+import { useTranslation } from 'react-i18next';
 import { getImageUrl } from '@/lib/getImageUrl';
 import { getProductImage } from '@/lib/productImages';
 
@@ -38,11 +39,11 @@ interface ProductCardProps {
 
 export default function ProductCard({ product, onCardClick }: ProductCardProps) {
     const { template = 'standard' } = useTheme();
+    const { i18n } = useTranslation();
     const pathname = usePathname();
     const [isAdding, setIsAdding] = useState(false);
     const [quantity, setQuantity] = useState(1);
 
-    // Log the product to see what the API returns
     console.log('🛒 ProductCard received product:', product);
 
     const initialImage = product.imageUrl
@@ -154,14 +155,18 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
         if (onCardClick) {
             onCardClick();
         } else {
-            console.warn('⚠️ onCardClick not provided for product:', product.id);
-            // 🔥 Fallback: try to navigate to product page, or alert
-            alert('Card clicked but onCardClick not provided. Please check parent component.');
+            console.warn('⚠️ Card clicked but onCardClick not provided. Please check parent component.');
         }
     };
 
-    const displayName = product.name || product.nameAr || product.nameEn || 'Untitled Product';
-    const displayDescription = product.description || product.descriptionAr || product.descriptionEn || '';
+    // 🌐 Language-aware display
+    const lang = i18n.language || 'en';
+    const displayName = lang === 'en'
+        ? (product.nameEn || product.name || product.nameAr || `Product #${product.id}`)
+        : (product.nameAr || product.name || product.nameEn || `Product #${product.id}`);
+    const displayDescription = lang === 'en'
+        ? (product.descriptionEn || product.description || product.descriptionAr || '')
+        : (product.descriptionAr || product.description || product.descriptionEn || '');
 
     return (
         <>

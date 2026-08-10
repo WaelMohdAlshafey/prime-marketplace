@@ -7,7 +7,7 @@ import { Product } from '@/types';
 import HeroBanner from '@/components/HeroBanner';
 import CategoryGrid from '@/components/CategoryGrid';
 import FilterSidebar from '@/components/Filters/FilterSidebar';
-import ProductCard from '@/components/ProductCard'; // ✅ default import – no braces
+import ProductCard from '@/components/ProductCard';
 import ProductDetailModal from '@/components/ProductDetailModal';
 import { ShoppingBag, Shield, Truck, Headphones } from 'lucide-react';
 
