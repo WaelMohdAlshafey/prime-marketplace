@@ -66,8 +66,10 @@ export default function Home() {
     };
 
     const handleCardClick = (productId: number) => {
+        console.log('🖱️ Card clicked, productId:', productId); // ✅ DEBUG
         setSelectedProductId(productId);
         setIsModalOpen(true);
+        console.log('🔓 Modal should open, isModalOpen:', true);
     };
 
     const services = [
@@ -157,7 +159,10 @@ export default function Home() {
             <ProductDetailModal
                 productId={selectedProductId || 0}
                 isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
+                onClose={() => {
+                    console.log('🔒 Modal closed');
+                    setIsModalOpen(false);
+                }}
             />
         </div>
     );
