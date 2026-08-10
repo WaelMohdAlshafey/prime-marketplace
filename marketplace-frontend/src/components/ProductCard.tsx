@@ -44,8 +44,6 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
     const [isAdding, setIsAdding] = useState(false);
     const [quantity, setQuantity] = useState(1);
 
-    console.log('🛒 ProductCard received product:', product);
-
     const initialImage = product.imageUrl
         ? getImageUrl(product.imageUrl)
         : getProductImage(product.name || product.nameAr || product.nameEn || '');
@@ -150,17 +148,16 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
 
     const handleCardClick = (e: React.MouseEvent) => {
         e.preventDefault();
+        alert(`🖱️ Card clicked! Product ID: ${product.id}`); // ✅ Debug alert
         console.log('🖱️ ProductCard clicked, productId:', product.id);
-        console.log('📦 onCardClick is:', onCardClick ? 'provided ✅' : '❌ NOT provided');
         if (onCardClick) {
             onCardClick();
         } else {
-            console.warn('⚠️ Card clicked but onCardClick not provided. Please check parent component.');
-            // Fallback: try to open modal directly (if you have a global state)
+            console.warn('⚠️ onCardClick not provided – but alert works.');
         }
     };
 
-    // 🌐 Language-aware display with fallback
+    // 🌐 Language-aware display (prefer bilingual if exists)
     const lang = i18n.language || 'en';
     const displayName = lang === 'en'
         ? (product.nameEn || product.name || product.nameAr || `Product #${product.id}`)
@@ -170,124 +167,107 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
         : (product.descriptionAr || product.description || product.descriptionEn || '');
 
     return (
-        <>
-            <motion.div
-                ref={cardRef}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4 }}
-                whileHover={{ y: -8 }}
-                onHoverStart={() => setIsHovered(true)}
-                onHoverEnd={() => setIsHovered(false)}
-                className="product-card cursor-pointer border border-gray-200 rounded-lg p-3 hover:shadow-lg transition"
-                onClick={handleCardClick}
-            >
-                <div className="block relative">
-                    <motion.button
-                        whileHover={{ scale: 1.2 }}
-                        whileTap={{ scale: 0.8 }}
-                        onClick={handleWishlistToggle}
-                        className="wishlist-btn absolute top-2 left-2 bg-white rounded-full p-1.5 shadow z-10"
-                    >
-                        <Heart
-                            className={`w-4 h-4 transition ${isWishlist ? 'fill-red-500 text-red-500' : 'text-gray-500'}`}
-                        />
-                    </motion.button>
+        <motion.div
+            ref={cardRef}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            whileHover={{ y: -8 }}
+            onHoverStart={() => setIsHovered(true)}
+            onHoverEnd={() => setIsHovered(false)}
+            className="product-card cursor-pointer border border-gray-200 rounded-lg p-3 hover:shadow-lg transition"
+            onClick={handleCardClick}
+        >
+            <div className="block relative">
+                <motion.button
+                    whileHover={{ scale: 1.2 }}
+                    whileTap={{ scale: 0.8 }}
+                    onClick={handleWishlistToggle}
+                    className="wishlist-btn absolute top-2 left-2 bg-white rounded-full p-1.5 shadow z-10"
+                >
+                    <Heart
+                        className={`w-4 h-4 transition ${isWishlist ? 'fill-red-500 text-red-500' : 'text-gray-500'}`}
+                    />
+                </motion.button>
 
-                    {hasDiscount && (
-                        <span className="discount-badge absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full z-10">
-                            -{product.discount}%
-                        </span>
-                    )}
-
-                    <div className="relative w-full h-48 bg-gray-50 rounded-md overflow-hidden">
-                        <Image
-                            src={imgSrc}
-                            alt={displayName}
-                            fill
-                            className={`object-cover transition-transform duration-700 ${isHovered ? 'scale-110' : 'scale-100'}`}
-                            sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-                            priority={false}
-                            onError={handleImageError}
-                        />
-                    </div>
-
-                    <h3 className="product-title font-bold text-lg text-gray-800 mt-2">{displayName}</h3>
-                    {displayDescription && (
-                        <p className="product-desc text-gray-600 text-sm line-clamp-2">{displayDescription}</p>
-                    )}
-
-                    {product.rating && (
-                        <div className="product-rating">
-                            {renderStars(product.rating)}
-                        </div>
-                    )}
-
-                    <div className="price-row">
-                        <span className="current-price text-xl font-bold text-[#0F5C45]">
-                            {CURRENCY}{(discountPrice || product.price).toFixed(2)}
-                        </span>
-                        {hasDiscount && (
-                            <>
-                                <span className="old-price text-gray-400 line-through">{CURRENCY}{product.price.toFixed(2)}</span>
-                                <span className="discount-tag bg-green-500 text-white text-xs px-2 py-0.5 rounded-full">-{product.discount}%</span>
-                            </>
-                        )}
-                    </div>
-                </div>
-
-                <div className="flex items-center gap-2 mt-3" onClick={(e) => e.stopPropagation()}>
-                    {product.stockQuantity > 0 && (
-                        <div className="flex items-center gap-1 bg-[#F8F9FA] rounded-lg p-0.5 border border-[#E0E0E0] flex-shrink-0">
-                            <button
-                                onClick={decrement}
-                                disabled={quantity <= 1}
-                                className="w-7 h-7 rounded-md flex items-center justify-center text-[#757575] hover:bg-white hover:shadow-sm transition disabled:opacity-30 disabled:cursor-not-allowed text-lg font-bold"
-                            >
-                                −
-                            </button>
-                            <span className="w-6 text-center text-sm font-medium text-[#1A1A1A]">
-                                {quantity}
-                            </span>
-                            <button
-                                onClick={increment}
-                                disabled={quantity >= product.stockQuantity}
-                                className="w-7 h-7 rounded-md flex items-center justify-center text-[#757575] hover:bg-white hover:shadow-sm transition disabled:opacity-30 disabled:cursor-not-allowed text-lg font-bold"
-                            >
-                                +
-                            </button>
-                        </div>
-                    )}
-
-                    <button
-                        onClick={(e) => handleAddToCart(e, quantity)}
-                        disabled={isAdding || product.stockQuantity === 0}
-                        className="add-to-cart-btn flex-1 bg-[#0F5C45] text-white py-2 rounded-lg hover:bg-[#0A4735] transition disabled:opacity-50"
-                    >
-                        <ShoppingBag className="w-4 h-4 inline mr-1" />
-                        {isAdding
-                            ? 'جاري الإضافة...'
-                            : product.stockQuantity === 0
-                                ? 'غير متوفر'
-                                : `إضافة (${quantity})`}
-                    </button>
-                </div>
-            </motion.div>
-
-            <AnimatePresence>
-                {fly && (
-                    <motion.div
-                        initial={{ x: flyStart.x, y: flyStart.y, scale: 1, opacity: 1 }}
-                        animate={{ x: flyEnd.x - 32, y: flyEnd.y - 32, scale: 0.3, opacity: 0 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.8, ease: 'easeInOut' }}
-                        className="fixed w-16 h-16 rounded-full bg-white shadow-xl z-50 pointer-events-none"
-                        style={{ left: -32, top: -32 }}
-                    >
-                        <Image src={imgSrc} alt={displayName} fill className="object-cover rounded-full" sizes="64px" />
-                    </motion.div>
+                {hasDiscount && (
+                    <span className="discount-badge absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full z-10">
+                        -{product.discount}%
+                    </span>
                 )}
-            </AnimatePresence>
-        </>
+
+                <div className="relative w-full h-48 bg-gray-50 rounded-md overflow-hidden">
+                    <Image
+                        src={imgSrc}
+                        alt={displayName}
+                        fill
+                        className={`object-cover transition-transform duration-700 ${isHovered ? 'scale-110' : 'scale-100'}`}
+                        sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                        priority={false}
+                        onError={handleImageError}
+                    />
+                </div>
+
+                <h3 className="product-title font-bold text-lg text-gray-800 mt-2">{displayName}</h3>
+                {displayDescription && (
+                    <p className="product-desc text-gray-600 text-sm line-clamp-2">{displayDescription}</p>
+                )}
+
+                {product.rating && (
+                    <div className="product-rating">
+                        {renderStars(product.rating)}
+                    </div>
+                )}
+
+                <div className="price-row">
+                    <span className="current-price text-xl font-bold text-[#0F5C45]">
+                        {CURRENCY}{(discountPrice || product.price).toFixed(2)}
+                    </span>
+                    {hasDiscount && (
+                        <>
+                            <span className="old-price text-gray-400 line-through">{CURRENCY}{product.price.toFixed(2)}</span>
+                            <span className="discount-tag bg-green-500 text-white text-xs px-2 py-0.5 rounded-full">-{product.discount}%</span>
+                        </>
+                    )}
+                </div>
+            </div>
+
+            <div className="flex items-center gap-2 mt-3" onClick={(e) => e.stopPropagation()}>
+                {product.stockQuantity > 0 && (
+                    <div className="flex items-center gap-1 bg-[#F8F9FA] rounded-lg p-0.5 border border-[#E0E0E0] flex-shrink-0">
+                        <button
+                            onClick={decrement}
+                            disabled={quantity <= 1}
+                            className="w-7 h-7 rounded-md flex items-center justify-center text-[#757575] hover:bg-white hover:shadow-sm transition disabled:opacity-30 disabled:cursor-not-allowed text-lg font-bold"
+                        >
+                            −
+                        </button>
+                        <span className="w-6 text-center text-sm font-medium text-[#1A1A1A]">
+                            {quantity}
+                        </span>
+                        <button
+                            onClick={increment}
+                            disabled={quantity >= product.stockQuantity}
+                            className="w-7 h-7 rounded-md flex items-center justify-center text-[#757575] hover:bg-white hover:shadow-sm transition disabled:opacity-30 disabled:cursor-not-allowed text-lg font-bold"
+                        >
+                            +
+                        </button>
+                    </div>
+                )}
+
+                <button
+                    onClick={(e) => handleAddToCart(e, quantity)}
+                    disabled={isAdding || product.stockQuantity === 0}
+                    className="add-to-cart-btn flex-1 bg-[#0F5C45] text-white py-2 rounded-lg hover:bg-[#0A4735] transition disabled:opacity-50"
+                >
+                    <ShoppingBag className="w-4 h-4 inline mr-1" />
+                    {isAdding
+                        ? 'جاري الإضافة...'
+                        : product.stockQuantity === 0
+                            ? 'غير متوفر'
+                            : `إضافة (${quantity})`}
+                </button>
+            </div>
+        </motion.div>
     );
 }

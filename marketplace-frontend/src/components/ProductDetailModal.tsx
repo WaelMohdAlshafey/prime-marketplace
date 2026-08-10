@@ -54,6 +54,9 @@ export default function ProductDetailModal({ productId, isOpen, onClose }: Produ
     const [ratingMessage, setRatingMessage] = useState('');
     const [addingToCart, setAddingToCart] = useState(false);
 
+    // Log when modal opens
+    console.log('🟢 ProductDetailModal rendering, isOpen:', isOpen, 'productId:', productId);
+
     useEffect(() => {
         if (isOpen && productId) {
             fetchProductDetails();

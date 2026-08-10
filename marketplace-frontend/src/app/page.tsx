@@ -65,9 +65,8 @@ export default function Home() {
         fetchProducts({});
     };
 
-    // ✅ Alert to confirm click
     const handleCardClick = (productId: number) => {
-        alert(`🖱️ Card clicked! Product ID: ${productId}`); // ← debug
+        alert(`🖱️ Card clicked! Product ID: ${productId}`); // ✅ Debug alert
         console.log('🖱️ handleCardClick called with productId:', productId);
         setSelectedProductId(productId);
         setIsModalOpen(true);
