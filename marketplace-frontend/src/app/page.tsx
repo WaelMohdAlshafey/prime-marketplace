@@ -66,10 +66,10 @@ export default function Home() {
     };
 
     const handleCardClick = (productId: number) => {
-        alert(`🖱️ Card clicked! Product ID: ${productId}`); // ✅ Debug alert
         console.log('🖱️ handleCardClick called with productId:', productId);
         setSelectedProductId(productId);
         setIsModalOpen(true);
+        console.log('🔓 isModalOpen set to true, selectedProductId:', productId);
     };
 
     const services = [
@@ -148,7 +148,7 @@ export default function Home() {
                                 <ProductCard
                                     key={product.id}
                                     product={product}
-                                    onCardClick={() => handleCardClick(product.id)}
+                                    onCardClick={() => handleCardClick(product.id)} // ✅ passes productId
                                 />
                             ))}
                         </div>

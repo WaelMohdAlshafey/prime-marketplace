@@ -34,7 +34,7 @@ interface ProductCardProps {
         descriptionAr?: string;
         descriptionEn?: string;
     };
-    onCardClick?: () => void;
+    onCardClick?: (productId: number) => void; // ✅ now accepts productId
 }
 
 export default function ProductCard({ product, onCardClick }: ProductCardProps) {
@@ -148,16 +148,16 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
 
     const handleCardClick = (e: React.MouseEvent) => {
         e.preventDefault();
-        alert(`🖱️ Card clicked! Product ID: ${product.id}`); // ✅ Debug alert
+        alert(`🖱️ Card clicked! Product ID: ${product.id}`); // <- debug alert
         console.log('🖱️ ProductCard clicked, productId:', product.id);
         if (onCardClick) {
-            onCardClick();
+            onCardClick(product.id); // ✅ pass productId to parent
         } else {
-            console.warn('⚠️ onCardClick not provided – but alert works.');
+            console.warn('⚠️ onCardClick not provided – alert works but modal won\'t open.');
         }
     };
 
-    // 🌐 Language-aware display (prefer bilingual if exists)
+    // 🌐 Language-aware display
     const lang = i18n.language || 'en';
     const displayName = lang === 'en'
         ? (product.nameEn || product.name || product.nameAr || `Product #${product.id}`)
@@ -178,6 +178,7 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
             className="product-card cursor-pointer border border-gray-200 rounded-lg p-3 hover:shadow-lg transition"
             onClick={handleCardClick}
         >
+            {/* ... card content (same as before) */}
             <div className="block relative">
                 <motion.button
                     whileHover={{ scale: 1.2 }}
