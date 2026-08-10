@@ -42,7 +42,7 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
     const [isAdding, setIsAdding] = useState(false);
     const [quantity, setQuantity] = useState(1);
 
-    // 🔍 Log the product data to see what the API returns
+    // Log the product to see what the API returns
     console.log('🛒 ProductCard received product:', product);
 
     const initialImage = product.imageUrl
@@ -155,10 +155,11 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
             onCardClick();
         } else {
             console.warn('⚠️ onCardClick not provided for product:', product.id);
+            // 🔥 Fallback: try to navigate to product page, or alert
+            alert('Card clicked but onCardClick not provided. Please check parent component.');
         }
     };
 
-    // ✅ Try name, nameAr, nameEn – fallback to "Untitled Product" if none
     const displayName = product.name || product.nameAr || product.nameEn || 'Untitled Product';
     const displayDescription = product.description || product.descriptionAr || product.descriptionEn || '';
 
@@ -205,7 +206,6 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
                         />
                     </div>
 
-                    {/* ✅ Product name – bold and large */}
                     <h3 className="product-title font-bold text-lg text-gray-800 mt-2">{displayName}</h3>
                     {displayDescription && (
                         <p className="product-desc text-gray-600 text-sm line-clamp-2">{displayDescription}</p>
