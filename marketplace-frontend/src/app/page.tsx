@@ -66,7 +66,7 @@ export default function Home() {
     };
 
     const handleCardClick = (productId: number) => {
-        console.log('🖱️ Card clicked, productId:', productId); // ✅ DEBUG
+        console.log('🖱️ handleCardClick called with productId:', productId);
         setSelectedProductId(productId);
         setIsModalOpen(true);
         console.log('🔓 Modal should open, isModalOpen:', true);

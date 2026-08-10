@@ -33,7 +33,7 @@ interface ProductCardProps {
         descriptionAr?: string;
         descriptionEn?: string;
     };
-    onCardClick?: () => void;
+    onCardClick?: () => void; // ✅ explicit prop
 }
 
 export default function ProductCard({ product, onCardClick }: ProductCardProps) {
@@ -145,9 +145,9 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
     };
 
     const handleCardClick = (e: React.MouseEvent) => {
-        if ((e.target as HTMLElement).closest('button')) return;
         e.preventDefault();
-        console.log('🖱️ ProductCard clicked, product:', product);
+        console.log('🖱️ ProductCard clicked, productId:', product.id);
+        console.log('📦 onCardClick is:', onCardClick ? 'provided ✅' : '❌ NOT provided');
         if (onCardClick) {
             onCardClick();
         } else {
@@ -155,7 +155,6 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
         }
     };
 
-    // ✅ Fallback: try name, then nameAr, then nameEn, then fallback
     const displayName = product.name || product.nameAr || product.nameEn || `Product #${product.id}`;
     const displayDescription = product.description || product.descriptionAr || product.descriptionEn || '';
 
@@ -169,7 +168,7 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
                 whileHover={{ y: -8 }}
                 onHoverStart={() => setIsHovered(true)}
                 onHoverEnd={() => setIsHovered(false)}
-                className="product-card cursor-pointer"
+                className="product-card cursor-pointer border border-gray-200 rounded-lg p-3 hover:shadow-lg transition"
                 onClick={handleCardClick}
             >
                 <div className="block">
@@ -177,15 +176,17 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
                         whileHover={{ scale: 1.2 }}
                         whileTap={{ scale: 0.8 }}
                         onClick={handleWishlistToggle}
-                        className="wishlist-btn"
+                        className="wishlist-btn absolute top-2 left-2 bg-white rounded-full p-1.5 shadow"
                     >
                         <Heart
-                            className={`w-4 h-4 transition ${isWishlist ? 'fill-red-500 text-red-500' : 'text-[#757575]'}`}
+                            className={`w-4 h-4 transition ${isWishlist ? 'fill-red-500 text-red-500' : 'text-gray-500'}`}
                         />
                     </motion.button>
 
                     {hasDiscount && (
-                        <span className="discount-badge">-{product.discount}%</span>
+                        <span className="discount-badge absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full">
+                            -{product.discount}%
+                        </span>
                     )}
 
                     <div className="relative w-full h-48 bg-gray-50 rounded-md overflow-hidden">
@@ -224,7 +225,7 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
                     </div>
                 </div>
 
-                <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                <div className="flex items-center gap-2 mt-3" onClick={(e) => e.stopPropagation()}>
                     {product.stockQuantity > 0 && (
                         <div className="flex items-center gap-1 bg-[#F8F9FA] rounded-lg p-0.5 border border-[#E0E0E0] flex-shrink-0">
                             <button
