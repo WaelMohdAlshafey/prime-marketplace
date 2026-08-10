@@ -200,5 +200,6 @@
   "invoiceConfirmedAt": "Confirmed at",
   "invoiceItems": "Items",
   "invoiceTotal": "Total",
-  "invoicePrint": "🖨️ Print Invoice"
+  "invoicePrint": "🖨️ Print Invoice",
+  "profile": "الملف الشخصي"
 }

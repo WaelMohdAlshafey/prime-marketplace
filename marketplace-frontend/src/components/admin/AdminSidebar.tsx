@@ -14,6 +14,7 @@ import {
     BarChart3,
     Lightbulb,
     Store,
+    Link as LinkIcon,  // ✅ NEW import
 } from 'lucide-react';
 
 interface AdminSidebarProps {
@@ -34,6 +35,8 @@ export default function AdminSidebar({ onLinkClick }: AdminSidebarProps) {
         { name: 'Newsletter', href: '/admin/newsletter', icon: <Mail className="w-5 h-5" /> },
         { name: 'Analytics', href: '/admin/analytics', icon: <BarChart3 className="w-5 h-5" /> },
         { name: 'Settings', href: '/admin/settings', icon: <Settings className="w-5 h-5" /> },
+        // ✅ NEW: Golden Links entry
+        { name: 'Golden Links', href: '/admin/golden-links', icon: <LinkIcon className="w-5 h-5" /> },
     ];
 
     return (

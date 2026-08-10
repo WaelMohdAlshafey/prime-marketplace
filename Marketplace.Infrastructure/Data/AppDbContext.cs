@@ -20,7 +20,8 @@ public class AppDbContext : DbContext
     public DbSet<Message> Messages { get; set; }
     public DbSet<ProductSuggestion> ProductSuggestions { get; set; }
     public DbSet<Store> Stores { get; set; }
-    public DbSet<ProductReview> ProductReviews { get; set; } // ✅ NEW
+    public DbSet<ProductReview> ProductReviews { get; set; }
+    public DbSet<GoldenLink> GoldenLinks { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -161,6 +162,18 @@ public class AppDbContext : DbContext
                   .WithMany()
                   .HasForeignKey(e => e.ProductId)
                   .OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(e => e.User)
+                  .WithMany()
+                  .HasForeignKey(e => e.UserId)
+                  .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // ---- GoldenLink configurations ----
+        modelBuilder.Entity<GoldenLink>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => e.Token).IsUnique();
+            entity.Property(e => e.Token).IsRequired().HasMaxLength(64);
             entity.HasOne(e => e.User)
                   .WithMany()
                   .HasForeignKey(e => e.UserId)

@@ -155,6 +155,7 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
                         </div>
                     ) : (
                         <>
+                            {/* ✅ Register link */}
                             <Link href="/auth/register" className="text-sm font-medium text-[#0F5C45] hover:text-[#0A4735] transition flex items-center gap-1">
                                 <UserPlusIcon className="w-5 h-5" />
                                 <span className="hidden sm:inline">{t('registerTitle')}</span>
@@ -172,7 +173,6 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
 
 // ============================================================
 // NAV MENU – Dynamic with mobile hamburger
-// ✅ Now accepts user and logout as props
 // ============================================================
 const NavMenu = ({ categories, loading, user, logout }: { categories: string[]; loading: boolean; user: AuthResponse | null; logout: () => void }) => {
     const { t } = useTranslation('common');
@@ -236,7 +236,7 @@ const NavMenu = ({ categories, loading, user, logout }: { categories: string[]; 
                             {t('contact')}
                         </Link>
 
-                        {/* Mobile auth links – using props */}
+                        {/* Mobile auth links */}
                         {!loading && !user && (
                             <>
                                 <Link href="/auth/register" className="block text-[#0F5C45] font-medium hover:underline transition py-1" onClick={() => setMobileMenuOpen(false)}>
@@ -304,10 +304,18 @@ const UserNav = ({ user, logout }: { user: AuthResponse; logout: () => void }) =
                             <Link href="/admin" className="hover:text-yellow-300 transition flex items-center gap-2 text-xs md:text-sm">
                                 <span>⚙️ {t('admin')}</span>
                             </Link>
+                            {/* ✅ NEW: Admin Golden Links */}
+                            <Link href="/admin/golden-links" className="hover:text-yellow-300 transition flex items-center gap-2 text-xs md:text-sm">
+                                <span>🔗 Golden Links</span>
+                            </Link>
                         </>
                     )}
                     <Link href="/chat" className="hover:text-yellow-300 transition flex items-center gap-2 text-xs md:text-sm">
                         <span>💬 Chat</span>
+                    </Link>
+                    {/* ✅ NEW: Profile Link – always visible for logged-in users */}
+                    <Link href="/profile" className="hover:text-yellow-300 transition flex items-center gap-2 text-xs md:text-sm">
+                        <span>👤 {t('profile')}</span>
                     </Link>
                 </div>
                 <div className="flex items-center gap-3">
@@ -352,7 +360,6 @@ export default function Navbar() {
         <header className="sticky top-0 z-50">
             <TopBar />
             <MainHeader user={user} />
-            {/* ✅ Pass user and logout to NavMenu */}
             <NavMenu categories={categories} loading={loadingCategories} user={user} logout={logout} />
             {user && <UserNav user={user} logout={logout} />}
         </header>
