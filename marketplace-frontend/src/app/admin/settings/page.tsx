@@ -1,4 +1,3 @@
-// E:\prime-marketplace\marketplace-frontend\src\app\admin\settings\page.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -54,15 +53,23 @@ export default function AdminSettings() {
         }
     };
 
-    // Handle template change – save immediately
+    // ✅ Robust template change handler with optimistic update
     const handleTemplateChange = async (newTemplate: string) => {
         if (!settings) return;
+        // Immediate UI update
+        const updated = { ...settings, template: newTemplate as any };
+        setSettings(updated);
+        applyTheme(updated);
         try {
             await saveTemplate(newTemplate as any);
-            setMessage('✅ Template updated successfully!');
-            setTimeout(() => setMessage(''), 3000);
-        } catch (error) {
-            setMessage('❌ Failed to update template.');
+            const fresh = await getStoreSettings();
+            setSettings(fresh);
+            applyTheme(fresh);
+        } catch {
+            // revert on error
+            const revert = await getStoreSettings();
+            setSettings(revert);
+            applyTheme(revert);
         }
     };
 
@@ -221,10 +228,11 @@ export default function AdminSettings() {
                             />
                         </div>
 
-                        {/* Template Selector – moved to Basic tab for visibility */}
+                        {/* Template Selector – with key to force re-render */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">القالب</label>
                             <select
+                                key={settings.template} // forces re-render on template change
                                 value={settings.template || 'standard'}
                                 onChange={(e) => handleTemplateChange(e.target.value)}
                                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0F5C45]"
