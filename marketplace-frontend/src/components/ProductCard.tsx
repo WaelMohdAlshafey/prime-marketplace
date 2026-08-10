@@ -33,9 +33,9 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-    // ✅ Force 'standard' – always show full card with counter
-    const { template = 'standard' } = useTheme();
-    console.log('🃏 ProductCard template:', template);
+    // ✅ ALWAYS use 'standard' – ignore theme context completely
+    const template = 'standard';
+    console.log('🃏 ProductCard template (forced):', template);
 
     const pathname = usePathname();
     const [isAdding, setIsAdding] = useState(false);
@@ -64,60 +64,6 @@ export default function ProductCard({ product }: ProductCardProps) {
     const handleImageError = () => {
         setImgSrc('/images/placeholder.jpg');
     };
-
-    // ── The simple/colored/blue templates are still here but will never be used
-    // because we force 'standard' in ThemeContext and have the fallback above.
-    // They are kept for completeness but won't render.
-    if (template === 'simple' || template === 'colored' || template === 'blue') {
-        const showRating = template !== 'simple' && product.rating;
-        const isColored = template === 'colored';
-        const isBlue = template === 'blue';
-        const primaryColor = isColored ? '#D97706' : isBlue ? '#1D4ED8' : '#0F5C45';
-
-        return (
-            <Link href={`/products/${product.id}`} className="block">
-                <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
-                    <div className="aspect-square bg-gray-50 overflow-hidden relative">
-                        <img
-                            src={imgSrc}
-                            alt={product.name}
-                            className="w-full h-full object-cover hover:scale-105 transition duration-500"
-                            onError={handleImageError}
-                        />
-                        {hasDiscount && (
-                            <span className="absolute top-2 right-2 bg-[#4CAF50] text-white text-xs font-bold px-2 py-0.5 rounded-full">
-                                -{product.discount}%
-                            </span>
-                        )}
-                    </div>
-                    <div className="p-3">
-                        <h3 className="text-sm font-medium text-[#1A1A1A] line-clamp-1">{product.name}</h3>
-                        {showRating && product.rating && (
-                            <div className="flex items-center gap-1 mt-1">
-                                <div className="stars">
-                                    {[...Array(5)].map((_, i) => (
-                                        <Star
-                                            key={i}
-                                            className={`w-3.5 h-3.5 ${i < Math.round(product.rating!)
-                                                ? 'fill-[#FFB400] text-[#FFB400]'
-                                                : 'text-[#E0E0E0] fill-[#E0E0E0]'
-                                                }`}
-                                        />
-                                    ))}
-                                </div>
-                                <span className="text-xs font-medium text-[#757575] mr-1">
-                                    {product.rating?.toFixed(1)}
-                                </span>
-                            </div>
-                        )}
-                        <p className={`text-lg font-bold mt-1`} style={{ color: primaryColor }}>
-                            {CURRENCY}{product.price.toFixed(2)}
-                        </p>
-                    </div>
-                </div>
-            </Link>
-        );
-    }
 
     // ── STANDARD TEMPLATE (full design) – with quantity controls ──
     const handleWishlistToggle = (e: React.MouseEvent) => {
