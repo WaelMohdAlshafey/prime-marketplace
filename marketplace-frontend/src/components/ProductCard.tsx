@@ -28,6 +28,10 @@ interface ProductCardProps {
         reviews?: number;
         discount?: number;
         category?: string;
+        nameAr?: string;
+        nameEn?: string;
+        descriptionAr?: string;
+        descriptionEn?: string;
     };
     onCardClick?: () => void;
 }
@@ -40,7 +44,7 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
 
     const initialImage = product.imageUrl
         ? getImageUrl(product.imageUrl)
-        : getProductImage(product.name);
+        : getProductImage(product.name || product.nameAr || product.nameEn || '');
 
     const [imgSrc, setImgSrc] = useState(initialImage);
     const [fly, setFly] = useState(false);
@@ -151,8 +155,9 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
         }
     };
 
-    // ✅ Fallback: if product.name is missing, show "Product #ID"
-    const displayName = product.name || `Product #${product.id}`;
+    // ✅ Fallback: try name, then nameAr, then nameEn, then fallback
+    const displayName = product.name || product.nameAr || product.nameEn || `Product #${product.id}`;
+    const displayDescription = product.description || product.descriptionAr || product.descriptionEn || '';
 
     return (
         <>
@@ -195,9 +200,10 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
                         />
                     </div>
 
-                    {/* ✅ Product Name – now clearly visible */}
                     <h3 className="product-title font-bold text-lg text-gray-800 mt-2">{displayName}</h3>
-                    <p className="product-desc text-gray-600 text-sm">{product.description}</p>
+                    {displayDescription && (
+                        <p className="product-desc text-gray-600 text-sm line-clamp-2">{displayDescription}</p>
+                    )}
 
                     {product.rating && (
                         <div className="product-rating">

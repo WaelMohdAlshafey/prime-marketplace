@@ -26,6 +26,10 @@ interface ProductDetail {
     rating?: number;
     reviewsCount?: number;
     category?: string;
+    nameAr?: string;
+    nameEn?: string;
+    descriptionAr?: string;
+    descriptionEn?: string;
     reviews?: Array<{
         id: number;
         userId: number;
@@ -135,8 +139,9 @@ export default function ProductDetailModal({ productId, isOpen, onClose }: Produ
 
     if (!isOpen) return null;
 
-    // ✅ Fallback: if product is null or name missing, show placeholder
-    const displayName = product?.name || `Product #${productId}`;
+    // ✅ Fallback: try name, then nameAr, then nameEn, then fallback
+    const displayName = product?.name || product?.nameAr || product?.nameEn || `Product #${productId}`;
+    const displayDescription = product?.description || product?.descriptionAr || product?.descriptionEn || 'No description available.';
 
     return (
         <AnimatePresence>
@@ -148,7 +153,6 @@ export default function ProductDetailModal({ productId, isOpen, onClose }: Produ
                         exit={{ opacity: 0, scale: 0.9 }}
                         className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl"
                     >
-                        {/* Close button */}
                         <div className="sticky top-0 z-10 flex justify-end p-4 bg-white/80 backdrop-blur-sm border-b border-gray-100">
                             <button
                                 onClick={onClose}
@@ -165,7 +169,6 @@ export default function ProductDetailModal({ productId, isOpen, onClose }: Produ
                         ) : product ? (
                             <div className="p-6">
                                 <div className="flex flex-col md:flex-row gap-6">
-                                    {/* Image */}
                                     <div className="md:w-1/2">
                                         <div className="relative w-full h-64 md:h-80 bg-gray-100 rounded-xl overflow-hidden">
                                             <Image
@@ -176,8 +179,6 @@ export default function ProductDetailModal({ productId, isOpen, onClose }: Produ
                                             />
                                         </div>
                                     </div>
-
-                                    {/* Details */}
                                     <div className="md:w-1/2 space-y-4 text-right">
                                         <h2 className="text-2xl font-bold text-gray-800">{displayName}</h2>
                                         <div className="flex items-center gap-2">
@@ -190,7 +191,7 @@ export default function ProductDetailModal({ productId, isOpen, onClose }: Produ
                                                 <span className="text-sm text-gray-400">No ratings yet</span>
                                             )}
                                         </div>
-                                        <p className="text-gray-600">{product.description || 'No description available.'}</p>
+                                        <p className="text-gray-600">{displayDescription}</p>
                                         <div className="flex items-center gap-2">
                                             <span className="text-3xl font-bold text-[#0F5C45]">£{product.price.toFixed(2)}</span>
                                             {product.stockQuantity > 0 ? (
@@ -234,7 +235,6 @@ export default function ProductDetailModal({ productId, isOpen, onClose }: Produ
                                     </div>
                                 </div>
 
-                                {/* Rating submission */}
                                 <div className="mt-8 pt-6 border-t border-gray-200">
                                     <h3 className="text-lg font-semibold text-gray-800 mb-3">Rate this product</h3>
                                     {user ? (
@@ -268,7 +268,6 @@ export default function ProductDetailModal({ productId, isOpen, onClose }: Produ
                                     )}
                                 </div>
 
-                                {/* Reviews */}
                                 {product.reviews && product.reviews.length > 0 && (
                                     <div className="mt-6 pt-6 border-t border-gray-200">
                                         <h3 className="text-lg font-semibold text-gray-800 mb-3">Reviews</h3>
