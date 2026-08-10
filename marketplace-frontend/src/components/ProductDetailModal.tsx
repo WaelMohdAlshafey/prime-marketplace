@@ -57,14 +57,19 @@ export default function ProductDetailModal({ productId, isOpen, onClose }: Produ
     const fetchProductDetails = async () => {
         setLoading(true);
         try {
+            console.log('📦 Fetching product details for ID:', productId);
             const response = await api.get(`/api/Products/${productId}`);
+            console.log('✅ Product data:', response.data);
             setProduct(response.data);
             try {
                 const reviewsRes = await api.get(`/api/Products/${productId}/reviews`);
+                console.log('✅ Reviews data:', reviewsRes.data);
                 setProduct(prev => prev ? { ...prev, reviews: reviewsRes.data } : null);
-            } catch (e) { /* ignore */ }
+            } catch (e) {
+                console.warn('⚠️ Failed to fetch reviews:', e);
+            }
         } catch (error) {
-            console.error('Failed to fetch product details:', error);
+            console.error('❌ Failed to fetch product details:', error);
         } finally {
             setLoading(false);
         }
@@ -130,6 +135,9 @@ export default function ProductDetailModal({ productId, isOpen, onClose }: Produ
 
     if (!isOpen) return null;
 
+    // ✅ Fallback: if product is null or name missing, show placeholder
+    const displayName = product?.name || `Product #${productId}`;
+
     return (
         <AnimatePresence>
             {isOpen && (
@@ -156,14 +164,13 @@ export default function ProductDetailModal({ productId, isOpen, onClose }: Produ
                             </div>
                         ) : product ? (
                             <div className="p-6">
-                                {/* Main content */}
                                 <div className="flex flex-col md:flex-row gap-6">
                                     {/* Image */}
                                     <div className="md:w-1/2">
                                         <div className="relative w-full h-64 md:h-80 bg-gray-100 rounded-xl overflow-hidden">
                                             <Image
                                                 src={product.imageUrl ? getImageUrl(product.imageUrl) : '/images/placeholder.jpg'}
-                                                alt={product.name}
+                                                alt={displayName}
                                                 fill
                                                 className="object-cover"
                                             />
@@ -172,9 +179,7 @@ export default function ProductDetailModal({ productId, isOpen, onClose }: Produ
 
                                     {/* Details */}
                                     <div className="md:w-1/2 space-y-4 text-right">
-                                        <h2 className="text-2xl font-bold text-gray-800">{product.name}</h2>
-
-                                        {/* Rating display */}
+                                        <h2 className="text-2xl font-bold text-gray-800">{displayName}</h2>
                                         <div className="flex items-center gap-2">
                                             {product.rating ? (
                                                 <>
@@ -185,9 +190,7 @@ export default function ProductDetailModal({ productId, isOpen, onClose }: Produ
                                                 <span className="text-sm text-gray-400">No ratings yet</span>
                                             )}
                                         </div>
-
-                                        <p className="text-gray-600">{product.description}</p>
-
+                                        <p className="text-gray-600">{product.description || 'No description available.'}</p>
                                         <div className="flex items-center gap-2">
                                             <span className="text-3xl font-bold text-[#0F5C45]">£{product.price.toFixed(2)}</span>
                                             {product.stockQuantity > 0 ? (
@@ -196,12 +199,9 @@ export default function ProductDetailModal({ productId, isOpen, onClose }: Produ
                                                 <span className="text-sm text-red-600 bg-red-50 px-2 py-1 rounded-full">Out of stock</span>
                                             )}
                                         </div>
-
                                         {product.vendorName && (
                                             <p className="text-sm text-gray-500">Sold by: <span className="font-medium">{product.vendorName}</span></p>
                                         )}
-
-                                        {/* Quantity and Add to Cart */}
                                         <div className="flex items-center gap-3 pt-2">
                                             {product.stockQuantity > 0 && (
                                                 <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
@@ -234,7 +234,7 @@ export default function ProductDetailModal({ productId, isOpen, onClose }: Produ
                                     </div>
                                 </div>
 
-                                {/* Rating submission section */}
+                                {/* Rating submission */}
                                 <div className="mt-8 pt-6 border-t border-gray-200">
                                     <h3 className="text-lg font-semibold text-gray-800 mb-3">Rate this product</h3>
                                     {user ? (
@@ -268,7 +268,7 @@ export default function ProductDetailModal({ productId, isOpen, onClose }: Produ
                                     )}
                                 </div>
 
-                                {/* Reviews list */}
+                                {/* Reviews */}
                                 {product.reviews && product.reviews.length > 0 && (
                                     <div className="mt-6 pt-6 border-t border-gray-200">
                                         <h3 className="text-lg font-semibold text-gray-800 mb-3">Reviews</h3>

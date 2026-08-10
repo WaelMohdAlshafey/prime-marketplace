@@ -141,16 +141,18 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
     };
 
     const handleCardClick = (e: React.MouseEvent) => {
-        // Ignore if clicked on a button
         if ((e.target as HTMLElement).closest('button')) return;
         e.preventDefault();
-        console.log('🖱️ ProductCard clicked, productId:', product.id);
+        console.log('🖱️ ProductCard clicked, product:', product);
         if (onCardClick) {
             onCardClick();
         } else {
             console.warn('⚠️ onCardClick not provided for product:', product.id);
         }
     };
+
+    // ✅ Fallback: if product.name is missing, show "Product #ID"
+    const displayName = product.name || `Product #${product.id}`;
 
     return (
         <>
@@ -165,7 +167,6 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
                 className="product-card cursor-pointer"
                 onClick={handleCardClick}
             >
-                {/* Card content – without Link */}
                 <div className="block">
                     <motion.button
                         whileHover={{ scale: 1.2 }}
@@ -185,7 +186,7 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
                     <div className="relative w-full h-48 bg-gray-50 rounded-md overflow-hidden">
                         <Image
                             src={imgSrc}
-                            alt={product.name}
+                            alt={displayName}
                             fill
                             className={`object-cover transition-transform duration-700 ${isHovered ? 'scale-110' : 'scale-100'}`}
                             sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
@@ -194,8 +195,9 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
                         />
                     </div>
 
-                    <h3 className="product-title">{product.name}</h3>
-                    <p className="product-desc">{product.description}</p>
+                    {/* ✅ Product Name – now clearly visible */}
+                    <h3 className="product-title font-bold text-lg text-gray-800 mt-2">{displayName}</h3>
+                    <p className="product-desc text-gray-600 text-sm">{product.description}</p>
 
                     {product.rating && (
                         <div className="product-rating">
@@ -204,13 +206,13 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
                     )}
 
                     <div className="price-row">
-                        <span className="current-price">
+                        <span className="current-price text-xl font-bold text-[#0F5C45]">
                             {CURRENCY}{(discountPrice || product.price).toFixed(2)}
                         </span>
                         {hasDiscount && (
                             <>
-                                <span className="old-price">{CURRENCY}{product.price.toFixed(2)}</span>
-                                <span className="discount-tag">-{product.discount}%</span>
+                                <span className="old-price text-gray-400 line-through">{CURRENCY}{product.price.toFixed(2)}</span>
+                                <span className="discount-tag bg-green-500 text-white text-xs px-2 py-0.5 rounded-full">-{product.discount}%</span>
                             </>
                         )}
                     </div>
@@ -242,9 +244,9 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
                     <button
                         onClick={(e) => handleAddToCart(e, quantity)}
                         disabled={isAdding || product.stockQuantity === 0}
-                        className="add-to-cart-btn flex-1"
+                        className="add-to-cart-btn flex-1 bg-[#0F5C45] text-white py-2 rounded-lg hover:bg-[#0A4735] transition disabled:opacity-50"
                     >
-                        <ShoppingBag className="w-4 h-4" />
+                        <ShoppingBag className="w-4 h-4 inline mr-1" />
                         {isAdding
                             ? 'جاري الإضافة...'
                             : product.stockQuantity === 0
@@ -264,7 +266,7 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
                         className="fixed w-16 h-16 rounded-full bg-white shadow-xl z-50 pointer-events-none"
                         style={{ left: -32, top: -32 }}
                     >
-                        <Image src={imgSrc} alt={product.name} fill className="object-cover rounded-full" sizes="64px" />
+                        <Image src={imgSrc} alt={displayName} fill className="object-cover rounded-full" sizes="64px" />
                     </motion.div>
                 )}
             </AnimatePresence>
