@@ -141,7 +141,7 @@ export default function ProductDetailModal({ productId, isOpen, onClose }: Produ
 
     if (!isOpen) return null;
 
-    // 🌐 Language-aware display
+    // 🌐 Language-aware display with fallback
     const lang = i18n.language || 'en';
     const displayName = lang === 'en'
         ? (product?.nameEn || product?.name || product?.nameAr || `Product #${productId}`)

@@ -65,7 +65,9 @@ export default function Home() {
         fetchProducts({});
     };
 
+    // ✅ Alert to confirm click
     const handleCardClick = (productId: number) => {
+        alert(`🖱️ Card clicked! Product ID: ${productId}`); // ← debug
         console.log('🖱️ handleCardClick called with productId:', productId);
         setSelectedProductId(productId);
         setIsModalOpen(true);
@@ -147,10 +149,7 @@ export default function Home() {
                                 <ProductCard
                                     key={product.id}
                                     product={product}
-                                    onCardClick={() => {
-                                        console.log('🔗 onCardClick passed for product:', product.id);
-                                        handleCardClick(product.id);
-                                    }}
+                                    onCardClick={() => handleCardClick(product.id)}
                                 />
                             ))}
                         </div>

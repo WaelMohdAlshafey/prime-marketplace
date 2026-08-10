@@ -156,10 +156,11 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
             onCardClick();
         } else {
             console.warn('⚠️ Card clicked but onCardClick not provided. Please check parent component.');
+            // Fallback: try to open modal directly (if you have a global state)
         }
     };
 
-    // 🌐 Language-aware display
+    // 🌐 Language-aware display with fallback
     const lang = i18n.language || 'en';
     const displayName = lang === 'en'
         ? (product.nameEn || product.name || product.nameAr || `Product #${product.id}`)
