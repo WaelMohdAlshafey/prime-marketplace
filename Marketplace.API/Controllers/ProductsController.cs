@@ -22,6 +22,12 @@ public class ProductsController : ControllerBase
         _context = context;
     }
 
+    private int GetUserId()
+    {
+        var claim = User.FindFirst("VendorId") ?? User.FindFirst(ClaimTypes.NameIdentifier);
+        return int.Parse(claim!.Value);
+    }
+
     // ============================================================
     // PUBLIC ENDPOINTS
     // ============================================================
@@ -84,8 +90,82 @@ public class ProductsController : ControllerBase
     }
 
     // ============================================================
-    // ADMIN ENDPOINT – Get ALL products (including inactive)
+    // RATING ENDPOINTS (NEW)
     // ============================================================
+
+    [HttpPost("{id}/rate")]
+    [Authorize]
+    public async Task<IActionResult> RateProduct(int id, [FromBody] ProductRatingDto ratingDto)
+    {
+        if (ratingDto.Rating < 1 || ratingDto.Rating > 5)
+            return BadRequest(new { message = "Rating must be between 1 and 5." });
+
+        var userId = GetUserId();
+
+        var product = await _context.Products.FindAsync(id);
+        if (product == null)
+            return NotFound(new { message = "Product not found." });
+
+        var existing = await _context.ProductReviews
+            .FirstOrDefaultAsync(r => r.ProductId == id && r.UserId == userId);
+
+        if (existing != null)
+        {
+            existing.Rating = ratingDto.Rating;
+            existing.Review = ratingDto.Review;
+            existing.CreatedAt = DateTime.UtcNow;
+        }
+        else
+        {
+            var review = new ProductReview
+            {
+                ProductId = id,
+                UserId = userId,
+                Rating = ratingDto.Rating,
+                Review = ratingDto.Review,
+                CreatedAt = DateTime.UtcNow
+            };
+            _context.ProductReviews.Add(review);
+        }
+
+        await _context.SaveChangesAsync();
+
+        // Recalculate average rating
+        var avg = await _context.ProductReviews
+            .Where(r => r.ProductId == id)
+            .AverageAsync(r => (double)r.Rating);
+
+        product.Rating = avg;
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "Rating submitted successfully.", averageRating = avg });
+    }
+
+    [HttpGet("{id}/reviews")]
+    public async Task<IActionResult> GetReviews(int id)
+    {
+        var reviews = await _context.ProductReviews
+            .Where(r => r.ProductId == id)
+            .Include(r => r.User)
+            .OrderByDescending(r => r.CreatedAt)
+            .Select(r => new ProductReviewResponseDto
+            {
+                Id = r.Id,
+                UserId = r.UserId,
+                UserName = r.User != null ? r.User.Username : "Unknown",
+                Rating = r.Rating,
+                Review = r.Review,
+                CreatedAt = r.CreatedAt
+            })
+            .ToListAsync();
+
+        return Ok(reviews);
+    }
+
+    // ============================================================
+    // ADMIN / VENDOR ENDPOINTS (unchanged, keep your existing code)
+    // ============================================================
+
     [HttpGet("admin/all")]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> GetAllProductsForAdmin(
@@ -126,10 +206,6 @@ public class ProductsController : ControllerBase
             PageSize = pageSize
         });
     }
-
-    // ============================================================
-    // VENDOR / ADMIN ENDPOINTS
-    // ============================================================
 
     [HttpGet("vendors/products")]
     [Authorize(Roles = "Vendor,Admin")]
@@ -175,12 +251,10 @@ public class ProductsController : ControllerBase
 
         var product = new Product
         {
-            // Use the bilingual fields
             NameAr = productDto.NameAr,
             NameEn = productDto.NameEn,
             DescriptionAr = productDto.DescriptionAr,
             DescriptionEn = productDto.DescriptionEn,
-            // For backward compatibility, keep the old fields filled (optional)
             Name = productDto.NameAr,
             Description = productDto.DescriptionAr,
             Price = productDto.Price,
@@ -198,9 +272,6 @@ public class ProductsController : ControllerBase
         return CreatedAtAction(nameof(GetAll), new { id = createdProduct.Id }, createdProduct);
     }
 
-    // ============================================================
-    // UPDATE – Allows Admin to edit ANY product
-    // ============================================================
     [HttpPut("{id}")]
     [Authorize(Roles = "Vendor,Admin")]
     public async Task<IActionResult> Update(int id, [FromForm] ProductUpdateDto productDto, IFormFile? image)
@@ -213,7 +284,6 @@ public class ProductsController : ControllerBase
 
         if (isAdmin)
         {
-            // Admin: find the product's actual vendor
             var existingProduct = await _context.Products.FindAsync(id);
             if (existingProduct == null)
                 return NotFound(new { message = "Product not found." });
@@ -221,7 +291,6 @@ public class ProductsController : ControllerBase
         }
         else
         {
-            // Vendor: use their own ID
             var vendorIdClaim = User.FindFirst("VendorId") ?? User.FindFirst(ClaimTypes.NameIdentifier);
             if (vendorIdClaim == null)
                 return Unauthorized();
@@ -251,7 +320,7 @@ public class ProductsController : ControllerBase
             NameEn = productDto.NameEn,
             DescriptionAr = productDto.DescriptionAr,
             DescriptionEn = productDto.DescriptionEn,
-            Name = productDto.NameAr, // optional fallback
+            Name = productDto.NameAr,
             Description = productDto.DescriptionAr,
             Price = productDto.Price,
             CostPrice = productDto.CostPrice,
