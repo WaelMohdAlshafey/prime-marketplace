@@ -33,7 +33,7 @@ interface ProductCardProps {
         descriptionAr?: string;
         descriptionEn?: string;
     };
-    onCardClick?: () => void; // ✅ explicit prop
+    onCardClick?: () => void;
 }
 
 export default function ProductCard({ product, onCardClick }: ProductCardProps) {
@@ -41,6 +41,9 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
     const pathname = usePathname();
     const [isAdding, setIsAdding] = useState(false);
     const [quantity, setQuantity] = useState(1);
+
+    // 🔍 Log the product data to see what the API returns
+    console.log('🛒 ProductCard received product:', product);
 
     const initialImage = product.imageUrl
         ? getImageUrl(product.imageUrl)
@@ -155,7 +158,8 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
         }
     };
 
-    const displayName = product.name || product.nameAr || product.nameEn || `Product #${product.id}`;
+    // ✅ Try name, nameAr, nameEn – fallback to "Untitled Product" if none
+    const displayName = product.name || product.nameAr || product.nameEn || 'Untitled Product';
     const displayDescription = product.description || product.descriptionAr || product.descriptionEn || '';
 
     return (
@@ -171,12 +175,12 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
                 className="product-card cursor-pointer border border-gray-200 rounded-lg p-3 hover:shadow-lg transition"
                 onClick={handleCardClick}
             >
-                <div className="block">
+                <div className="block relative">
                     <motion.button
                         whileHover={{ scale: 1.2 }}
                         whileTap={{ scale: 0.8 }}
                         onClick={handleWishlistToggle}
-                        className="wishlist-btn absolute top-2 left-2 bg-white rounded-full p-1.5 shadow"
+                        className="wishlist-btn absolute top-2 left-2 bg-white rounded-full p-1.5 shadow z-10"
                     >
                         <Heart
                             className={`w-4 h-4 transition ${isWishlist ? 'fill-red-500 text-red-500' : 'text-gray-500'}`}
@@ -184,7 +188,7 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
                     </motion.button>
 
                     {hasDiscount && (
-                        <span className="discount-badge absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full">
+                        <span className="discount-badge absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full z-10">
                             -{product.discount}%
                         </span>
                     )}
@@ -201,6 +205,7 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
                         />
                     </div>
 
+                    {/* ✅ Product name – bold and large */}
                     <h3 className="product-title font-bold text-lg text-gray-800 mt-2">{displayName}</h3>
                     {displayDescription && (
                         <p className="product-desc text-gray-600 text-sm line-clamp-2">{displayDescription}</p>

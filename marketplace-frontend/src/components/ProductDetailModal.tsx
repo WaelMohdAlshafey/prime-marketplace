@@ -139,8 +139,8 @@ export default function ProductDetailModal({ productId, isOpen, onClose }: Produ
 
     if (!isOpen) return null;
 
-    // ✅ Fallback: try name, then nameAr, then nameEn, then fallback
-    const displayName = product?.name || product?.nameAr || product?.nameEn || `Product #${productId}`;
+    // ✅ Try name, nameAr, nameEn – fallback to "Untitled Product"
+    const displayName = product?.name || product?.nameAr || product?.nameEn || 'Untitled Product';
     const displayDescription = product?.description || product?.descriptionAr || product?.descriptionEn || 'No description available.';
 
     return (
