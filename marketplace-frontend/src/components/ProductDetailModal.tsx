@@ -58,11 +58,7 @@ export default function ProductDetailModal({ productId, isOpen, onClose }: Produ
         setLoading(true);
         try {
             const response = await api.get(`/api/Products/${productId}`);
-            // The API returns ProductDto, but we need reviews too – we'll fetch them separately.
-            // For now, we'll use the product data and later fetch reviews.
-            // We can extend the backend to include reviews, but for simplicity we'll do a separate call.
             setProduct(response.data);
-            // Then fetch reviews separately
             try {
                 const reviewsRes = await api.get(`/api/Products/${productId}/reviews`);
                 setProduct(prev => prev ? { ...prev, reviews: reviewsRes.data } : null);
@@ -102,7 +98,6 @@ export default function ProductDetailModal({ productId, isOpen, onClose }: Produ
                 review: userReview || null
             });
             setRatingMessage('✅ Rating submitted successfully!');
-            // Refresh product details to update average rating
             await fetchProductDetails();
             setUserRating(0);
             setUserReview('');
