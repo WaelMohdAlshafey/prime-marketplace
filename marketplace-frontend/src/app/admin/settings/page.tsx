@@ -1,18 +1,18 @@
-// app/admin/settings/page.tsx
+// E:\prime-marketplace\marketplace-frontend\src\app\admin\settings\page.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { getStoreSettings, updateStoreSettings } from '@/lib/storeApi';
-import { StoreSettings } from '@/types';
 import { useTheme } from '@/context/ThemeContext';
-import { Settings, Building, Palette, Code, Save } from 'lucide-react';
+import { getStoreSettings, updateStoreSettings } from '@/lib/storeApi';
+import { StoreSettings, Owner } from '@/types';
+import { Save, Palette, Settings as SettingsIcon, Code, Building } from 'lucide-react';
 
 export default function AdminSettings() {
     const { user, isLoading } = useAuth();
     const router = useRouter();
-    const { applyTheme } = useTheme();
+    const { template, saveTemplate, applyTheme } = useTheme();
     const [settings, setSettings] = useState<StoreSettings | null>(null);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -54,6 +54,18 @@ export default function AdminSettings() {
         }
     };
 
+    // Handle template change – save immediately
+    const handleTemplateChange = async (newTemplate: string) => {
+        if (!settings) return;
+        try {
+            await saveTemplate(newTemplate as any);
+            setMessage('✅ Template updated successfully!');
+            setTimeout(() => setMessage(''), 3000);
+        } catch (error) {
+            setMessage('❌ Failed to update template.');
+        }
+    };
+
     const updateField = <K extends keyof StoreSettings>(field: K, value: StoreSettings[K]) => {
         setSettings(prev => prev ? { ...prev, [field]: value } : null);
     };
@@ -73,14 +85,6 @@ export default function AdminSettings() {
         setSettings(prev => prev ? { ...prev, emails } : null);
     };
 
-    const updateThemeColor = (field: keyof StoreSettings, value: string) => {
-        if (value.startsWith('#')) {
-            updateField(field, value);
-        } else {
-            updateField(field, value);
-        }
-    };
-
     if (loading || isLoading) {
         return <div className="text-center py-12">جاري التحميل...</div>;
     }
@@ -92,11 +96,10 @@ export default function AdminSettings() {
     return (
         <div className="container mx-auto px-4 py-12 max-w-5xl">
             <div className="flex items-center gap-3 mb-8">
-                <Settings className="w-8 h-8 text-[#0F5C45]" />
-                <div>
-                    <h1 className="text-3xl font-bold text-gray-800">إعدادات الموقع</h1>
-                    <p className="text-gray-500 mt-1">إدارة معلومات المتجر والمظهر العام</p>
+                <div className="p-2 bg-[#0F5C45]/10 rounded-xl">
+                    <SettingsIcon className="w-7 h-7 text-[#0F5C45]" />
                 </div>
+                <h1 className="text-3xl font-bold text-gray-800">إعدادات الموقع</h1>
             </div>
 
             {message && (
@@ -111,19 +114,22 @@ export default function AdminSettings() {
                     onClick={() => setActiveTab('basic')}
                     className={`flex items-center gap-2 px-4 py-2 rounded-lg transition ${activeTab === 'basic' ? 'bg-[#0F5C45] text-white' : 'text-gray-600 hover:bg-gray-100'}`}
                 >
-                    <Building className="w-4 h-4" /> معلومات أساسية
+                    <Building className="w-4 h-4" />
+                    معلومات أساسية
                 </button>
                 <button
                     onClick={() => setActiveTab('theme')}
                     className={`flex items-center gap-2 px-4 py-2 rounded-lg transition ${activeTab === 'theme' ? 'bg-[#0F5C45] text-white' : 'text-gray-600 hover:bg-gray-100'}`}
                 >
-                    <Palette className="w-4 h-4" /> تخصيص المظهر
+                    <Palette className="w-4 h-4" />
+                    تخصيص المظهر
                 </button>
                 <button
                     onClick={() => setActiveTab('advanced')}
                     className={`flex items-center gap-2 px-4 py-2 rounded-lg transition ${activeTab === 'advanced' ? 'bg-[#0F5C45] text-white' : 'text-gray-600 hover:bg-gray-100'}`}
                 >
-                    <Code className="w-4 h-4" /> متقدم
+                    <Code className="w-4 h-4" />
+                    متقدم
                 </button>
             </div>
 
@@ -215,18 +221,20 @@ export default function AdminSettings() {
                             />
                         </div>
 
+                        {/* Template Selector – moved to Basic tab for visibility */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">القالب</label>
                             <select
-                                value={settings.template}
-                                onChange={(e) => updateField('template', e.target.value)}
+                                value={settings.template || 'standard'}
+                                onChange={(e) => handleTemplateChange(e.target.value)}
                                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0F5C45]"
                             >
-                                <option value="standard">قياسي</option>
+                                <option value="standard">قياسي (أخضر)</option>
                                 <option value="simple">بسيط (رمادي)</option>
                                 <option value="colored">ملون (برتقالي)</option>
                                 <option value="blue">أزرق</option>
                             </select>
+                            <p className="text-xs text-gray-400 mt-1">يتغير التصميم فوراً عند التحديد</p>
                         </div>
                     </div>
                 )}
@@ -242,13 +250,13 @@ export default function AdminSettings() {
                                         type="color"
                                         className="w-12 h-12 rounded-lg cursor-pointer border border-gray-300"
                                         value={settings.primaryColor || '#0F5C45'}
-                                        onChange={(e) => updateThemeColor('primaryColor', e.target.value)}
+                                        onChange={(e) => updateField('primaryColor', e.target.value)}
                                     />
                                     <input
                                         type="text"
                                         className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0F5C45]"
                                         value={settings.primaryColor || ''}
-                                        onChange={(e) => updateThemeColor('primaryColor', e.target.value)}
+                                        onChange={(e) => updateField('primaryColor', e.target.value)}
                                         placeholder="#0F5C45"
                                     />
                                 </div>
@@ -261,13 +269,13 @@ export default function AdminSettings() {
                                         type="color"
                                         className="w-12 h-12 rounded-lg cursor-pointer border border-gray-300"
                                         value={settings.secondaryColor || '#D4A54A'}
-                                        onChange={(e) => updateThemeColor('secondaryColor', e.target.value)}
+                                        onChange={(e) => updateField('secondaryColor', e.target.value)}
                                     />
                                     <input
                                         type="text"
                                         className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0F5C45]"
                                         value={settings.secondaryColor || ''}
-                                        onChange={(e) => updateThemeColor('secondaryColor', e.target.value)}
+                                        onChange={(e) => updateField('secondaryColor', e.target.value)}
                                         placeholder="#D4A54A"
                                     />
                                 </div>
@@ -280,13 +288,13 @@ export default function AdminSettings() {
                                         type="color"
                                         className="w-12 h-12 rounded-lg cursor-pointer border border-gray-300"
                                         value={settings.backgroundColor || '#F7F8FA'}
-                                        onChange={(e) => updateThemeColor('backgroundColor', e.target.value)}
+                                        onChange={(e) => updateField('backgroundColor', e.target.value)}
                                     />
                                     <input
                                         type="text"
                                         className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0F5C45]"
                                         value={settings.backgroundColor || ''}
-                                        onChange={(e) => updateThemeColor('backgroundColor', e.target.value)}
+                                        onChange={(e) => updateField('backgroundColor', e.target.value)}
                                         placeholder="#F7F8FA"
                                     />
                                 </div>
@@ -299,13 +307,13 @@ export default function AdminSettings() {
                                         type="color"
                                         className="w-12 h-12 rounded-lg cursor-pointer border border-gray-300"
                                         value={settings.textColor || '#1A1A2E'}
-                                        onChange={(e) => updateThemeColor('textColor', e.target.value)}
+                                        onChange={(e) => updateField('textColor', e.target.value)}
                                     />
                                     <input
                                         type="text"
                                         className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0F5C45]"
                                         value={settings.textColor || ''}
-                                        onChange={(e) => updateThemeColor('textColor', e.target.value)}
+                                        onChange={(e) => updateField('textColor', e.target.value)}
                                         placeholder="#1A1A2E"
                                     />
                                 </div>

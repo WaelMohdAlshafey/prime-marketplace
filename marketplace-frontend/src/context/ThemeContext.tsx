@@ -1,7 +1,8 @@
+// E:\prime-marketplace\marketplace-frontend\src\context\ThemeContext.tsx
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { getStoreSettings } from '@/lib/storeApi';
+import { getStoreSettings, updateStoreSettings } from '@/lib/storeApi';
 import { StoreSettings } from '@/types';
 
 export type Template = 'standard' | 'simple' | 'colored' | 'blue';
@@ -12,22 +13,25 @@ interface ThemeContextType {
     settings: StoreSettings | null;
     isLoading: boolean;
     applyTheme: (settings: StoreSettings) => void;
+    saveTemplate: (template: Template) => Promise<void>;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-    // ✅ Force 'standard' as the default template
     const [template, setTemplate] = useState<Template>('standard');
     const [settings, setSettings] = useState<StoreSettings | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
     const applyTheme = (themeSettings: StoreSettings) => {
-        console.log('🎨 Applying theme:', themeSettings.template);
         const root = document.documentElement;
-        // Always set data-theme to 'standard' to ensure full card
-        root.setAttribute('data-theme', 'standard');
+        const templateVal = (themeSettings.template as Template) || 'standard';
 
+        // Set data-theme on both html and body
+        root.setAttribute('data-theme', templateVal);
+        document.body.setAttribute('data-theme', templateVal);
+
+        // Apply all CSS variables from settings
         const cssVars: Record<string, string | undefined> = {
             '--color-primary': themeSettings.primaryColor,
             '--color-primary-light': themeSettings.primaryLight,
@@ -76,20 +80,46 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
             document.head.appendChild(customStyle);
         }
         customStyle.textContent = themeSettings.customCss || '';
+
+        // Update state
+        setTemplate(templateVal);
+    };
+
+    const saveTemplate = async (newTemplate: Template) => {
+        if (!settings) return;
+        const updatedSettings = { ...settings, template: newTemplate };
+        try {
+            await updateStoreSettings(updatedSettings);
+            setSettings(updatedSettings);
+            applyTheme(updatedSettings);
+        } catch (error) {
+            console.error('Failed to save template:', error);
+            throw error;
+        }
     };
 
     useEffect(() => {
         const fetchSettings = async () => {
             try {
                 const data = await getStoreSettings();
-                console.log('🏪 Store settings loaded:', data);
                 setSettings(data);
-                // ✅ FORCE STANDARD – ignore whatever the API returns
-                setTemplate('standard');
                 applyTheme(data);
             } catch (error) {
                 console.error('❌ Failed to load theme:', error);
-                setTemplate('standard');
+                const defaultSettings: StoreSettings = {
+                    id: 0,
+                    storeName: 'Prime',
+                    address: '',
+                    location: '',
+                    owners: [],
+                    mobileNumbers: [],
+                    emails: [],
+                    landline: '',
+                    whatsapp: '',
+                    template: 'standard',
+                };
+                setSettings(defaultSettings);
+                applyTheme(defaultSettings);
             } finally {
                 setIsLoading(false);
             }
@@ -97,15 +127,17 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         fetchSettings();
     }, []);
 
-    // Re-apply when template or settings change
-    useEffect(() => {
-        if (settings) {
-            applyTheme(settings);
-        }
-    }, [template, settings]);
-
     return (
-        <ThemeContext.Provider value={{ template, setTemplate, settings, isLoading, applyTheme }}>
+        <ThemeContext.Provider
+            value={{
+                template,
+                setTemplate,
+                settings,
+                isLoading,
+                applyTheme,
+                saveTemplate
+            }}
+        >
             {children}
         </ThemeContext.Provider>
     );

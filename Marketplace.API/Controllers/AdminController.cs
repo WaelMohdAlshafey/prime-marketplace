@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Marketplace.Infrastructure.Data;
+using Marketplace.Domain.Entities;
 
 namespace Marketplace.API.Controllers;
 
@@ -20,12 +21,36 @@ public class AdminController : ControllerBase
     [HttpGet("dashboard")]
     public async Task<IActionResult> GetDashboardStats()
     {
+        // 🔹 Ensure StoreSettings has a default row (if missing)
+        var settings = await _context.StoreSettings.FirstOrDefaultAsync();
+        if (settings == null)
+        {
+            _context.StoreSettings.Add(new StoreSetting
+            {
+                StoreName = "Prime",
+                Address = "Default Address",
+                Location = "Default Location",
+                OwnersJson = "[]",
+                MobileNumbersJson = "[]",
+                EmailsJson = "[]",
+                Landline = "N/A",
+                WhatsApp = "N/A",
+                Template = "standard"
+            });
+            await _context.SaveChangesAsync();
+        }
+
+        // 🔹 Get stats (with null checks)
         var totalUsers = await _context.Users.CountAsync();
         var totalProducts = await _context.Products.CountAsync(p => p.IsActive);
         var totalOrders = await _context.Orders.CountAsync();
-        var totalRevenue = await _context.Orders.Where(o => o.Status == "Paid").SumAsync(o => o.TotalAmount);
-        var totalSubscribers = await _context.NewsletterSubscriptions.CountAsync(ns => ns.IsActive);
-        var pendingOrders = await _context.Orders.CountAsync(o => o.Status == "Pending");
+        var totalRevenue = await _context.Orders
+            .Where(o => o.CurrentStatus == "Paid")
+            .SumAsync(o => (decimal?)o.TotalAmount) ?? 0;
+        var totalSubscribers = await _context.NewsletterSubscriptions
+            .CountAsync(ns => ns.IsActive);
+        var pendingOrders = await _context.Orders
+            .CountAsync(o => o.CurrentStatus == "Pending");
 
         var recentOrders = await _context.Orders
             .OrderByDescending(o => o.OrderDate)
@@ -35,7 +60,7 @@ public class AdminController : ControllerBase
                 o.Id,
                 o.OrderDate,
                 o.TotalAmount,
-                o.Status,
+                Status = o.CurrentStatus,
                 o.UserId
             })
             .ToListAsync();
@@ -46,12 +71,12 @@ public class AdminController : ControllerBase
             .ToListAsync();
 
         var ordersByStatus = await _context.Orders
-            .GroupBy(o => o.Status)
+            .GroupBy(o => o.CurrentStatus)
             .Select(g => new { Status = g.Key, Count = g.Count() })
             .ToListAsync();
 
         var monthlyRevenue = await _context.Orders
-            .Where(o => o.Status == "Paid" && o.OrderDate >= DateTime.UtcNow.AddMonths(-12))
+            .Where(o => o.CurrentStatus == "Paid" && o.OrderDate >= DateTime.UtcNow.AddMonths(-12))
             .GroupBy(o => new { o.OrderDate.Year, o.OrderDate.Month })
             .Select(g => new
             {
@@ -91,7 +116,7 @@ public class AdminController : ControllerBase
                 o.UserId,
                 o.OrderDate,
                 o.TotalAmount,
-                o.Status,
+                Status = o.CurrentStatus,
                 o.ShippingAddress,
                 o.PaymentMethod,
                 o.IsPaymentConfirmed,
