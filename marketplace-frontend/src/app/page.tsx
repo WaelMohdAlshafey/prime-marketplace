@@ -8,6 +8,7 @@ import HeroBanner from '@/components/HeroBanner';
 import CategoryGrid from '@/components/CategoryGrid';
 import FilterSidebar from '@/components/Filters/FilterSidebar';
 import ProductCard from '@/components/ProductCard';
+import ProductDetailModal from '@/components/ProductDetailModal';
 import { ShoppingBag, Shield, Truck, Headphones } from 'lucide-react';
 
 export default function Home() {
@@ -21,6 +22,8 @@ export default function Home() {
         inStock?: boolean;
         rating?: number;
     }>({});
+    const [selectedProductId, setSelectedProductId] = useState<number | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const fetchProducts = async (filterOverrides?: typeof filters) => {
         setLoading(true);
@@ -62,7 +65,11 @@ export default function Home() {
         fetchProducts({});
     };
 
-    // Service banners data
+    const handleCardClick = (productId: number) => {
+        setSelectedProductId(productId);
+        setIsModalOpen(true);
+    };
+
     const services = [
         { icon: <Truck className="w-8 h-8" />, title: 'شحن سريع', subtitle: 'توصيل خلال 2-5 أيام' },
         { icon: <Shield className="w-8 h-8" />, title: 'ضمان الجودة', subtitle: 'منتجات أصلية 100%' },
@@ -72,19 +79,9 @@ export default function Home() {
 
     return (
         <div className="container">
-            {/* ============================================================
-                HERO BANNER
-                ============================================================ */}
             <HeroBanner />
-
-            {/* ============================================================
-                CATEGORY GRID
-                ============================================================ */}
             <CategoryGrid />
 
-            {/* ============================================================
-                SERVICE BANNERS
-                ============================================================ */}
             <div className="service-banners">
                 {services.map((service, index) => (
                     <div key={index} className="service-banner">
@@ -95,17 +92,12 @@ export default function Home() {
                 ))}
             </div>
 
-            {/* ============================================================
-                MAIN LAYOUT – Sidebar + Products
-                ============================================================ */}
             <div className="main-layout">
-                {/* Sidebar */}
                 <FilterSidebar
                     onApplyFilters={handleApplyFilters}
                     onResetFilters={handleResetFilters}
                 />
 
-                {/* Product Grid */}
                 <div className="flex-1">
                     <div className="flex justify-between items-center mb-4">
                         <h2 className="text-2xl font-bold text-[#1A1A1A] flex items-center gap-2">
@@ -151,12 +143,22 @@ export default function Home() {
                     ) : (
                         <div className="product-grid">
                             {products.map((product) => (
-                                <ProductCard key={product.id} product={product} />
+                                <ProductCard
+                                    key={product.id}
+                                    product={product}
+                                    onCardClick={() => handleCardClick(product.id)}
+                                />
                             ))}
                         </div>
                     )}
                 </div>
             </div>
+
+            <ProductDetailModal
+                productId={selectedProductId || 0}
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+            />
         </div>
     );
 }

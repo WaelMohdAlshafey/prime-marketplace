@@ -30,13 +30,11 @@ interface ProductCardProps {
         discount?: number;
         category?: string;
     };
+    onCardClick?: () => void;
 }
 
-export default function ProductCard({ product }: ProductCardProps) {
-    // ✅ ALWAYS use 'standard' – ignore theme context completely
-    const template = 'standard';
-    console.log('🃏 ProductCard template (forced):', template);
-
+export default function ProductCard({ product, onCardClick }: ProductCardProps) {
+    const { template = 'standard' } = useTheme();
     const pathname = usePathname();
     const [isAdding, setIsAdding] = useState(false);
     const [quantity, setQuantity] = useState(1);
@@ -65,7 +63,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         setImgSrc('/images/placeholder.jpg');
     };
 
-    // ── STANDARD TEMPLATE (full design) – with quantity controls ──
+    // ── STANDARD TEMPLATE (full design) with quantity controls ──
     const handleWishlistToggle = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
@@ -155,10 +153,13 @@ export default function ProductCard({ product }: ProductCardProps) {
                 whileHover={{ y: -8 }}
                 onHoverStart={() => setIsHovered(true)}
                 onHoverEnd={() => setIsHovered(false)}
-                className="product-card"
+                className="product-card cursor-pointer"
+                onClick={(e) => {
+                    if ((e.target as HTMLElement).closest('button, a')) return;
+                    onCardClick?.();
+                }}
             >
                 <Link href={`/products/${product.id}`} className="block">
-                    {/* Wishlist Button */}
                     <motion.button
                         whileHover={{ scale: 1.2 }}
                         whileTap={{ scale: 0.8 }}
@@ -170,12 +171,10 @@ export default function ProductCard({ product }: ProductCardProps) {
                         />
                     </motion.button>
 
-                    {/* Discount Badge */}
                     {hasDiscount && (
                         <span className="discount-badge">-{product.discount}%</span>
                     )}
 
-                    {/* Product Image */}
                     <div className="relative w-full h-48 bg-gray-50 rounded-md overflow-hidden">
                         <Image
                             src={imgSrc}
@@ -188,18 +187,15 @@ export default function ProductCard({ product }: ProductCardProps) {
                         />
                     </div>
 
-                    {/* Product Info */}
                     <h3 className="product-title">{product.name}</h3>
                     <p className="product-desc">{product.description}</p>
 
-                    {/* Rating */}
                     {product.rating && (
                         <div className="product-rating">
                             {renderStars(product.rating)}
                         </div>
                     )}
 
-                    {/* Price Row */}
                     <div className="price-row">
                         <span className="current-price">
                             {CURRENCY}{(discountPrice || product.price).toFixed(2)}
@@ -213,7 +209,6 @@ export default function ProductCard({ product }: ProductCardProps) {
                     </div>
                 </Link>
 
-                {/* ✅ Quantity Controls + Add to Cart */}
                 <div className="flex items-center gap-2">
                     {product.stockQuantity > 0 && (
                         <div className="flex items-center gap-1 bg-[#F8F9FA] rounded-lg p-0.5 border border-[#E0E0E0] flex-shrink-0">
@@ -252,7 +247,6 @@ export default function ProductCard({ product }: ProductCardProps) {
                 </div>
             </motion.div>
 
-            {/* Fly animation */}
             <AnimatePresence>
                 {fly && (
                     <motion.div
