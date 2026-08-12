@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace Marketplace.Application.DTOs;
 
 public class AuthResponseDto
