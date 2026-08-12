@@ -10,7 +10,6 @@ using Marketplace.Application.DTOs;
 using Marketplace.Application.Interfaces;
 using Marketplace.Domain.Entities;
 using Marketplace.Infrastructure.Data;
-// BCrypt is used via fully qualified name
 
 namespace Marketplace.API.Controllers;
 
@@ -36,7 +35,7 @@ public class AuthController : ControllerBase
     }
 
     // ============================================================
-    // PUBLIC ENDPOINTS (No authentication required)
+    // PUBLIC ENDPOINTS
     // ============================================================
 
     [HttpPost("register")]
@@ -108,7 +107,7 @@ public class AuthController : ControllerBase
     }
 
     // ============================================================
-    // ADMIN-ONLY ENDPOINT (To create Vendor users)
+    // ADMIN-ONLY ENDPOINT (Create Vendor)
     // ============================================================
     [HttpPost("create-vendor")]
     [Authorize(Roles = "Admin")]
@@ -129,7 +128,7 @@ public class AuthController : ControllerBase
     }
 
     // ============================================================
-    // HELPER METHODS
+    // HELPER: Generate JWT Token
     // ============================================================
     private string GenerateJwtToken(User user)
     {
