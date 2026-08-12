@@ -1,20 +1,18 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import api from '@/lib/api';
 import { AuthResponse } from '@/types';
 
 export default function GoldenLoginPage() {
     const searchParams = useSearchParams();
-    const router = useRouter();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         console.log('🔍 GoldenLoginPage: useEffect started');
 
-        // 1. Get token from URL
         const token = searchParams?.get('token');
         console.log('🔑 Token from URL:', token);
 
@@ -44,17 +42,20 @@ export default function GoldenLoginPage() {
                 const userData = response.data;
                 console.log('👤 User data:', userData);
 
+                // Store auth data
                 localStorage.setItem('token', userData.token);
                 localStorage.setItem('user', JSON.stringify(userData));
+                console.log('💾 Auth data saved to localStorage');
 
+                // Get redirect path
                 const redirectPath = userData.redirectPath || '/';
                 console.log('🔄 Redirecting to:', redirectPath);
-                router.push(redirectPath);
+
+                // ✅ Force full page reload – ensures AuthContext re‑reads localStorage
+                window.location.href = redirectPath;
             } catch (err: any) {
                 console.error('❌ Golden login failed:', err);
-                console.error('📦 Error object:', err);
                 console.error('📦 Error response:', err.response);
-                console.error('📦 Error response data:', err.response?.data);
                 const message = err.response?.data?.message || 'Invalid or expired golden link.';
                 setError(message);
                 setLoading(false);
@@ -62,7 +63,7 @@ export default function GoldenLoginPage() {
         };
 
         loginWithToken();
-    }, [searchParams, router]);
+    }, [searchParams]);
 
     if (loading) {
         return (
