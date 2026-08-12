@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '@/context/AuthContext';
 import {
     LayoutDashboard,
     Users,
@@ -24,6 +25,14 @@ interface AdminSidebarProps {
 export default function AdminSidebar({ onLinkClick }: AdminSidebarProps) {
     const { t } = useTranslation('common');
     const pathname = usePathname();
+    const router = useRouter();
+    const { logout } = useAuth();
+
+    const handleLogout = () => {
+        logout();
+        router.push('/auth/login');
+        if (onLinkClick) onLinkClick();
+    };
 
     const navItems = [
         { name: 'Dashboard', href: '/admin', icon: <LayoutDashboard className="w-5 h-5" /> },
@@ -70,15 +79,15 @@ export default function AdminSidebar({ onLinkClick }: AdminSidebarProps) {
                 })}
             </nav>
 
+            {/* ✅ Fixed Logout – uses function, not Link */}
             <div className="border-t border-gray-700 pt-4 mt-4">
-                <Link
-                    href="/auth/logout"
-                    onClick={onLinkClick}
-                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/10 transition-all duration-300"
+                <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/10 transition-all duration-300"
                 >
                     <LogOut className="w-5 h-5" />
                     <span className="font-medium">Logout</span>
-                </Link>
+                </button>
             </div>
         </>
     );
