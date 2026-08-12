@@ -9,9 +9,10 @@ public interface IGoldenLinkService
         int currentUserId,
         int? targetUserId,
         int expiryDays,
+        string? redirectPath,
         bool isAdmin
     );
 
-    Task<(bool valid, int userId)> ValidateTokenAsync(string token);
+    Task<(bool valid, int userId, string? redirectPath)> ValidateTokenAsync(string token);
     Task MarkTokenAsUsedAsync(string token);
 }

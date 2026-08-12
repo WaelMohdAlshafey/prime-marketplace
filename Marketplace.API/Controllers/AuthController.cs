@@ -73,7 +73,7 @@ public class AuthController : ControllerBase
     }
 
     // ============================================================
-    // GOLDEN LOGIN (Magic Link)
+    // GOLDEN LOGIN (Magic Link) – Multiple Uses Until Expiry
     // ============================================================
     [HttpPost("golden-login")]
     [AllowAnonymous]
@@ -82,7 +82,7 @@ public class AuthController : ControllerBase
         if (string.IsNullOrWhiteSpace(request.Token))
             return BadRequest(new { message = "Token is required." });
 
-        var (valid, userId) = await _goldenLinkService.ValidateTokenAsync(request.Token);
+        var (valid, userId, redirectPath) = await _goldenLinkService.ValidateTokenAsync(request.Token);
         if (!valid)
             return BadRequest(new { message = "Invalid or expired golden link." });
 
@@ -90,10 +90,9 @@ public class AuthController : ControllerBase
         if (user == null)
             return BadRequest(new { message = "User not found." });
 
-        // Mark token as used (one-time use)
-        await _goldenLinkService.MarkTokenAsUsedAsync(request.Token);
+        // ✅ DO NOT mark as used – allow multiple uses until expiry
+        // await _goldenLinkService.MarkTokenAsUsedAsync(request.Token);
 
-        // Generate JWT token
         var token = GenerateJwtToken(user);
 
         return Ok(new AuthResponseDto
@@ -102,7 +101,8 @@ public class AuthController : ControllerBase
             Username = user.Username,
             Email = user.Email,
             Role = user.Role,
-            Token = token
+            Token = token,
+            RedirectPath = redirectPath ?? "/"
         });
     }
 
@@ -132,7 +132,8 @@ public class AuthController : ControllerBase
     // ============================================================
     private string GenerateJwtToken(User user)
     {
-        var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"] ?? "ThisIsASuperSecretKeyWithAtLeast32CharactersLongForJWT!");
+        var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"] ??
+            "ThisIsASuperSecretKeyWithAtLeast32CharactersLongForJWT!");
         var tokenHandler = new JwtSecurityTokenHandler();
 
         var claims = new List<Claim>
@@ -147,7 +148,8 @@ public class AuthController : ControllerBase
         {
             Subject = new ClaimsIdentity(claims),
             Expires = DateTime.UtcNow.AddDays(7),
-            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
+                SecurityAlgorithms.HmacSha256Signature)
         };
 
         var token = tokenHandler.CreateToken(tokenDescriptor);
@@ -155,9 +157,7 @@ public class AuthController : ControllerBase
     }
 }
 
-// ============================================================
-// DTO FOR GOLDEN LOGIN
-// ============================================================
+// DTO for golden login
 public class GoldenLoginDto
 {
     public string Token { get; set; } = string.Empty;

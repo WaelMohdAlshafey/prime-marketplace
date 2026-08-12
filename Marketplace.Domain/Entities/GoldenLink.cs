@@ -11,6 +11,7 @@ public class GoldenLink
     public DateTime ExpiresAt { get; set; }
     public bool IsUsed { get; set; } = false;
     public string? CreatedBy { get; set; }
+    public string? RedirectPath { get; set; } = "/";   // ✅ NEW
 
     public virtual User? User { get; set; }
 }

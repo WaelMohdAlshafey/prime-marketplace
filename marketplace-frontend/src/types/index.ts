@@ -1,6 +1,4 @@
-﻿// M:\Marketplace\marketplace-frontend\src\types\index.ts
-
-// ============================================================
+﻿// ============================================================
 // PRODUCT TYPES
 // ============================================================
 export interface Product {
@@ -17,7 +15,6 @@ export interface Product {
     discount?: number;
     isActive: boolean;
     category?: string;
-    // Bilingual fields (optional, may be set by API)
     nameAr?: string;
     nameEn?: string;
     descriptionAr?: string;
@@ -81,7 +78,7 @@ export interface Order {
 }
 
 // ============================================================
-// AUTHENTICATION TYPES
+// AUTHENTICATION TYPES (✅ Updated with RedirectPath)
 // ============================================================
 export interface AuthResponse {
     userId: number;
@@ -89,6 +86,7 @@ export interface AuthResponse {
     email: string;
     token: string;
     role: string;
+    redirectPath?: string;   // ✅ NEW
 }
 
 export interface LoginRequest {
@@ -103,7 +101,7 @@ export interface RegisterRequest {
 }
 
 // ============================================================
-// STORE SETTINGS TYPES (with full theming)
+// STORE SETTINGS TYPES
 // ============================================================
 export interface Owner {
     name: string;
@@ -120,10 +118,6 @@ export interface StoreSettings {
     landline: string;
     whatsapp: string;
     template: string;
-
-    // ============================================================
-    // THEME COLORS
-    // ============================================================
     primaryColor?: string;
     primaryLight?: string;
     primaryDark?: string;
@@ -133,51 +127,27 @@ export interface StoreSettings {
     surfaceColor?: string;
     textColor?: string;
     textMuted?: string;
-
-    // ============================================================
-    // NAVBAR & FOOTER
-    // ============================================================
     navbarBg?: string;
     navbarText?: string;
     navbarHover?: string;
     footerBg?: string;
     footerText?: string;
-
-    // ============================================================
-    // BUTTONS
-    // ============================================================
     buttonPrimaryBg?: string;
     buttonPrimaryHover?: string;
     buttonPrimaryText?: string;
     buttonSecondaryBg?: string;
     buttonSecondaryHover?: string;
     buttonSecondaryText?: string;
-
-    // ============================================================
-    // CARDS
-    // ============================================================
     cardBg?: string;
     cardBorder?: string;
     cardShadow?: string;
     cardHoverShadow?: string;
     cardBorderRadius?: string;
-
-    // ============================================================
-    // FONTS & TYPOGRAPHY
-    // ============================================================
     fontFamily?: string;
     headingFont?: string;
     bodyFont?: string;
-
-    // ============================================================
-    // EMOJIS / SITE ICON
-    // ============================================================
     siteEmoji?: string;
     faviconEmoji?: string;
-
-    // ============================================================
-    // ADVANCED
-    // ============================================================
     customCss?: string;
     customHeaderHtml?: string;
     customFooterHtml?: string;

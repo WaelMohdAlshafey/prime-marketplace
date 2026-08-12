@@ -36,6 +36,7 @@ public class GoldenLinkController : ControllerBase
                 userId,
                 request.UserId,
                 request.ExpiryDays,
+                request.RedirectPath,   // ✅ pass the redirect path
                 isAdmin
             );
             return Ok(result);

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import api from '@/lib/api';
+import { AuthResponse } from '@/types';
 
 export default function GoldenLoginPage() {
     const searchParams = useSearchParams();
@@ -27,15 +28,15 @@ export default function GoldenLoginPage() {
 
         const loginWithToken = async () => {
             try {
-                const response = await api.post('/api/Auth/golden-login', { token });
+                const response = await api.post<AuthResponse>('/api/Auth/golden-login', { token });
                 const userData = response.data;
 
-                // Store authentication data
                 localStorage.setItem('token', userData.token);
                 localStorage.setItem('user', JSON.stringify(userData));
 
-                // Redirect to homepage
-                router.push('/');
+                // ✅ Redirect to the stored path or default to home
+                const redirectPath = userData.redirectPath || '/';
+                router.push(redirectPath);
             } catch (err: any) {
                 console.error('Golden login failed:', err);
                 const message = err.response?.data?.message || 'Invalid or expired golden link.';

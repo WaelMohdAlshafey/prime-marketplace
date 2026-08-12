@@ -15,4 +15,8 @@ public class GenerateGoldenLinkResponseDto
     public DateTime ExpiresAt { get; set; }
     public int UserId { get; set; }
     public string UserName { get; set; } = string.Empty;
+    public int? UserId { get; set; }
+    public int ExpiryDays { get; set; } = 7;
+    public string? RedirectPath { get; set; }
+
 }
