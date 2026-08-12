@@ -157,7 +157,7 @@ public class AuthController : ControllerBase
     }
 }
 
-// DTO for golden login
+// DTO for golden login (kept inside this file for simplicity)
 public class GoldenLoginDto
 {
     public string Token { get; set; } = string.Empty;

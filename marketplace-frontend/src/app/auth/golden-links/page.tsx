@@ -12,33 +12,49 @@ export default function GoldenLoginPage() {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
+        console.log('🔍 GoldenLoginPage: useEffect started');
+
+        // 1. Get token from URL
         const token = searchParams?.get('token');
+        console.log('🔑 Token from URL:', token);
 
         if (!token) {
+            console.error('❌ No token found in URL');
             setError('No token provided. The link may be malformed.');
             setLoading(false);
             return;
         }
 
         if (token.length < 10) {
+            console.error('❌ Token too short:', token.length);
             setError('Invalid token format. Please check your link.');
             setLoading(false);
             return;
         }
 
+        console.log('✅ Token looks valid, proceeding to login...');
+
         const loginWithToken = async () => {
             try {
+                console.log('📤 Sending POST to /api/Auth/golden-login');
                 const response = await api.post<AuthResponse>('/api/Auth/golden-login', { token });
+                console.log('✅ API response status:', response.status);
+                console.log('✅ API response data:', response.data);
+
                 const userData = response.data;
+                console.log('👤 User data:', userData);
 
                 localStorage.setItem('token', userData.token);
                 localStorage.setItem('user', JSON.stringify(userData));
 
-                // ✅ Redirect to the stored path or default to home
                 const redirectPath = userData.redirectPath || '/';
+                console.log('🔄 Redirecting to:', redirectPath);
                 router.push(redirectPath);
             } catch (err: any) {
-                console.error('Golden login failed:', err);
+                console.error('❌ Golden login failed:', err);
+                console.error('📦 Error object:', err);
+                console.error('📦 Error response:', err.response);
+                console.error('📦 Error response data:', err.response?.data);
                 const message = err.response?.data?.message || 'Invalid or expired golden link.';
                 setError(message);
                 setLoading(false);
