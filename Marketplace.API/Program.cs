@@ -141,7 +141,7 @@ if (app.Environment.IsDevelopment())
 }
 
 // ============================================================
-// 11. Use CORS (place BEFORE authentication)
+// 11. Use CORS (must be placed BEFORE UseAuthentication)
 // ============================================================
 app.UseCors("AllowAll");
 
@@ -191,6 +191,7 @@ using (var scope = app.Services.CreateScope())
     {
         Console.WriteLine($"❌ Database migration error: {ex.Message}");
         Console.WriteLine($"Stack trace: {ex.StackTrace}");
+        // Don't throw – allow the app to start even if migration fails
     }
 }
 
