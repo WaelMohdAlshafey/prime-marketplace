@@ -74,19 +74,31 @@ builder.Services.AddScoped<IStoreService, StoreService>();
 builder.Services.AddScoped<IGoldenLinkService, GoldenLinkService>();
 
 // ============================================================
-// 6. Database Context (SQLite locally, PostgreSQL on Render/Supabase)
+// 6. Database Context – with Retry & Detailed Logging
 // ============================================================
-builder.Services.AddDbContext<AppDbContext>(options =>
+builder.Services.AddDbContext<AppDbContext>((serviceProvider, options) =>
 {
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-    if (builder.Environment.IsDevelopment() && connectionString?.Contains("Data Source") == true)
+
+    // Log the connection string (mask password for security)
+    if (!string.IsNullOrEmpty(connectionString))
     {
-        options.UseSqlite(connectionString);
+        var masked = System.Text.RegularExpressions.Regex.Replace(connectionString, "Password=([^;]+)", "Password=***");
+        Console.WriteLine($"🔌 Database connection string (masked): {masked}");
     }
-    else
+
+    options.UseNpgsql(connectionString, npgsqlOptions =>
     {
-        options.UseNpgsql(connectionString);
-    }
+        // Retry on transient failures (e.g., network issues, timeouts)
+        npgsqlOptions.EnableRetryOnFailure(
+            maxRetryCount: 5,
+            maxRetryDelay: TimeSpan.FromSeconds(10),
+            errorCodesToAdd: null);
+    });
+
+    // Enable detailed logging for debugging (remove in production if sensitive)
+    options.EnableSensitiveDataLogging();
+    options.EnableDetailedErrors();
 });
 
 // ============================================================
@@ -138,16 +150,13 @@ if (app.Environment.IsDevelopment())
 
 // ============================================================
 // 11. Custom Middleware: Force CORS Headers on Every Response
-//     (This guarantees headers even if the request fails early)
 // ============================================================
 app.Use(async (context, next) =>
 {
-    // Set headers unconditionally
     context.Response.Headers["Access-Control-Allow-Origin"] = "*";
     context.Response.Headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS";
     context.Response.Headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With";
 
-    // For preflight requests, return 204 immediately
     if (context.Request.Method == "OPTIONS")
     {
         context.Response.StatusCode = 204;
@@ -158,12 +167,12 @@ app.Use(async (context, next) =>
 });
 
 // ============================================================
-// 12. Enable CORS Middleware (handles the rest, but we already set headers)
+// 12. Enable CORS Middleware
 // ============================================================
 app.UseCors("AllowAll");
 
 // ============================================================
-// 13. Request Logging Middleware (helps debug)
+// 13. Request Logging Middleware
 // ============================================================
 app.Use(async (context, next) =>
 {
@@ -189,18 +198,19 @@ app.MapControllers();
 app.MapGet("/", () => "Prime Marketplace API is running!");
 
 // ============================================================
-// 17. Health Check Endpoint (for Render monitoring)
+// 17. Health Check Endpoint
 // ============================================================
 app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = DateTime.UtcNow }));
 
 // ============================================================
-// 18. Database Migration – Apply pending migrations
+// 18. Database Migration – Apply pending migrations with retry
 // ============================================================
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     try
     {
+        // Try to apply migrations with a timeout (this is already handled by EnableRetryOnFailure)
         dbContext.Database.Migrate();
         Console.WriteLine("✅ Database migrations applied successfully.");
     }
