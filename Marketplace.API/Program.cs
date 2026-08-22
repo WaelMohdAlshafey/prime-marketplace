@@ -74,7 +74,7 @@ builder.Services.AddScoped<IStoreService, StoreService>();
 builder.Services.AddScoped<IGoldenLinkService, GoldenLinkService>();
 
 // ============================================================
-// 6. Database Context (SQLite locally, PostgreSQL on Render)
+// 6. Database Context (SQLite locally, PostgreSQL on Render/Supabase)
 // ============================================================
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
@@ -127,9 +127,14 @@ if (app.Environment.IsDevelopment())
 }
 
 // ============================================================
-// 10. Security & Routing
+// 10. Security & Routing – Conditional HTTPS Redirection
 // ============================================================
-app.UseHttpsRedirection();
+if (app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
+// In production (Render), HTTPS is terminated at the load balancer,
+// so we skip UseHttpsRedirection to avoid the warning.
 
 // ============================================================
 // 11. Manual OPTIONS handling (fixes preflight CORS)
@@ -165,7 +170,12 @@ app.UseAuthorization();
 app.MapControllers();
 
 // ============================================================
-// 15. Database Migration – Apply pending migrations
+// 15. Root Route – Fixes 404 on "/"
+// ============================================================
+app.MapGet("/", () => "Prime Marketplace API is running!");
+
+// ============================================================
+// 16. Database Migration – Apply pending migrations
 // ============================================================
 using (var scope = app.Services.CreateScope())
 {
@@ -180,11 +190,10 @@ using (var scope = app.Services.CreateScope())
         Console.WriteLine($"❌ Database migration error: {ex.Message}");
         Console.WriteLine($"Stack trace: {ex.StackTrace}");
         // Don't throw - allow app to start even if migration fails
-        // This helps with read-only databases or permission issues
     }
 }
 
 // ============================================================
-// 16. Run the App
+// 17. Run the App
 // ============================================================
 app.Run();
