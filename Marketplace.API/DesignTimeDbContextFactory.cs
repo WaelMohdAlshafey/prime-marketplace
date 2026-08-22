@@ -10,10 +10,9 @@ namespace Marketplace.Infrastructure
         {
             var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
 
-            // Use your live PostgreSQL connection string
             optionsBuilder.UseNpgsql(
-                "Host=dpg-d9gdcfrbc2fs73fuacug-a.oregon-postgres.render.com;Database=prime_db_ty5u;Username=prime_user;Password=NSDiY1PDaON08IydKzrBLlQC84OTphBU;Port=5432;SslMode=Require"
-            );
+     "Host=db.rgnanibivkruuryndplle.supabase.co;Database=postgres;Username=postgres;Password=MyMarketplaceDB#2026!Secure;Port=5432;SslMode=Require;Trust Server Certificate=true;"
+ );
 
             return new AppDbContext(optionsBuilder.Options);
         }

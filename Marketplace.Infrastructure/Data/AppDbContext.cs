@@ -5,7 +5,26 @@ namespace Marketplace.Infrastructure.Data;
 
 public class AppDbContext : DbContext
 {
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+    // Parameterless constructor – required for EF Core migrations
+    public AppDbContext()
+    {
+    }
+
+    // Constructor for runtime dependency injection
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
+    {
+    }
+
+    // ✅ ADD THIS METHOD – Configures the database provider for design‑time
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        if (!optionsBuilder.IsConfigured)
+        {
+            optionsBuilder.UseNpgsql(
+                "Host=db.rgnanibivkruuryndplle.supabase.co;Database=postgres;Username=postgres;Password=MyMarketplaceDB#2026!Secure;Port=5432;SslMode=Require;Trust Server Certificate=true;"
+            );
+        }
+    }
 
     public DbSet<Product> Products { get; set; }
     public DbSet<User> Users { get; set; }
