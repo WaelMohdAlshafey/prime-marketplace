@@ -79,24 +79,18 @@ builder.Services.AddScoped<IGoldenLinkService, GoldenLinkService>();
 builder.Services.AddDbContext<AppDbContext>((serviceProvider, options) =>
 {
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-
-    // Log the connection string (mask password for security)
     if (!string.IsNullOrEmpty(connectionString))
     {
         var masked = System.Text.RegularExpressions.Regex.Replace(connectionString, "Password=([^;]+)", "Password=***");
         Console.WriteLine($"🔌 Database connection string (masked): {masked}");
     }
-
     options.UseNpgsql(connectionString, npgsqlOptions =>
     {
-        // Retry on transient failures (e.g., network issues, timeouts)
         npgsqlOptions.EnableRetryOnFailure(
             maxRetryCount: 5,
             maxRetryDelay: TimeSpan.FromSeconds(10),
             errorCodesToAdd: null);
     });
-
-    // Enable detailed logging for debugging (remove in production if sensitive)
     options.EnableSensitiveDataLogging();
     options.EnableDetailedErrors();
 });
@@ -145,34 +139,14 @@ if (app.Environment.IsDevelopment())
 {
     app.UseHttpsRedirection();
 }
-// In production (Render), HTTPS is terminated at the load balancer,
-// so we skip UseHttpsRedirection to avoid the warning.
 
 // ============================================================
-// 11. Custom Middleware: Force CORS Headers on Every Response
-// ============================================================
-app.Use(async (context, next) =>
-{
-    context.Response.Headers["Access-Control-Allow-Origin"] = "*";
-    context.Response.Headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS";
-    context.Response.Headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With";
-
-    if (context.Request.Method == "OPTIONS")
-    {
-        context.Response.StatusCode = 204;
-        return;
-    }
-
-    await next();
-});
-
-// ============================================================
-// 12. Enable CORS Middleware
+// 11. Use CORS (place BEFORE authentication)
 // ============================================================
 app.UseCors("AllowAll");
 
 // ============================================================
-// 13. Request Logging Middleware
+// 12. Request Logging Middleware (helps debug)
 // ============================================================
 app.Use(async (context, next) =>
 {
@@ -182,35 +156,34 @@ app.Use(async (context, next) =>
 });
 
 // ============================================================
-// 14. Authentication & Authorization
+// 13. Authentication & Authorization
 // ============================================================
 app.UseAuthentication();
 app.UseAuthorization();
 
 // ============================================================
-// 15. Map Controllers
+// 14. Map Controllers
 // ============================================================
 app.MapControllers();
 
 // ============================================================
-// 16. Root Route – Fixes 404 on "/"
+// 15. Root Route – Fixes 404 on "/"
 // ============================================================
 app.MapGet("/", () => "Prime Marketplace API is running!");
 
 // ============================================================
-// 17. Health Check Endpoint
+// 16. Health Check Endpoint
 // ============================================================
 app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = DateTime.UtcNow }));
 
 // ============================================================
-// 18. Database Migration – Apply pending migrations with retry
+// 17. Database Migration – Apply pending migrations
 // ============================================================
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     try
     {
-        // Try to apply migrations with a timeout (this is already handled by EnableRetryOnFailure)
         dbContext.Database.Migrate();
         Console.WriteLine("✅ Database migrations applied successfully.");
     }
@@ -218,11 +191,10 @@ using (var scope = app.Services.CreateScope())
     {
         Console.WriteLine($"❌ Database migration error: {ex.Message}");
         Console.WriteLine($"Stack trace: {ex.StackTrace}");
-        // Don't throw - allow app to start even if migration fails
     }
 }
 
 // ============================================================
-// 19. Run the App
+// 18. Run the App
 // ============================================================
 app.Run();
