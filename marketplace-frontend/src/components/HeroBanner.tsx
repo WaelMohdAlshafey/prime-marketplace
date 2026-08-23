@@ -12,6 +12,9 @@ export default function HeroBanner() {
     const [current, setCurrent] = useState(0);
     const [direction, setDirection] = useState(0);
 
+    // Placeholder image (always works)
+    const PLACEHOLDER_IMAGE = 'https://placehold.co/600x400/0F5C45/FFFFFF?text=Prime';
+
     const slides = [
         {
             id: 1,
@@ -22,7 +25,7 @@ export default function HeroBanner() {
                 'من البرامج والتقنية إلى التجميل، الأزياء، والإلكترونيات. كل ما تحتاجه في مكان واحد، بأسعار تنافسية وشحن سريع لجميع المحافظات.',
             cta: 'تسوق الآن',
             link: '/products',
-            image: '/images/hero/slide1.jpg',
+            image: PLACEHOLDER_IMAGE,
         },
         {
             id: 2,
@@ -33,7 +36,7 @@ export default function HeroBanner() {
                 'احصل على أدوات التطوير، برامج التصميم الجرافيكي، حلول الأمن السيبراني، والذكاء الاصطناعي. تراخيص أصلية ودعم فني متواصل.',
             cta: 'استكشف البرامج',
             link: '/software',
-            image: '/images/hero/slide2.jpg',
+            image: PLACEHOLDER_IMAGE,
         },
         {
             id: 3,
@@ -44,7 +47,7 @@ export default function HeroBanner() {
                 'شامبو عضوي، كريمات مرطبة للبشرة الحساسة، زيوت مغربية أصلية. منتجات معتمدة من أفضل الماركات العالمية، مناسبة لجميع أنواع البشرة.',
             cta: 'تسوق التجميل',
             link: '/hair-care',
-            image: '/images/hero/slide3.jpg',
+            image: PLACEHOLDER_IMAGE,
         },
         {
             id: 4,
@@ -55,7 +58,7 @@ export default function HeroBanner() {
                 'تشكيلة مميزة من الملابس القطنية، الأحذية الرياضية، الساعات الكلاسيكية، والمجوهرات. نناسب جميع المناسبات بأفضل جودة وأسعار لا تقبل المنافسة.',
             cta: 'تسوق الأزياء',
             link: '/fashion',
-            image: '/images/hero/slide4.jpg',
+            image: PLACEHOLDER_IMAGE,
         },
     ];
 
@@ -126,8 +129,8 @@ export default function HeroBanner() {
                     className="hero-image object-contain"
                     priority
                     onError={(e) => {
-                        // Fallback to a placeholder if image fails
-                        (e.target as HTMLImageElement).src = '/images/placeholder.jpg';
+                        // Fallback if placeholder fails (shouldn't happen)
+                        (e.target as HTMLImageElement).src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400"%3E%3Crect width="400" height="400" fill="%230F5C45"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="40" font-family="sans-serif"%3EPrime%3C/text%3E%3C/svg%3E';
                     }}
                 />
             </div>
