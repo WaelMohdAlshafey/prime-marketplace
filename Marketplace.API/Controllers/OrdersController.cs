@@ -100,47 +100,9 @@ public class OrdersController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetOrders()
     {
-        try
-        {
-            var orders = await _context.Orders
-                .OrderByDescending(o => o.OrderDate)
-                .ToListAsync();
-
-            var orderIds = orders.Select(o => o.Id).ToList();
-            var allOrderItems = await _context.OrderItems
-                .Where(oi => orderIds.Contains(oi.OrderId))
-                .ToListAsync();
-
-            var result = orders.Select(o => new
-            {
-                o.Id,
-                o.UserId,
-                o.OrderDate,
-                TotalAmount = decimal.TryParse(o.TotalAmount?.ToString(), out var ta) ? ta : 0,
-                Status = o.CurrentStatus,
-                o.ShippingAddress,
-                o.PaymentMethod,
-                o.IsPaymentConfirmed,
-                o.PaymentConfirmedAt,
-                Items = allOrderItems
-                    .Where(oi => oi.OrderId == o.Id)
-                    .Select(oi => new
-                    {
-                        oi.ProductId,
-                        oi.ProductName,
-                        UnitPrice = decimal.TryParse(oi.UnitPrice?.ToString(), out var up) ? up : 0,
-                        oi.Quantity,
-                        Subtotal = (decimal.TryParse(oi.UnitPrice?.ToString(), out var up2) ? up2 : 0) * oi.Quantity
-                    })
-                    .ToList()
-            }).ToList();
-
-            return Ok(result);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, new { message = "Failed to load orders.", error = ex.Message });
-        }
+        var userId = GetUserId();
+        var orders = await _orderService.GetOrdersAsync(userId);
+        return Ok(orders);
     }
 
     [HttpGet("{id}")]
@@ -159,7 +121,7 @@ public class OrdersController : ControllerBase
     }
 
     // ============================================================
-    // CONFIRM PAYMENT – Admin, Vendor, Employee
+    // CONFIRM PAYMENT
     // ============================================================
     [HttpPost("{id}/confirm-payment")]
     [Authorize(Roles = "Admin,Vendor,Employee")]
@@ -178,7 +140,7 @@ public class OrdersController : ControllerBase
     }
 
     // ============================================================
-    // REVERT PAYMENT – Admin only
+    // REVERT PAYMENT
     // ============================================================
     [HttpPost("{id}/revert-payment")]
     [Authorize(Roles = "Admin")]
@@ -197,23 +159,21 @@ public class OrdersController : ControllerBase
     }
 
     // ============================================================
-    // UPDATE ORDER STATUS – Admin, Vendor, Employee, Customer (cancel only)
+    // UPDATE ORDER STATUS
     // ============================================================
     [HttpPut("{id}/status")]
-    [Authorize] // any logged-in user
+    [Authorize]
     public async Task<IActionResult> UpdateStatus(int id, [FromBody] UpdateStatusWithNoteDto request)
     {
         try
         {
             var userId = GetUserId();
-
-            // ✅ Pass the carrier field (if provided) to the service
             var updatedOrder = await _orderService.UpdateOrderStatusAsync(
                 userId,
                 id,
                 request.Status,
                 request.Note,
-                request.Carrier // ✅ New parameter for carrier update
+                request.Carrier
             );
 
             return Ok(updatedOrder);
@@ -225,7 +185,7 @@ public class OrdersController : ControllerBase
     }
 
     // ============================================================
-    // TRACKING – PUBLIC (supports both TrackingNumber and Order ID)
+    // TRACKING – PUBLIC
     // ============================================================
     [HttpGet("track/{trackingNumberOrId}")]
     [AllowAnonymous]
@@ -233,13 +193,11 @@ public class OrdersController : ControllerBase
     {
         Order? order = null;
 
-        // 1. Try to find by TrackingNumber
         order = await _context.Orders
             .Include(o => o.StatusLogs)
             .ThenInclude(s => s.UpdatedBy)
             .FirstOrDefaultAsync(o => o.TrackingNumber == trackingNumberOrId);
 
-        // 2. If not found, try parsing as Order ID (int)
         if (order == null && int.TryParse(trackingNumberOrId, out int orderId))
         {
             order = await _context.Orders
@@ -251,7 +209,6 @@ public class OrdersController : ControllerBase
         if (order == null)
             return NotFound(new { message = "Order not found for this tracking number or ID." });
 
-        // ✅ Fetch the customer username separately (Order has no navigation to User)
         string? customerName = null;
         if (order.UserId > 0)
         {
@@ -276,7 +233,7 @@ public class OrdersController : ControllerBase
         {
             order.Id,
             order.TrackingNumber,
-            ShippingCarrier = order.ShippingCarrier ?? "N/A", // ✅ Carrier included
+            ShippingCarrier = order.ShippingCarrier ?? "N/A",
             order.ShippedAt,
             order.DeliveredAt,
             order.CurrentStatus,
@@ -298,25 +255,21 @@ public class OrdersController : ControllerBase
     }
 
     // ============================================================
-    // ADMIN: GET ALL ORDERS (FIXED: Return Status, not CurrentStatus)
+    // ADMIN: GET ALL ORDERS
     // ============================================================
     [HttpGet("admin/all")]
     [Authorize(Roles = "Admin,Vendor,Employee")]
     public async Task<IActionResult> GetAllOrdersForAdmin()
     {
-        try
-        {
-            var orders = await _context.Orders
-                .Include(o => o.OrderItems)
-                .OrderByDescending(o => o.OrderDate)
-                .ToListAsync();
-
-            var result = orders.Select(o => new
+        var orders = await _context.Orders
+            .Include(o => o.OrderItems)
+            .OrderByDescending(o => o.OrderDate)
+            .Select(o => new
             {
                 o.Id,
                 o.UserId,
                 o.OrderDate,
-                TotalAmount = decimal.TryParse(o.TotalAmount?.ToString(), out var ta) ? ta : 0,
+                o.TotalAmount,
                 Status = o.CurrentStatus,
                 o.ShippingAddress,
                 o.PaymentMethod,
@@ -326,30 +279,26 @@ public class OrdersController : ControllerBase
                 {
                     oi.ProductId,
                     oi.ProductName,
-                    UnitPrice = decimal.TryParse(oi.UnitPrice?.ToString(), out var up) ? up : 0,
+                    oi.UnitPrice,
                     oi.Quantity,
-                    Subtotal = (decimal.TryParse(oi.UnitPrice?.ToString(), out var up2) ? up2 : 0) * oi.Quantity
+                    Subtotal = oi.UnitPrice * oi.Quantity
                 })
-            });
+            })
+            .ToListAsync();
 
-            return Ok(result);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, new { message = "Failed to load orders.", error = ex.Message });
-        }
+        return Ok(orders);
     }
 }
 
 // ============================================================
-// DTOs (local to this controller)
+// DTOs (local)
 // ============================================================
 
 public class UpdateStatusWithNoteDto
 {
     public string Status { get; set; } = string.Empty;
     public string? Note { get; set; }
-    public string? Carrier { get; set; } // ✅ New field for carrier update
+    public string? Carrier { get; set; }
 }
 
 public class RevertPaymentDto
