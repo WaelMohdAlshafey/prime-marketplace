@@ -3,7 +3,7 @@
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import { Heart, ShoppingBag, Star } from 'lucide-react';
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import { useWishlist } from '@/context/WishlistContext';
@@ -63,9 +63,9 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
     const discountPrice = product.discount ? product.price * (1 - product.discount / 100) : null;
     const hasDiscount = product.discount && product.discount > 0;
 
-    const handleImageError = () => {
+    const handleImageError = useCallback(() => {
         setImgSrc('/images/placeholder.jpg');
-    };
+    }, []);
 
     const handleWishlistToggle = (e: React.MouseEvent) => {
         e.preventDefault();
