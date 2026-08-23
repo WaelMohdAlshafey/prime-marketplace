@@ -173,7 +173,18 @@ app.UseAuthorization();
 // 14. Map Controllers
 // ============================================================
 app.MapControllers();
-
+app.MapGet("/db-test", async (AppDbContext dbContext) =>
+{
+    try
+    {
+        var result = await dbContext.Database.ExecuteSqlRawAsync("SELECT 1");
+        return Results.Ok(new { connected = true, result });
+    }
+    catch (Exception ex)
+    {
+        return Results.BadRequest(new { connected = false, error = ex.Message });
+    }
+});
 // ============================================================
 // 15. Root Route – Fixes 404 on "/"
 // ============================================================
