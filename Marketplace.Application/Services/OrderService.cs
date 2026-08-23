@@ -19,22 +19,54 @@ public class OrderService : IOrderService
     // CART OPERATIONS
     // ============================================================
 
-    public async Task<CartResponseDto> GetCartAsync(int userId)
+    public async Task<CartResponseDto> AddToCartAsync(int userId, AddToCartDto addToCartDto)
     {
-        var cartItems = await _context.CartItems
-            .Where(ci => ci.UserId == userId)
-            .Include(ci => ci.Product)
-            .Select(ci => new CartItemDto
-            {
-                Id = ci.Id,
-                ProductId = ci.ProductId,
-                ProductName = ci.Product != null ? ci.Product.Name : "Product Unavailable",
-                UnitPrice = ci.Product != null ? ci.Product.Price : 0,
-                Quantity = ci.Quantity
-            })
-            .ToListAsync();
+        try
+        {
+            var product = await _context.Products
+                .FirstOrDefaultAsync(p => p.Id == addToCartDto.ProductId && p.IsActive);
 
-        return new CartResponseDto { Items = cartItems };
+            if (product == null)
+                throw new Exception("Product not available.");
+
+            if (product.StockQuantity < addToCartDto.Quantity)
+                throw new Exception($"Only {product.StockQuantity} items available.");
+
+            var existingItem = await _context.CartItems
+                .FirstOrDefaultAsync(ci => ci.UserId == userId && ci.ProductId == addToCartDto.ProductId);
+
+            if (existingItem != null)
+            {
+                existingItem.Quantity += addToCartDto.Quantity;
+                if (existingItem.Quantity > product.StockQuantity)
+                    existingItem.Quantity = product.StockQuantity;
+            }
+            else
+            {
+                var cartItem = new CartItem
+                {
+                    UserId = userId,
+                    ProductId = addToCartDto.ProductId,
+                    Quantity = addToCartDto.Quantity,
+                    AddedAt = DateTime.UtcNow
+                };
+                _context.CartItems.Add(cartItem);
+            }
+
+            await _context.SaveChangesAsync();
+            return await GetCartAsync(userId);
+        }
+        catch (DbUpdateException dbEx)
+        {
+            Console.WriteLine($"❌ Cart DB Update Error: {dbEx.InnerException?.Message}");
+            Console.WriteLine($"Stack Trace: {dbEx.InnerException?.StackTrace}");
+            throw;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Cart General Error: {ex.Message}");
+            throw;
+        }
     }
 
     public async Task<CartResponseDto> AddToCartAsync(int userId, AddToCartDto addToCartDto)
