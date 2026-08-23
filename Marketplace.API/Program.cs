@@ -138,12 +138,10 @@ if (app.Environment.IsDevelopment())
 // ============================================================
 app.Use(async (context, next) =>
 {
-    // Set CORS headers on every response
     context.Response.Headers["Access-Control-Allow-Origin"] = "*";
     context.Response.Headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS";
     context.Response.Headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With";
 
-    // If it's an OPTIONS request, respond immediately with 204
     if (context.Request.Method == "OPTIONS")
     {
         context.Response.StatusCode = 204;
@@ -164,15 +162,24 @@ app.Use(async (context, next) =>
 });
 
 // ============================================================
-// 13. Authentication & Authorization
+// 13. Serve static files (product images, etc.)
+// ============================================================
+app.UseStaticFiles();
+
+// ============================================================
+// 14. Authentication & Authorization
 // ============================================================
 app.UseAuthentication();
 app.UseAuthorization();
 
 // ============================================================
-// 14. Map Controllers
+// 15. Map Controllers
 // ============================================================
 app.MapControllers();
+
+// ============================================================
+// 16. Additional Endpoints
+// ============================================================
 app.MapGet("/db-test", async (AppDbContext dbContext) =>
 {
     try
@@ -185,14 +192,8 @@ app.MapGet("/db-test", async (AppDbContext dbContext) =>
         return Results.BadRequest(new { connected = false, error = ex.Message });
     }
 });
-// ============================================================
-// 15. Root Route – Fixes 404 on "/"
-// ============================================================
-app.MapGet("/", () => "Prime Marketplace API is running!");
 
-// ============================================================
-// 16. Health Check Endpoint
-// ============================================================
+app.MapGet("/", () => "Prime Marketplace API is running!");
 app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = DateTime.UtcNow }));
 
 // ============================================================
