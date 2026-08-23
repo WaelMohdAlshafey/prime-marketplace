@@ -39,9 +39,11 @@
 		<ProjectReference Include="..\Marketplace.Infrastructure\Marketplace.Infrastructure.csproj" />
 	</ItemGroup>
 
-	<!-- ✅ NEW: Include wwwroot content in the publish output -->
+	<!-- ❌ REMOVE this entire ItemGroup – the SDK already includes wwwroot automatically -->
+	<!--
 	<ItemGroup>
 		<Content Include="wwwroot\**" CopyToOutputDirectory="PreserveNewest" />
 	</ItemGroup>
+	-->
 
 </Project>
