@@ -26,27 +26,20 @@ public class AdminController : ControllerBase
     {
         try
         {
-            // Ensure StoreSettings exists
             await EnsureStoreSettingsExists();
 
-            // --- Safe queries with fallbacks ---
             var totalUsers = await _context.Users.CountAsync();
             var totalProducts = await _context.Products.CountAsync(p => p.IsActive);
             var totalOrders = await _context.Orders.CountAsync();
 
-            // Safe total revenue: try to sum as decimal, fallback to 0
-            decimal totalRevenue = 0;
-            try
-            {
-                var revenueQuery = _context.Orders
-                    .Where(o => o.CurrentStatus == "Paid")
-                    .Select(o => o.TotalAmount);
-                var revenueList = await revenueQuery.ToListAsync();
-                totalRevenue = revenueList
-                    .Select(v => v != null ? decimal.TryParse(v.ToString(), out var d) ? d : 0 : 0)
-                    .Sum();
-            }
-            catch { totalRevenue = 0; }
+            // Total revenue – parse in memory
+            var revenueList = await _context.Orders
+                .Where(o => o.CurrentStatus == "Paid")
+                .Select(o => o.TotalAmount)
+                .ToListAsync();
+            var totalRevenue = revenueList
+                .Select(v => decimal.TryParse(v?.ToString(), out var d) ? d : 0)
+                .Sum();
 
             var totalSubscribers = await _context.NewsletterSubscriptions
                 .CountAsync(ns => ns.IsActive);
@@ -54,7 +47,6 @@ public class AdminController : ControllerBase
             var pendingOrders = await _context.Orders
                 .CountAsync(o => o.CurrentStatus == "Pending");
 
-            // Recent Orders
             var recentOrders = await _context.Orders
                 .OrderByDescending(o => o.OrderDate)
                 .Take(10)
@@ -78,17 +70,22 @@ public class AdminController : ControllerBase
                 .Select(g => new { Status = g.Key, Count = g.Count() })
                 .ToListAsync();
 
-            var monthlyRevenue = await _context.Orders
+            // Monthly revenue – parse in memory to avoid Sum() casting issues
+            var monthlyData = await _context.Orders
                 .Where(o => o.CurrentStatus == "Paid" && o.OrderDate >= DateTime.UtcNow.AddMonths(-12))
-                .GroupBy(o => new { o.OrderDate.Year, o.OrderDate.Month })
+                .Select(o => new { o.OrderDate.Year, o.OrderDate.Month, o.TotalAmount })
+                .ToListAsync();
+
+            var monthlyRevenue = monthlyData
+                .GroupBy(o => new { o.Year, o.Month })
                 .Select(g => new
                 {
                     Year = g.Key.Year,
                     Month = g.Key.Month,
-                    Total = g.Sum(o => o.TotalAmount)
+                    Total = g.Sum(o => decimal.TryParse(o.TotalAmount?.ToString(), out var d) ? d : 0)
                 })
                 .OrderBy(x => x.Year).ThenBy(x => x.Month)
-                .ToListAsync();
+                .ToList();
 
             return Ok(new
             {
@@ -106,7 +103,6 @@ public class AdminController : ControllerBase
         }
         catch (Exception ex)
         {
-            // Return a detailed error so you can see what went wrong
             return StatusCode(500, new
             {
                 message = "Failed to load dashboard data.",
@@ -145,34 +141,43 @@ public class AdminController : ControllerBase
     {
         try
         {
+            // Load orders first
             var orders = await _context.Orders
                 .OrderByDescending(o => o.OrderDate)
-                .Select(o => new
-                {
-                    o.Id,
-                    o.UserId,
-                    o.OrderDate,
-                    o.TotalAmount,
-                    Status = o.CurrentStatus,
-                    o.ShippingAddress,
-                    o.PaymentMethod,
-                    o.IsPaymentConfirmed,
-                    o.PaymentConfirmedAt,
-                    Items = _context.OrderItems
-                        .Where(oi => oi.OrderId == o.Id)
-                        .Select(oi => new
-                        {
-                            oi.ProductId,
-                            oi.ProductName,
-                            oi.UnitPrice,
-                            oi.Quantity,
-                            Subtotal = oi.UnitPrice * oi.Quantity
-                        })
-                        .ToList()
-                })
                 .ToListAsync();
 
-            return Ok(orders);
+            // Load all order items in one go
+            var orderIds = orders.Select(o => o.Id).ToList();
+            var allOrderItems = await _context.OrderItems
+                .Where(oi => orderIds.Contains(oi.OrderId))
+                .ToListAsync();
+
+            // Build the result in memory
+            var result = orders.Select(o => new
+            {
+                o.Id,
+                o.UserId,
+                o.OrderDate,
+                TotalAmount = decimal.TryParse(o.TotalAmount?.ToString(), out var ta) ? ta : 0,
+                Status = o.CurrentStatus,
+                o.ShippingAddress,
+                o.PaymentMethod,
+                o.IsPaymentConfirmed,
+                o.PaymentConfirmedAt,
+                Items = allOrderItems
+                    .Where(oi => oi.OrderId == o.Id)
+                    .Select(oi => new
+                    {
+                        oi.ProductId,
+                        oi.ProductName,
+                        UnitPrice = decimal.TryParse(oi.UnitPrice?.ToString(), out var up) ? up : 0,
+                        oi.Quantity,
+                        Subtotal = (decimal.TryParse(oi.UnitPrice?.ToString(), out var up2) ? up2 : 0) * oi.Quantity
+                    })
+                    .ToList()
+            }).ToList();
+
+            return Ok(result);
         }
         catch (Exception ex)
         {

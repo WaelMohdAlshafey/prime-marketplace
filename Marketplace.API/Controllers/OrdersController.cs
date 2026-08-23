@@ -100,9 +100,47 @@ public class OrdersController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetOrders()
     {
-        var userId = GetUserId();
-        var orders = await _orderService.GetOrdersAsync(userId);
-        return Ok(orders);
+        try
+        {
+            var orders = await _context.Orders
+                .OrderByDescending(o => o.OrderDate)
+                .ToListAsync();
+
+            var orderIds = orders.Select(o => o.Id).ToList();
+            var allOrderItems = await _context.OrderItems
+                .Where(oi => orderIds.Contains(oi.OrderId))
+                .ToListAsync();
+
+            var result = orders.Select(o => new
+            {
+                o.Id,
+                o.UserId,
+                o.OrderDate,
+                TotalAmount = decimal.TryParse(o.TotalAmount?.ToString(), out var ta) ? ta : 0,
+                Status = o.CurrentStatus,
+                o.ShippingAddress,
+                o.PaymentMethod,
+                o.IsPaymentConfirmed,
+                o.PaymentConfirmedAt,
+                Items = allOrderItems
+                    .Where(oi => oi.OrderId == o.Id)
+                    .Select(oi => new
+                    {
+                        oi.ProductId,
+                        oi.ProductName,
+                        UnitPrice = decimal.TryParse(oi.UnitPrice?.ToString(), out var up) ? up : 0,
+                        oi.Quantity,
+                        Subtotal = (decimal.TryParse(oi.UnitPrice?.ToString(), out var up2) ? up2 : 0) * oi.Quantity
+                    })
+                    .ToList()
+            }).ToList();
+
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "Failed to load orders.", error = ex.Message });
+        }
     }
 
     [HttpGet("{id}")]
@@ -266,16 +304,20 @@ public class OrdersController : ControllerBase
     [Authorize(Roles = "Admin,Vendor,Employee")]
     public async Task<IActionResult> GetAllOrdersForAdmin()
     {
-        var orders = await _context.Orders
-            .Include(o => o.OrderItems)
-            .OrderByDescending(o => o.OrderDate)
-            .Select(o => new
+        try
+        {
+            var orders = await _context.Orders
+                .Include(o => o.OrderItems)
+                .OrderByDescending(o => o.OrderDate)
+                .ToListAsync();
+
+            var result = orders.Select(o => new
             {
                 o.Id,
                 o.UserId,
                 o.OrderDate,
-                o.TotalAmount,
-                Status = o.CurrentStatus, // ✅ Frontend expects "status"
+                TotalAmount = decimal.TryParse(o.TotalAmount?.ToString(), out var ta) ? ta : 0,
+                Status = o.CurrentStatus,
                 o.ShippingAddress,
                 o.PaymentMethod,
                 o.IsPaymentConfirmed,
@@ -284,14 +326,18 @@ public class OrdersController : ControllerBase
                 {
                     oi.ProductId,
                     oi.ProductName,
-                    oi.UnitPrice,
+                    UnitPrice = decimal.TryParse(oi.UnitPrice?.ToString(), out var up) ? up : 0,
                     oi.Quantity,
-                    Subtotal = oi.UnitPrice * oi.Quantity
+                    Subtotal = (decimal.TryParse(oi.UnitPrice?.ToString(), out var up2) ? up2 : 0) * oi.Quantity
                 })
-            })
-            .ToListAsync();
+            });
 
-        return Ok(orders);
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "Failed to load orders.", error = ex.Message });
+        }
     }
 }
 
