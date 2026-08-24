@@ -9,7 +9,7 @@ import CategoryGrid from '@/components/CategoryGrid';
 import FilterSidebar from '@/components/Filters/FilterSidebar';
 import ProductCard from '@/components/ProductCard';
 import ProductDetailModal from '@/components/ProductDetailModal';
-import { ShoppingBag, Shield, Truck, Headphones } from 'lucide-react';
+import { ShoppingBag, Shield, Truck, Headphones, Clock, Sparkles, TrendingUp, Award } from 'lucide-react';
 
 export default function Home() {
     const { t } = useTranslation('common');
@@ -66,103 +66,139 @@ export default function Home() {
     };
 
     const handleCardClick = (productId: number) => {
-        console.log('🖱️ handleCardClick called with productId:', productId);
         setSelectedProductId(productId);
         setIsModalOpen(true);
-        console.log('🔓 isModalOpen set to true, selectedProductId:', productId);
     };
 
-    const services = [
-        { icon: <Truck className="w-8 h-8" />, title: 'شحن سريع', subtitle: 'توصيل خلال 2-5 أيام' },
-        { icon: <Shield className="w-8 h-8" />, title: 'ضمان الجودة', subtitle: 'منتجات أصلية 100%' },
-        { icon: <Headphones className="w-8 h-8" />, title: 'دعم على مدار الساعة', subtitle: 'خدمة عملاء 24/7' },
-        { icon: <ShoppingBag className="w-8 h-8" />, title: 'توصيل مجاني', subtitle: 'للطلبات فوق 100$' },
+    // Premium Trust Badges
+    const trustBadges = [
+        { icon: Truck, label: 'شحن سريع', sub: 'توصيل خلال 2-5 أيام', color: 'bg-blue-50 text-blue-600' },
+        { icon: Shield, label: 'ضمان الجودة', sub: 'منتجات أصلية 100%', color: 'bg-green-50 text-green-600' },
+        { icon: Headphones, label: 'دعم 24/7', sub: 'خدمة عملاء على مدار الساعة', color: 'bg-purple-50 text-purple-600' },
+        { icon: Clock, label: 'إرجاع مجاني', sub: '30 يوم لإرجاع المنتج', color: 'bg-amber-50 text-amber-600' },
     ];
 
     return (
-        <div className="container">
+        <div className="bg-background min-h-screen">
             <HeroBanner />
-            <CategoryGrid />
 
-            <div className="service-banners">
-                {services.map((service, index) => (
-                    <div key={index} className="service-banner">
-                        <span className="icon">{service.icon}</span>
-                        <h3 className="title">{service.title}</h3>
-                        <p className="subtitle">{service.subtitle}</p>
-                    </div>
-                ))}
-            </div>
-
-            <div className="main-layout">
-                <FilterSidebar
-                    onApplyFilters={handleApplyFilters}
-                    onResetFilters={handleResetFilters}
-                />
-
-                <div className="flex-1">
-                    <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-2xl font-bold text-[#1A1A1A] flex items-center gap-2">
-                            <ShoppingBag className="w-6 h-6 text-[#0A6C44]" />
-                            {t('featuredProducts')}
-                        </h2>
-                        <span className="text-sm text-[#757575]">
-                            {products.length} {t('productCount')}
-                        </span>
-                    </div>
-
-                    {loading ? (
-                        <div className="product-grid">
-                            {[...Array(8)].map((_, i) => (
-                                <div key={i} className="bg-white rounded-card shadow-card p-4 animate-pulse">
-                                    <div className="w-full h-48 bg-gray-200 rounded-md"></div>
-                                    <div className="h-4 bg-gray-200 rounded mt-3 w-3/4"></div>
-                                    <div className="h-3 bg-gray-200 rounded mt-2 w-1/2"></div>
-                                    <div className="h-6 bg-gray-200 rounded mt-3 w-1/3"></div>
-                                </div>
-                            ))}
-                        </div>
-                    ) : error ? (
-                        <div className="text-center py-20 bg-white rounded-card shadow-card">
-                            <p className="text-red-500">{error}</p>
-                            <button
-                                onClick={() => fetchProducts()}
-                                className="mt-4 bg-[#0A6C44] text-white px-6 py-2 rounded-button hover:bg-[#06452A] transition"
+            {/* Trust Badges */}
+            <div className="container mx-auto px-4 -mt-4 md:-mt-6 relative z-10">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+                    {trustBadges.map((badge, index) => {
+                        const Icon = badge.icon;
+                        return (
+                            <div
+                                key={index}
+                                className={`${badge.color} rounded-xl shadow-soft p-3 md:p-4 text-center transition-all duration-300 hover:shadow-card-hover hover:-translate-y-1 cursor-default border border-white/50`}
                             >
-                                إعادة المحاولة
-                            </button>
-                        </div>
-                    ) : products.length === 0 ? (
-                        <div className="text-center py-20 bg-white rounded-card shadow-card">
-                            <p className="text-[#757575]">لا توجد منتجات تطابق الفلاتر المحددة</p>
-                            <button
-                                onClick={handleResetFilters}
-                                className="mt-4 bg-[#0A6C44] text-white px-6 py-2 rounded-button hover:bg-[#06452A] transition"
-                            >
-                                إعادة تعيين الفلاتر
-                            </button>
-                        </div>
-                    ) : (
-                        <div className="product-grid">
-                            {products.map((product) => (
-                                <ProductCard
-                                    key={product.id}
-                                    product={product}
-                                    onCardClick={() => handleCardClick(product.id)} // ✅ passes productId
-                                />
-                            ))}
-                        </div>
-                    )}
+                                <Icon className="w-5 h-5 md:w-6 md:h-6 mx-auto mb-1 md:mb-2" />
+                                <p className="text-xs md:text-sm font-bold text-text">{badge.label}</p>
+                                <p className="text-[10px] md:text-xs text-text-muted">{badge.sub}</p>
+                            </div>
+                        );
+                    })}
                 </div>
             </div>
 
+            {/* Main Content with Filters */}
+            <div className="container mx-auto px-4 py-6 md:py-10">
+                <div className="flex flex-col md:flex-row gap-6">
+                    {/* Sidebar */}
+                    <div className="md:w-72 flex-shrink-0">
+                        <FilterSidebar
+                            onApplyFilters={handleApplyFilters}
+                            onResetFilters={handleResetFilters}
+                        />
+                    </div>
+
+                    {/* Products */}
+                    <div className="flex-1">
+                        <div className="flex items-center justify-between mb-6">
+                            <div>
+                                <h2 className="text-2xl md:text-3xl font-bold text-text flex items-center gap-2">
+                                    <Sparkles className="w-6 h-6 text-primary" />
+                                    {t('featuredProducts')}
+                                </h2>
+                                <p className="text-sm text-text-muted mt-1">{t('featuredProductsSub')}</p>
+                            </div>
+                            <span className="text-sm text-primary font-medium bg-primary/10 px-4 py-1 rounded-pill">
+                                {products.length} {t('productCount')}
+                            </span>
+                        </div>
+
+                        {loading ? (
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                {[...Array(6)].map((_, i) => (
+                                    <div key={i} className="bg-white rounded-2xl shadow-soft p-4 animate-pulse">
+                                        <div className="w-full aspect-square bg-gray-200 rounded-xl"></div>
+                                        <div className="h-4 bg-gray-200 rounded mt-3 w-3/4"></div>
+                                        <div className="h-6 bg-gray-200 rounded mt-2 w-1/3"></div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : error ? (
+                            <div className="text-center py-12 bg-white rounded-2xl shadow-soft">
+                                <p className="text-red-500">{error}</p>
+                                <button
+                                    onClick={() => fetchProducts()}
+                                    className="mt-4 bg-primary text-white px-6 py-2 rounded-pill hover:bg-primary-dark transition"
+                                >
+                                    إعادة المحاولة
+                                </button>
+                            </div>
+                        ) : products.length === 0 ? (
+                            <div className="text-center py-12 bg-white rounded-2xl shadow-soft">
+                                <ShoppingBag className="w-12 h-12 text-text-muted mx-auto mb-3" />
+                                <p className="text-text-muted">لا توجد منتجات تطابق الفلاتر المحددة</p>
+                                <button
+                                    onClick={handleResetFilters}
+                                    className="mt-4 bg-primary text-white px-6 py-2 rounded-pill hover:bg-primary-dark transition"
+                                >
+                                    إعادة تعيين الفلاتر
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-5">
+                                {products.map((product) => (
+                                    <ProductCard
+                                        key={product.id}
+                                        product={product}
+                                        onCardClick={() => handleCardClick(product.id)}
+                                    />
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+
+            {/* Premium CTA Banner */}
+            <section className="container mx-auto px-4 py-8 md:py-12">
+                <div className="relative bg-gradient-to-br from-primary to-primary-dark rounded-2xl p-6 md:p-10 text-white overflow-hidden">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/3"></div>
+                    <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/4"></div>
+
+                    <div className="relative z-10 text-center md:text-right">
+                        <Award className="w-10 h-10 md:w-14 md:h-14 text-secondary mx-auto md:mx-0 mb-3" />
+                        <h2 className="text-2xl md:text-4xl font-bold">انضم إلى برايم اليوم</h2>
+                        <p className="text-white/80 text-sm md:text-base max-w-2xl mx-auto md:mx-0 mt-2">
+                            احصل على أفضل المنتجات بأسعار تنافسية وشحن سريع لجميع المحافظات.
+                            اشترك الآن واستمتع بتجربة تسوق فاخرة.
+                        </p>
+                        <button className="mt-4 bg-secondary hover:bg-secondary-dark text-white px-6 md:px-8 py-2 md:py-3 rounded-pill font-semibold transition hover:shadow-lg hover:-translate-y-1 inline-flex items-center gap-2 text-sm md:text-base">
+                            <TrendingUp className="w-4 h-4" />
+                            اكتشف المزيد
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            {/* Product Detail Modal */}
             <ProductDetailModal
                 productId={selectedProductId || 0}
                 isOpen={isModalOpen}
-                onClose={() => {
-                    console.log('🔒 Modal closed');
-                    setIsModalOpen(false);
-                }}
+                onClose={() => setIsModalOpen(false)}
             />
         </div>
     );
