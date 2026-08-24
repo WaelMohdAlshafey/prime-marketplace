@@ -23,7 +23,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import api from '@/lib/api';
 
 // ============================================================
-// TOP BAR (free shipping, track order, currency, support)
+// TOP BAR
 // ============================================================
 const TopBar = () => {
     const { t } = useTranslation('common');
@@ -52,7 +52,7 @@ const TopBar = () => {
 };
 
 // ============================================================
-// MAIN HEADER with two dropdown menus
+// MAIN HEADER
 // ============================================================
 const MainHeader = ({ user }: { user: AuthResponse | null }) => {
     const { t } = useTranslation('common');
@@ -103,7 +103,8 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
                                 initial={{ opacity: 0, y: -10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: -10 }}
-                                className="absolute left-0 top-full mt-2 w-56 bg-surface rounded-xl shadow-strong border border-border py-2 z-50"
+                                // ✅ FIX: prevent overflow
+                                className="absolute left-0 top-full mt-2 w-56 max-w-[calc(100vw-2rem)] max-h-[80vh] overflow-y-auto bg-surface rounded-xl shadow-strong border border-border py-2 z-50"
                             >
                                 <Link href="/" className="block px-4 py-2 text-text hover:bg-background transition" onClick={() => setLeftMenuOpen(false)}>
                                     {t('home')}
@@ -156,7 +157,7 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
                         </motion.span>
                     </Link>
 
-                    {/* Right user menu */}
+                    {/* Right user menu - FIXED: added max-width & overflow */}
                     <div className="relative" onClick={(e) => e.stopPropagation()}>
                         <button
                             onClick={() => setRightMenuOpen(!rightMenuOpen)}
@@ -180,7 +181,8 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
                                     initial={{ opacity: 0, y: -10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: -10 }}
-                                    className="absolute right-0 top-full mt-2 w-56 bg-surface rounded-xl shadow-strong border border-border py-2 z-50"
+                                    // ✅ FIX: prevent overflow & keep within screen
+                                    className="absolute right-0 top-full mt-2 w-56 max-w-[calc(100vw-2rem)] max-h-[80vh] overflow-y-auto bg-surface rounded-xl shadow-strong border border-border py-2 z-50"
                                 >
                                     {!user ? (
                                         <>
