@@ -1,5 +1,5 @@
 ﻿/* ============================================================
-   PREVENT HORIZONTAL SCROLL – FIXES OVERFLOW ISSUES
+   PREVENT HORIZONTAL SCROLL
    ============================================================ */
 html,
 body {
@@ -15,7 +15,8 @@ body {
 }
 
 /* ============================================================
-   NEMOCARE-STYLE THEME – Clean, Trustworthy, Premium
+   NEMOCARE-INSPIRED PREMIUM THEME
+   Soft, Trustworthy, Premium
    ============================================================ */
 
 @tailwind base;
@@ -23,21 +24,21 @@ body {
 @tailwind utilities;
 
 /* ============================================================
-   ROOT THEME VARIABLES
+   ROOT THEME VARIABLES – Nemocare Palette
    ============================================================ */
 :root {
-    /* ===== Primary Colors (Teal) ===== */
+    /* ===== Primary Colors (Teal – Trust & Cleanliness) ===== */
     --color-primary: #4E8C9E;
     --color-primary-dark: #2F5A6B;
     --color-primary-light: #7AB8C9;
     --color-primary-bg: #E8F4F7;
-    /* ===== Secondary Colors (Terracotta/Warm Orange) ===== */
+    /* ===== Secondary Colors (Terracotta – Friendly & Warm) ===== */
     --color-secondary: #D27736;
     --color-secondary-dark: #B05E2A;
     --color-secondary-light: #E8B48C;
     --color-secondary-bg: #FDF3E8;
     /* ===== Background & Surfaces ===== */
-    --color-background: #F8F9FA;
+    --color-background: #F8F8F8;
     --color-surface: #FFFFFF;
     --color-surface-alt: #F1F3F5;
     /* ===== Text Colors ===== */
@@ -47,11 +48,11 @@ body {
     /* ===== Borders & Shadows ===== */
     --color-border: #E5E7EB;
     --color-border-light: #F0F0F0;
-    --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.06);
-    --shadow-card-hover: 0 12px 40px rgba(0, 0, 0, 0.10);
+    --shadow-card: 0 4px 20px rgba(78, 140, 158, 0.08);
+    --shadow-card-hover: 0 12px 40px rgba(78, 140, 158, 0.15);
     --shadow-dropdown: 0 8px 30px rgba(0, 0, 0, 0.08);
-    --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.06);
-    --shadow-strong: 0 12px 40px rgba(0, 0, 0, 0.10);
+    --shadow-soft: 0 4px 20px rgba(78, 140, 158, 0.06);
+    --shadow-strong: 0 12px 40px rgba(78, 140, 158, 0.15);
     /* ===== Buttons ===== */
     --color-button-primary-bg: #4E8C9E;
     --color-button-primary-hover: #2F5A6B;
@@ -59,9 +60,6 @@ body {
     --color-button-secondary-bg: #D27736;
     --color-button-secondary-hover: #B05E2A;
     --color-button-secondary-text: #FFFFFF;
-    --color-button-outline-bg: transparent;
-    --color-button-outline-hover: #4E8C9E;
-    --color-button-outline-text: #4E8C9E;
     /* ===== Navbar ===== */
     --color-navbar-bg: #FFFFFF;
     --color-navbar-text: #2F5A6B;
@@ -75,8 +73,8 @@ body {
     --color-card-bg: #FFFFFF;
     --color-card-border: #E5E7EB;
     /* ===== Badges ===== */
-    --color-badge-sale: #D27736;
-    --color-badge-new: #4E8C9E;
+    --color-badge-sale: #ff4e00;
+    --color-badge-new: #109533;
     --color-badge-sold: #8A8A9A;
     /* ===== Spacing ===== */
     --radius-sm: 6px;
@@ -86,7 +84,6 @@ body {
     --radius-card: 12px;
     /* ===== Typography ===== */
     --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    /* ===== Star Rating ===== */
     --star-gold: #F5A623;
 }
 
@@ -169,13 +166,13 @@ body {
 }
 
 /* ============================================================
-   TOP BAR
+   TOP BAR – Premium Teal Dark
    ============================================================ */
 .top-bar {
     background: var(--color-primary-dark);
     color: #FFFFFF;
     font-size: 12px;
-    padding: 6px 0;
+    padding: 8px 0;
 }
 
     .top-bar .container {
@@ -191,16 +188,16 @@ body {
     }
 
         .top-bar a:hover {
-            opacity: 0.7;
+            opacity: 0.8;
         }
 
     .top-bar .divider {
-        color: rgba(255, 255, 255, 0.3);
+        color: rgba(255, 255, 255, 0.25);
         margin: 0 8px;
     }
 
 /* ============================================================
-   NAVBAR
+   NAVBAR – Clean & Premium
    ============================================================ */
 .navbar {
     background: var(--color-navbar-bg);
@@ -229,13 +226,8 @@ body {
         flex-shrink: 0;
     }
 
-        .navbar .logo svg {
-            width: 32px;
-            height: 32px;
-        }
-
 /* ============================================================
-   SEARCH BAR
+   SEARCH BAR – Premium Style
    ============================================================ */
 .search-bar {
     flex: 1;
@@ -252,7 +244,7 @@ body {
 
     .search-bar:focus-within {
         border-color: var(--color-primary);
-        box-shadow: 0 0 0 3px rgba(78, 140, 158, 0.15);
+        box-shadow: 0 0 0 4px rgba(78, 140, 158, 0.15);
     }
 
     .search-bar input {
@@ -278,7 +270,7 @@ body {
         height: 36px;
         cursor: pointer;
         font-weight: 600;
-        transition: background 0.3s ease;
+        transition: all 0.3s ease;
         display: flex;
         align-items: center;
         gap: 8px;
@@ -287,6 +279,7 @@ body {
 
         .search-bar .search-btn:hover {
             background: var(--color-button-primary-hover);
+            transform: scale(1.02);
         }
 
 /* ============================================================
@@ -328,19 +321,11 @@ body {
         justify-content: center;
     }
 
-    .nav-icons .user-info {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 14px;
-        color: var(--color-text);
-    }
-
 /* ============================================================
-   HERO BANNER – BACKGROUND IS HARDCODED TO BRIGHT GRAY
+   HERO BANNER – Premium & Trustworthy
    ============================================================ */
 .hero {
-    background: #E8F0F4; /* FIXED bright gray – does NOT change with theme */
+    background: linear-gradient(135deg, #E8F4F7 0%, #F8F8F8 100%);
     border-radius: var(--radius-lg);
     padding: 48px 48px 48px 64px;
     margin: 24px 0;
@@ -360,7 +345,7 @@ body {
         width: 60%;
         height: 200%;
         background: radial-gradient(ellipse at center, var(--color-primary-light) 0%, transparent 70%);
-        opacity: 0.15;
+        opacity: 0.12;
         pointer-events: none;
     }
 
@@ -439,7 +424,7 @@ body {
     }
 
 /* ============================================================
-   CATEGORY GRID
+   CATEGORY GRID – Modern & Clean
    ============================================================ */
 .category-section {
     padding: 24px 0;
@@ -480,12 +465,6 @@ body {
         color: var(--color-text);
     }
 
-    .category-card .subtitle {
-        font-size: 12px;
-        color: var(--color-text-muted);
-        margin-top: 2px;
-    }
-
 /* ============================================================
    PRODUCT GRID
    ============================================================ */
@@ -496,20 +475,22 @@ body {
 }
 
 /* ============================================================
-   PRODUCT CARD – All colors are dynamic via Tailwind classes
+   PRODUCT CARD – Premium & Attractive
    ============================================================ */
 .product-card {
     background: var(--color-card-bg);
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-card);
     padding: 16px;
     border: 1px solid var(--color-card-border);
     transition: all 0.3s ease;
     position: relative;
+    box-shadow: var(--shadow-soft);
 }
 
     .product-card:hover {
         box-shadow: var(--shadow-card-hover);
-        transform: translateY(-4px);
+        transform: translateY(-6px);
+        border-color: var(--color-primary-light);
     }
 
     .product-card .product-image {
@@ -574,8 +555,37 @@ body {
             font-size: 14px;
         }
 
+    .product-card .add-to-cart-btn {
+        width: 100%;
+        background: var(--color-button-primary-bg);
+        color: var(--color-button-primary-text);
+        border: none;
+        padding: 10px;
+        border-radius: var(--radius-pill);
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+        .product-card .add-to-cart-btn:hover {
+            background: var(--color-button-primary-hover);
+            transform: scale(1.02);
+        }
+
+        .product-card .add-to-cart-btn:disabled {
+            background: var(--color-border);
+            color: var(--color-text-muted);
+            cursor: not-allowed;
+            transform: none;
+        }
+
 /* ============================================================
-   TRUST BADGES / SERVICE BANNERS
+   TRUST BADGES – Premium Service Banners
    ============================================================ */
 .service-banners {
     display: grid;
@@ -596,6 +606,7 @@ body {
     .service-banner:hover {
         box-shadow: var(--shadow-card-hover);
         transform: translateY(-2px);
+        border-color: var(--color-primary-light);
     }
 
     .service-banner .icon {
@@ -617,7 +628,7 @@ body {
     }
 
 /* ============================================================
-   FOOTER
+   FOOTER – Premium Dark
    ============================================================ */
 .footer {
     background: var(--color-footer-bg);
@@ -654,12 +665,35 @@ body {
 
     .footer .copyright {
         grid-column: 1 / -1;
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
         padding-top: 20px;
         margin-top: 20px;
         text-align: center;
         font-size: 13px;
     }
+
+/* ============================================================
+   BADGES – Sale & New
+   ============================================================ */
+.badge-sale {
+    background: var(--color-badge-sale);
+    color: #FFFFFF;
+    padding: 2px 10px;
+    border-radius: var(--radius-pill);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.badge-new {
+    background: var(--color-badge-new);
+    color: #FFFFFF;
+    padding: 2px 10px;
+    border-radius: var(--radius-pill);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
 
 /* ============================================================
    RESPONSIVE
