@@ -201,5 +201,13 @@
   "invoiceItems": "Items",
   "invoiceTotal": "Total",
   "invoicePrint": "🖨️ Print Invoice",
-  "profile": "الملف الشخصي"
+
+  "profile": "Profile",
+
+  "help": "User Guide",
+  "helpTitle": "📘 Complete User Guide",
+  "helpCustomer": "👤 Customer",
+  "helpVendor": "🏪 Vendor",
+  "helpEmployee": "👔 Employee",
+  "helpAdmin": "⚙️ Admin"
 }

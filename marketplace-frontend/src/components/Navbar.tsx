@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import Link from 'next/link';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
@@ -16,16 +16,14 @@ import {
     MagnifyingGlassIcon,
     CurrencyDollarIcon,
     Bars3Icon,
-    XMarkIcon,
-    UserPlusIcon,
-    Cog6ToothIcon,
+    ChevronDownIcon,
 } from '@heroicons/react/24/outline';
 import { AuthResponse } from '@/types';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import api from '@/lib/api';
 
 // ============================================================
-// TOP BAR
+// TOP BAR (free shipping, track order, currency, support)
 // ============================================================
 const TopBar = () => {
     const { t } = useTranslation('common');
@@ -54,7 +52,7 @@ const TopBar = () => {
 };
 
 // ============================================================
-// MAIN HEADER
+// MAIN HEADER with two dropdown menus
 // ============================================================
 const MainHeader = ({ user }: { user: AuthResponse | null }) => {
     const { t } = useTranslation('common');
@@ -63,6 +61,9 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
     const { totalItems } = useCart();
     const { totalFavorites } = useWishlist();
     const { cartIconRef } = useCartIconRef();
+    const [leftMenuOpen, setLeftMenuOpen] = useState(false);
+    const [rightMenuOpen, setRightMenuOpen] = useState(false);
+    const { logout } = useAuth();
 
     useEffect(() => {
         const handleScroll = () => setIsScrolled(window.scrollY > 20);
@@ -77,9 +78,53 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
         }
     };
 
+    // Close menus on outside click
+    useEffect(() => {
+        const closeMenus = () => { setLeftMenuOpen(false); setRightMenuOpen(false); };
+        window.addEventListener('click', closeMenus);
+        return () => window.removeEventListener('click', closeMenus);
+    }, []);
+
     return (
         <div className={`bg-navbar-bg border-b border-navbar-border sticky top-0 z-50 ${isScrolled ? 'shadow-md' : ''}`}>
             <div className="container mx-auto px-4 flex items-center gap-4 py-2">
+                {/* Left hamburger menu */}
+                <div className="relative" onClick={(e) => e.stopPropagation()}>
+                    <button
+                        onClick={() => setLeftMenuOpen(!leftMenuOpen)}
+                        className="p-2 rounded-md hover:bg-background transition text-navbar-text"
+                        aria-label="Main menu"
+                    >
+                        <Bars3Icon className="w-6 h-6" />
+                    </button>
+                    <AnimatePresence>
+                        {leftMenuOpen && (
+                            <motion.div
+                                initial={{ opacity: 0, y: -10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -10 }}
+                                className="absolute left-0 top-full mt-2 w-56 bg-surface rounded-xl shadow-strong border border-border py-2 z-50"
+                            >
+                                <Link href="/" className="block px-4 py-2 text-text hover:bg-background transition" onClick={() => setLeftMenuOpen(false)}>
+                                    {t('home')}
+                                </Link>
+                                <Link href="/stores" className="block px-4 py-2 text-text hover:bg-background transition" onClick={() => setLeftMenuOpen(false)}>
+                                    {t('stores')}
+                                </Link>
+                                <Link href="/offers" className="block px-4 py-2 text-text hover:bg-background transition" onClick={() => setLeftMenuOpen(false)}>
+                                    🔥 {t('offers')}
+                                </Link>
+                                <Link href="/contact" className="block px-4 py-2 text-text hover:bg-background transition" onClick={() => setLeftMenuOpen(false)}>
+                                    {t('contact')}
+                                </Link>
+                                <Link href="/help" className="block px-4 py-2 text-text hover:bg-background transition" onClick={() => setLeftMenuOpen(false)}>
+                                    📘 {t('help')}
+                                </Link>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
+
                 <Logo />
 
                 <form onSubmit={handleSearch} className="flex-1 flex items-center bg-background border border-border rounded-pill h-11 px-1 max-w-[600px] focus-within:border-primary focus-within:shadow-[0_0_0_3px_rgba(78,140,158,0.15)] transition">
@@ -96,7 +141,7 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
                     </button>
                 </form>
 
-                <div className="flex items-center gap-4 flex-shrink-0">
+                <div className="flex items-center gap-3 flex-shrink-0">
                     <motion.button whileHover={{ scale: 1.1 }} className="text-navbar-text hover:text-navbar-hover transition relative hidden sm:block">
                         <HeartIcon className="w-6 h-6" />
                         <span className="absolute -top-1.5 -right-1.5 bg-secondary text-white text-[10px] font-bold w-[18px] h-[18px] rounded-full flex items-center justify-center">
@@ -111,174 +156,94 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
                         </motion.span>
                     </Link>
 
-                    {user && user.role === 'Admin' && (
-                        <Link href="/admin" className="text-navbar-text hover:text-navbar-hover transition">
-                            <Cog6ToothIcon className="w-6 h-6" />
-                        </Link>
-                    )}
-
-                    {user ? (
-                        <div className="hidden sm:flex items-center gap-2 text-text">
-                            <span className="font-medium">{user.username}</span>
-                            <UserIcon className="w-5 h-5" />
-                        </div>
-                    ) : (
-                        <>
-                            <Link href="/auth/register" className="text-sm font-medium text-navbar-text hover:text-navbar-hover transition flex items-center gap-1">
-                                <UserPlusIcon className="w-5 h-5" />
-                                <span className="hidden sm:inline">{t('registerTitle')}</span>
-                            </Link>
-                            <Link href="/auth/login" className="hidden sm:block text-navbar-text hover:text-navbar-hover transition">
+                    {/* Right user menu */}
+                    <div className="relative" onClick={(e) => e.stopPropagation()}>
+                        <button
+                            onClick={() => setRightMenuOpen(!rightMenuOpen)}
+                            className="flex items-center gap-1 p-2 rounded-md hover:bg-background transition text-navbar-text"
+                            aria-label="User menu"
+                        >
+                            {user ? (
+                                <>
+                                    <span className="hidden sm:inline text-sm font-medium">{user.username}</span>
+                                    <UserIcon className="w-6 h-6" />
+                                </>
+                            ) : (
                                 <UserIcon className="w-6 h-6" />
-                            </Link>
-                        </>
-                    )}
-                </div>
-            </div>
-        </div>
-    );
-};
+                            )}
+                            <ChevronDownIcon className="w-4 h-4" />
+                        </button>
 
-// ============================================================
-// NAV MENU
-// ============================================================
-const NavMenu = ({ categories, loading, user, logout }: { categories: string[]; loading: boolean; user: AuthResponse | null; logout: () => void }) => {
-    const { t } = useTranslation('common');
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-    return (
-        <div className="bg-surface border-b border-border shadow-sm">
-            <div className="container mx-auto px-4">
-                <div className="flex items-center justify-between gap-6 py-2.5">
-                    <div className="flex items-center gap-6 overflow-x-auto whitespace-nowrap text-sm scrollbar-hide">
-                        <Link href="/" className="text-navbar-text font-semibold hover:text-navbar-hover transition border-b-2 border-primary pb-1">
-                            {t('home')}
-                        </Link>
-                        {loading ? (
-                            <span className="text-text-muted">Loading categories…</span>
-                        ) : (
-                            categories.map((cat) => (
-                                <Link key={cat} href={`/${cat}`} className="text-text-muted hover:text-navbar-hover transition pb-1">
-                                    {cat.replace(/-/g, ' ')}
-                                </Link>
-                            ))
-                        )}
-                        <Link href="/stores" className="text-text-muted hover:text-navbar-hover transition pb-1">
-                            {t('stores')}
-                        </Link>
-                        <Link href="/offers" className="text-secondary font-medium hover:text-secondary-dark transition pb-1">
-                            🔥 {t('offers')}
-                        </Link>
-                        <Link href="/contact" className="text-text-muted hover:text-navbar-hover transition pb-1">
-                            {t('contact')}
-                        </Link>
+                        <AnimatePresence>
+                            {rightMenuOpen && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                    className="absolute right-0 top-full mt-2 w-56 bg-surface rounded-xl shadow-strong border border-border py-2 z-50"
+                                >
+                                    {!user ? (
+                                        <>
+                                            <Link href="/auth/login" className="block px-4 py-2 text-text hover:bg-background transition" onClick={() => setRightMenuOpen(false)}>
+                                                {t('loginTitle')}
+                                            </Link>
+                                            <Link href="/auth/register" className="block px-4 py-2 text-text hover:bg-background transition" onClick={() => setRightMenuOpen(false)}>
+                                                {t('registerTitle')}
+                                            </Link>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Link href="/cart" className="block px-4 py-2 text-text hover:bg-background transition" onClick={() => setRightMenuOpen(false)}>
+                                                🛒 {t('cart')}
+                                            </Link>
+                                            <Link href="/orders" className="block px-4 py-2 text-text hover:bg-background transition" onClick={() => setRightMenuOpen(false)}>
+                                                📋 {t('orders')}
+                                            </Link>
+                                            <Link href="/suggest" className="block px-4 py-2 text-text hover:bg-background transition" onClick={() => setRightMenuOpen(false)}>
+                                                💡 Suggest
+                                            </Link>
+                                            {(user.role === 'Vendor' || user.role === 'Admin') && (
+                                                <Link href="/vendor/dashboard" className="block px-4 py-2 text-text hover:bg-background transition" onClick={() => setRightMenuOpen(false)}>
+                                                    📊 {t('dashboard')}
+                                                </Link>
+                                            )}
+                                            {(user.role === 'Vendor' || user.role === 'Admin' || user.role === 'Employee') && (
+                                                <Link href="/admin/orders" className="block px-4 py-2 text-text hover:bg-background transition" onClick={() => setRightMenuOpen(false)}>
+                                                    📦 Manage Orders
+                                                </Link>
+                                            )}
+                                            {user.role === 'Admin' && (
+                                                <>
+                                                    <Link href="/admin/users" className="block px-4 py-2 text-text hover:bg-background transition" onClick={() => setRightMenuOpen(false)}>
+                                                        👥 {t('users')}
+                                                    </Link>
+                                                    <Link href="/admin" className="block px-4 py-2 text-text hover:bg-background transition" onClick={() => setRightMenuOpen(false)}>
+                                                        ⚙️ {t('admin')}
+                                                    </Link>
+                                                    <Link href="/admin/golden-links" className="block px-4 py-2 text-text hover:bg-background transition" onClick={() => setRightMenuOpen(false)}>
+                                                        🔗 Golden Links
+                                                    </Link>
+                                                </>
+                                            )}
+                                            <Link href="/chat" className="block px-4 py-2 text-text hover:bg-background transition" onClick={() => setRightMenuOpen(false)}>
+                                                💬 Chat
+                                            </Link>
+                                            <Link href="/profile" className="block px-4 py-2 text-text hover:bg-background transition" onClick={() => setRightMenuOpen(false)}>
+                                                👤 {t('profile')}
+                                            </Link>
+                                            <hr className="my-2 border-border" />
+                                            <button
+                                                onClick={() => { logout(); setRightMenuOpen(false); }}
+                                                className="block w-full text-right px-4 py-2 text-red-600 hover:bg-red-50 transition"
+                                            >
+                                                {t('logout')}
+                                            </button>
+                                        </>
+                                    )}
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
                     </div>
-
-                    <button
-                        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                        className="lg:hidden p-1 rounded-md hover:bg-background transition"
-                    >
-                        {mobileMenuOpen ? <XMarkIcon className="w-6 h-6" /> : <Bars3Icon className="w-6 h-6" />}
-                    </button>
-                </div>
-
-                {mobileMenuOpen && (
-                    <div className="lg:hidden py-3 space-y-2 text-right border-t border-border">
-                        <Link href="/" className="block text-text hover:text-navbar-hover transition py-1" onClick={() => setMobileMenuOpen(false)}>
-                            {t('home')}
-                        </Link>
-                        {categories.map((cat) => (
-                            <Link key={cat} href={`/${cat}`} className="block text-text hover:text-navbar-hover transition py-1" onClick={() => setMobileMenuOpen(false)}>
-                                {cat.replace(/-/g, ' ')}
-                            </Link>
-                        ))}
-                        <Link href="/stores" className="block text-text hover:text-navbar-hover transition py-1" onClick={() => setMobileMenuOpen(false)}>
-                            {t('stores')}
-                        </Link>
-                        <Link href="/offers" className="block text-secondary hover:text-secondary-dark transition py-1" onClick={() => setMobileMenuOpen(false)}>
-                            🔥 {t('offers')}
-                        </Link>
-                        <Link href="/contact" className="block text-text hover:text-navbar-hover transition py-1" onClick={() => setMobileMenuOpen(false)}>
-                            {t('contact')}
-                        </Link>
-                        {!loading && !user && (
-                            <>
-                                <Link href="/auth/register" className="block text-primary font-medium hover:underline transition py-1" onClick={() => setMobileMenuOpen(false)}>
-                                    {t('registerTitle')}
-                                </Link>
-                                <Link href="/auth/login" className="block text-primary font-medium hover:underline transition py-1" onClick={() => setMobileMenuOpen(false)}>
-                                    {t('loginTitle')}
-                                </Link>
-                            </>
-                        )}
-                        {user && (
-                            <button onClick={() => { logout(); setMobileMenuOpen(false); }} className="block w-full text-right text-red-500 hover:text-red-700 transition py-1">
-                                {t('logout')}
-                            </button>
-                        )}
-                    </div>
-                )}
-            </div>
-        </div>
-    );
-};
-
-// ============================================================
-// USER NAV
-// ============================================================
-const UserNav = ({ user, logout }: { user: AuthResponse; logout: () => void }) => {
-    const { t } = useTranslation('common');
-    const isVendor = user.role === 'Vendor' || user.role === 'Admin';
-    const isAdmin = user.role === 'Admin';
-
-    return (
-        <div className="bg-footer-bg text-footer-text text-sm py-2">
-            <div className="container mx-auto px-4 flex flex-wrap justify-between items-center gap-2">
-                <div className="flex flex-wrap items-center gap-4">
-                    <Link href="/cart" className="hover:text-white transition flex items-center gap-2 text-xs md:text-sm">
-                        <ShoppingCartIcon className="w-4 h-4" /> {t('cart')}
-                    </Link>
-                    <Link href="/orders" className="hover:text-white transition flex items-center gap-2 text-xs md:text-sm">
-                        📋 {t('orders')}
-                    </Link>
-                    <Link href="/suggest" className="hover:text-white transition flex items-center gap-2 text-xs md:text-sm">
-                        💡 Suggest
-                    </Link>
-                    {isVendor && (
-                        <>
-                            <Link href="/vendor/dashboard" className="hover:text-white transition flex items-center gap-2 text-xs md:text-sm">
-                                📊 {t('dashboard')}
-                            </Link>
-                            <Link href="/admin/orders" className="hover:text-white transition flex items-center gap-2 text-xs md:text-sm">
-                                📦 Manage Orders
-                            </Link>
-                        </>
-                    )}
-                    {isAdmin && (
-                        <>
-                            <Link href="/admin/users" className="hover:text-white transition flex items-center gap-2 text-xs md:text-sm">
-                                👥 {t('users')}
-                            </Link>
-                            <Link href="/admin" className="hover:text-white transition flex items-center gap-2 text-xs md:text-sm">
-                                ⚙️ {t('admin')}
-                            </Link>
-                            <Link href="/admin/golden-links" className="hover:text-white transition flex items-center gap-2 text-xs md:text-sm">
-                                🔗 Golden Links
-                            </Link>
-                        </>
-                    )}
-                    <Link href="/chat" className="hover:text-white transition flex items-center gap-2 text-xs md:text-sm">
-                        💬 Chat
-                    </Link>
-                    <Link href="/profile" className="hover:text-white transition flex items-center gap-2 text-xs md:text-sm">
-                        👤 {t('profile')}
-                    </Link>
-                </div>
-                <div className="flex items-center gap-3">
-                    <span className="text-xs text-footer-text/70">{t('welcome')}، {user.username}</span>
-                    <button onClick={logout} className="text-xs bg-white/10 px-3 py-1 rounded-pill hover:bg-white/20 transition">
-                        {t('logout')}
-                    </button>
                 </div>
             </div>
         </div>
@@ -289,8 +254,7 @@ const UserNav = ({ user, logout }: { user: AuthResponse; logout: () => void }) =
 // MAIN EXPORT
 // ============================================================
 export default function Navbar() {
-    const { user, logout, isLoading } = useAuth();
-    const { t } = useTranslation('common');
+    const { user, isLoading } = useAuth();
     const [categories, setCategories] = useState<string[]>([]);
     const [loadingCategories, setLoadingCategories] = useState(true);
 
@@ -309,15 +273,13 @@ export default function Navbar() {
     }, []);
 
     if (isLoading) {
-        return <div className="bg-surface shadow-md py-4 text-center text-text-muted animate-pulse">{t('loading')}</div>;
+        return <div className="bg-surface shadow-md py-4 text-center text-text-muted animate-pulse">Loading...</div>;
     }
 
     return (
         <header className="sticky top-0 z-50">
             <TopBar />
             <MainHeader user={user} />
-            <NavMenu categories={categories} loading={loadingCategories} user={user} logout={logout} />
-            {user && <UserNav user={user} logout={logout} />}
         </header>
     );
 }
