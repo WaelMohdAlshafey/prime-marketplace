@@ -135,7 +135,7 @@ const templatePresets: Record<string, Partial<StoreSettings>> = {
 export default function AdminSettings() {
     const { user, isLoading } = useAuth();
     const router = useRouter();
-    const { template, saveTemplate, applyTheme } = useTheme();
+    const { applyTheme } = useTheme(); // ✅ We don't need saveTemplate here anymore
     const [settings, setSettings] = useState<StoreSettings | null>(null);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -177,31 +177,31 @@ export default function AdminSettings() {
         }
     };
 
-    // ✅ UPDATED: Applies full preset when template changes
+    // ✅ FIXED: Applies full preset and SAVES ALL COLORS to database
     const handleTemplateChange = async (newTemplate: string) => {
         if (!settings) return;
 
-        // ✅ Get the preset for the selected template
+        // Get the preset for the selected template
         const preset = templatePresets[newTemplate as keyof typeof templatePresets] || {};
 
-        // ✅ Merge the preset with current settings (keep custom fields not in preset)
+        // Merge the preset with current settings
         const updated = {
             ...settings,
             ...preset,
             template: newTemplate as any,
         };
 
-        // ✅ Immediate UI update
+        // Immediate UI update
         setSettings(updated);
         applyTheme(updated);
 
         try {
-            await saveTemplate(newTemplate as any);
-            // ✅ Sync with server – this will also call applyTheme again
-            const fresh = await getStoreSettings();
-            setSettings(fresh);
-            applyTheme(fresh);
-        } catch {
+            // ✅ Save ALL settings (colors + template) to database
+            const saved = await updateStoreSettings(updated);
+            setSettings(saved);
+            applyTheme(saved);
+        } catch (error) {
+            console.error('Failed to save template:', error);
             // Revert if save fails
             const revert = await getStoreSettings();
             setSettings(revert);
@@ -383,7 +383,7 @@ export default function AdminSettings() {
                     </div>
                 )}
 
-                {/* TAB 2: THEME (same as before – manual color overrides) */}
+                {/* TAB 2: THEME – Manual color overrides */}
                 {activeTab === 'theme' && (
                     <div className="space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

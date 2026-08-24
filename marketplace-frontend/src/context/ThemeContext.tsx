@@ -31,19 +31,19 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         root.setAttribute('data-theme', templateVal);
         document.body.setAttribute('data-theme', templateVal);
 
-        // ✅ All CSS variables – now includes missing ones used in globals.css
+        // ✅ All CSS variables – includes missing ones used in globals.css
         const cssVars: Record<string, string | undefined> = {
             // Primary
             '--color-primary': themeSettings.primaryColor || '#4E8C9E',
             '--color-primary-dark': themeSettings.primaryDark || '#2F5A6B',
             '--color-primary-light': themeSettings.primaryLight || '#7AB8C9',
-            '--color-primary-bg': themeSettings.primaryLight || '#E8F4F7',   // ✅ NEW
+            '--color-primary-bg': themeSettings.primaryLight || '#E8F4F7',
 
             // Secondary
             '--color-secondary': themeSettings.secondaryColor || '#D27736',
             '--color-secondary-dark': themeSettings.secondaryColor || '#B05E2A',
             '--color-secondary-light': themeSettings.secondaryLight || '#E8B48C',
-            '--color-secondary-bg': themeSettings.secondaryLight || '#FDF3E8', // ✅ NEW
+            '--color-secondary-bg': themeSettings.secondaryLight || '#FDF3E8',
 
             // Background & Surfaces
             '--color-background': themeSettings.backgroundColor || '#F8F9FA',
@@ -51,15 +51,16 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
             // Text
             '--color-text': themeSettings.textColor || '#1A1A2E',
-            '--color-text-secondary': themeSettings.textColor || '#4A4A5A', // fallback
+            '--color-text-secondary': themeSettings.textColor || '#4A4A5A',
             '--color-text-muted': themeSettings.textMuted || '#8A8A9A',
 
             // Borders & Shadows
-            '--color-border': themeSettings.cardBorder || '#E5E7EB',         // ✅ NEW
-            '--color-border-light': themeSettings.cardBorder || '#F0F0F0',   // ✅ NEW
+            '--color-border': themeSettings.cardBorder || '#E5E7EB',
+            '--color-border-light': themeSettings.cardBorder || '#F0F0F0',
             '--shadow-card': themeSettings.cardShadow || '0 4px 20px rgba(0,0,0,0.06)',
             '--shadow-card-hover': themeSettings.cardHoverShadow || '0 12px 40px rgba(0,0,0,0.10)',
-            '--shadow-soft': themeSettings.cardShadow || '0 4px 20px rgba(0,0,0,0.06)', // ✅ NEW (used by Tailwind shadow-soft)
+            '--shadow-soft': themeSettings.cardShadow || '0 4px 20px rgba(0,0,0,0.06)',
+            '--shadow-dropdown': '0 8px 30px rgba(0, 0, 0, 0.08)',
 
             // Navbar
             '--color-navbar-bg': themeSettings.navbarBg || '#FFFFFF',
@@ -83,6 +84,11 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
             // Cards
             '--color-card-bg': themeSettings.cardBg || '#FFFFFF',
             '--color-card-border': themeSettings.cardBorder || '#E5E7EB',
+
+            // Badges
+            '--color-badge-sale': themeSettings.secondaryColor || '#D27736',
+            '--color-badge-new': themeSettings.primaryColor || '#4E8C9E',
+            '--color-badge-sold': '#8A8A9A',
 
             // Radius & Font
             '--radius-card': themeSettings.cardBorderRadius || '12px',
@@ -119,7 +125,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
                 applyTheme(data);
             } catch (error) {
                 console.error('❌ Failed to load theme:', error);
-                // Fallback defaults – includes all necessary fields
                 const defaultSettings: StoreSettings = {
                     id: 0,
                     storeName: 'Prime',
