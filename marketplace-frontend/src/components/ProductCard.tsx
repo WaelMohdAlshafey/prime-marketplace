@@ -34,7 +34,7 @@ interface ProductCardProps {
         descriptionAr?: string;
         descriptionEn?: string;
     };
-    onCardClick?: (productId: number) => void; // ✅ now accepts productId
+    onCardClick?: (productId: number) => void;
 }
 
 export default function ProductCard({ product, onCardClick }: ProductCardProps) {
@@ -132,15 +132,15 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
                         key={i}
                         className={`w-3.5 h-3.5 ${i < fullStars
                             ? 'fill-[#FFB400] text-[#FFB400]'
-                            : 'text-[#E0E0E0] fill-[#E0E0E0]'
+                            : 'text-text-muted fill-text-muted'
                             }`}
                     />
                 ))}
-                <span className="text-xs font-medium text-[#757575] mr-1">
+                <span className="text-xs font-medium text-text-muted mr-1">
                     {rating.toFixed(1)}
                 </span>
                 {product.reviews && (
-                    <span className="text-xs text-[#9E9E9E]">({product.reviews})</span>
+                    <span className="text-xs text-text-muted">({product.reviews})</span>
                 )}
             </div>
         );
@@ -148,16 +148,11 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
 
     const handleCardClick = (e: React.MouseEvent) => {
         e.preventDefault();
-        alert(`🖱️ Card clicked! Product ID: ${product.id}`); // <- debug alert
-        console.log('🖱️ ProductCard clicked, productId:', product.id);
         if (onCardClick) {
-            onCardClick(product.id); // ✅ pass productId to parent
-        } else {
-            console.warn('⚠️ onCardClick not provided – alert works but modal won\'t open.');
+            onCardClick(product.id);
         }
     };
 
-    // 🌐 Language-aware display
     const lang = i18n.language || 'en';
     const displayName = lang === 'en'
         ? (product.nameEn || product.name || product.nameAr || `Product #${product.id}`)
@@ -175,29 +170,28 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
             whileHover={{ y: -8 }}
             onHoverStart={() => setIsHovered(true)}
             onHoverEnd={() => setIsHovered(false)}
-            className="product-card cursor-pointer border border-gray-200 rounded-lg p-3 hover:shadow-lg transition"
+            className="bg-card-bg border border-card-border rounded-card hover:shadow-card-hover shadow-card transition-all duration-300 p-3 cursor-pointer"
             onClick={handleCardClick}
         >
-            {/* ... card content (same as before) */}
             <div className="block relative">
                 <motion.button
                     whileHover={{ scale: 1.2 }}
                     whileTap={{ scale: 0.8 }}
                     onClick={handleWishlistToggle}
-                    className="wishlist-btn absolute top-2 left-2 bg-white rounded-full p-1.5 shadow z-10"
+                    className="absolute top-2 left-2 bg-surface rounded-full p-1.5 shadow-md z-10"
                 >
                     <Heart
-                        className={`w-4 h-4 transition ${isWishlist ? 'fill-red-500 text-red-500' : 'text-gray-500'}`}
+                        className={`w-4 h-4 transition ${isWishlist ? 'fill-red-500 text-red-500' : 'text-text-muted'}`}
                     />
                 </motion.button>
 
                 {hasDiscount && (
-                    <span className="discount-badge absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full z-10">
+                    <span className="absolute top-2 right-2 bg-secondary text-white text-xs px-2 py-0.5 rounded-pill z-10">
                         -{product.discount}%
                     </span>
                 )}
 
-                <div className="relative w-full h-48 bg-gray-50 rounded-md overflow-hidden">
+                <div className="relative w-full h-48 bg-background rounded-sm overflow-hidden">
                     <Image
                         src={imgSrc}
                         alt={displayName}
@@ -209,25 +203,23 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
                     />
                 </div>
 
-                <h3 className="product-title font-bold text-lg text-gray-800 mt-2">{displayName}</h3>
+                <h3 className="font-semibold text-text text-lg mt-2 line-clamp-1">{displayName}</h3>
                 {displayDescription && (
-                    <p className="product-desc text-gray-600 text-sm line-clamp-2">{displayDescription}</p>
+                    <p className="text-text-muted text-sm line-clamp-2">{displayDescription}</p>
                 )}
 
                 {product.rating && (
-                    <div className="product-rating">
-                        {renderStars(product.rating)}
-                    </div>
+                    <div className="product-rating">{renderStars(product.rating)}</div>
                 )}
 
-                <div className="price-row">
-                    <span className="current-price text-xl font-bold text-[#0F5C45]">
+                <div className="flex items-center gap-2 flex-wrap mt-2">
+                    <span className="text-xl font-bold text-primary">
                         {CURRENCY}{(discountPrice || product.price).toFixed(2)}
                     </span>
                     {hasDiscount && (
                         <>
-                            <span className="old-price text-gray-400 line-through">{CURRENCY}{product.price.toFixed(2)}</span>
-                            <span className="discount-tag bg-green-500 text-white text-xs px-2 py-0.5 rounded-full">-{product.discount}%</span>
+                            <span className="text-text-muted line-through text-sm">{CURRENCY}{product.price.toFixed(2)}</span>
+                            <span className="bg-secondary text-white text-xs px-2 py-0.5 rounded-pill">-{product.discount}%</span>
                         </>
                     )}
                 </div>
@@ -235,21 +227,21 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
 
             <div className="flex items-center gap-2 mt-3" onClick={(e) => e.stopPropagation()}>
                 {product.stockQuantity > 0 && (
-                    <div className="flex items-center gap-1 bg-[#F8F9FA] rounded-lg p-0.5 border border-[#E0E0E0] flex-shrink-0">
+                    <div className="flex items-center gap-1 bg-background rounded-lg p-0.5 border border-border flex-shrink-0">
                         <button
                             onClick={decrement}
                             disabled={quantity <= 1}
-                            className="w-7 h-7 rounded-md flex items-center justify-center text-[#757575] hover:bg-white hover:shadow-sm transition disabled:opacity-30 disabled:cursor-not-allowed text-lg font-bold"
+                            className="w-7 h-7 rounded-md flex items-center justify-center text-text-muted hover:bg-surface hover:shadow-sm transition disabled:opacity-30 disabled:cursor-not-allowed text-lg font-bold"
                         >
                             −
                         </button>
-                        <span className="w-6 text-center text-sm font-medium text-[#1A1A1A]">
+                        <span className="w-6 text-center text-sm font-medium text-text">
                             {quantity}
                         </span>
                         <button
                             onClick={increment}
                             disabled={quantity >= product.stockQuantity}
-                            className="w-7 h-7 rounded-md flex items-center justify-center text-[#757575] hover:bg-white hover:shadow-sm transition disabled:opacity-30 disabled:cursor-not-allowed text-lg font-bold"
+                            className="w-7 h-7 rounded-md flex items-center justify-center text-text-muted hover:bg-surface hover:shadow-sm transition disabled:opacity-30 disabled:cursor-not-allowed text-lg font-bold"
                         >
                             +
                         </button>
@@ -259,9 +251,9 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
                 <button
                     onClick={(e) => handleAddToCart(e, quantity)}
                     disabled={isAdding || product.stockQuantity === 0}
-                    className="add-to-cart-btn flex-1 bg-[#0F5C45] text-white py-2 rounded-lg hover:bg-[#0A4735] transition disabled:opacity-50"
+                    className="flex-1 py-2 rounded-lg transition disabled:opacity-50 bg-button-primary-bg hover:bg-button-primary-hover text-button-primary-text flex items-center justify-center gap-2"
                 >
-                    <ShoppingBag className="w-4 h-4 inline mr-1" />
+                    <ShoppingBag className="w-4 h-4" />
                     {isAdding
                         ? 'جاري الإضافة...'
                         : product.stockQuantity === 0

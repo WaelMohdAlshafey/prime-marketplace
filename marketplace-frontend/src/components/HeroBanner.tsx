@@ -1,5 +1,3 @@
-// marketplace-frontend/components/HeroBanner.tsx
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -94,7 +92,7 @@ export default function HeroBanner() {
     };
 
     return (
-        <div className="hero relative overflow-hidden">
+        <div className="relative bg-[#E8F0F4] rounded-lg p-8 md:p-12 my-6 overflow-hidden min-h-[320px] flex items-center justify-between">
             <AnimatePresence mode="wait" custom={direction}>
                 {slides.map((slide, index) => (
                     index === current && (
@@ -106,13 +104,15 @@ export default function HeroBanner() {
                             animate="center"
                             exit="exit"
                             transition={{ duration: 0.6, ease: 'easeInOut' }}
-                            className="hero-content"
+                            className="flex-1 text-right relative z-10"
                         >
-                            <span className="badge">{slide.badge}</span>
-                            <h1>{slide.title}</h1>
-                            <p className="subtitle">{slide.subtitle}</p>
-                            <p className="description">{slide.description}</p>
-                            <Link href={slide.link} className="hero-btn">
+                            <span className="inline-block bg-secondary text-white text-xs font-semibold px-4 py-1 rounded-pill mb-3">
+                                {slide.badge}
+                            </span>
+                            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-text mb-2">{slide.title}</h1>
+                            <p className="text-xl text-text-secondary mb-3">{slide.subtitle}</p>
+                            <p className="text-text-muted max-w-lg mb-5 leading-relaxed">{slide.description}</p>
+                            <Link href={slide.link} className="inline-flex items-center gap-2 bg-button-secondary-bg hover:bg-button-secondary-hover text-button-secondary-text px-8 py-3 rounded-pill font-semibold transition hover:shadow-lg hover:-translate-y-1">
                                 <ShoppingBag className="w-5 h-5" />
                                 {slide.cta}
                             </Link>
@@ -121,13 +121,13 @@ export default function HeroBanner() {
                 ))}
             </AnimatePresence>
 
-            <div className="hero-visual">
+            <div className="flex-1 flex justify-center z-10">
                 <Image
                     src={slides[current].image}
                     alt={slides[current].title}
                     width={400}
                     height={400}
-                    className="hero-image object-contain"
+                    className="max-w-[200px] md:max-w-[320px] h-auto object-contain"
                     priority
                     onError={(e) => {
                         (e.target as HTMLImageElement).src = PLACEHOLDER_IMAGE;
@@ -137,15 +137,15 @@ export default function HeroBanner() {
 
             <button
                 onClick={handlePrev}
-                className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-3 bg-white/80 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-all duration-300 hover:scale-110"
+                className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-3 bg-white/80 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition hover:scale-110"
             >
-                <ArrowLeft className="w-5 h-5 text-[#2F5A6B]" />
+                <ArrowLeft className="w-5 h-5 text-text" />
             </button>
             <button
                 onClick={handleNext}
-                className="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-3 bg-white/80 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-all duration-300 hover:scale-110"
+                className="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-3 bg-white/80 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition hover:scale-110"
             >
-                <ArrowRight className="w-5 h-5 text-[#2F5A6B]" />
+                <ArrowRight className="w-5 h-5 text-text" />
             </button>
 
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
@@ -157,8 +157,8 @@ export default function HeroBanner() {
                             setCurrent(index);
                         }}
                         className={`transition-all duration-300 rounded-full ${current === index
-                            ? 'w-8 h-2.5 bg-[#4E8C9E]'
-                            : 'w-2.5 h-2.5 bg-gray-300 hover:bg-[#4E8C9E]/50'
+                            ? 'w-8 h-2.5 bg-primary'
+                            : 'w-2.5 h-2.5 bg-gray-300 hover:bg-primary/50'
                             }`}
                     />
                 ))}

@@ -1,5 +1,7 @@
 ﻿/* ============================================================
-   NEMOCARE-STYLE THEME – Clean, Trustworthy, Premium
+   globals.css – PRIME MARKETPLACE
+   All themeable values use CSS variables.
+   Hardcoded colors only for fixed elements (hero, etc.)
    ============================================================ */
 
 @tailwind base;
@@ -7,67 +9,69 @@
 @tailwind utilities;
 
 /* ============================================================
-   ROOT THEME VARIABLES
+   ROOT THEME VARIABLES (fallback values)
+   These are overridden by ThemeContext.tsx at runtime.
    ============================================================ */
 :root {
-    /* ===== Primary Colors (Teal) ===== */
+    /* Primary Colors */
     --color-primary: #4E8C9E;
     --color-primary-dark: #2F5A6B;
     --color-primary-light: #7AB8C9;
     --color-primary-bg: #E8F4F7;
-    /* ===== Secondary Colors (Terracotta/Warm Orange) ===== */
+    /* Secondary Colors */
     --color-secondary: #D27736;
     --color-secondary-dark: #B05E2A;
     --color-secondary-light: #E8B48C;
     --color-secondary-bg: #FDF3E8;
-    /* ===== Background & Surfaces ===== */
+    /* Background & Surfaces */
     --color-background: #F8F9FA;
     --color-surface: #FFFFFF;
     --color-surface-alt: #F1F3F5;
-    /* ===== Text Colors ===== */
+    /* Text Colors */
     --color-text: #1A1A2E;
     --color-text-secondary: #4A4A5A;
     --color-text-muted: #8A8A9A;
-    /* ===== Borders & Shadows ===== */
+    /* Borders & Shadows */
     --color-border: #E5E7EB;
     --color-border-light: #F0F0F0;
     --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.06);
     --shadow-card-hover: 0 12px 40px rgba(0, 0, 0, 0.10);
+    --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.06);
+    --shadow-strong: 0 12px 40px rgba(0, 0, 0, 0.10);
     --shadow-dropdown: 0 8px 30px rgba(0, 0, 0, 0.08);
-    /* ===== Buttons ===== */
+    /* Buttons */
     --color-button-primary-bg: #4E8C9E;
     --color-button-primary-hover: #2F5A6B;
     --color-button-primary-text: #FFFFFF;
     --color-button-secondary-bg: #D27736;
     --color-button-secondary-hover: #B05E2A;
     --color-button-secondary-text: #FFFFFF;
-    --color-button-outline-bg: transparent;
-    --color-button-outline-hover: #4E8C9E;
-    --color-button-outline-text: #4E8C9E;
-    /* ===== Navbar ===== */
+    /* Navbar */
     --color-navbar-bg: #FFFFFF;
     --color-navbar-text: #2F5A6B;
     --color-navbar-hover: #D27736;
     --color-navbar-border: #E5E7EB;
-    /* ===== Footer ===== */
+    /* Footer */
     --color-footer-bg: #2F5A6B;
     --color-footer-text: #C8D8DE;
     --color-footer-heading: #FFFFFF;
-    /* ===== Cards ===== */
+    /* Cards */
     --color-card-bg: #FFFFFF;
     --color-card-border: #E5E7EB;
-    /* ===== Badges ===== */
+    /* Badges */
     --color-badge-sale: #D27736;
     --color-badge-new: #4E8C9E;
     --color-badge-sold: #8A8A9A;
-    /* ===== Spacing ===== */
+    /* Radii */
     --radius-sm: 6px;
     --radius-md: 12px;
     --radius-lg: 20px;
     --radius-pill: 40px;
-    /* ===== Typography ===== */
+    --radius-card: 12px;
+    /* Fonts */
     --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    /* ===== Star Rating ===== */
+    --heading-font: 'Cairo', sans-serif;
+    /* Star Rating */
     --star-gold: #F5A623;
 }
 
@@ -150,7 +154,7 @@ body {
 }
 
 /* ============================================================
-   TOP BAR
+   TOP BAR (hardcoded primary-dark – does not change)
    ============================================================ */
 .top-bar {
     background: var(--color-primary-dark);
@@ -318,10 +322,10 @@ body {
     }
 
 /* ============================================================
-   HERO BANNER
+   HERO BANNER – BACKGROUND IS HARDCODED TO BRIGHT GRAY
    ============================================================ */
 .hero {
-    background: var(--color-primary-bg);
+    background: #E8F0F4; /* FIXED bright gray – does NOT change with theme */
     border-radius: var(--radius-lg);
     padding: 48px 48px 48px 64px;
     margin: 24px 0;
@@ -477,7 +481,7 @@ body {
 }
 
 /* ============================================================
-   PRODUCT CARD
+   PRODUCT CARD – All colors are dynamic via Tailwind classes
    ============================================================ */
 .product-card {
     background: var(--color-card-bg);
@@ -553,33 +557,6 @@ body {
             color: var(--color-text-muted);
             text-decoration: line-through;
             font-size: 14px;
-        }
-
-    .product-card .add-to-cart-btn {
-        width: 100%;
-        background: var(--color-button-primary-bg);
-        color: var(--color-button-primary-text);
-        border: none;
-        padding: 10px;
-        border-radius: var(--radius-pill);
-        font-weight: 600;
-        font-size: 14px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-    }
-
-        .product-card .add-to-cart-btn:hover {
-            background: var(--color-button-primary-hover);
-        }
-
-        .product-card .add-to-cart-btn:disabled {
-            background: var(--color-border);
-            color: var(--color-text-muted);
-            cursor: not-allowed;
         }
 
 /* ============================================================
