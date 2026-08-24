@@ -24,7 +24,7 @@ interface ProductCardProps {
         nameAr?: string;
         nameEn?: string;
         rating?: number;
-        discount?: number; // ✅ optional
+        discount?: number;
     };
     onCardClick?: (productId: number) => void;
 }
@@ -44,8 +44,6 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
     const { cartIconRef } = useCartIconRef();
 
     const isWishlist = isFavorite(product.id);
-
-    // ✅ Safe handling of discount (optional)
     const hasDiscount = product.discount !== undefined && product.discount > 0;
     const discountPrice = hasDiscount ? product.price * (1 - (product.discount ?? 0) / 100) : null;
 
@@ -85,7 +83,6 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
         ? (product.nameEn || product.name || product.nameAr || `Product #${product.id}`)
         : (product.nameAr || product.name || product.nameEn || `Product #${product.id}`);
 
-    // ✅ Safe rating rendering
     const renderStars = () => {
         if (!product.rating) return null;
         const fullStars = Math.round(product.rating);
@@ -94,7 +91,7 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
                 {[...Array(5)].map((_, i) => (
                     <Star
                         key={i}
-                        className={`w-3.5 h-3.5 ${i < fullStars
+                        className={`w-3 h-3 ${i < fullStars
                                 ? 'fill-[#F5A623] text-[#F5A623]'
                                 : 'text-[#D1D5DB] fill-[#D1D5DB]'
                             }`}
@@ -113,8 +110,8 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
-            whileHover={{ y: -6 }}
-            className="bg-card-bg border border-card-border rounded-card shadow-soft hover:shadow-card-hover transition-all duration-300 p-3 cursor-pointer group"
+            whileHover={{ y: -8 }}
+            className="bg-card-bg border border-card-border rounded-2xl shadow-soft hover:shadow-2xl transition-all duration-300 overflow-hidden cursor-pointer group relative"
             onClick={handleCardClick}
         >
             <div className="relative">
@@ -123,7 +120,7 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
                     whileHover={{ scale: 1.2 }}
                     whileTap={{ scale: 0.8 }}
                     onClick={handleWishlistToggle}
-                    className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm rounded-full p-1.5 shadow-md z-10 hover:bg-white transition"
+                    className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-md z-10 hover:bg-white transition"
                 >
                     <Heart
                         className={`w-4 h-4 transition ${isWishlist ? 'fill-red-500 text-red-500' : 'text-text-muted'
@@ -131,63 +128,62 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
                     />
                 </motion.button>
 
-                {/* Discount badge – only if discount exists and > 0 */}
+                {/* Discount badge */}
                 {hasDiscount && (
-                    <span className="absolute top-2 right-2 bg-[#ff4e00] text-white text-xs font-bold px-2 py-0.5 rounded-pill z-10">
+                    <span className="absolute top-3 right-3 bg-[#ff4e00] text-white text-xs font-bold px-2.5 py-1 rounded-full z-10 shadow-md">
                         -{product.discount}%
                     </span>
                 )}
 
-                {/* Product image */}
-                <div className="relative w-full h-48 bg-background rounded-sm overflow-hidden">
+                {/* Image */}
+                <div className="relative w-full aspect-square bg-background overflow-hidden">
                     <Image
                         src={imgSrc}
                         alt={displayName}
                         fill
                         className="object-cover group-hover:scale-105 transition-transform duration-500"
-                        sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                         onError={handleImageError}
                     />
                 </div>
 
-                {/* Product name */}
-                <h3 className="font-semibold text-text text-base mt-3 line-clamp-1">
-                    {displayName}
-                </h3>
+                {/* Content */}
+                <div className="p-3 md:p-4">
+                    <h3 className="font-semibold text-text text-sm md:text-base line-clamp-1">
+                        {displayName}
+                    </h3>
 
-                {/* Rating */}
-                {product.rating && (
-                    <div className="mt-1">{renderStars()}</div>
-                )}
-
-                {/* Price */}
-                <div className="flex items-center gap-2 mt-2">
-                    <span className="text-xl font-bold text-primary">
-                        {CURRENCY}{(discountPrice ?? product.price).toFixed(2)}
-                    </span>
-                    {hasDiscount && (
-                        <span className="text-sm text-text-muted line-through">
-                            {CURRENCY}{product.price.toFixed(2)}
-                        </span>
+                    {product.rating && (
+                        <div className="mt-1">{renderStars()}</div>
                     )}
-                </div>
 
-                {/* Add to Cart button */}
-                <button
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        handleAddToCart(e);
-                    }}
-                    disabled={isAdding || product.stockQuantity === 0}
-                    className="w-full mt-3 py-2 rounded-pill font-semibold text-sm transition-all duration-300 bg-button-primary-bg hover:bg-button-primary-hover text-button-primary-text disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                >
-                    <ShoppingBag className="w-4 h-4" />
-                    {isAdding
-                        ? 'جاري الإضافة...'
-                        : product.stockQuantity === 0
-                            ? 'غير متوفر'
-                            : 'إضافة إلى السلة'}
-                </button>
+                    <div className="flex items-center gap-2 mt-2">
+                        <span className="text-lg md:text-xl font-bold text-primary">
+                            {CURRENCY}{(discountPrice ?? product.price).toFixed(2)}
+                        </span>
+                        {hasDiscount && (
+                            <span className="text-xs text-text-muted line-through">
+                                {CURRENCY}{product.price.toFixed(2)}
+                            </span>
+                        )}
+                    </div>
+
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            handleAddToCart(e);
+                        }}
+                        disabled={isAdding || product.stockQuantity === 0}
+                        className="w-full mt-3 py-2.5 rounded-full font-semibold text-sm transition-all duration-300 bg-primary hover:bg-primary-dark text-white disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    >
+                        <ShoppingBag className="w-4 h-4" />
+                        {isAdding
+                            ? 'جاري الإضافة...'
+                            : product.stockQuantity === 0
+                                ? 'غير متوفر'
+                                : 'إضافة إلى السلة'}
+                    </button>
+                </div>
             </div>
         </motion.div>
     );
