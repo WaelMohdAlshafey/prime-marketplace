@@ -85,6 +85,9 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
         return () => window.removeEventListener('click', closeMenus);
     }, []);
 
+    // Check if RTL
+    const isRTL = document.documentElement.dir === 'rtl';
+
     return (
         <div className={`bg-navbar-bg border-b border-navbar-border sticky top-0 z-50 ${isScrolled ? 'shadow-md' : ''}`}>
             <div className="container mx-auto px-4 flex items-center gap-4 py-2">
@@ -92,7 +95,7 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
                 <div className="relative" onClick={(e) => e.stopPropagation()}>
                     <button
                         onClick={() => setLeftMenuOpen(!leftMenuOpen)}
-                        className="p-2 rounded-md hover:bg-background transition text-navbar-text"
+                        className="p-2 rounded-md hover:bg-primary-dark/10 transition text-navbar-text"
                         aria-label="Main menu"
                     >
                         <Bars3Icon className="w-6 h-6" />
@@ -103,22 +106,21 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
                                 initial={{ opacity: 0, y: -10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: -10 }}
-                                // ✅ FIX: prevent overflow
-                                className="absolute left-0 top-full mt-2 w-56 max-w-[calc(100vw-2rem)] max-h-[80vh] overflow-y-auto bg-surface rounded-xl shadow-strong border border-border py-2 z-50"
+                                className={`absolute ${isRTL ? 'right-0' : 'left-0'} top-full mt-2 w-56 max-w-[calc(100vw-2rem)] max-h-[80vh] overflow-y-auto bg-surface rounded-xl shadow-strong border border-border py-2 z-50`}
                             >
-                                <Link href="/" className="block px-4 py-2 text-text hover:bg-background transition" onClick={() => setLeftMenuOpen(false)}>
+                                <Link href="/" className="block px-4 py-2 text-text hover:bg-primary-dark/10 transition" onClick={() => setLeftMenuOpen(false)}>
                                     {t('home')}
                                 </Link>
-                                <Link href="/stores" className="block px-4 py-2 text-text hover:bg-background transition" onClick={() => setLeftMenuOpen(false)}>
+                                <Link href="/stores" className="block px-4 py-2 text-text hover:bg-primary-dark/10 transition" onClick={() => setLeftMenuOpen(false)}>
                                     {t('stores')}
                                 </Link>
-                                <Link href="/offers" className="block px-4 py-2 text-text hover:bg-background transition" onClick={() => setLeftMenuOpen(false)}>
+                                <Link href="/offers" className="block px-4 py-2 text-text hover:bg-primary-dark/10 transition" onClick={() => setLeftMenuOpen(false)}>
                                     🔥 {t('offers')}
                                 </Link>
-                                <Link href="/contact" className="block px-4 py-2 text-text hover:bg-background transition" onClick={() => setLeftMenuOpen(false)}>
+                                <Link href="/contact" className="block px-4 py-2 text-text hover:bg-primary-dark/10 transition" onClick={() => setLeftMenuOpen(false)}>
                                     {t('contact')}
                                 </Link>
-                                <Link href="/help" className="block px-4 py-2 text-text hover:bg-background transition" onClick={() => setLeftMenuOpen(false)}>
+                                <Link href="/help" className="block px-4 py-2 text-text hover:bg-primary-dark/10 transition" onClick={() => setLeftMenuOpen(false)}>
                                     📘 {t('help')}
                                 </Link>
                             </motion.div>
@@ -157,11 +159,11 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
                         </motion.span>
                     </Link>
 
-                    {/* Right user menu - FIXED: added max-width & overflow */}
+                    {/* Right user menu - FIXED for RTL */}
                     <div className="relative" onClick={(e) => e.stopPropagation()}>
                         <button
                             onClick={() => setRightMenuOpen(!rightMenuOpen)}
-                            className="flex items-center gap-1 p-2 rounded-md hover:bg-background transition text-navbar-text"
+                            className="flex items-center gap-1 p-2 rounded-md hover:bg-primary-dark/10 transition text-navbar-text"
                             aria-label="User menu"
                         >
                             {user ? (
@@ -181,56 +183,56 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
                                     initial={{ opacity: 0, y: -10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: -10 }}
-                                    // ✅ FIX: prevent overflow & keep within screen
-                                    className="absolute right-0 top-full mt-2 w-56 max-w-[calc(100vw-2rem)] max-h-[80vh] overflow-y-auto bg-surface rounded-xl shadow-strong border border-border py-2 z-50"
+                                    // ✅ FIX: Use left-0 for RTL, right-0 for LTR
+                                    className={`absolute ${isRTL ? 'left-0' : 'right-0'} top-full mt-2 w-56 max-w-[calc(100vw-2rem)] max-h-[80vh] overflow-y-auto bg-surface rounded-xl shadow-strong border border-border py-2 z-50`}
                                 >
                                     {!user ? (
                                         <>
-                                            <Link href="/auth/login" className="block px-4 py-2 text-text hover:bg-background transition" onClick={() => setRightMenuOpen(false)}>
+                                            <Link href="/auth/login" className="block px-4 py-2 text-text hover:bg-primary-dark/10 transition" onClick={() => setRightMenuOpen(false)}>
                                                 {t('loginTitle')}
                                             </Link>
-                                            <Link href="/auth/register" className="block px-4 py-2 text-text hover:bg-background transition" onClick={() => setRightMenuOpen(false)}>
+                                            <Link href="/auth/register" className="block px-4 py-2 text-text hover:bg-primary-dark/10 transition" onClick={() => setRightMenuOpen(false)}>
                                                 {t('registerTitle')}
                                             </Link>
                                         </>
                                     ) : (
                                         <>
-                                            <Link href="/cart" className="block px-4 py-2 text-text hover:bg-background transition" onClick={() => setRightMenuOpen(false)}>
+                                            <Link href="/cart" className="block px-4 py-2 text-text hover:bg-primary-dark/10 transition" onClick={() => setRightMenuOpen(false)}>
                                                 🛒 {t('cart')}
                                             </Link>
-                                            <Link href="/orders" className="block px-4 py-2 text-text hover:bg-background transition" onClick={() => setRightMenuOpen(false)}>
+                                            <Link href="/orders" className="block px-4 py-2 text-text hover:bg-primary-dark/10 transition" onClick={() => setRightMenuOpen(false)}>
                                                 📋 {t('orders')}
                                             </Link>
-                                            <Link href="/suggest" className="block px-4 py-2 text-text hover:bg-background transition" onClick={() => setRightMenuOpen(false)}>
+                                            <Link href="/suggest" className="block px-4 py-2 text-text hover:bg-primary-dark/10 transition" onClick={() => setRightMenuOpen(false)}>
                                                 💡 Suggest
                                             </Link>
                                             {(user.role === 'Vendor' || user.role === 'Admin') && (
-                                                <Link href="/vendor/dashboard" className="block px-4 py-2 text-text hover:bg-background transition" onClick={() => setRightMenuOpen(false)}>
+                                                <Link href="/vendor/dashboard" className="block px-4 py-2 text-text hover:bg-primary-dark/10 transition" onClick={() => setRightMenuOpen(false)}>
                                                     📊 {t('dashboard')}
                                                 </Link>
                                             )}
                                             {(user.role === 'Vendor' || user.role === 'Admin' || user.role === 'Employee') && (
-                                                <Link href="/admin/orders" className="block px-4 py-2 text-text hover:bg-background transition" onClick={() => setRightMenuOpen(false)}>
+                                                <Link href="/admin/orders" className="block px-4 py-2 text-text hover:bg-primary-dark/10 transition" onClick={() => setRightMenuOpen(false)}>
                                                     📦 Manage Orders
                                                 </Link>
                                             )}
                                             {user.role === 'Admin' && (
                                                 <>
-                                                    <Link href="/admin/users" className="block px-4 py-2 text-text hover:bg-background transition" onClick={() => setRightMenuOpen(false)}>
+                                                    <Link href="/admin/users" className="block px-4 py-2 text-text hover:bg-primary-dark/10 transition" onClick={() => setRightMenuOpen(false)}>
                                                         👥 {t('users')}
                                                     </Link>
-                                                    <Link href="/admin" className="block px-4 py-2 text-text hover:bg-background transition" onClick={() => setRightMenuOpen(false)}>
+                                                    <Link href="/admin" className="block px-4 py-2 text-text hover:bg-primary-dark/10 transition" onClick={() => setRightMenuOpen(false)}>
                                                         ⚙️ {t('admin')}
                                                     </Link>
-                                                    <Link href="/admin/golden-links" className="block px-4 py-2 text-text hover:bg-background transition" onClick={() => setRightMenuOpen(false)}>
+                                                    <Link href="/admin/golden-links" className="block px-4 py-2 text-text hover:bg-primary-dark/10 transition" onClick={() => setRightMenuOpen(false)}>
                                                         🔗 Golden Links
                                                     </Link>
                                                 </>
                                             )}
-                                            <Link href="/chat" className="block px-4 py-2 text-text hover:bg-background transition" onClick={() => setRightMenuOpen(false)}>
+                                            <Link href="/chat" className="block px-4 py-2 text-text hover:bg-primary-dark/10 transition" onClick={() => setRightMenuOpen(false)}>
                                                 💬 Chat
                                             </Link>
-                                            <Link href="/profile" className="block px-4 py-2 text-text hover:bg-background transition" onClick={() => setRightMenuOpen(false)}>
+                                            <Link href="/profile" className="block px-4 py-2 text-text hover:bg-primary-dark/10 transition" onClick={() => setRightMenuOpen(false)}>
                                                 👤 {t('profile')}
                                             </Link>
                                             <hr className="my-2 border-border" />
