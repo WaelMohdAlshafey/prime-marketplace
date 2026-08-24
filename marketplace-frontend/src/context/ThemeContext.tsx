@@ -31,32 +31,60 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         root.setAttribute('data-theme', templateVal);
         document.body.setAttribute('data-theme', templateVal);
 
-        // ✅ FIXED: removed 'secondaryDark' – using secondaryColor as fallback for -dark variant
+        // ✅ All CSS variables – now includes missing ones used in globals.css
         const cssVars: Record<string, string | undefined> = {
+            // Primary
             '--color-primary': themeSettings.primaryColor || '#4E8C9E',
             '--color-primary-dark': themeSettings.primaryDark || '#2F5A6B',
             '--color-primary-light': themeSettings.primaryLight || '#7AB8C9',
+            '--color-primary-bg': themeSettings.primaryLight || '#E8F4F7',   // ✅ NEW
+
+            // Secondary
             '--color-secondary': themeSettings.secondaryColor || '#D27736',
-            '--color-secondary-dark': themeSettings.secondaryColor || '#B05E2A', // ✅ FIXED
+            '--color-secondary-dark': themeSettings.secondaryColor || '#B05E2A',
+            '--color-secondary-light': themeSettings.secondaryLight || '#E8B48C',
+            '--color-secondary-bg': themeSettings.secondaryLight || '#FDF3E8', // ✅ NEW
+
+            // Background & Surfaces
             '--color-background': themeSettings.backgroundColor || '#F8F9FA',
             '--color-surface': themeSettings.surfaceColor || '#FFFFFF',
+
+            // Text
             '--color-text': themeSettings.textColor || '#1A1A2E',
+            '--color-text-secondary': themeSettings.textColor || '#4A4A5A', // fallback
             '--color-text-muted': themeSettings.textMuted || '#8A8A9A',
+
+            // Borders & Shadows
+            '--color-border': themeSettings.cardBorder || '#E5E7EB',         // ✅ NEW
+            '--color-border-light': themeSettings.cardBorder || '#F0F0F0',   // ✅ NEW
+            '--shadow-card': themeSettings.cardShadow || '0 4px 20px rgba(0,0,0,0.06)',
+            '--shadow-card-hover': themeSettings.cardHoverShadow || '0 12px 40px rgba(0,0,0,0.10)',
+            '--shadow-soft': themeSettings.cardShadow || '0 4px 20px rgba(0,0,0,0.06)', // ✅ NEW (used by Tailwind shadow-soft)
+
+            // Navbar
             '--color-navbar-bg': themeSettings.navbarBg || '#FFFFFF',
             '--color-navbar-text': themeSettings.navbarText || '#2F5A6B',
             '--color-navbar-hover': themeSettings.navbarHover || '#D27736',
+            '--color-navbar-border': themeSettings.cardBorder || '#E5E7EB',
+
+            // Footer
             '--color-footer-bg': themeSettings.footerBg || '#2F5A6B',
             '--color-footer-text': themeSettings.footerText || '#C8D8DE',
+            '--color-footer-heading': themeSettings.footerText || '#FFFFFF',
+
+            // Buttons
             '--color-button-primary-bg': themeSettings.buttonPrimaryBg || '#4E8C9E',
             '--color-button-primary-hover': themeSettings.buttonPrimaryHover || '#2F5A6B',
             '--color-button-primary-text': themeSettings.buttonPrimaryText || '#FFFFFF',
             '--color-button-secondary-bg': themeSettings.buttonSecondaryBg || '#D27736',
             '--color-button-secondary-hover': themeSettings.buttonSecondaryHover || '#B05E2A',
             '--color-button-secondary-text': themeSettings.buttonSecondaryText || '#FFFFFF',
+
+            // Cards
             '--color-card-bg': themeSettings.cardBg || '#FFFFFF',
             '--color-card-border': themeSettings.cardBorder || '#E5E7EB',
-            '--shadow-card': themeSettings.cardShadow || '0 4px 20px rgba(0,0,0,0.06)',
-            '--shadow-card-hover': themeSettings.cardHoverShadow || '0 12px 40px rgba(0,0,0,0.10)',
+
+            // Radius & Font
             '--radius-card': themeSettings.cardBorderRadius || '12px',
             '--font-family': themeSettings.fontFamily || "'Inter', sans-serif",
         };
@@ -91,7 +119,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
                 applyTheme(data);
             } catch (error) {
                 console.error('❌ Failed to load theme:', error);
-                // ✅ FIXED: removed 'secondaryDark' from default object
+                // Fallback defaults – includes all necessary fields
                 const defaultSettings: StoreSettings = {
                     id: 0,
                     storeName: 'Prime',
@@ -107,7 +135,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
                     primaryDark: '#2F5A6B',
                     primaryLight: '#7AB8C9',
                     secondaryColor: '#D27736',
-                    // secondaryDark removed – it doesn't exist in StoreSettings
+                    secondaryLight: '#E8B48C',
                     backgroundColor: '#F8F9FA',
                     surfaceColor: '#FFFFFF',
                     textColor: '#1A1A2E',
