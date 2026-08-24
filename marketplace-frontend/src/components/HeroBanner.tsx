@@ -1,3 +1,5 @@
+// marketplace-frontend/components/HeroBanner.tsx
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -12,8 +14,7 @@ export default function HeroBanner() {
     const [current, setCurrent] = useState(0);
     const [direction, setDirection] = useState(0);
 
-    // Placeholder image (always works)
-    const PLACEHOLDER_IMAGE = 'https://placehold.co/600x400/0F5C45/FFFFFF?text=Prime';
+    const PLACEHOLDER_IMAGE = 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1200&h=400&fit=crop';
 
     const slides = [
         {
@@ -25,7 +26,7 @@ export default function HeroBanner() {
                 'من البرامج والتقنية إلى التجميل، الأزياء، والإلكترونيات. كل ما تحتاجه في مكان واحد، بأسعار تنافسية وشحن سريع لجميع المحافظات.',
             cta: 'تسوق الآن',
             link: '/products',
-            image: PLACEHOLDER_IMAGE,
+            image: '/images/hero/slide1.jpg',
         },
         {
             id: 2,
@@ -36,7 +37,7 @@ export default function HeroBanner() {
                 'احصل على أدوات التطوير، برامج التصميم الجرافيكي، حلول الأمن السيبراني، والذكاء الاصطناعي. تراخيص أصلية ودعم فني متواصل.',
             cta: 'استكشف البرامج',
             link: '/software',
-            image: PLACEHOLDER_IMAGE,
+            image: '/images/hero/slide2.jpg',
         },
         {
             id: 3,
@@ -47,7 +48,7 @@ export default function HeroBanner() {
                 'شامبو عضوي، كريمات مرطبة للبشرة الحساسة، زيوت مغربية أصلية. منتجات معتمدة من أفضل الماركات العالمية، مناسبة لجميع أنواع البشرة.',
             cta: 'تسوق التجميل',
             link: '/hair-care',
-            image: PLACEHOLDER_IMAGE,
+            image: '/images/hero/slide3.jpg',
         },
         {
             id: 4,
@@ -58,7 +59,7 @@ export default function HeroBanner() {
                 'تشكيلة مميزة من الملابس القطنية، الأحذية الرياضية، الساعات الكلاسيكية، والمجوهرات. نناسب جميع المناسبات بأفضل جودة وأسعار لا تقبل المنافسة.',
             cta: 'تسوق الأزياء',
             link: '/fashion',
-            image: PLACEHOLDER_IMAGE,
+            image: '/images/hero/slide4.jpg',
         },
     ];
 
@@ -129,27 +130,24 @@ export default function HeroBanner() {
                     className="hero-image object-contain"
                     priority
                     onError={(e) => {
-                        // Fallback if placeholder fails (shouldn't happen)
-                        (e.target as HTMLImageElement).src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400"%3E%3Crect width="400" height="400" fill="%230F5C45"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="40" font-family="sans-serif"%3EPrime%3C/text%3E%3C/svg%3E';
+                        (e.target as HTMLImageElement).src = PLACEHOLDER_IMAGE;
                     }}
                 />
             </div>
 
-            {/* Navigation Arrows */}
             <button
                 onClick={handlePrev}
                 className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-3 bg-white/80 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-all duration-300 hover:scale-110"
             >
-                <ArrowLeft className="w-5 h-5 text-[#0A6C44]" />
+                <ArrowLeft className="w-5 h-5 text-[#2F5A6B]" />
             </button>
             <button
                 onClick={handleNext}
                 className="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-3 bg-white/80 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-all duration-300 hover:scale-110"
             >
-                <ArrowRight className="w-5 h-5 text-[#0A6C44]" />
+                <ArrowRight className="w-5 h-5 text-[#2F5A6B]" />
             </button>
 
-            {/* Dots */}
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
                 {slides.map((_, index) => (
                     <button
@@ -159,8 +157,8 @@ export default function HeroBanner() {
                             setCurrent(index);
                         }}
                         className={`transition-all duration-300 rounded-full ${current === index
-                            ? 'w-8 h-2.5 bg-[#0A6C44]'
-                            : 'w-2.5 h-2.5 bg-gray-300 hover:bg-[#0A6C44]/50'
+                            ? 'w-8 h-2.5 bg-[#4E8C9E]'
+                            : 'w-2.5 h-2.5 bg-gray-300 hover:bg-[#4E8C9E]/50'
                             }`}
                     />
                 ))}

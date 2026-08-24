@@ -1,3 +1,5 @@
+// marketplace-frontend/components/Footer.tsx
+
 'use client';
 
 import Link from 'next/link';
@@ -5,15 +7,6 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Heart, Mail, Phone, MapPin, Apple, Smartphone, ShoppingBag } from 'lucide-react';
 import api from '@/lib/api';
-
-interface ApiError {
-    response?: {
-        data?: {
-            message?: string;
-        };
-    };
-    message?: string;
-}
 
 export default function Footer() {
     const { t } = useTranslation('common');
@@ -35,17 +28,8 @@ export default function Footer() {
             await api.post('/api/Newsletter/subscribe', { email });
             setMessage({ type: 'success', text: '✅ تم الاشتراك بنجاح!' });
             setEmail('');
-        } catch (err: unknown) {
-            let errorMsg = 'حدث خطأ، حاول مرة أخرى.';
-            if (err && typeof err === 'object') {
-                const error = err as ApiError;
-                if (error.response?.data?.message) {
-                    errorMsg = error.response.data.message;
-                } else if (error.message) {
-                    errorMsg = error.message;
-                }
-            }
-            setMessage({ type: 'error', text: errorMsg });
+        } catch (err: any) {
+            setMessage({ type: 'error', text: err.response?.data?.message || 'حدث خطأ، حاول مرة أخرى.' });
         } finally {
             setLoading(false);
             setTimeout(() => setMessage(null), 5000);
@@ -55,28 +39,24 @@ export default function Footer() {
     return (
         <footer className="footer">
             <div className="container">
-                {/* Column 1: About & App Downloads */}
                 <div>
                     <h4 className="footer-title flex items-center gap-2">
                         <ShoppingBag className="w-5 h-5" />
                         Prime
                     </h4>
-                    <p className="text-[#9E9E9E] text-sm leading-relaxed mb-4">
+                    <p className="text-[#C8D8DE] text-sm leading-relaxed mb-4">
                         منصة تسوق فاخرة تقدم أفضل المنتجات من برامج، تجميل، أزياء، وإكسسوارات.
                     </p>
-                    <div className="app-badges">
-                        <Link href="#" className="app-badge">
-                            <Apple className="w-5 h-5" />
-                            <span>App Store</span>
+                    <div className="flex gap-2">
+                        <Link href="#" className="inline-flex items-center gap-2 bg-white/10 px-4 py-2 rounded-lg hover:bg-white/20 transition text-sm text-white">
+                            <Apple className="w-4 h-4" /> App Store
                         </Link>
-                        <Link href="#" className="app-badge">
-                            <Smartphone className="w-5 h-5" />
-                            <span>Google Play</span>
+                        <Link href="#" className="inline-flex items-center gap-2 bg-white/10 px-4 py-2 rounded-lg hover:bg-white/20 transition text-sm text-white">
+                            <Smartphone className="w-4 h-4" /> Google Play
                         </Link>
                     </div>
                 </div>
 
-                {/* Column 2: Quick Links */}
                 <div>
                     <h4 className="footer-title">روابط سريعة</h4>
                     <Link href="/">{t('footer.home')}</Link>
@@ -85,7 +65,6 @@ export default function Footer() {
                     <Link href="/offers">{t('footer.offers')}</Link>
                 </div>
 
-                {/* Column 3: Support */}
                 <div>
                     <h4 className="footer-title">خدمة العملاء</h4>
                     <Link href="/contact">{t('footer.contact')}</Link>
@@ -94,10 +73,9 @@ export default function Footer() {
                     <Link href="/shipping">{t('footer.shipping')}</Link>
                 </div>
 
-                {/* Column 4: Newsletter */}
                 <div>
                     <h4 className="footer-title">{t('footer.newsletter')}</h4>
-                    <p className="text-[#9E9E9E] text-sm mb-3">
+                    <p className="text-[#C8D8DE] text-sm mb-3">
                         {t('footer.newsletterDescription')}
                     </p>
 
@@ -107,21 +85,25 @@ export default function Footer() {
                         </div>
                     )}
 
-                    <form onSubmit={handleSubscribe} className="newsletter-input">
+                    <form onSubmit={handleSubscribe} className="flex rounded-lg overflow-hidden border border-white/20">
                         <input
                             type="email"
                             placeholder={t('footer.emailPlaceholder')}
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
+                            className="flex-1 px-4 py-2 bg-transparent text-white placeholder:text-white/50 outline-none"
                         />
-                        <button type="submit" disabled={loading}>
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="px-4 py-2 bg-[#D27736] text-white font-medium hover:bg-[#B05E2A] transition disabled:opacity-50"
+                        >
                             {loading ? '...' : t('footer.subscribe')}
                         </button>
                     </form>
                 </div>
 
-                {/* Copyright */}
                 <div className="copyright">
                     {t('footer.copyright')}
                     <span className="flex items-center justify-center gap-1 mt-1">

@@ -674,13 +674,6 @@ namespace Marketplace.Infrastructure
 		<ProjectReference Include="..\Marketplace.Infrastructure\Marketplace.Infrastructure.csproj" />
 	</ItemGroup>
 
-	<!-- ❌ REMOVE this entire ItemGroup – the SDK already includes wwwroot automatically -->
-	<!--
-	<ItemGroup>
-		<Content Include="wwwroot\**" CopyToOutputDirectory="PreserveNewest" />
-	</ItemGroup>
-	-->
-
 </Project>
 
 // ===== products.sql =====
@@ -874,10 +867,12 @@ if (app.Environment.IsDevelopment())
 // ============================================================
 app.Use(async (context, next) =>
 {
+    // Set CORS headers on every response
     context.Response.Headers["Access-Control-Allow-Origin"] = "*";
     context.Response.Headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS";
     context.Response.Headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With";
 
+    // If it's an OPTIONS request, respond immediately with 204
     if (context.Request.Method == "OPTIONS")
     {
         context.Response.StatusCode = 204;
@@ -898,38 +893,24 @@ app.Use(async (context, next) =>
 });
 
 // ============================================================
-// 13. Serve static files (product images, etc.)
-// ============================================================
-app.UseStaticFiles();
-
-// ============================================================
-// 14. Authentication & Authorization
+// 13. Authentication & Authorization
 // ============================================================
 app.UseAuthentication();
 app.UseAuthorization();
 
 // ============================================================
-// 15. Map Controllers
+// 14. Map Controllers
 // ============================================================
 app.MapControllers();
 
 // ============================================================
-// 16. Additional Endpoints
+// 15. Root Route – Fixes 404 on "/"
 // ============================================================
-app.MapGet("/db-test", async (AppDbContext dbContext) =>
-{
-    try
-    {
-        var result = await dbContext.Database.ExecuteSqlRawAsync("SELECT 1");
-        return Results.Ok(new { connected = true, result });
-    }
-    catch (Exception ex)
-    {
-        return Results.BadRequest(new { connected = false, error = ex.Message });
-    }
-});
-
 app.MapGet("/", () => "Prime Marketplace API is running!");
+
+// ============================================================
+// 16. Health Check Endpoint
+// ============================================================
 app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = DateTime.UtcNow }));
 
 // ============================================================
@@ -2863,19 +2844,27 @@ public class AdminController : ControllerBase
     {
         try
         {
+            // Ensure StoreSettings exists
             await EnsureStoreSettingsExists();
 
+            // --- Safe queries with fallbacks ---
             var totalUsers = await _context.Users.CountAsync();
             var totalProducts = await _context.Products.CountAsync(p => p.IsActive);
             var totalOrders = await _context.Orders.CountAsync();
 
-            // Safe total revenue: sum only valid decimals
-            var revenueList = await _context.Orders
-                .Where(o => o.CurrentStatus == "Paid" && o.TotalAmount != null)
-                .Select(o => o.TotalAmount)
-                .ToListAsync();
-
-            var totalRevenue = revenueList.Sum(); // now decimal, no nulls
+            // Safe total revenue: try to sum as decimal, fallback to 0
+            decimal totalRevenue = 0;
+            try
+            {
+                var revenueQuery = _context.Orders
+                    .Where(o => o.CurrentStatus == "Paid")
+                    .Select(o => o.TotalAmount);
+                var revenueList = await revenueQuery.ToListAsync();
+                totalRevenue = revenueList
+                    .Select(v => v != null ? decimal.TryParse(v.ToString(), out var d) ? d : 0 : 0)
+                    .Sum();
+            }
+            catch { totalRevenue = 0; }
 
             var totalSubscribers = await _context.NewsletterSubscriptions
                 .CountAsync(ns => ns.IsActive);
@@ -2883,6 +2872,7 @@ public class AdminController : ControllerBase
             var pendingOrders = await _context.Orders
                 .CountAsync(o => o.CurrentStatus == "Pending");
 
+            // Recent Orders
             var recentOrders = await _context.Orders
                 .OrderByDescending(o => o.OrderDate)
                 .Take(10)
@@ -2934,6 +2924,7 @@ public class AdminController : ControllerBase
         }
         catch (Exception ex)
         {
+            // Return a detailed error so you can see what went wrong
             return StatusCode(500, new
             {
                 message = "Failed to load dashboard data.",
@@ -2964,6 +2955,9 @@ public class AdminController : ControllerBase
         }
     }
 
+    // ============================================================
+    // ORDERS (separate endpoint)
+    // ============================================================
     [HttpGet("orders")]
     public async Task<IActionResult> GetOrders()
     {
@@ -3004,6 +2998,9 @@ public class AdminController : ControllerBase
         }
     }
 
+    // ============================================================
+    // NEWSLETTER
+    // ============================================================
     [HttpGet("newsletter")]
     public async Task<IActionResult> GetSubscribers()
     {
@@ -3619,7 +3616,7 @@ public class OrdersController : ControllerBase
     }
 
     // ============================================================
-    // CONFIRM PAYMENT
+    // CONFIRM PAYMENT – Admin, Vendor, Employee
     // ============================================================
     [HttpPost("{id}/confirm-payment")]
     [Authorize(Roles = "Admin,Vendor,Employee")]
@@ -3638,7 +3635,7 @@ public class OrdersController : ControllerBase
     }
 
     // ============================================================
-    // REVERT PAYMENT
+    // REVERT PAYMENT – Admin only
     // ============================================================
     [HttpPost("{id}/revert-payment")]
     [Authorize(Roles = "Admin")]
@@ -3657,21 +3654,23 @@ public class OrdersController : ControllerBase
     }
 
     // ============================================================
-    // UPDATE ORDER STATUS
+    // UPDATE ORDER STATUS – Admin, Vendor, Employee, Customer (cancel only)
     // ============================================================
     [HttpPut("{id}/status")]
-    [Authorize]
+    [Authorize] // any logged-in user
     public async Task<IActionResult> UpdateStatus(int id, [FromBody] UpdateStatusWithNoteDto request)
     {
         try
         {
             var userId = GetUserId();
+
+            // ✅ Pass the carrier field (if provided) to the service
             var updatedOrder = await _orderService.UpdateOrderStatusAsync(
                 userId,
                 id,
                 request.Status,
                 request.Note,
-                request.Carrier
+                request.Carrier // ✅ New parameter for carrier update
             );
 
             return Ok(updatedOrder);
@@ -3683,7 +3682,7 @@ public class OrdersController : ControllerBase
     }
 
     // ============================================================
-    // TRACKING – PUBLIC
+    // TRACKING – PUBLIC (supports both TrackingNumber and Order ID)
     // ============================================================
     [HttpGet("track/{trackingNumberOrId}")]
     [AllowAnonymous]
@@ -3691,11 +3690,13 @@ public class OrdersController : ControllerBase
     {
         Order? order = null;
 
+        // 1. Try to find by TrackingNumber
         order = await _context.Orders
             .Include(o => o.StatusLogs)
             .ThenInclude(s => s.UpdatedBy)
             .FirstOrDefaultAsync(o => o.TrackingNumber == trackingNumberOrId);
 
+        // 2. If not found, try parsing as Order ID (int)
         if (order == null && int.TryParse(trackingNumberOrId, out int orderId))
         {
             order = await _context.Orders
@@ -3707,6 +3708,7 @@ public class OrdersController : ControllerBase
         if (order == null)
             return NotFound(new { message = "Order not found for this tracking number or ID." });
 
+        // ✅ Fetch the customer username separately (Order has no navigation to User)
         string? customerName = null;
         if (order.UserId > 0)
         {
@@ -3731,7 +3733,7 @@ public class OrdersController : ControllerBase
         {
             order.Id,
             order.TrackingNumber,
-            ShippingCarrier = order.ShippingCarrier ?? "N/A",
+            ShippingCarrier = order.ShippingCarrier ?? "N/A", // ✅ Carrier included
             order.ShippedAt,
             order.DeliveredAt,
             order.CurrentStatus,
@@ -3753,7 +3755,7 @@ public class OrdersController : ControllerBase
     }
 
     // ============================================================
-    // ADMIN: GET ALL ORDERS
+    // ADMIN: GET ALL ORDERS (FIXED: Return Status, not CurrentStatus)
     // ============================================================
     [HttpGet("admin/all")]
     [Authorize(Roles = "Admin,Vendor,Employee")]
@@ -3768,7 +3770,7 @@ public class OrdersController : ControllerBase
                 o.UserId,
                 o.OrderDate,
                 o.TotalAmount,
-                Status = o.CurrentStatus,
+                Status = o.CurrentStatus, // ✅ Frontend expects "status"
                 o.ShippingAddress,
                 o.PaymentMethod,
                 o.IsPaymentConfirmed,
@@ -3789,14 +3791,14 @@ public class OrdersController : ControllerBase
 }
 
 // ============================================================
-// DTOs (local)
+// DTOs (local to this controller)
 // ============================================================
 
 public class UpdateStatusWithNoteDto
 {
     public string Status { get; set; } = string.Empty;
     public string? Note { get; set; }
-    public string? Carrier { get; set; }
+    public string? Carrier { get; set; } // ✅ New field for carrier update
 }
 
 public class RevertPaymentDto
@@ -10110,7 +10112,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Marketplace.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f5b428bc412c9102fc42b566ea24c5e461ffc19b")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4bb84b6df4042eb1b55343b807d731384412ccee")]
 [assembly: System.Reflection.AssemblyProductAttribute("Marketplace.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Marketplace.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
@@ -10546,7 +10548,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Marketplace.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f5b428bc412c9102fc42b566ea24c5e461ffc19b")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4bb84b6df4042eb1b55343b807d731384412ccee")]
 [assembly: System.Reflection.AssemblyProductAttribute("Marketplace.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Marketplace.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

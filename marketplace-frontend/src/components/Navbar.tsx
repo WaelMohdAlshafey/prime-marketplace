@@ -1,4 +1,6 @@
-﻿'use client';
+﻿// marketplace-frontend/components/Navbar.tsx
+
+'use client';
 
 import Link from 'next/link';
 import { useState, useEffect, useRef } from 'react';
@@ -30,28 +32,23 @@ import api from '@/lib/api';
 const TopBar = () => {
     const { t } = useTranslation('common');
     return (
-        <div className="bg-gradient-to-r from-[#0F5C45] to-[#1A7A5C] text-white text-xs py-1.5 relative overflow-hidden">
-            <div className="absolute inset-0 opacity-10 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDM0djItSDI0di0yaDEyek0zNiAyNHYySDI0di0yaDEyeiIvPjwvZz48L2c+PC9zdmc+')]"></div>
-            <div className="container mx-auto px-4 flex justify-between items-center relative z-10">
+        <div className="top-bar">
+            <div className="container mx-auto px-4 flex justify-between items-center">
                 <div className="flex items-center gap-4">
-                    <span className="flex items-center gap-1.5">
-                        <span className="text-yellow-400 animate-pulse">✦</span>
-                        {t('freeShipping')}
-                    </span>
+                    <span>🚚 {t('freeShipping')}</span>
                     <span className="text-white/30">|</span>
-                    <Link href="/tracking" className="hover:text-yellow-300 transition duration-300">
+                    <Link href="/tracking" className="hover:opacity-70">
                         {t('trackOrder')}
                     </Link>
                 </div>
                 <div className="flex items-center gap-3">
                     <LanguageSwitcher />
-                    <button className="flex items-center gap-1 hover:text-yellow-300 transition duration-300">
-                        <CurrencyDollarIcon className="w-3.5 h-3.5" />
-                        {t('currency')}
+                    <span className="text-white/30">|</span>
+                    <button className="hover:opacity-70">
+                        <CurrencyDollarIcon className="w-4 h-4 inline" /> {t('currency')}
                     </button>
-                    <button className="hover:text-yellow-300 transition duration-300">
-                        {t('support')}
-                    </button>
+                    <span className="text-white/30">|</span>
+                    <button className="hover:opacity-70">{t('support')}</button>
                 </div>
             </div>
         </div>
@@ -68,23 +65,12 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
     const { totalItems } = useCart();
     const { totalFavorites } = useWishlist();
     const { cartIconRef } = useCartIconRef();
-    const [isAnimating, setIsAnimating] = useState(false);
-    const prevTotalRef = useRef(totalItems);
 
     useEffect(() => {
         const handleScroll = () => setIsScrolled(window.scrollY > 20);
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
-
-    useEffect(() => {
-        if (totalItems > prevTotalRef.current) {
-            setIsAnimating(true);
-            const timer = setTimeout(() => setIsAnimating(false), 300);
-            return () => clearTimeout(timer);
-        }
-        prevTotalRef.current = totalItems;
-    }, [totalItems]);
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
@@ -94,74 +80,58 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
     };
 
     return (
-        <div className={`sticky top-0 z-40 transition-all duration-500 ${isScrolled ? 'bg-white/80 backdrop-blur-xl shadow-lg border-b border-white/20' : 'bg-white/60 backdrop-blur-md shadow-sm border-b border-gray-100/50'}`}>
-            <div className="container mx-auto px-4 flex items-center gap-4 py-3">
+        <div className={`navbar ${isScrolled ? 'shadow-md' : ''}`}>
+            <div className="container mx-auto px-4 flex items-center gap-4 py-2">
                 <Logo />
 
-                <form onSubmit={handleSearch} className="flex-1 max-w-2xl relative group hidden sm:block">
-                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-[#0F5C45]/5 to-[#D4A54A]/5 opacity-0 group-hover:opacity-100 transition duration-500 blur-xl"></div>
+                <form onSubmit={handleSearch} className="search-bar">
                     <input
                         type="text"
                         placeholder={t('searchPlaceholder')}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full px-5 py-3 pr-12 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#0F5C45]/30 focus:border-[#0F5C45] transition-all duration-300 bg-white/80 backdrop-blur-sm hover:bg-white text-right shadow-soft relative z-10"
                     />
-                    <MagnifyingGlassIcon className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-hover:text-[#0F5C45] transition duration-300" />
-                    <button type="submit" className="absolute left-1.5 top-1/2 -translate-y-1/2 bg-gradient-to-r from-[#0F5C45] to-[#1A7A5C] text-white px-5 py-1.5 rounded-xl text-sm font-medium hover:shadow-lg hover:scale-105 transition-all duration-300 shadow-soft">
-                        {t('search')}
+                    <button type="submit" className="search-btn">
+                        <MagnifyingGlassIcon className="w-4 h-4" />
+                        <span>{t('search')}</span>
                     </button>
                 </form>
 
-                {/* Mobile search */}
-                <form onSubmit={handleSearch} className="flex-1 sm:hidden">
-                    <input
-                        type="text"
-                        placeholder={t('searchPlaceholder')}
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0F5C45]/30 text-right text-sm"
-                    />
-                </form>
-
-                <div className="flex items-center gap-3 md:gap-4 flex-shrink-0">
-                    <motion.button whileHover={{ scale: 1.15, rotate: -5 }} whileTap={{ scale: 0.9 }} className="text-gray-600 hover:text-[#0F5C45] transition relative group hidden sm:block">
-                        <HeartIcon className="w-6 h-6 group-hover:fill-[#0F5C45]/10 transition" />
-                        <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute -top-1 -right-1 bg-gradient-to-r from-[#0F5C45] to-[#1A7A5C] text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center shadow-md">
-                            {totalFavorites}
-                        </motion.span>
+                <div className="nav-icons">
+                    <motion.button whileHover={{ scale: 1.1 }} className="icon-link hidden sm:block">
+                        <HeartIcon className="w-6 h-6" />
+                        <span className="badge">{totalFavorites}</span>
                     </motion.button>
 
-                    <Link href="/cart" ref={(el) => { cartIconRef.current = el as HTMLElement; }} className="text-gray-600 hover:text-[#0F5C45] transition relative group">
-                        <motion.div whileHover={{ scale: 1.15, rotate: 8 }} whileTap={{ scale: 0.9 }} className="relative">
-                            <ShoppingCartIcon className="w-6 h-6 group-hover:fill-[#0F5C45]/10 transition" />
-                            <motion.span animate={{ scale: isAnimating ? 1.5 : 1 }} transition={{ type: 'spring', stiffness: 400, damping: 10 }} className="absolute -top-1 -right-1 bg-gradient-to-r from-[#0F5C45] to-[#1A7A5C] text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center shadow-md">
-                                {totalItems}
-                            </motion.span>
-                        </motion.div>
+                    <Link href="/cart" ref={(el) => { cartIconRef.current = el as HTMLElement; }} className="icon-link">
+                        <ShoppingCartIcon className="w-6 h-6" />
+                        <motion.span
+                            animate={{ scale: totalItems > 0 ? 1.2 : 1 }}
+                            className="badge"
+                        >
+                            {totalItems}
+                        </motion.span>
                     </Link>
 
-                    {/* Admin Settings – visible only for Admin */}
                     {user && user.role === 'Admin' && (
-                        <Link href="/admin" className="text-gray-600 hover:text-[#0F5C45] transition relative group">
-                            <Cog6ToothIcon className="w-6 h-6 group-hover:fill-[#0F5C45]/10 transition" />
+                        <Link href="/admin" className="icon-link">
+                            <Cog6ToothIcon className="w-6 h-6" />
                         </Link>
                     )}
 
                     {user ? (
-                        <div className="hidden sm:flex items-center gap-2 bg-[#0F5C45]/5 px-3 py-1.5 rounded-full border border-[#0F5C45]/10">
-                            <span className="text-sm text-gray-700 font-medium">{user.username}</span>
-                            <UserIcon className="w-4 h-4 text-[#0F5C45]" />
+                        <div className="user-info hidden sm:flex">
+                            <span className="font-medium">{user.username}</span>
+                            <UserIcon className="w-5 h-5" />
                         </div>
                     ) : (
                         <>
-                            {/* ✅ Register link */}
-                            <Link href="/auth/register" className="text-sm font-medium text-[#0F5C45] hover:text-[#0A4735] transition flex items-center gap-1">
+                            <Link href="/auth/register" className="icon-link text-sm font-medium">
                                 <UserPlusIcon className="w-5 h-5" />
                                 <span className="hidden sm:inline">{t('registerTitle')}</span>
                             </Link>
-                            <Link href="/auth/login" className="text-gray-600 hover:text-[#0F5C45] transition hidden sm:block">
-                                <UserIcon className="w-6 h-6 hover:scale-110 transition duration-300" />
+                            <Link href="/auth/login" className="icon-link hidden sm:block">
+                                <UserIcon className="w-6 h-6" />
                             </Link>
                         </>
                     )}
@@ -172,36 +142,36 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
 };
 
 // ============================================================
-// NAV MENU – Dynamic with mobile hamburger
+// NAV MENU
 // ============================================================
 const NavMenu = ({ categories, loading, user, logout }: { categories: string[]; loading: boolean; user: AuthResponse | null; logout: () => void }) => {
     const { t } = useTranslation('common');
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     return (
-        <div className="bg-white/70 backdrop-blur-sm border-b border-gray-100/50 shadow-sm">
+        <div className="bg-white border-b border-gray-100 shadow-sm">
             <div className="container mx-auto px-4">
                 <div className="flex items-center justify-between gap-6 py-2.5">
                     <div className="flex items-center gap-6 overflow-x-auto whitespace-nowrap text-sm scrollbar-hide">
-                        <Link href="/" className="text-[#0F5C45] font-semibold hover:text-[#0A4735] transition border-b-2 border-[#0F5C45] pb-1">
+                        <Link href="/" className="text-[#2F5A6B] font-semibold hover:text-[#D27736] transition border-b-2 border-[#4E8C9E] pb-1">
                             {t('home')}
                         </Link>
                         {loading ? (
                             <span className="text-gray-400">Loading categories…</span>
                         ) : (
                             categories.map((cat) => (
-                                <Link key={cat} href={`/${cat}`} className="text-gray-600 hover:text-[#0F5C45] transition pb-1">
+                                <Link key={cat} href={`/${cat}`} className="text-gray-600 hover:text-[#D27736] transition pb-1">
                                     {cat.replace(/-/g, ' ')}
                                 </Link>
                             ))
                         )}
-                        <Link href="/stores" className="text-gray-600 hover:text-[#0F5C45] transition pb-1">
+                        <Link href="/stores" className="text-gray-600 hover:text-[#D27736] transition pb-1">
                             {t('stores')}
                         </Link>
-                        <Link href="/offers" className="text-orange-500 font-medium hover:text-orange-600 transition pb-1">
+                        <Link href="/offers" className="text-[#D27736] font-medium hover:text-[#B05E2A] transition pb-1">
                             🔥 {t('offers')}
                         </Link>
-                        <Link href="/contact" className="text-gray-600 hover:text-[#0F5C45] transition pb-1">
+                        <Link href="/contact" className="text-gray-600 hover:text-[#D27736] transition pb-1">
                             {t('contact')}
                         </Link>
                     </div>
@@ -209,52 +179,42 @@ const NavMenu = ({ categories, loading, user, logout }: { categories: string[]; 
                     <button
                         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                         className="lg:hidden p-1 rounded-md hover:bg-gray-100 transition"
-                        aria-label="Toggle menu"
                     >
                         {mobileMenuOpen ? <XMarkIcon className="w-6 h-6" /> : <Bars3Icon className="w-6 h-6" />}
                     </button>
                 </div>
 
-                {/* Mobile dropdown */}
                 {mobileMenuOpen && (
                     <div className="lg:hidden py-3 space-y-2 text-right border-t border-gray-100">
-                        <Link href="/" className="block text-gray-700 hover:text-[#0F5C45] transition py-1" onClick={() => setMobileMenuOpen(false)}>
+                        <Link href="/" className="block text-gray-700 hover:text-[#D27736] transition py-1" onClick={() => setMobileMenuOpen(false)}>
                             {t('home')}
                         </Link>
                         {categories.map((cat) => (
-                            <Link key={cat} href={`/${cat}`} className="block text-gray-700 hover:text-[#0F5C45] transition py-1" onClick={() => setMobileMenuOpen(false)}>
+                            <Link key={cat} href={`/${cat}`} className="block text-gray-700 hover:text-[#D27736] transition py-1" onClick={() => setMobileMenuOpen(false)}>
                                 {cat.replace(/-/g, ' ')}
                             </Link>
                         ))}
-                        <Link href="/stores" className="block text-gray-700 hover:text-[#0F5C45] transition py-1" onClick={() => setMobileMenuOpen(false)}>
+                        <Link href="/stores" className="block text-gray-700 hover:text-[#D27736] transition py-1" onClick={() => setMobileMenuOpen(false)}>
                             {t('stores')}
                         </Link>
-                        <Link href="/offers" className="block text-orange-500 hover:text-orange-600 transition py-1" onClick={() => setMobileMenuOpen(false)}>
+                        <Link href="/offers" className="block text-[#D27736] hover:text-[#B05E2A] transition py-1" onClick={() => setMobileMenuOpen(false)}>
                             🔥 {t('offers')}
                         </Link>
-                        <Link href="/contact" className="block text-gray-700 hover:text-[#0F5C45] transition py-1" onClick={() => setMobileMenuOpen(false)}>
+                        <Link href="/contact" className="block text-gray-700 hover:text-[#D27736] transition py-1" onClick={() => setMobileMenuOpen(false)}>
                             {t('contact')}
                         </Link>
-
-                        {/* Mobile auth links */}
                         {!loading && !user && (
                             <>
-                                <Link href="/auth/register" className="block text-[#0F5C45] font-medium hover:underline transition py-1" onClick={() => setMobileMenuOpen(false)}>
+                                <Link href="/auth/register" className="block text-[#4E8C9E] font-medium hover:underline transition py-1" onClick={() => setMobileMenuOpen(false)}>
                                     {t('registerTitle')}
                                 </Link>
-                                <Link href="/auth/login" className="block text-[#0F5C45] font-medium hover:underline transition py-1" onClick={() => setMobileMenuOpen(false)}>
+                                <Link href="/auth/login" className="block text-[#4E8C9E] font-medium hover:underline transition py-1" onClick={() => setMobileMenuOpen(false)}>
                                     {t('loginTitle')}
                                 </Link>
                             </>
                         )}
                         {user && (
-                            <button
-                                onClick={() => {
-                                    logout();
-                                    setMobileMenuOpen(false);
-                                }}
-                                className="block w-full text-right text-red-500 hover:text-red-700 transition py-1"
-                            >
+                            <button onClick={() => { logout(); setMobileMenuOpen(false); }} className="block w-full text-right text-red-500 hover:text-red-700 transition py-1">
                                 {t('logout')}
                             </button>
                         )}
@@ -266,7 +226,7 @@ const NavMenu = ({ categories, loading, user, logout }: { categories: string[]; 
 };
 
 // ============================================================
-// USER NAV (bottom bar for logged-in users)
+// USER NAV
 // ============================================================
 const UserNav = ({ user, logout }: { user: AuthResponse; logout: () => void }) => {
     const { t } = useTranslation('common');
@@ -274,53 +234,51 @@ const UserNav = ({ user, logout }: { user: AuthResponse; logout: () => void }) =
     const isAdmin = user.role === 'Admin';
 
     return (
-        <div className="bg-gradient-to-r from-[#0F5C45] to-[#1A7A5C] text-white text-sm py-2">
+        <div className="bg-[#2F5A6B] text-white text-sm py-2">
             <div className="container mx-auto px-4 flex flex-wrap justify-between items-center gap-2">
                 <div className="flex flex-wrap items-center gap-4">
-                    <Link href="/cart" className="hover:text-yellow-300 transition flex items-center gap-2 text-xs md:text-sm">
+                    <Link href="/cart" className="hover:text-[#D27736] transition flex items-center gap-2 text-xs md:text-sm">
                         <ShoppingCartIcon className="w-4 h-4" /> {t('cart')}
                     </Link>
-                    <Link href="/orders" className="hover:text-yellow-300 transition flex items-center gap-2 text-xs md:text-sm">
-                        <span>📋 {t('orders')}</span>
+                    <Link href="/orders" className="hover:text-[#D27736] transition flex items-center gap-2 text-xs md:text-sm">
+                        📋 {t('orders')}
                     </Link>
-                    <Link href="/suggest" className="hover:text-yellow-300 transition flex items-center gap-2 text-xs md:text-sm">
-                        <span>💡 Suggest</span>
+                    <Link href="/suggest" className="hover:text-[#D27736] transition flex items-center gap-2 text-xs md:text-sm">
+                        💡 Suggest
                     </Link>
                     {isVendor && (
                         <>
-                            <Link href="/vendor/dashboard" className="hover:text-yellow-300 transition flex items-center gap-2 text-xs md:text-sm">
-                                <span>📊 {t('dashboard')}</span>
+                            <Link href="/vendor/dashboard" className="hover:text-[#D27736] transition flex items-center gap-2 text-xs md:text-sm">
+                                📊 {t('dashboard')}
                             </Link>
-                            <Link href="/admin/orders" className="hover:text-yellow-300 transition flex items-center gap-2 text-xs md:text-sm">
-                                <span>📦 Manage Orders</span>
+                            <Link href="/admin/orders" className="hover:text-[#D27736] transition flex items-center gap-2 text-xs md:text-sm">
+                                📦 Manage Orders
                             </Link>
                         </>
                     )}
                     {isAdmin && (
                         <>
-                            <Link href="/admin/users" className="hover:text-yellow-300 transition flex items-center gap-2 text-xs md:text-sm">
-                                <span>👥 {t('users')}</span>
+                            <Link href="/admin/users" className="hover:text-[#D27736] transition flex items-center gap-2 text-xs md:text-sm">
+                                👥 {t('users')}
                             </Link>
-                            <Link href="/admin" className="hover:text-yellow-300 transition flex items-center gap-2 text-xs md:text-sm">
-                                <span>⚙️ {t('admin')}</span>
+                            <Link href="/admin" className="hover:text-[#D27736] transition flex items-center gap-2 text-xs md:text-sm">
+                                ⚙️ {t('admin')}
                             </Link>
-                            {/* ✅ NEW: Admin Golden Links */}
-                            <Link href="/admin/golden-links" className="hover:text-yellow-300 transition flex items-center gap-2 text-xs md:text-sm">
-                                <span>🔗 Golden Links</span>
+                            <Link href="/admin/golden-links" className="hover:text-[#D27736] transition flex items-center gap-2 text-xs md:text-sm">
+                                🔗 Golden Links
                             </Link>
                         </>
                     )}
-                    <Link href="/chat" className="hover:text-yellow-300 transition flex items-center gap-2 text-xs md:text-sm">
-                        <span>💬 Chat</span>
+                    <Link href="/chat" className="hover:text-[#D27736] transition flex items-center gap-2 text-xs md:text-sm">
+                        💬 Chat
                     </Link>
-                    {/* ✅ NEW: Profile Link – always visible for logged-in users */}
-                    <Link href="/profile" className="hover:text-yellow-300 transition flex items-center gap-2 text-xs md:text-sm">
-                        <span>👤 {t('profile')}</span>
+                    <Link href="/profile" className="hover:text-[#D27736] transition flex items-center gap-2 text-xs md:text-sm">
+                        👤 {t('profile')}
                     </Link>
                 </div>
                 <div className="flex items-center gap-3">
                     <span className="text-xs text-white/70">{t('welcome')}، {user.username}</span>
-                    <button onClick={logout} className="text-xs bg-white/10 px-3 py-1 rounded-full hover:bg-white/20 transition duration-300 hover:scale-105">
+                    <button onClick={logout} className="text-xs bg-white/10 px-3 py-1 rounded-full hover:bg-white/20 transition">
                         {t('logout')}
                     </button>
                 </div>
