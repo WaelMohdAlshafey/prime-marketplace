@@ -8,6 +8,130 @@ import { getStoreSettings, updateStoreSettings } from '@/lib/storeApi';
 import { StoreSettings, Owner } from '@/types';
 import { Save, Palette, Settings as SettingsIcon, Code, Building } from 'lucide-react';
 
+// ✅ PRESET COLOR SCHEMES FOR EACH TEMPLATE
+const templatePresets: Record<string, Partial<StoreSettings>> = {
+    standard: {
+        primaryColor: '#0F5C45',
+        primaryDark: '#0A4735',
+        primaryLight: '#1A7A5C',
+        secondaryColor: '#D4A54A',
+        secondaryLight: '#E8C97A',
+        backgroundColor: '#F7F8FA',
+        surfaceColor: '#FFFFFF',
+        textColor: '#1A1A2E',
+        textMuted: '#6B7280',
+        navbarBg: '#0F5C45',
+        navbarText: '#FFFFFF',
+        navbarHover: '#D4A54A',
+        footerBg: '#111827',
+        footerText: '#9CA3AF',
+        buttonPrimaryBg: '#0F5C45',
+        buttonPrimaryHover: '#0A4735',
+        buttonPrimaryText: '#FFFFFF',
+        buttonSecondaryBg: '#D4A54A',
+        buttonSecondaryHover: '#B8923A',
+        buttonSecondaryText: '#FFFFFF',
+        cardBg: '#FFFFFF',
+        cardBorder: '#E5E7EB',
+        cardShadow: '0 8px 32px rgba(15, 92, 69, 0.08)',
+        cardHoverShadow: '0 20px 60px rgba(15, 92, 69, 0.18)',
+        cardBorderRadius: '16px',
+        fontFamily: "'Cairo', 'Inter', sans-serif",
+        siteEmoji: '🛍️',
+        faviconEmoji: '🏪',
+    },
+    simple: {
+        primaryColor: '#4A4A4A',
+        primaryDark: '#2C2C2C',
+        primaryLight: '#7A7A7A',
+        secondaryColor: '#7A7A7A',
+        secondaryLight: '#B0B0B0',
+        backgroundColor: '#F0F0F0',
+        surfaceColor: '#FFFFFF',
+        textColor: '#1A1A1A',
+        textMuted: '#888888',
+        navbarBg: '#FFFFFF',
+        navbarText: '#333333',
+        navbarHover: '#4A4A4A',
+        footerBg: '#333333',
+        footerText: '#CCCCCC',
+        buttonPrimaryBg: '#4A4A4A',
+        buttonPrimaryHover: '#2C2C2C',
+        buttonPrimaryText: '#FFFFFF',
+        buttonSecondaryBg: '#CCCCCC',
+        buttonSecondaryHover: '#AAAAAA',
+        buttonSecondaryText: '#333333',
+        cardBg: '#FFFFFF',
+        cardBorder: '#E0E0E0',
+        cardShadow: '0 2px 8px rgba(0,0,0,0.06)',
+        cardHoverShadow: '0 8px 24px rgba(0,0,0,0.10)',
+        cardBorderRadius: '8px',
+        fontFamily: "'Inter', sans-serif",
+        siteEmoji: '🛒',
+        faviconEmoji: '🛍️',
+    },
+    colored: {
+        primaryColor: '#D27736',
+        primaryDark: '#B05E2A',
+        primaryLight: '#E8B48C',
+        secondaryColor: '#F5A623',
+        secondaryLight: '#FFD700',
+        backgroundColor: '#FFF8F0',
+        surfaceColor: '#FFFFFF',
+        textColor: '#2C1810',
+        textMuted: '#8A7A6A',
+        navbarBg: '#D27736',
+        navbarText: '#FFFFFF',
+        navbarHover: '#F5A623',
+        footerBg: '#2C1810',
+        footerText: '#D4B8A0',
+        buttonPrimaryBg: '#D27736',
+        buttonPrimaryHover: '#B05E2A',
+        buttonPrimaryText: '#FFFFFF',
+        buttonSecondaryBg: '#F5A623',
+        buttonSecondaryHover: '#D4891A',
+        buttonSecondaryText: '#FFFFFF',
+        cardBg: '#FFFFFF',
+        cardBorder: '#E8D4C0',
+        cardShadow: '0 8px 32px rgba(210, 119, 54, 0.12)',
+        cardHoverShadow: '0 20px 60px rgba(210, 119, 54, 0.22)',
+        cardBorderRadius: '16px',
+        fontFamily: "'Cairo', sans-serif",
+        siteEmoji: '🌶️',
+        faviconEmoji: '🔥',
+    },
+    blue: {
+        primaryColor: '#2563EB',
+        primaryDark: '#1D4ED8',
+        primaryLight: '#60A5FA',
+        secondaryColor: '#3B82F6',
+        secondaryLight: '#93C5FD',
+        backgroundColor: '#EFF6FF',
+        surfaceColor: '#FFFFFF',
+        textColor: '#1E293B',
+        textMuted: '#64748B',
+        navbarBg: '#1E3A8A',
+        navbarText: '#FFFFFF',
+        navbarHover: '#60A5FA',
+        footerBg: '#0F172A',
+        footerText: '#94A3B8',
+        buttonPrimaryBg: '#2563EB',
+        buttonPrimaryHover: '#1D4ED8',
+        buttonPrimaryText: '#FFFFFF',
+        buttonSecondaryBg: '#3B82F6',
+        buttonSecondaryHover: '#2563EB',
+        buttonSecondaryText: '#FFFFFF',
+        cardBg: '#FFFFFF',
+        cardBorder: '#DBEAFE',
+        cardShadow: '0 8px 32px rgba(37, 99, 235, 0.08)',
+        cardHoverShadow: '0 20px 60px rgba(37, 99, 235, 0.18)',
+        cardBorderRadius: '16px',
+        fontFamily: "'Inter', sans-serif",
+        siteEmoji: '💎',
+        faviconEmoji: '⚡',
+    },
+};
+
 export default function AdminSettings() {
     const { user, isLoading } = useAuth();
     const router = useRouter();
@@ -53,20 +177,32 @@ export default function AdminSettings() {
         }
     };
 
-    // ✅ Robust template change handler with optimistic update
+    // ✅ UPDATED: Applies full preset when template changes
     const handleTemplateChange = async (newTemplate: string) => {
         if (!settings) return;
-        // Immediate UI update
-        const updated = { ...settings, template: newTemplate as any };
+
+        // ✅ Get the preset for the selected template
+        const preset = templatePresets[newTemplate as keyof typeof templatePresets] || {};
+
+        // ✅ Merge the preset with current settings (keep custom fields not in preset)
+        const updated = {
+            ...settings,
+            ...preset,
+            template: newTemplate as any,
+        };
+
+        // ✅ Immediate UI update
         setSettings(updated);
         applyTheme(updated);
+
         try {
             await saveTemplate(newTemplate as any);
+            // ✅ Sync with server – this will also call applyTheme again
             const fresh = await getStoreSettings();
             setSettings(fresh);
             applyTheme(fresh);
         } catch {
-            // revert on error
+            // Revert if save fails
             const revert = await getStoreSettings();
             setSettings(revert);
             applyTheme(revert);
@@ -228,11 +364,11 @@ export default function AdminSettings() {
                             />
                         </div>
 
-                        {/* Template Selector – with key to force re-render */}
+                        {/* ✅ Template Selector with Presets */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">القالب</label>
                             <select
-                                key={settings.template} // forces re-render on template change
+                                key={settings.template}
                                 value={settings.template || 'standard'}
                                 onChange={(e) => handleTemplateChange(e.target.value)}
                                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0F5C45]"
@@ -247,7 +383,7 @@ export default function AdminSettings() {
                     </div>
                 )}
 
-                {/* TAB 2: THEME */}
+                {/* TAB 2: THEME (same as before – manual color overrides) */}
                 {activeTab === 'theme' && (
                     <div className="space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
