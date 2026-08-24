@@ -92,7 +92,7 @@ export default function HeroBanner() {
     };
 
     return (
-        <div className="relative bg-[#E8F0F4] rounded-lg p-8 md:p-12 my-6 overflow-hidden min-h-[320px] flex items-center justify-between">
+        <div className="relative bg-[#E8F0F4] rounded-lg p-4 md:p-8 lg:p-12 my-4 md:my-6 overflow-hidden min-h-[280px] md:min-h-[320px]">
             <AnimatePresence mode="wait" custom={direction}>
                 {slides.map((slide, index) => (
                     index === current && (
@@ -104,51 +104,64 @@ export default function HeroBanner() {
                             animate="center"
                             exit="exit"
                             transition={{ duration: 0.6, ease: 'easeInOut' }}
-                            className="flex-1 text-right relative z-10"
+                            className="flex flex-col md:flex-row items-center gap-4 md:gap-8"
                         >
-                            <span className="inline-block bg-secondary text-white text-xs font-semibold px-4 py-1 rounded-pill mb-3">
-                                {slide.badge}
-                            </span>
-                            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-text mb-2">{slide.title}</h1>
-                            <p className="text-xl text-text-secondary mb-3">{slide.subtitle}</p>
-                            <p className="text-text-muted max-w-lg mb-5 leading-relaxed">{slide.description}</p>
-                            <Link href={slide.link} className="inline-flex items-center gap-2 bg-button-secondary-bg hover:bg-button-secondary-hover text-button-secondary-text px-8 py-3 rounded-pill font-semibold transition hover:shadow-lg hover:-translate-y-1">
-                                <ShoppingBag className="w-5 h-5" />
-                                {slide.cta}
-                            </Link>
+                            {/* Text content - full width on mobile, half on desktop */}
+                            <div className="flex-1 text-right z-10 w-full md:w-1/2">
+                                <span className="inline-block bg-secondary text-white text-xs font-semibold px-3 py-1 rounded-pill mb-2 md:mb-3">
+                                    {slide.badge}
+                                </span>
+                                <h1 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-text mb-1 md:mb-2">
+                                    {slide.title}
+                                </h1>
+                                <p className="text-lg md:text-xl text-text-secondary mb-2">{slide.subtitle}</p>
+                                <p className="text-sm md:text-base text-text-muted max-w-lg leading-relaxed mb-3 md:mb-5">
+                                    {slide.description}
+                                </p>
+                                <Link
+                                    href={slide.link}
+                                    className="inline-flex items-center gap-2 bg-button-secondary-bg hover:bg-button-secondary-hover text-button-secondary-text px-4 md:px-6 py-2 md:py-3 rounded-pill font-semibold transition hover:shadow-lg hover:-translate-y-1 text-sm md:text-base"
+                                >
+                                    <ShoppingBag className="w-4 h-4 md:w-5 md:h-5" />
+                                    {slide.cta}
+                                </Link>
+                            </div>
+
+                            {/* Image - hidden on mobile, shown on tablet+ */}
+                            <div className="hidden md:flex md:w-1/2 justify-center z-10">
+                                <Image
+                                    src={slide.image}
+                                    alt={slide.title}
+                                    width={400}
+                                    height={400}
+                                    className="max-w-[200px] lg:max-w-[320px] h-auto object-contain"
+                                    priority
+                                    onError={(e) => {
+                                        (e.target as HTMLImageElement).src = PLACEHOLDER_IMAGE;
+                                    }}
+                                />
+                            </div>
                         </motion.div>
                     )
                 ))}
             </AnimatePresence>
 
-            <div className="flex-1 flex justify-center z-10">
-                <Image
-                    src={slides[current].image}
-                    alt={slides[current].title}
-                    width={400}
-                    height={400}
-                    className="max-w-[200px] md:max-w-[320px] h-auto object-contain"
-                    priority
-                    onError={(e) => {
-                        (e.target as HTMLImageElement).src = PLACEHOLDER_IMAGE;
-                    }}
-                />
-            </div>
-
+            {/* Navigation buttons */}
             <button
                 onClick={handlePrev}
-                className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-3 bg-white/80 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition hover:scale-110"
+                className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-20 p-2 md:p-3 bg-white/80 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition hover:scale-110"
             >
-                <ArrowLeft className="w-5 h-5 text-text" />
+                <ArrowLeft className="w-4 h-4 md:w-5 md:h-5 text-text" />
             </button>
             <button
                 onClick={handleNext}
-                className="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-3 bg-white/80 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition hover:scale-110"
+                className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-20 p-2 md:p-3 bg-white/80 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition hover:scale-110"
             >
-                <ArrowRight className="w-5 h-5 text-text" />
+                <ArrowRight className="w-4 h-4 md:w-5 md:h-5 text-text" />
             </button>
 
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+            {/* Dots */}
+            <div className="absolute bottom-2 md:bottom-4 left-1/2 -translate-x-1/2 flex gap-1 md:gap-2 z-20">
                 {slides.map((_, index) => (
                     <button
                         key={index}
@@ -157,8 +170,8 @@ export default function HeroBanner() {
                             setCurrent(index);
                         }}
                         className={`transition-all duration-300 rounded-full ${current === index
-                            ? 'w-8 h-2.5 bg-primary'
-                            : 'w-2.5 h-2.5 bg-gray-300 hover:bg-primary/50'
+                                ? 'w-6 md:w-8 h-1.5 md:h-2.5 bg-primary'
+                                : 'w-1.5 md:w-2.5 h-1.5 md:h-2.5 bg-gray-300 hover:bg-primary/50'
                             }`}
                     />
                 ))}

@@ -1,7 +1,21 @@
 ﻿/* ============================================================
-   globals.css – PRIME MARKETPLACE
-   All themeable values use CSS variables.
-   Hardcoded colors only for fixed elements (hero, etc.)
+   PREVENT HORIZONTAL SCROLL – FIXES OVERFLOW ISSUES
+   ============================================================ */
+html,
+body {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+    margin: 0;
+    padding: 0;
+}
+
+* {
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+/* ============================================================
+   NEMOCARE-STYLE THEME – Clean, Trustworthy, Premium
    ============================================================ */
 
 @tailwind base;
@@ -9,69 +23,70 @@
 @tailwind utilities;
 
 /* ============================================================
-   ROOT THEME VARIABLES (fallback values)
-   These are overridden by ThemeContext.tsx at runtime.
+   ROOT THEME VARIABLES
    ============================================================ */
 :root {
-    /* Primary Colors */
+    /* ===== Primary Colors (Teal) ===== */
     --color-primary: #4E8C9E;
     --color-primary-dark: #2F5A6B;
     --color-primary-light: #7AB8C9;
     --color-primary-bg: #E8F4F7;
-    /* Secondary Colors */
+    /* ===== Secondary Colors (Terracotta/Warm Orange) ===== */
     --color-secondary: #D27736;
     --color-secondary-dark: #B05E2A;
     --color-secondary-light: #E8B48C;
     --color-secondary-bg: #FDF3E8;
-    /* Background & Surfaces */
+    /* ===== Background & Surfaces ===== */
     --color-background: #F8F9FA;
     --color-surface: #FFFFFF;
     --color-surface-alt: #F1F3F5;
-    /* Text Colors */
+    /* ===== Text Colors ===== */
     --color-text: #1A1A2E;
     --color-text-secondary: #4A4A5A;
     --color-text-muted: #8A8A9A;
-    /* Borders & Shadows */
+    /* ===== Borders & Shadows ===== */
     --color-border: #E5E7EB;
     --color-border-light: #F0F0F0;
     --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.06);
     --shadow-card-hover: 0 12px 40px rgba(0, 0, 0, 0.10);
+    --shadow-dropdown: 0 8px 30px rgba(0, 0, 0, 0.08);
     --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.06);
     --shadow-strong: 0 12px 40px rgba(0, 0, 0, 0.10);
-    --shadow-dropdown: 0 8px 30px rgba(0, 0, 0, 0.08);
-    /* Buttons */
+    /* ===== Buttons ===== */
     --color-button-primary-bg: #4E8C9E;
     --color-button-primary-hover: #2F5A6B;
     --color-button-primary-text: #FFFFFF;
     --color-button-secondary-bg: #D27736;
     --color-button-secondary-hover: #B05E2A;
     --color-button-secondary-text: #FFFFFF;
-    /* Navbar */
+    --color-button-outline-bg: transparent;
+    --color-button-outline-hover: #4E8C9E;
+    --color-button-outline-text: #4E8C9E;
+    /* ===== Navbar ===== */
     --color-navbar-bg: #FFFFFF;
     --color-navbar-text: #2F5A6B;
     --color-navbar-hover: #D27736;
     --color-navbar-border: #E5E7EB;
-    /* Footer */
+    /* ===== Footer ===== */
     --color-footer-bg: #2F5A6B;
     --color-footer-text: #C8D8DE;
     --color-footer-heading: #FFFFFF;
-    /* Cards */
+    /* ===== Cards ===== */
     --color-card-bg: #FFFFFF;
     --color-card-border: #E5E7EB;
-    /* Badges */
+    /* ===== Badges ===== */
     --color-badge-sale: #D27736;
     --color-badge-new: #4E8C9E;
     --color-badge-sold: #8A8A9A;
-    /* Radii */
+    /* ===== Spacing ===== */
     --radius-sm: 6px;
     --radius-md: 12px;
     --radius-lg: 20px;
     --radius-pill: 40px;
     --radius-card: 12px;
-    /* Fonts */
+    /* ===== Typography ===== */
     --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    --heading-font: 'Cairo', sans-serif;
-    /* Star Rating */
+    /* ===== Star Rating ===== */
     --star-gold: #F5A623;
 }
 
@@ -154,7 +169,7 @@ body {
 }
 
 /* ============================================================
-   TOP BAR (hardcoded primary-dark – does not change)
+   TOP BAR
    ============================================================ */
 .top-bar {
     background: var(--color-primary-dark);
