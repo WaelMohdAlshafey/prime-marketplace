@@ -5,16 +5,11 @@ import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import api from '@/lib/api';
 import { Product, PagedResult } from '@/types';
-import ProductCard from './ProductCard';
-import FilterSidebar from './Filters/FilterSidebar';
-import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
-import {
-    Monitor, Sparkles, Droplet, Shirt, Gem, Smartphone, Pill, Home
-} from 'lucide-react';
+import ProductCard from '@/components/ProductCard';
+import FilterSidebar from '@/components/Filters/FilterSidebar';
+import { Sparkles } from 'lucide-react';
 
-// ============================================================
-// Category mapping – SLUG → DATABASE NAME (case-sensitive)
-// ============================================================
+// Category mapping – SLUG → DATABASE NAME
 const categoryNameMap: Record<string, string> = {
     software: 'Software',
     'hair-care': 'Hair Care',
@@ -26,102 +21,65 @@ const categoryNameMap: Record<string, string> = {
     home: 'Home',
 };
 
-// Map for icons and colors (used for hero section)
-const categoryMap: Record<string, { icon: React.ReactNode; color: string; vendorId: number }> = {
-    software: {
-        icon: <Monitor className="w-16 h-16" />,
-        color: 'from-indigo-500 to-indigo-700',
-        vendorId: 1,
-    },
-    'hair-care': {
-        icon: <Sparkles className="w-16 h-16" />,
-        color: 'from-pink-500 to-pink-700',
-        vendorId: 2,
-    },
-    'skin-care': {
-        icon: <Droplet className="w-16 h-16" />,
-        color: 'from-amber-400 to-amber-600',
-        vendorId: 2,
-    },
-    fashion: {
-        icon: <Shirt className="w-16 h-16" />,
-        color: 'from-rose-400 to-rose-600',
-        vendorId: 3,
-    },
-    accessories: {
-        icon: <Gem className="w-16 h-16" />,
-        color: 'from-yellow-400 to-yellow-600',
-        vendorId: 3,
-    },
-    electronics: {
-        icon: <Smartphone className="w-16 h-16" />,
-        color: 'from-blue-500 to-blue-700',
-        vendorId: 4,
-    },
-    supplements: {
-        icon: <Pill className="w-16 h-16" />,
-        color: 'from-green-500 to-green-700',
-        vendorId: 2,
-    },
-    home: {
-        icon: <Home className="w-16 h-16" />,
-        color: 'from-gray-400 to-gray-600',
-        vendorId: 5,
-    },
+const categoryEmojis: Record<string, string> = {
+    software: '💻',
+    'hair-care': '💇',
+    'skin-care': '🧴',
+    fashion: '👗',
+    accessories: '💎',
+    electronics: '📱',
+    supplements: '💊',
+    home: '🏠',
 };
 
-// Helper to get the display name from translation keys
 const getCategoryDisplayName = (slug: string, t: (key: string) => string): string => {
     const key = `categories.${slug}`;
     const translated = t(key);
-    // If translation returns the key itself, fallback to slug formatted
-    if (translated === key) {
-        return slug.replace(/-/g, ' ');
-    }
-    return translated;
+    return translated === key ? slug.replace(/-/g, ' ') : translated;
 };
 
-export default function CategoryPage({ category }: { category: string }) {
+interface CategoryPageProps {
+    category: string;
+}
+
+export default function CategoryPage({ category }: CategoryPageProps) {
     const { t } = useTranslation('common');
     const router = useRouter();
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [search, setSearch] = useState('');
-    const [filters, setFilters] = useState<{ minPrice?: number; maxPrice?: number; inStock?: boolean; rating?: number }>({});
+    const [filters, setFilters] = useState<{
+        minPrice?: number;
+        maxPrice?: number;
+        inStock?: boolean;
+        rating?: number;
+    }>({});
 
-    // Normalize category to lowercase for mapping
     const normalizedCategory = category.toLowerCase();
-    const catInfo = categoryMap[normalizedCategory];
     const dbCategory = categoryNameMap[normalizedCategory];
     const displayName = getCategoryDisplayName(normalizedCategory, t);
+    const emoji = categoryEmojis[normalizedCategory] || '📂';
 
-    const fetchProducts = async (q?: string, filterOverrides?: typeof filters) => {
+    const fetchProducts = async (filterOverrides?: typeof filters) => {
         setLoading(true);
         setError(null);
         try {
             const finalFilters = filterOverrides || filters;
             let url = '';
 
-            if (q) {
-                url = `/api/Products/search?q=${encodeURIComponent(q)}&page=1&pageSize=100`;
-            } else if (Object.keys(finalFilters).length > 0) {
+            if (Object.keys(finalFilters).length > 0) {
                 const params = new URLSearchParams();
-                if (catInfo) params.append('vendorId', catInfo.vendorId.toString());
                 if (finalFilters.minPrice !== undefined) params.append('minPrice', finalFilters.minPrice.toString());
                 if (finalFilters.maxPrice !== undefined) params.append('maxPrice', finalFilters.maxPrice.toString());
                 if (finalFilters.inStock !== undefined) params.append('inStock', finalFilters.inStock.toString());
                 if (finalFilters.rating !== undefined) params.append('rating', finalFilters.rating.toString());
                 url = `/api/Products/filter?${params.toString()}&page=1&pageSize=100`;
             } else {
-                // Use the mapped database name, or fallback to normalized slug
                 const categoryName = dbCategory || normalizedCategory;
                 url = `/api/Products/category/${encodeURIComponent(categoryName)}?page=1&pageSize=100`;
             }
 
-            console.log('🔄 Fetching:', url);
             const response = await api.get<PagedResult<Product>>(url);
-            console.log('✅ API response:', response.data);
             setProducts(response.data.items || []);
         } catch (err) {
             console.error('❌ Failed to fetch products:', err);
@@ -135,37 +93,26 @@ export default function CategoryPage({ category }: { category: string }) {
         if (category) {
             fetchProducts();
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [category]);
-
-    const handleSearch = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (search.trim()) {
-            fetchProducts(search.trim());
-        } else {
-            fetchProducts();
-        }
-    };
 
     const handleApplyFilters = (newFilters: typeof filters) => {
         setFilters(newFilters);
-        fetchProducts(undefined, newFilters);
+        fetchProducts(newFilters);
     };
 
     const handleResetFilters = () => {
         setFilters({});
-        fetchProducts();
+        fetchProducts({});
     };
 
-    // If category not supported, show a friendly message
-    if (!catInfo) {
+    if (!dbCategory) {
         return (
             <div className="container mx-auto px-4 py-20 text-center">
-                <h1 className="text-3xl font-bold text-gray-800 mb-4">⚠️ القسم غير موجود</h1>
-                <p className="text-gray-600">عذراً، القسم "{category}" غير مدعوم حالياً.</p>
+                <h1 className="text-3xl font-bold text-text mb-4">⚠️ القسم غير موجود</h1>
+                <p className="text-text-muted">عذراً، القسم "{category}" غير مدعوم حالياً.</p>
                 <button
                     onClick={() => window.location.href = '/'}
-                    className="mt-6 bg-[#0F5C45] text-white px-6 py-3 rounded-xl hover:bg-[#0A4735] transition"
+                    className="mt-6 bg-primary text-white px-6 py-3 rounded-pill hover:bg-primary-dark transition"
                 >
                     العودة إلى الرئيسية
                 </button>
@@ -174,65 +121,73 @@ export default function CategoryPage({ category }: { category: string }) {
     }
 
     return (
-        <div>
+        <div className="bg-background min-h-screen">
             {/* Category Hero */}
-            <section className="bg-gradient-to-r from-[#0F5C45]/10 to-[#0F5C45]/5 py-16">
+            <section className="bg-gradient-to-br from-primary-bg to-background py-12 md:py-16">
                 <div className="container mx-auto px-4 text-center">
-                    <div className={`p-4 rounded-2xl bg-gradient-to-br ${catInfo.color} text-white shadow-lg inline-block mb-4`}>
-                        {catInfo.icon}
-                    </div>
-                    <h1 className="text-5xl font-bold text-gray-900">{displayName}</h1>
-                    <p className="text-gray-600 mt-4 text-lg">
+                    <div className="text-5xl md:text-6xl mb-4">{emoji}</div>
+                    <h1 className="text-3xl md:text-5xl font-bold text-text">{displayName}</h1>
+                    <p className="text-text-muted mt-3 text-lg">
                         {t('categories.discover', { category: displayName })}
                     </p>
-                    <form onSubmit={handleSearch} className="max-w-2xl mx-auto mt-6 flex gap-2">
-                        <div className="relative flex-1">
-                            <MagnifyingGlassIcon className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                            <input
-                                type="text"
-                                placeholder={t('categories.searchPlaceholder', { category: displayName })}
-                                value={search}
-                                onChange={(e) => setSearch(e.target.value)}
-                                className="w-full pr-10 pl-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#0F5C45] text-right"
-                            />
-                        </div>
-                        <button
-                            type="submit"
-                            className="px-8 py-3 bg-[#0F5C45] text-white rounded-xl font-medium hover:bg-[#0A4735] transition"
-                        >
-                            {t('search')}
-                        </button>
-                    </form>
                 </div>
             </section>
 
             {/* Main Content */}
             <div className="container mx-auto px-4 py-8">
-                <div className="flex flex-col md:flex-row gap-8">
-                    <div className="md:w-1/4">
+                <div className="flex flex-col md:flex-row gap-6">
+                    <div className="md:w-72 flex-shrink-0">
                         <FilterSidebar
-                            vendorId={catInfo.vendorId}
                             onApplyFilters={handleApplyFilters}
                             onResetFilters={handleResetFilters}
                         />
                     </div>
-                    <div className="md:w-3/4">
-                        {error ? (
-                            <div className="text-center py-20 text-red-500 bg-white rounded-2xl shadow-sm">
-                                <p className="text-lg">{error}</p>
+
+                    <div className="flex-1">
+                        <div className="flex items-center justify-between mb-6">
+                            <div>
+                                <h2 className="text-2xl font-bold text-text flex items-center gap-2">
+                                    <Sparkles className="w-6 h-6 text-primary" />
+                                    {displayName}
+                                </h2>
+                                <p className="text-sm text-text-muted mt-1">
+                                    {products.length} {t('productCount')}
+                                </p>
                             </div>
-                        ) : loading ? (
+                        </div>
+
+                        {loading ? (
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                                 {[...Array(6)].map((_, i) => (
-                                    <div key={i} className="bg-gray-200 rounded-2xl h-72 animate-pulse" />
+                                    <div key={i} className="bg-white rounded-2xl shadow-soft p-4 animate-pulse">
+                                        <div className="w-full aspect-square bg-gray-200 rounded-xl"></div>
+                                        <div className="h-4 bg-gray-200 rounded mt-3 w-3/4"></div>
+                                        <div className="h-6 bg-gray-200 rounded mt-2 w-1/3"></div>
+                                    </div>
                                 ))}
                             </div>
+                        ) : error ? (
+                            <div className="text-center py-12 bg-white rounded-2xl shadow-soft">
+                                <p className="text-red-500">{error}</p>
+                                <button
+                                    onClick={() => fetchProducts()}
+                                    className="mt-4 bg-primary text-white px-6 py-2 rounded-pill hover:bg-primary-dark transition"
+                                >
+                                    إعادة المحاولة
+                                </button>
+                            </div>
                         ) : products.length === 0 ? (
-                            <div className="text-center py-20 text-gray-500 bg-white rounded-2xl shadow-sm">
-                                <p className="text-lg">{t('categories.noProducts')}</p>
+                            <div className="text-center py-12 bg-white rounded-2xl shadow-soft">
+                                <p className="text-text-muted">{t('categories.noProducts')}</p>
+                                <button
+                                    onClick={handleResetFilters}
+                                    className="mt-4 bg-primary text-white px-6 py-2 rounded-pill hover:bg-primary-dark transition"
+                                >
+                                    إعادة تعيين الفلاتر
+                                </button>
                             </div>
                         ) : (
-                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-5">
                                 {products.map((product) => (
                                     <ProductCard key={product.id} product={product} />
                                 ))}

@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 import api from '@/lib/api';
 import { Monitor, Sparkles, Droplet, Shirt, Gem, Smartphone, Pill, Home } from 'lucide-react';
 
-// Map normalized category keys to icons
 const categoryIcons: Record<string, any> = {
     software: Monitor,
     'hair-care': Sparkles,
@@ -64,25 +63,25 @@ export default function CategoryGrid() {
         return (
             <section className="container mx-auto px-4 py-12">
                 <div className="flex justify-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0F5C45]" />
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
                 </div>
             </section>
         );
     }
 
     return (
-        <section className="container mx-auto px-4 py-12">
+        <section className="container mx-auto px-4 py-8 md:py-12">
             <div className="flex justify-between items-center mb-6">
                 <div className="text-right">
-                    <h2 className="text-3xl font-bold text-gray-900">{t('categories.title')}</h2>
-                    <p className="text-sm text-gray-500 mt-1">{t('categories.subtitle')}</p>
+                    <h2 className="text-2xl md:text-3xl font-bold text-text">{t('categories.title')}</h2>
+                    <p className="text-sm text-text-muted mt-1">{t('categories.subtitle')}</p>
                 </div>
-                <span className="text-[#0F5C45] font-medium">
+                <span className="text-primary font-medium bg-primary/10 px-4 py-1 rounded-pill text-sm">
                     {t('categories.viewAll')} ←
                 </span>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4">
                 {categories.map((cat) => {
                     const key = normalizeCategory(cat);
                     const Icon = categoryIcons[key] || Home;
@@ -93,12 +92,12 @@ export default function CategoryGrid() {
                         <button
                             key={cat}
                             onClick={() => handleCategoryClick(cat)}
-                            className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition p-5 text-center hover:-translate-y-1 duration-300 border border-gray-50 cursor-pointer w-full group"
+                            className="bg-card-bg rounded-2xl shadow-soft hover:shadow-card-hover transition p-4 md:p-5 text-center hover:-translate-y-1 duration-300 border border-border/50 cursor-pointer w-full group"
                         >
-                            <div className={`w-14 h-14 rounded-full ${colorClass} flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-300`}>
-                                <Icon className="w-7 h-7" />
+                            <div className={`w-12 h-12 md:w-14 md:h-14 rounded-full ${colorClass} flex items-center justify-center mx-auto mb-2 md:mb-3 group-hover:scale-110 transition-transform duration-300`}>
+                                <Icon className="w-6 h-6 md:w-7 md:h-7" />
                             </div>
-                            <h3 className="font-semibold text-gray-800 text-sm">{displayName}</h3>
+                            <h3 className="font-semibold text-text text-xs md:text-sm">{displayName}</h3>
                         </button>
                     );
                 })}
