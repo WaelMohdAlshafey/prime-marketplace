@@ -21,6 +21,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { AuthResponse } from '@/types';
 import { motion, AnimatePresence } from 'framer-motion';
+import api from '@/lib/api';
 
 // ============================================================
 // TOP BAR – all items with text labels
@@ -146,7 +147,7 @@ const TopBar = () => {
 };
 
 // ============================================================
-// MAIN HEADER – Logo right, vertical menu button next to it
+// MAIN HEADER – Logo right, hamburger (no label) for main menu
 // ============================================================
 const MainHeader = ({ user }: { user: AuthResponse | null }) => {
     const { t, i18n } = useTranslation('common');
@@ -158,6 +159,23 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
     const { logout } = useAuth();
     const mainMenuRef = useRef<HTMLDivElement>(null);
     const userMenuRef = useRef<HTMLDivElement>(null);
+    const [categories, setCategories] = useState<string[]>([]);
+    const [loadingCategories, setLoadingCategories] = useState(true);
+
+    // Fetch categories for the main menu
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const response = await api.get('/api/Categories');
+                setCategories(response.data);
+            } catch (error) {
+                console.error('Failed to fetch categories:', error);
+            } finally {
+                setLoadingCategories(false);
+            }
+        };
+        fetchCategories();
+    }, []);
 
     // Close menus on outside click
     useEffect(() => {
@@ -171,10 +189,14 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
 
     const isRTL = typeof document !== 'undefined' && document.documentElement.dir === 'rtl';
 
-    // Main navigation links – vertical dropdown
+    // Main navigation links – include categories as separate items
     const navLinks = [
         { href: '/', label: t('home') },
         { href: '/products', label: t('products') },
+        ...categories.map((cat) => ({
+            href: `/${cat.toLowerCase().replace(/\s+/g, '-')}`,
+            label: cat,
+        })),
         { href: '/stores', label: t('stores') },
         { href: '/offers', label: t('offers') },
         { href: '/contact', label: t('contact') },
@@ -297,19 +319,16 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
                     </div>
                 </div>
 
-                {/* RIGHT SIDE (start of bar) – Logo + Vertical Menu Button */}
+                {/* RIGHT SIDE (start of bar) – Hamburger (no label) + Logo */}
                 <div className="flex items-center gap-2 md:gap-4 flex-shrink-0">
-                    {/* Vertical Menu Button */}
+                    {/* Main menu – hamburger icon only (no text) */}
                     <div className="relative" ref={mainMenuRef} onClick={(e) => e.stopPropagation()}>
                         <button
                             onClick={() => setMainMenuOpen(!mainMenuOpen)}
-                            className="flex items-center gap-1 px-2 py-1.5 rounded-md hover:bg-primary-dark/10 transition text-navbar-text border border-navbar-border hover:border-primary"
+                            className="p-1.5 md:p-2 rounded-md hover:bg-primary-dark/10 transition text-navbar-text"
+                            aria-label="Main menu"
                         >
-                            <Bars3Icon className="w-5 h-5" />
-                            <span className="text-sm font-medium hidden sm:inline">
-                                {i18n.language === 'ar' ? 'القائمة' : 'Menu'}
-                            </span>
-                            <ChevronDownIcon className="w-3.5 h-3.5" />
+                            <Bars3Icon className="w-5 h-5 md:w-6 md:h-6" />
                         </button>
                         <AnimatePresence>
                             {mainMenuOpen && (
@@ -329,6 +348,10 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
                                             {link.label}
                                         </Link>
                                     ))}
+                                    {/* Separator and extra links if needed */}
+                                    {loadingCategories && (
+                                        <span className="block px-4 py-2 text-text-muted text-sm">جاري التحميل...</span>
+                                    )}
                                 </motion.div>
                             )}
                         </AnimatePresence>
