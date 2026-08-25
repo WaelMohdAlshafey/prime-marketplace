@@ -1,33 +1,56 @@
 ﻿'use client';
 
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
 import { useTranslation } from 'react-i18next';
 import { useCartIconRef } from '@/context/CartIconRefContext';
 import Logo from './Logo';
-import LanguageSwitcher from './LanguageSwitcher';
+import LanguageSwitcher from './LanguageSwitcher'; // may not be needed if we have dropdown
 import {
     ShoppingCartIcon,
     UserIcon,
     HeartIcon,
-    MagnifyingGlassIcon,
     CurrencyDollarIcon,
     Bars3Icon,
     ChevronDownIcon,
+    GlobeAltIcon,
+    LifebuoyIcon,
 } from '@heroicons/react/24/outline';
-import { Truck, Shield, Clock, Headphones } from 'lucide-react';
 import { AuthResponse } from '@/types';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '@/lib/api';
 
 // ============================================================
-// TOP BAR – with trust badges
+// TOP BAR – with dropdown menus
 // ============================================================
 const TopBar = () => {
-    const { t } = useTranslation('common');
+    const { t, i18n } = useTranslation('common');
+    const [langOpen, setLangOpen] = useState(false);
+    const [supportOpen, setSupportOpen] = useState(false);
+    const [currencyOpen, setCurrencyOpen] = useState(false);
+    const langRef = useRef<HTMLDivElement>(null);
+    const supportRef = useRef<HTMLDivElement>(null);
+    const currencyRef = useRef<HTMLDivElement>(null);
+
+    // Close dropdowns on outside click
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (langRef.current && !langRef.current.contains(event.target as Node)) setLangOpen(false);
+            if (supportRef.current && !supportRef.current.contains(event.target as Node)) setSupportOpen(false);
+            if (currencyRef.current && !currencyRef.current.contains(event.target as Node)) setCurrencyOpen(false);
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    const toggleLanguage = (lng: string) => {
+        i18n.changeLanguage(lng);
+        setLangOpen(false);
+    };
+
     return (
         <div className="bg-primary-dark text-white text-xs py-1.5 relative z-50">
             <div className="container mx-auto px-4 flex flex-wrap items-center justify-between gap-1">
@@ -40,34 +63,113 @@ const TopBar = () => {
                     </Link>
                 </div>
 
-                {/* Middle: Trust badges – small, delicate, inline */}
-                <div className="flex items-center gap-3 text-[10px] md:text-xs">
-                    <span className="flex items-center gap-1">
-                        <Truck className="w-3 h-3" /> {t('shipping')}
-                    </span>
-                    <span className="text-white/30">|</span>
-                    <span className="flex items-center gap-1">
-                        <Shield className="w-3 h-3" /> {t('quality')}
-                    </span>
-                    <span className="text-white/30">|</span>
-                    <span className="flex items-center gap-1">
-                        <Clock className="w-3 h-3" /> {t('returns')}
-                    </span>
-                    <span className="text-white/30">|</span>
-                    <span className="flex items-center gap-1">
-                        <Headphones className="w-3 h-3" /> {t('support')}
-                    </span>
-                </div>
+                {/* Right side: three dropdown menus */}
+                <div className="flex items-center gap-2 md:gap-4">
+                    {/* Language Dropdown */}
+                    <div className="relative" ref={langRef}>
+                        <button
+                            onClick={() => setLangOpen(!langOpen)}
+                            onMouseEnter={() => setLangOpen(true)}
+                            className="flex items-center gap-1 hover:text-yellow-400 transition px-2 py-1 rounded-md hover:bg-white/10"
+                        >
+                            <GlobeAltIcon className="w-3.5 h-3.5" />
+                            <span>{i18n.language === 'ar' ? 'العربية' : 'English'}</span>
+                            <ChevronDownIcon className="w-3 h-3" />
+                        </button>
+                        <AnimatePresence>
+                            {langOpen && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                    className="absolute right-0 top-full mt-1 bg-white text-gray-800 rounded-lg shadow-lg py-1 w-32 z-50"
+                                >
+                                    <button
+                                        onClick={() => toggleLanguage('ar')}
+                                        className="block w-full text-right px-4 py-2 hover:bg-gray-100 transition"
+                                    >
+                                        العربية
+                                    </button>
+                                    <button
+                                        onClick={() => toggleLanguage('en')}
+                                        className="block w-full text-right px-4 py-2 hover:bg-gray-100 transition"
+                                    >
+                                        English
+                                    </button>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
 
-                {/* Right side: language + currency + support */}
-                <div className="flex items-center gap-3">
-                    <LanguageSwitcher />
                     <span className="text-white/30">|</span>
-                    <button className="hover:opacity-70 transition">
-                        <CurrencyDollarIcon className="w-3 h-3 inline" /> {t('currency')}
-                    </button>
+
+                    {/* Support Dropdown */}
+                    <div className="relative" ref={supportRef}>
+                        <button
+                            onClick={() => setSupportOpen(!supportOpen)}
+                            onMouseEnter={() => setSupportOpen(true)}
+                            className="flex items-center gap-1 hover:text-yellow-400 transition px-2 py-1 rounded-md hover:bg-white/10"
+                        >
+                            <LifebuoyIcon className="w-3.5 h-3.5" />
+                            <span>{t('support')}</span>
+                            <ChevronDownIcon className="w-3 h-3" />
+                        </button>
+                        <AnimatePresence>
+                            {supportOpen && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                    className="absolute right-0 top-full mt-1 bg-white text-gray-800 rounded-lg shadow-lg py-1 w-40 z-50"
+                                >
+                                    <Link href="/help" className="block w-full text-right px-4 py-2 hover:bg-gray-100 transition" onClick={() => setSupportOpen(false)}>
+                                        {t('help')}
+                                    </Link>
+                                    <Link href="/faq" className="block w-full text-right px-4 py-2 hover:bg-gray-100 transition" onClick={() => setSupportOpen(false)}>
+                                        {t('footer.faq')}
+                                    </Link>
+                                    <Link href="/returns" className="block w-full text-right px-4 py-2 hover:bg-gray-100 transition" onClick={() => setSupportOpen(false)}>
+                                        {t('footer.returns')}
+                                    </Link>
+                                    <Link href="/shipping" className="block w-full text-right px-4 py-2 hover:bg-gray-100 transition" onClick={() => setSupportOpen(false)}>
+                                        {t('footer.shipping')}
+                                    </Link>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
+
                     <span className="text-white/30">|</span>
-                    <button className="hover:opacity-70 transition">{t('support')}</button>
+
+                    {/* Currency Dropdown */}
+                    <div className="relative" ref={currencyRef}>
+                        <button
+                            onClick={() => setCurrencyOpen(!currencyOpen)}
+                            onMouseEnter={() => setCurrencyOpen(true)}
+                            className="flex items-center gap-1 hover:text-yellow-400 transition px-2 py-1 rounded-md hover:bg-white/10"
+                        >
+                            <CurrencyDollarIcon className="w-3.5 h-3.5" />
+                            <span>{t('currency')}</span>
+                            <ChevronDownIcon className="w-3 h-3" />
+                        </button>
+                        <AnimatePresence>
+                            {currencyOpen && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                    className="absolute right-0 top-full mt-1 bg-white text-gray-800 rounded-lg shadow-lg py-1 w-32 z-50"
+                                >
+                                    <button className="block w-full text-right px-4 py-2 hover:bg-gray-100 transition">
+                                        EGP
+                                    </button>
+                                    <button className="block w-full text-right px-4 py-2 hover:bg-gray-100 transition">
+                                        USD
+                                    </button>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
                 </div>
             </div>
         </div>
@@ -75,11 +177,10 @@ const TopBar = () => {
 };
 
 // ============================================================
-// MAIN HEADER
+// MAIN HEADER – No search bar
 // ============================================================
 const MainHeader = ({ user }: { user: AuthResponse | null }) => {
     const { t } = useTranslation('common');
-    const [searchTerm, setSearchTerm] = useState('');
     const { totalItems } = useCart();
     const { totalFavorites } = useWishlist();
     const { cartIconRef } = useCartIconRef();
@@ -89,7 +190,6 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
     const [categories, setCategories] = useState<string[]>([]);
     const [loadingCategories, setLoadingCategories] = useState(true);
 
-    // Fetch categories for the left menu
     useEffect(() => {
         const fetchCategories = async () => {
             try {
@@ -104,13 +204,6 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
         fetchCategories();
     }, []);
 
-    const handleSearch = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (searchTerm.trim()) {
-            window.location.href = `/?q=${encodeURIComponent(searchTerm.trim())}`;
-        }
-    };
-
     // Close menus on outside click
     useEffect(() => {
         const closeMenus = () => { setLeftMenuOpen(false); setRightMenuOpen(false); };
@@ -124,7 +217,7 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
 
     return (
         <div className="navbar">
-            <div className="container mx-auto px-4 flex items-center gap-4 py-2">
+            <div className="container mx-auto px-4 flex items-center justify-between gap-4 py-2">
                 {/* Left hamburger menu */}
                 <div className="relative" onClick={(e) => e.stopPropagation()}>
                     <button
@@ -183,20 +276,7 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
 
                 <Logo />
 
-                <form onSubmit={handleSearch} className="flex-1 flex items-center bg-background border border-border rounded-pill h-11 px-1 max-w-[600px] focus-within:border-primary focus-within:shadow-[0_0_0_3px_rgba(78,140,158,0.15)] transition">
-                    <input
-                        type="text"
-                        placeholder={t('searchPlaceholder')}
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="flex-1 border-none outline-none px-4 text-text bg-transparent placeholder-text-muted text-sm"
-                    />
-                    <button type="submit" className="bg-button-primary-bg hover:bg-button-primary-hover text-button-primary-text border-none rounded-pill px-6 h-9 font-semibold transition flex items-center gap-2 text-sm">
-                        <MagnifyingGlassIcon className="w-4 h-4" />
-                        <span>{t('search')}</span>
-                    </button>
-                </form>
-
+                {/* Right icons: wishlist, cart, user menu */}
                 <div className="flex items-center gap-3 flex-shrink-0">
                     <motion.button whileHover={{ scale: 1.1 }} className="text-navbar-text hover:text-navbar-hover transition relative hidden sm:block">
                         <HeartIcon className="w-6 h-6" />
@@ -205,7 +285,6 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
                         </span>
                     </motion.button>
 
-                    {/* Cart icon with ref on a span wrapper */}
                     <span ref={cartIconRef} className="relative inline-flex">
                         <Link href="/cart" className="text-navbar-text hover:text-navbar-hover transition">
                             <ShoppingCartIcon className="w-6 h-6" />
@@ -218,7 +297,7 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
                         </Link>
                     </span>
 
-                    {/* Right user menu */}
+                    {/* User menu */}
                     <div className="relative" onClick={(e) => e.stopPropagation()}>
                         <button
                             onClick={() => setRightMenuOpen(!rightMenuOpen)}

@@ -249,16 +249,7 @@ header {
    SEARCH BAR
    ============================================================ */
 .search-bar {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    background: var(--color-background);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-pill);
-    height: 44px;
-    padding: 4px;
-    max-width: 600px;
-    transition: all 0.3s ease;
+    display: none !important;
 }
 
     .search-bar:focus-within {
