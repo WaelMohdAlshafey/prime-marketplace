@@ -116,7 +116,7 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     line-height: 1.6;
-    padding-top: 110px; /* 👈 Space for fixed header (adjust if needed) */
+    padding-top: 110px; /* Space for fixed header */
 }
 
 /* ============================================================
@@ -485,12 +485,12 @@ header {
     }
 
 /* ============================================================
-   PRODUCT GRID
+   PRODUCT GRID – Premium Spacing
    ============================================================ */
 .product-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
+    gap: 24px; /* Increased from 20px for more space */
 }
 
 /* ============================================================
@@ -626,11 +626,12 @@ header {
 }
 
 /* ============================================================
-   RESPONSIVE
+   RESPONSIVE – Adjust gaps
    ============================================================ */
 @media (max-width: 1200px) {
     .product-grid {
         grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
     }
 
     .category-grid {
@@ -660,6 +661,7 @@ header {
 @media (max-width: 992px) {
     .product-grid {
         grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
     }
 
     .category-grid {
@@ -743,6 +745,7 @@ header {
 @media (max-width: 480px) {
     .product-grid {
         grid-template-columns: 1fr;
+        gap: 16px;
     }
 
     .category-grid {

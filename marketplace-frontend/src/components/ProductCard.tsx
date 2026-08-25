@@ -83,7 +83,6 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
         const cardRect = cardRef.current?.getBoundingClientRect();
         const cartRect = cartIconRef.current?.getBoundingClientRect();
 
-        // Use fallback if cart icon not found
         let endX = window.innerWidth - 80;
         let endY = 60;
         if (cartRect) {
@@ -105,26 +104,9 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
                 addToCart(product.id, qty).finally(() => setIsAdding(false));
             }, 800);
         } else {
-            // Fallback – no fly
             setIsAdding(true);
             await addToCart(product.id, qty);
             setIsAdding(false);
-        }
-    };
-
-    const increment = (e: React.MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (quantity < product.stockQuantity) {
-            setQuantity(q => q + 1);
-        }
-    };
-
-    const decrement = (e: React.MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (quantity > 1) {
-            setQuantity(q => q - 1);
         }
     };
 
@@ -155,32 +137,37 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
             className="cursor-pointer"
             onClick={handleCardClick}
         >
-            {/* BLOCK 1 – Content: Image + Info */}
-            <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow-md transition-all duration-300">
-                <div className="relative">
+            {/* Premium Card – White background with shadow */}
+            <div className="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100/50">
+
+                {/* Image Section */}
+                <div className="relative bg-gray-50/80 p-4">
+                    {/* Wishlist Heart – top right */}
                     <motion.button
                         whileHover={{ scale: 1.2 }}
                         whileTap={{ scale: 0.8 }}
                         onClick={handleWishlistToggle}
-                        className="absolute top-2 left-2 z-10 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-md hover:shadow-lg transition"
+                        className="absolute top-3 right-3 z-10 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-sm hover:shadow-md transition"
                     >
                         <Heart
                             className={`w-4 h-4 transition ${isWishlist ? 'fill-red-500 text-red-500' : 'text-gray-400'}`}
                         />
                     </motion.button>
 
+                    {/* Discount Badge */}
                     {hasDiscount && (
-                        <span className="absolute top-2 right-2 z-10 bg-[#D27736] text-white text-xs font-bold px-2.5 py-1 rounded-full">
+                        <span className="absolute top-3 left-3 z-10 bg-[#D27736] text-white text-xs font-bold px-2.5 py-1 rounded-full">
                             -{product.discount}%
                         </span>
                     )}
 
-                    <div className="relative w-full h-52 bg-gray-50 rounded-lg overflow-hidden">
+                    {/* Product Image */}
+                    <div className="relative w-full aspect-square max-h-[220px] mx-auto">
                         <Image
                             src={imgSrc}
                             alt={displayName}
                             fill
-                            className={`object-contain p-3 transition-transform duration-500 ${isHovered ? 'scale-105' : 'scale-100'}`}
+                            className={`object-contain p-2 transition-transform duration-500 ${isHovered ? 'scale-105' : 'scale-100'}`}
                             sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                             priority={false}
                             onError={handleImageError}
@@ -188,18 +175,30 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
                     </div>
                 </div>
 
-                <div className="mt-3 space-y-1.5">
+                {/* Content Section */}
+                <div className="p-4 space-y-2">
+                    {/* Category/Vendor Badge */}
+                    {product.category && (
+                        <span className="inline-block text-[10px] font-semibold text-primary bg-primary/10 px-2.5 py-0.5 rounded-full">
+                            {product.category}
+                        </span>
+                    )}
+
+                    {/* Product Name */}
                     <h3 className="font-semibold text-gray-800 text-base line-clamp-1">
                         {displayName}
                     </h3>
+
+                    {/* Description */}
                     {displayDescription && (
                         <p className="text-gray-500 text-sm line-clamp-2 leading-relaxed">
                             {displayDescription}
                         </p>
                     )}
 
-                    <div className="flex items-center gap-3 pt-1">
-                        <span className="text-xl font-bold text-[#2F5A6B]">
+                    {/* Price */}
+                    <div className="flex items-center gap-2 pt-1">
+                        <span className="text-xl font-bold text-gray-900">
                             {CURRENCY}{(discountPrice || product.price).toFixed(2)}
                         </span>
                         {hasDiscount && (
@@ -208,40 +207,19 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
                             </span>
                         )}
                     </div>
-                </div>
-            </div>
 
-            {/* BLOCK 2 – Controls */}
-            <div className="mt-2 bg-[#4E8C9E] rounded-xl border border-[#4E8C9E]/30 p-3 shadow-sm transition-all duration-300">
-                <div className="flex items-center gap-3" onClick={(e) => e.stopPropagation()}>
-                    <div className="flex items-center gap-1 bg-white/20 rounded-full p-1 border border-white/30 flex-shrink-0">
-                        <button
-                            onClick={decrement}
-                            disabled={quantity <= 1}
-                            className="w-8 h-8 rounded-full flex items-center justify-center text-white hover:bg-white/30 transition disabled:opacity-30 disabled:cursor-not-allowed text-lg font-bold"
-                        >
-                            −
-                        </button>
-                        <span className="w-8 text-center text-sm font-medium text-white">
-                            {quantity}
-                        </span>
-                        <button
-                            onClick={increment}
-                            disabled={quantity >= product.stockQuantity}
-                            className="w-8 h-8 rounded-full flex items-center justify-center text-white hover:bg-white/30 transition disabled:opacity-30 disabled:cursor-not-allowed text-lg font-bold"
-                        >
-                            +
-                        </button>
-                    </div>
-
+                    {/* Add to Cart Button */}
                     <button
-                        onClick={(e) => handleAddToCart(e, quantity)}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            handleAddToCart(e, quantity);
+                        }}
                         disabled={isAdding || product.stockQuantity === 0}
-                        className={`flex-1 py-2.5 rounded-full font-medium text-sm transition-all duration-300 flex items-center justify-center gap-2 ${product.stockQuantity === 0
-                                ? 'bg-gray-400 text-white cursor-not-allowed'
+                        className={`w-full py-2.5 rounded-xl font-medium text-sm transition-all duration-300 flex items-center justify-center gap-2 ${product.stockQuantity === 0
+                                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                                 : isAdding
-                                    ? 'bg-white/40 text-white cursor-wait'
-                                    : 'bg-white text-[#4E8C9E] hover:bg-white/90 hover:shadow-lg'
+                                    ? 'bg-primary/70 text-white cursor-wait'
+                                    : 'bg-primary text-white hover:bg-primary-dark hover:shadow-md'
                             }`}
                     >
                         <ShoppingBag className="w-4 h-4" />
@@ -249,21 +227,22 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
                             ? 'جاري الإضافة...'
                             : product.stockQuantity === 0
                                 ? 'غير متوفر'
-                                : `إضافة (${quantity})`}
+                                : 'أضف إلى السلة'}
                     </button>
-                </div>
 
-                {product.stockQuantity > 0 && product.stockQuantity <= 5 && (
-                    <p className="text-xs text-white/80 text-center mt-2">
-                        ⚠️ متبقي {product.stockQuantity} فقط
-                    </p>
-                )}
+                    {/* Low stock warning */}
+                    {product.stockQuantity > 0 && product.stockQuantity <= 5 && (
+                        <p className="text-xs text-amber-600 text-center">
+                            ⚠️ متبقي {product.stockQuantity} فقط
+                        </p>
+                    )}
+                </div>
             </div>
 
-            {/* Fly animation – big icon, smooth transition */}
+            {/* Fly animation */}
             {fly && (
                 <div
-                    className="fixed pointer-events-none z-50 w-14 h-14 bg-[#4E8C9E] rounded-full shadow-lg flex items-center justify-center"
+                    className="fixed pointer-events-none z-50 w-14 h-14 bg-primary rounded-full shadow-lg flex items-center justify-center"
                     style={{
                         left: flyStart.x,
                         top: flyStart.y,
@@ -273,7 +252,7 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
                     }}
                     ref={(el) => {
                         if (el) {
-                            void el.offsetHeight; // force reflow
+                            void el.offsetHeight;
                             el.style.left = flyEnd.x + 'px';
                             el.style.top = flyEnd.y + 'px';
                             el.style.transform = 'translate(-50%, -50%) scale(0.3)';

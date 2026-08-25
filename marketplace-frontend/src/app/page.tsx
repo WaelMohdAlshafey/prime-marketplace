@@ -9,7 +9,7 @@ import CategoryGrid from '@/components/CategoryGrid';
 import FilterSidebar from '@/components/Filters/FilterSidebar';
 import ProductCard from '@/components/ProductCard';
 import ProductDetailModal from '@/components/ProductDetailModal';
-import { ShoppingBag, Shield, Truck, Headphones, Clock, Sparkles, TrendingUp, Award } from 'lucide-react';
+import { ShoppingBag, Sparkles, TrendingUp, Award } from 'lucide-react';
 
 export default function Home() {
     const { t } = useTranslation('common');
@@ -70,20 +70,10 @@ export default function Home() {
         setIsModalOpen(true);
     };
 
-    // Premium Trust Badges
-    const trustBadges = [
-        { icon: Truck, label: 'شحن سريع', sub: 'توصيل خلال 2-5 أيام', color: 'bg-blue-50 text-blue-600' },
-        { icon: Shield, label: 'ضمان الجودة', sub: 'منتجات أصلية 100%', color: 'bg-green-50 text-green-600' },
-        { icon: Headphones, label: 'دعم 24/7', sub: 'خدمة عملاء على مدار الساعة', color: 'bg-purple-50 text-purple-600' },
-        { icon: Clock, label: 'إرجاع مجاني', sub: '30 يوم لإرجاع المنتج', color: 'bg-amber-50 text-amber-600' },
-    ];
-
     return (
         <div className="bg-background min-h-screen">
             <HeroBanner />
-
-            {/* Trust Badges */}
-            
+            <CategoryGrid />
 
             {/* Main Content with Filters */}
             <div className="container mx-auto px-4 py-6 md:py-10">
@@ -112,7 +102,7 @@ export default function Home() {
                         </div>
 
                         {loading ? (
-                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
                                 {[...Array(6)].map((_, i) => (
                                     <div key={i} className="bg-white rounded-2xl shadow-soft p-4 animate-pulse">
                                         <div className="w-full aspect-square bg-gray-200 rounded-xl"></div>
@@ -143,7 +133,7 @@ export default function Home() {
                                 </button>
                             </div>
                         ) : (
-                            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-5">
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
                                 {products.map((product) => (
                                     <ProductCard
                                         key={product.id}
