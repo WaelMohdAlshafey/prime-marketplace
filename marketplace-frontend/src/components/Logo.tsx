@@ -1,13 +1,13 @@
-// marketplace-frontend/components/Logo.tsx
-
-'use client';
-
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 
-export default function Logo() {
+interface LogoProps {
+    className?: string;
+}
+
+export default function Logo({ className = '' }: LogoProps) {
     return (
-        <Link href="/" className="flex items-center gap-2.5 group">
+        <Link href="/" className={`flex items-center gap-2.5 group ${className}`}>
             <motion.div whileHover={{ rotate: -5, scale: 1.05 }} className="relative">
                 <div className="w-10 h-10 bg-[#4E8C9E] rounded-xl flex items-center justify-center shadow-md group-hover:shadow-lg transition-all duration-300">
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -18,7 +18,7 @@ export default function Logo() {
                     </svg>
                 </div>
             </motion.div>
-            <motion.span whileHover={{ scale: 1.02 }} className="text-2xl font-bold text-[#2F5A6B] tracking-tight">
+            <motion.span whileHover={{ scale: 1.02 }} className="text-2xl font-bold text-black tracking-tight">
                 Prime
             </motion.span>
         </Link>

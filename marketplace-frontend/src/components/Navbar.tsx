@@ -63,13 +63,12 @@ const TopBar = () => {
                     </Link>
                 </div>
 
-                {/* Right: three dropdown menus in one line */}
+                {/* Right: three dropdown menus – click only */}
                 <div className="flex items-center gap-1 md:gap-3 flex-shrink-0">
                     {/* Language Dropdown */}
                     <div className="relative" ref={langRef}>
                         <button
                             onClick={() => setLangOpen(!langOpen)}
-                            onMouseEnter={() => setLangOpen(true)}
                             className="flex items-center gap-0.5 md:gap-1 hover:text-yellow-400 transition px-1 md:px-2 py-0.5 rounded-md hover:bg-white/10 whitespace-nowrap"
                         >
                             <GlobeAltIcon className="w-3 h-3 md:w-3.5 md:h-3.5" />
@@ -101,7 +100,6 @@ const TopBar = () => {
                     <div className="relative" ref={supportRef}>
                         <button
                             onClick={() => setSupportOpen(!supportOpen)}
-                            onMouseEnter={() => setSupportOpen(true)}
                             className="flex items-center gap-0.5 md:gap-1 hover:text-yellow-400 transition px-1 md:px-2 py-0.5 rounded-md hover:bg-white/10 whitespace-nowrap"
                         >
                             <LifebuoyIcon className="w-3 h-3 md:w-3.5 md:h-3.5" />
@@ -139,7 +137,6 @@ const TopBar = () => {
                     <div className="relative" ref={currencyRef}>
                         <button
                             onClick={() => setCurrencyOpen(!currencyOpen)}
-                            onMouseEnter={() => setCurrencyOpen(true)}
                             className="flex items-center gap-0.5 md:gap-1 hover:text-yellow-400 transition px-1 md:px-2 py-0.5 rounded-md hover:bg-white/10 whitespace-nowrap"
                         >
                             <CurrencyDollarIcon className="w-3 h-3 md:w-3.5 md:h-3.5" />
@@ -171,7 +168,7 @@ const TopBar = () => {
 };
 
 // ============================================================
-// MAIN HEADER – No search bar
+// MAIN HEADER – Logo on right, no search bar
 // ============================================================
 const MainHeader = ({ user }: { user: AuthResponse | null }) => {
     const { t } = useTranslation('common');
@@ -212,7 +209,7 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
     return (
         <div className="navbar">
             <div className="container mx-auto px-2 md:px-4 flex items-center justify-between gap-2 md:gap-4 py-2">
-                {/* Left hamburger menu */}
+                {/* Left: Hamburger menu */}
                 <div className="relative" onClick={(e) => e.stopPropagation()}>
                     <button
                         onClick={() => setLeftMenuOpen(!leftMenuOpen)}
@@ -268,9 +265,7 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
                     </AnimatePresence>
                 </div>
 
-                <Logo />
-
-                {/* Right icons: wishlist, cart, user menu */}
+                {/* Right side icons: wishlist, cart, user */}
                 <div className="flex items-center gap-1.5 md:gap-3 flex-shrink-0">
                     <motion.button whileHover={{ scale: 1.1 }} className="text-navbar-text hover:text-navbar-hover transition relative hidden sm:block">
                         <HeartIcon className="w-5 h-5 md:w-6 md:h-6" />
@@ -379,6 +374,11 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
                             )}
                         </AnimatePresence>
                     </div>
+                </div>
+
+                {/* Logo – rightmost (black & bold) */}
+                <div className="flex-shrink-0">
+                    <Logo />
                 </div>
             </div>
         </div>
