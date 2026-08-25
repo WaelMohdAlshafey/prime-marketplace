@@ -18,30 +18,53 @@ import {
     Bars3Icon,
     ChevronDownIcon,
 } from '@heroicons/react/24/outline';
+import { Truck, Shield, Clock, Headphones } from 'lucide-react';
 import { AuthResponse } from '@/types';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '@/lib/api';
 
 // ============================================================
-// TOP BAR
+// TOP BAR – with trust badges
 // ============================================================
 const TopBar = () => {
     const { t } = useTranslation('common');
     return (
         <div className="bg-primary-dark text-white text-xs py-1.5 relative z-50">
-            <div className="container mx-auto px-4 flex justify-between items-center">
-                <div className="flex items-center gap-4">
+            <div className="container mx-auto px-4 flex flex-wrap items-center justify-between gap-1">
+                {/* Left side: free shipping + track order */}
+                <div className="flex items-center gap-3">
                     <span>🚚 {t('freeShipping')}</span>
                     <span className="text-white/30">|</span>
                     <Link href="/tracking" className="hover:opacity-70 transition">
                         {t('trackOrder')}
                     </Link>
                 </div>
+
+                {/* Middle: Trust badges – small, delicate, inline */}
+                <div className="flex items-center gap-3 text-[10px] md:text-xs">
+                    <span className="flex items-center gap-1">
+                        <Truck className="w-3 h-3" /> {t('shipping')}
+                    </span>
+                    <span className="text-white/30">|</span>
+                    <span className="flex items-center gap-1">
+                        <Shield className="w-3 h-3" /> {t('quality')}
+                    </span>
+                    <span className="text-white/30">|</span>
+                    <span className="flex items-center gap-1">
+                        <Clock className="w-3 h-3" /> {t('returns')}
+                    </span>
+                    <span className="text-white/30">|</span>
+                    <span className="flex items-center gap-1">
+                        <Headphones className="w-3 h-3" /> {t('support')}
+                    </span>
+                </div>
+
+                {/* Right side: language + currency + support */}
                 <div className="flex items-center gap-3">
                     <LanguageSwitcher />
                     <span className="text-white/30">|</span>
                     <button className="hover:opacity-70 transition">
-                        <CurrencyDollarIcon className="w-4 h-4 inline" /> {t('currency')}
+                        <CurrencyDollarIcon className="w-3 h-3 inline" /> {t('currency')}
                     </button>
                     <span className="text-white/30">|</span>
                     <button className="hover:opacity-70 transition">{t('support')}</button>
@@ -182,7 +205,7 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
                         </span>
                     </motion.button>
 
-                    {/* ✅ Cart icon with ref on a span wrapper */}
+                    {/* Cart icon with ref on a span wrapper */}
                     <span ref={cartIconRef} className="relative inline-flex">
                         <Link href="/cart" className="text-navbar-text hover:text-navbar-hover transition">
                             <ShoppingCartIcon className="w-6 h-6" />

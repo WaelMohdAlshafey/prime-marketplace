@@ -83,23 +83,7 @@ export default function Home() {
             <HeroBanner />
 
             {/* Trust Badges */}
-            <div className="container mx-auto px-4 -mt-4 md:-mt-6 relative z-10">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-                    {trustBadges.map((badge, index) => {
-                        const Icon = badge.icon;
-                        return (
-                            <div
-                                key={index}
-                                className={`${badge.color} rounded-xl shadow-soft p-3 md:p-4 text-center transition-all duration-300 hover:shadow-card-hover hover:-translate-y-1 cursor-default border border-white/50`}
-                            >
-                                <Icon className="w-5 h-5 md:w-6 md:h-6 mx-auto mb-1 md:mb-2" />
-                                <p className="text-xs md:text-sm font-bold text-text">{badge.label}</p>
-                                <p className="text-[10px] md:text-xs text-text-muted">{badge.sub}</p>
-                            </div>
-                        );
-                    })}
-                </div>
-            </div>
+            
 
             {/* Main Content with Filters */}
             <div className="container mx-auto px-4 py-6 md:py-10">
