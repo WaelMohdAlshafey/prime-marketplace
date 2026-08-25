@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import Link from 'next/link';
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
@@ -21,7 +21,6 @@ import {
 } from '@heroicons/react/24/outline';
 import { AuthResponse } from '@/types';
 import { motion, AnimatePresence } from 'framer-motion';
-import api from '@/lib/api';
 
 // ============================================================
 // TOP BAR
@@ -63,7 +62,7 @@ const TopBar = () => {
     return (
         <div className="bg-primary-dark text-white text-[10px] md:text-xs py-1 relative z-50">
             <div className="container mx-auto px-2 md:px-4 flex items-center justify-between gap-1 md:gap-3 flex-nowrap overflow-x-auto">
-                {/* LEFT SIDE (start of bar) – Language toggle + free shipping */}
+                {/* LEFT SIDE (end of bar) – Language toggle + free shipping */}
                 <div className="flex items-center gap-1 md:gap-3 flex-shrink-0 whitespace-nowrap">
                     {/* Language toggle – simple button, no dropdown */}
                     <button
@@ -77,7 +76,7 @@ const TopBar = () => {
                     <span className="hidden xs:inline">🚚 {t('freeShipping')}</span>
                 </div>
 
-                {/* RIGHT SIDE (end of bar) – Support, Currency, Track Order */}
+                {/* RIGHT SIDE (start of bar) – Support, Currency, Track Order */}
                 <div className="flex items-center gap-1 md:gap-3 flex-shrink-0">
                     {/* Support Dropdown */}
                     <div
@@ -169,7 +168,7 @@ const TopBar = () => {
 };
 
 // ============================================================
-// MAIN HEADER – Logo right, icons left
+// MAIN HEADER – Logo right, navigation links next to it
 // ============================================================
 const MainHeader = ({ user }: { user: AuthResponse | null }) => {
     const { t } = useTranslation('common');
@@ -179,22 +178,6 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
     const [leftMenuOpen, setLeftMenuOpen] = useState(false);
     const [rightMenuOpen, setRightMenuOpen] = useState(false);
     const { logout } = useAuth();
-    const [categories, setCategories] = useState<string[]>([]);
-    const [loadingCategories, setLoadingCategories] = useState(true);
-
-    useEffect(() => {
-        const fetchCategories = async () => {
-            try {
-                const response = await api.get('/api/Categories');
-                setCategories(response.data);
-            } catch (error) {
-                console.error('Failed to fetch categories:', error);
-            } finally {
-                setLoadingCategories(false);
-            }
-        };
-        fetchCategories();
-    }, []);
 
     // Close menus on outside click
     useEffect(() => {
@@ -205,15 +188,23 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
 
     const isRTL = typeof document !== 'undefined' && document.documentElement.dir === 'rtl';
 
-    const getCategorySlug = (cat: string) => cat.toLowerCase().replace(/\s+/g, '-');
+    // Main navigation links – visible on desktop, hidden in hamburger on mobile
+    const navLinks = [
+        { href: '/', label: t('home') },
+        { href: '/products', label: t('products') },
+        { href: '/stores', label: t('stores') },
+        { href: '/offers', label: t('offers') },
+        { href: '/contact', label: t('contact') },
+        { href: '/help', label: t('help') },
+    ];
 
     return (
         <div className="navbar">
             <div className="container mx-auto px-2 md:px-4 flex items-center justify-between gap-2 md:gap-4 py-2">
                 {/* LEFT SIDE (end of bar) – Hamburger + Icons */}
                 <div className="flex items-center gap-1.5 md:gap-3 flex-shrink-0">
-                    {/* Hamburger menu */}
-                    <div className="relative" onClick={(e) => e.stopPropagation()}>
+                    {/* Hamburger menu (mobile) */}
+                    <div className="relative md:hidden" onClick={(e) => e.stopPropagation()}>
                         <button
                             onClick={() => setLeftMenuOpen(!leftMenuOpen)}
                             className="p-1.5 md:p-2 rounded-md hover:bg-primary-dark/10 transition text-navbar-text"
@@ -229,40 +220,16 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
                                     exit={{ opacity: 0, y: -10 }}
                                     className={`absolute ${isRTL ? 'right-0' : 'left-0'} top-full mt-2 w-64 max-w-[calc(100vw-2rem)] max-h-[80vh] overflow-y-auto bg-white rounded-xl shadow-strong border border-border py-2 z-[999]`}
                                 >
-                                    <Link href="/" className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition" onClick={() => setLeftMenuOpen(false)}>
-                                        {t('home')}
-                                    </Link>
-
-                                    {loadingCategories ? (
-                                        <span className="block px-4 py-2 text-text-muted text-sm">جاري التحميل...</span>
-                                    ) : (
-                                        categories.map((cat) => {
-                                            const slug = getCategorySlug(cat);
-                                            return (
-                                                <Link
-                                                    key={cat}
-                                                    href={`/${slug}`}
-                                                    className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition"
-                                                    onClick={() => setLeftMenuOpen(false)}
-                                                >
-                                                    {cat}
-                                                </Link>
-                                            );
-                                        })
-                                    )}
-
-                                    <Link href="/stores" className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition" onClick={() => setLeftMenuOpen(false)}>
-                                        {t('stores')}
-                                    </Link>
-                                    <Link href="/offers" className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition" onClick={() => setLeftMenuOpen(false)}>
-                                        🔥 {t('offers')}
-                                    </Link>
-                                    <Link href="/contact" className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition" onClick={() => setLeftMenuOpen(false)}>
-                                        {t('contact')}
-                                    </Link>
-                                    <Link href="/help" className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition" onClick={() => setLeftMenuOpen(false)}>
-                                        📘 {t('help')}
-                                    </Link>
+                                    {navLinks.map((link) => (
+                                        <Link
+                                            key={link.href}
+                                            href={link.href}
+                                            className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition"
+                                            onClick={() => setLeftMenuOpen(false)}
+                                        >
+                                            {link.label}
+                                        </Link>
+                                    ))}
                                 </motion.div>
                             )}
                         </AnimatePresence>
@@ -379,9 +346,23 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
                     </div>
                 </div>
 
-                {/* RIGHT SIDE (start of bar) – Logo & Name */}
-                <div className="flex-shrink-0">
+                {/* RIGHT SIDE (start of bar) – Logo + Main Navigation Links */}
+                <div className="flex items-center gap-2 md:gap-4 flex-shrink-0">
+                    {/* Logo */}
                     <Logo />
+
+                    {/* Main navigation – visible on md and up */}
+                    <div className="hidden md:flex items-center gap-1 lg:gap-3 text-sm font-medium text-navbar-text">
+                        {navLinks.map((link) => (
+                            <Link
+                                key={link.href}
+                                href={link.href}
+                                className="hover:text-navbar-hover transition px-2 py-1 rounded-md hover:bg-primary-dark/10"
+                            >
+                                {link.label}
+                            </Link>
+                        ))}
+                    </div>
                 </div>
             </div>
         </div>
