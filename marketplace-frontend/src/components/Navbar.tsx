@@ -110,7 +110,7 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
     return (
         <div className={`bg-navbar-bg border-b border-navbar-border sticky top-0 z-50 ${isScrolled ? 'shadow-md' : ''}`}>
             <div className="container mx-auto px-4 flex items-center gap-4 py-2">
-                {/* Left hamburger menu - SOLID BACKGROUND */}
+                {/* Left hamburger menu */}
                 <div className="relative" onClick={(e) => e.stopPropagation()}>
                     <button
                         onClick={() => setLeftMenuOpen(!leftMenuOpen)}
@@ -191,14 +191,20 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
                         </span>
                     </motion.button>
 
-                    <Link href="/cart" ref={(el) => { cartIconRef.current = el as HTMLElement; }} className="text-navbar-text hover:text-navbar-hover transition relative">
-                        <ShoppingCartIcon className="w-6 h-6" />
-                        <motion.span animate={{ scale: totalItems > 0 ? 1.2 : 1 }} className="absolute -top-1.5 -right-1.5 bg-secondary text-white text-[10px] font-bold w-[18px] h-[18px] rounded-full flex items-center justify-center">
-                            {totalItems}
-                        </motion.span>
-                    </Link>
+                    {/* ✅ FIX: Cart icon with proper ref on a span wrapper */}
+                    <span ref={cartIconRef} className="relative inline-flex">
+                        <Link href="/cart" className="text-navbar-text hover:text-navbar-hover transition">
+                            <ShoppingCartIcon className="w-6 h-6" />
+                            <motion.span
+                                animate={{ scale: totalItems > 0 ? 1.2 : 1 }}
+                                className="absolute -top-1.5 -right-1.5 bg-secondary text-white text-[10px] font-bold w-[18px] h-[18px] rounded-full flex items-center justify-center"
+                            >
+                                {totalItems}
+                            </motion.span>
+                        </Link>
+                    </span>
 
-                    {/* Right user menu - SOLID BACKGROUND */}
+                    {/* Right user menu */}
                     <div className="relative" onClick={(e) => e.stopPropagation()}>
                         <button
                             onClick={() => setRightMenuOpen(!rightMenuOpen)}

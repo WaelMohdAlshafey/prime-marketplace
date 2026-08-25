@@ -24,9 +24,8 @@ export default function FilterSidebar({
     const [rating, setRating] = useState<number | undefined>(undefined);
     const [isMobileOpen, setIsMobileOpen] = useState(false);
 
-    const [openSections, setOpenSections] = useState<Set<string>>(
-        new Set(['نطاق السعر', 'التقييم', 'التوفر'])
-    );
+    // ✅ Start with ALL sections collapsed
+    const [openSections, setOpenSections] = useState<Set<string>>(new Set());
 
     const toggleSection = (title: string) => {
         const newSet = new Set(openSections);
