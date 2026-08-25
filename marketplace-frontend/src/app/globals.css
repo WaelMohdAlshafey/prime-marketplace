@@ -1,12 +1,21 @@
 ﻿/* ============================================================
-   PREVENT HORIZONTAL SCROLL
+   PREVENT HORIZONTAL SCROLL – but do NOT break sticky
    ============================================================ */
 html,
 body {
-    overflow-x: hidden !important;
-    max-width: 100vw !important;
+    max-width: 100vw;
     margin: 0;
     padding: 0;
+}
+
+    /* Apply overflow-x: hidden ONLY to wrappers inside the body */
+    body > * {
+        overflow-x: hidden;
+    }
+
+/* Main container also gets overflow protection */
+main {
+    overflow-x: hidden;
 }
 
 * {
@@ -197,8 +206,14 @@ body {
     }
 
 /* ============================================================
-   NAVBAR
+   NAVBAR – Force sticky fix
    ============================================================ */
+header.sticky {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 100 !important;
+}
+
 .navbar {
     background: var(--color-navbar-bg);
     border-bottom: 1px solid var(--color-navbar-border);
@@ -477,8 +492,6 @@ body {
 /* ============================================================
    PREMIUM UI/UX – Modern Shapes, Colors, and Feel
    ============================================================ */
-
-/* ----- Modern Card Styles ----- */
 .rounded-card {
     border-radius: var(--radius-card, 12px);
 }
@@ -491,7 +504,6 @@ body {
     box-shadow: var(--shadow-card-hover, 0 12px 40px rgba(78, 140, 158, 0.15));
 }
 
-/* ----- Premium Gradient Backgrounds ----- */
 .bg-premium-gradient {
     background: linear-gradient(135deg, #E8F4F7 0%, #F8F8F8 100%);
 }
@@ -500,7 +512,6 @@ body {
     background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 100%);
 }
 
-/* ----- Modern Button Styles ----- */
 .btn-premium {
     background: var(--color-button-primary-bg);
     color: var(--color-button-primary-text);
@@ -532,7 +543,6 @@ body {
         box-shadow: 0 8px 24px rgba(210, 119, 54, 0.3);
     }
 
-/* ----- Premium Badge Styles ----- */
 .badge-premium {
     display: inline-block;
     padding: 2px 12px;
@@ -558,7 +568,6 @@ body {
     color: #FFFFFF;
 }
 
-/* ----- Trust Badge Styles ----- */
 .trust-badge {
     background: var(--color-card-bg);
     border-radius: var(--radius-md, 12px);
@@ -590,12 +599,26 @@ body {
         color: var(--color-text-muted);
     }
 
-/* ----- Premium Section Divider ----- */
 .section-divider {
     height: 2px;
     background: linear-gradient(to right, transparent, var(--color-primary-light), transparent);
     margin: 24px 0;
     opacity: 0.3;
+}
+
+/* ============================================================
+   FLY ANIMATION – used by ProductCard
+   ============================================================ */
+@keyframes flyToCart {
+    0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translate(-50%, -50%) scale(0.2);
+        opacity: 0;
+    }
 }
 
 /* ============================================================
@@ -737,4 +760,14 @@ body {
     .hero-content .description {
         font-size: 13px;
     }
+}
+
+/* ============================================================
+   FORCE HEADER FIXED – Fallback for production
+   ============================================================ */
+header {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 1000 !important;
+    background: var(--color-navbar-bg, #FFFFFF) !important;
 }
