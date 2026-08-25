@@ -1,10 +1,9 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import { Heart, ShoppingBag } from 'lucide-react';
 import { useState, useRef, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import { useWishlist } from '@/context/WishlistContext';
 import { useCart } from '@/context/CartContext';
@@ -40,7 +39,6 @@ interface ProductCardProps {
 export default function ProductCard({ product, onCardClick }: ProductCardProps) {
     const { template = 'standard' } = useTheme();
     const { i18n } = useTranslation();
-    const pathname = usePathname();
     const [isAdding, setIsAdding] = useState(false);
     const [quantity, setQuantity] = useState(1);
 
@@ -85,7 +83,7 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
         const cardRect = cardRef.current?.getBoundingClientRect();
         const cartRect = cartIconRef.current?.getBoundingClientRect();
 
-        // If cart icon is not found, use a safe fallback (top‑right of screen)
+        // Use fallback if cart icon not found
         let endX = window.innerWidth - 80;
         let endY = 60;
         if (cartRect) {
@@ -101,7 +99,6 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
             setFlyEnd({ x: endX, y: endY });
             setFly(true);
 
-            // After the fly animation (0.8s), actually add to cart
             setTimeout(() => {
                 setFly(false);
                 setIsAdding(true);
@@ -263,7 +260,7 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
                 )}
             </div>
 
-            {/* Fly animation – bigger icon, lands on cart icon */}
+            {/* Fly animation – big icon, smooth transition */}
             {fly && (
                 <div
                     className="fixed pointer-events-none z-50 w-14 h-14 bg-[#4E8C9E] rounded-full shadow-lg flex items-center justify-center"
@@ -276,8 +273,7 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
                     }}
                     ref={(el) => {
                         if (el) {
-                            // Force reflow then set end position
-                            void el.offsetHeight;
+                            void el.offsetHeight; // force reflow
                             el.style.left = flyEnd.x + 'px';
                             el.style.top = flyEnd.y + 'px';
                             el.style.transform = 'translate(-50%, -50%) scale(0.3)';

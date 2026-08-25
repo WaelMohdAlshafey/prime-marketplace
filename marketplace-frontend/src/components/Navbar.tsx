@@ -57,7 +57,6 @@ const TopBar = () => {
 const MainHeader = ({ user }: { user: AuthResponse | null }) => {
     const { t } = useTranslation('common');
     const [searchTerm, setSearchTerm] = useState('');
-    const [isScrolled, setIsScrolled] = useState(false);
     const { totalItems } = useCart();
     const { totalFavorites } = useWishlist();
     const { cartIconRef } = useCartIconRef();
@@ -82,12 +81,6 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
         fetchCategories();
     }, []);
 
-    useEffect(() => {
-        const handleScroll = () => setIsScrolled(window.scrollY > 20);
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
-
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
         if (searchTerm.trim()) {
@@ -102,13 +95,12 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
         return () => window.removeEventListener('click', closeMenus);
     }, []);
 
-    // Check if RTL
     const isRTL = typeof document !== 'undefined' && document.documentElement.dir === 'rtl';
 
     const getCategorySlug = (cat: string) => cat.toLowerCase().replace(/\s+/g, '-');
 
     return (
-        <div className={`bg-navbar-bg border-b border-navbar-border sticky top-0 z-50 ${isScrolled ? 'shadow-md' : ''}`}>
+        <div className="navbar">
             <div className="container mx-auto px-4 flex items-center gap-4 py-2">
                 {/* Left hamburger menu */}
                 <div className="relative" onClick={(e) => e.stopPropagation()}>
@@ -131,7 +123,6 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
                                     {t('home')}
                                 </Link>
 
-                                {/* Categories */}
                                 {loadingCategories ? (
                                     <span className="block px-4 py-2 text-text-muted text-sm">جاري التحميل...</span>
                                 ) : (
@@ -191,7 +182,7 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
                         </span>
                     </motion.button>
 
-                    {/* ✅ FIX: Cart icon with proper ref on a span wrapper */}
+                    {/* ✅ Cart icon with ref on a span wrapper */}
                     <span ref={cartIconRef} className="relative inline-flex">
                         <Link href="/cart" className="text-navbar-text hover:text-navbar-hover transition">
                             <ShoppingCartIcon className="w-6 h-6" />
@@ -309,7 +300,7 @@ export default function Navbar() {
     }
 
     return (
-        <header className="sticky top-0 z-[100]">
+        <header className="fixed top-0 left-0 right-0 z-[1000] bg-white shadow-sm">
             <TopBar />
             <MainHeader user={user} />
         </header>

@@ -1,5 +1,5 @@
 ﻿/* ============================================================
-   PREVENT HORIZONTAL SCROLL – but do NOT break sticky
+   PREVENT HORIZONTAL SCROLL – but do NOT break fixed header
    ============================================================ */
 html,
 body {
@@ -25,7 +25,6 @@ main {
 
 /* ============================================================
    NEMOCARE-INSPIRED PREMIUM THEME
-   Soft, Trustworthy, Premium
    ============================================================ */
 
 @tailwind base;
@@ -117,6 +116,7 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     line-height: 1.6;
+    padding-top: 110px; /* 👈 Space for fixed header (adjust if needed) */
 }
 
 /* ============================================================
@@ -206,21 +206,25 @@ body {
     }
 
 /* ============================================================
-   NAVBAR – Force sticky fix
+   HEADER – FIXED (no sticky)
    ============================================================ */
-header.sticky {
-    position: sticky !important;
+header {
+    position: fixed !important;
     top: 0 !important;
-    z-index: 100 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 1000 !important;
+    background: var(--color-navbar-bg, #FFFFFF) !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 
+/* ============================================================
+   NAVBAR
+   ============================================================ */
 .navbar {
     background: var(--color-navbar-bg);
     border-bottom: 1px solid var(--color-navbar-border);
     padding: 12px 0;
-    position: sticky;
-    top: 0;
-    z-index: 100;
 }
 
     .navbar .container {
@@ -760,14 +764,4 @@ header.sticky {
     .hero-content .description {
         font-size: 13px;
     }
-}
-
-/* ============================================================
-   FORCE HEADER FIXED – Fallback for production
-   ============================================================ */
-header {
-    position: sticky !important;
-    top: 0 !important;
-    z-index: 1000 !important;
-    background: var(--color-navbar-bg, #FFFFFF) !important;
 }
