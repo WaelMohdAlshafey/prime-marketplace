@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import Link from 'next/link';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
@@ -17,27 +17,32 @@ import {
     ChevronDownIcon,
     GlobeAltIcon,
     LifebuoyIcon,
+    TruckIcon,
 } from '@heroicons/react/24/outline';
 import { AuthResponse } from '@/types';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '@/lib/api';
 
 // ============================================================
-// TOP BAR – All items in ONE LINE, no wrap
+// TOP BAR
 // ============================================================
 const TopBar = () => {
     const { t, i18n } = useTranslation('common');
-    const [langOpen, setLangOpen] = useState(false);
     const [supportOpen, setSupportOpen] = useState(false);
     const [currencyOpen, setCurrencyOpen] = useState(false);
-    const langRef = useRef<HTMLDivElement>(null);
     const supportRef = useRef<HTMLDivElement>(null);
     const currencyRef = useRef<HTMLDivElement>(null);
+    let hoverTimeout: NodeJS.Timeout | null = null;
+
+    // Language toggle – simple click, no dropdown
+    const toggleLanguage = () => {
+        const nextLang = i18n.language === 'ar' ? 'en' : 'ar';
+        i18n.changeLanguage(nextLang);
+    };
 
     // Close dropdowns on outside click
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
-            if (langRef.current && !langRef.current.contains(event.target as Node)) setLangOpen(false);
             if (supportRef.current && !supportRef.current.contains(event.target as Node)) setSupportOpen(false);
             if (currencyRef.current && !currencyRef.current.contains(event.target as Node)) setCurrencyOpen(false);
         };
@@ -45,59 +50,42 @@ const TopBar = () => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    const toggleLanguage = (lng: string) => {
-        i18n.changeLanguage(lng);
-        setLangOpen(false);
+    // Hover handlers with delay
+    const handleMouseEnter = (setter: React.Dispatch<React.SetStateAction<boolean>>) => {
+        if (hoverTimeout) clearTimeout(hoverTimeout);
+        setter(true);
+    };
+
+    const handleMouseLeave = (setter: React.Dispatch<React.SetStateAction<boolean>>) => {
+        hoverTimeout = setTimeout(() => setter(false), 200);
     };
 
     return (
         <div className="bg-primary-dark text-white text-[10px] md:text-xs py-1 relative z-50">
             <div className="container mx-auto px-2 md:px-4 flex items-center justify-between gap-1 md:gap-3 flex-nowrap overflow-x-auto">
-                {/* Left: free shipping + track order */}
+                {/* LEFT SIDE (start of bar) – Language toggle + free shipping */}
                 <div className="flex items-center gap-1 md:gap-3 flex-shrink-0 whitespace-nowrap">
-                    <span className="hidden sm:inline">🚚</span>
-                    <span className="hidden xs:inline">{t('freeShipping')}</span>
+                    {/* Language toggle – simple button, no dropdown */}
+                    <button
+                        onClick={toggleLanguage}
+                        className="flex items-center gap-0.5 md:gap-1 hover:text-yellow-400 transition px-1 md:px-2 py-0.5 rounded-md hover:bg-white/10"
+                    >
+                        <GlobeAltIcon className="w-3 h-3 md:w-3.5 md:h-3.5" />
+                        <span>{i18n.language === 'ar' ? 'العربية' : 'English'}</span>
+                    </button>
                     <span className="text-white/30 hidden xs:inline">|</span>
-                    <Link href="/tracking" className="hover:opacity-70 transition whitespace-nowrap">
-                        {t('trackOrder')}
-                    </Link>
+                    <span className="hidden xs:inline">🚚 {t('freeShipping')}</span>
                 </div>
 
-                {/* Right: three dropdown menus – click only */}
+                {/* RIGHT SIDE (end of bar) – Support, Currency, Track Order */}
                 <div className="flex items-center gap-1 md:gap-3 flex-shrink-0">
-                    {/* Language Dropdown */}
-                    <div className="relative" ref={langRef}>
-                        <button
-                            onClick={() => setLangOpen(!langOpen)}
-                            className="flex items-center gap-0.5 md:gap-1 hover:text-yellow-400 transition px-1 md:px-2 py-0.5 rounded-md hover:bg-white/10 whitespace-nowrap"
-                        >
-                            <GlobeAltIcon className="w-3 h-3 md:w-3.5 md:h-3.5" />
-                            <span className="hidden xs:inline">{i18n.language === 'ar' ? 'العربية' : 'English'}</span>
-                            <ChevronDownIcon className="w-2.5 h-2.5 md:w-3 md:h-3" />
-                        </button>
-                        <AnimatePresence>
-                            {langOpen && (
-                                <motion.div
-                                    initial={{ opacity: 0, y: -10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -10 }}
-                                    className="absolute right-0 top-full mt-1 bg-white text-gray-800 rounded-lg shadow-lg py-1 w-28 md:w-32 z-50"
-                                >
-                                    <button onClick={() => toggleLanguage('ar')} className="block w-full text-right px-3 md:px-4 py-1.5 md:py-2 hover:bg-gray-100 transition text-xs md:text-sm">
-                                        العربية
-                                    </button>
-                                    <button onClick={() => toggleLanguage('en')} className="block w-full text-right px-3 md:px-4 py-1.5 md:py-2 hover:bg-gray-100 transition text-xs md:text-sm">
-                                        English
-                                    </button>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-                    </div>
-
-                    <span className="text-white/30 hidden xs:inline">|</span>
-
                     {/* Support Dropdown */}
-                    <div className="relative" ref={supportRef}>
+                    <div
+                        className="relative"
+                        ref={supportRef}
+                        onMouseEnter={() => handleMouseEnter(setSupportOpen)}
+                        onMouseLeave={() => handleMouseLeave(setSupportOpen)}
+                    >
                         <button
                             onClick={() => setSupportOpen(!supportOpen)}
                             className="flex items-center gap-0.5 md:gap-1 hover:text-yellow-400 transition px-1 md:px-2 py-0.5 rounded-md hover:bg-white/10 whitespace-nowrap"
@@ -134,7 +122,12 @@ const TopBar = () => {
                     <span className="text-white/30 hidden xs:inline">|</span>
 
                     {/* Currency Dropdown */}
-                    <div className="relative" ref={currencyRef}>
+                    <div
+                        className="relative"
+                        ref={currencyRef}
+                        onMouseEnter={() => handleMouseEnter(setCurrencyOpen)}
+                        onMouseLeave={() => handleMouseLeave(setCurrencyOpen)}
+                    >
                         <button
                             onClick={() => setCurrencyOpen(!currencyOpen)}
                             className="flex items-center gap-0.5 md:gap-1 hover:text-yellow-400 transition px-1 md:px-2 py-0.5 rounded-md hover:bg-white/10 whitespace-nowrap"
@@ -161,6 +154,14 @@ const TopBar = () => {
                             )}
                         </AnimatePresence>
                     </div>
+
+                    <span className="text-white/30 hidden xs:inline">|</span>
+
+                    {/* Track Order – simple link */}
+                    <Link href="/tracking" className="flex items-center gap-0.5 md:gap-1 hover:text-yellow-400 transition px-1 md:px-2 py-0.5 rounded-md hover:bg-white/10 whitespace-nowrap">
+                        <TruckIcon className="w-3 h-3 md:w-3.5 md:h-3.5" />
+                        <span className="hidden xs:inline">{t('trackOrder')}</span>
+                    </Link>
                 </div>
             </div>
         </div>
@@ -168,7 +169,7 @@ const TopBar = () => {
 };
 
 // ============================================================
-// MAIN HEADER – Logo on right, no search bar
+// MAIN HEADER – Logo right, icons left
 // ============================================================
 const MainHeader = ({ user }: { user: AuthResponse | null }) => {
     const { t } = useTranslation('common');
@@ -209,64 +210,65 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
     return (
         <div className="navbar">
             <div className="container mx-auto px-2 md:px-4 flex items-center justify-between gap-2 md:gap-4 py-2">
-                {/* Left: Hamburger menu */}
-                <div className="relative" onClick={(e) => e.stopPropagation()}>
-                    <button
-                        onClick={() => setLeftMenuOpen(!leftMenuOpen)}
-                        className="p-1.5 md:p-2 rounded-md hover:bg-primary-dark/10 transition text-navbar-text"
-                        aria-label="Main menu"
-                    >
-                        <Bars3Icon className="w-5 h-5 md:w-6 md:h-6" />
-                    </button>
-                    <AnimatePresence>
-                        {leftMenuOpen && (
-                            <motion.div
-                                initial={{ opacity: 0, y: -10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -10 }}
-                                className={`absolute ${isRTL ? 'right-0' : 'left-0'} top-full mt-2 w-64 max-w-[calc(100vw-2rem)] max-h-[80vh] overflow-y-auto bg-white rounded-xl shadow-strong border border-border py-2 z-[999]`}
-                            >
-                                <Link href="/" className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition" onClick={() => setLeftMenuOpen(false)}>
-                                    {t('home')}
-                                </Link>
-
-                                {loadingCategories ? (
-                                    <span className="block px-4 py-2 text-text-muted text-sm">جاري التحميل...</span>
-                                ) : (
-                                    categories.map((cat) => {
-                                        const slug = getCategorySlug(cat);
-                                        return (
-                                            <Link
-                                                key={cat}
-                                                href={`/${slug}`}
-                                                className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition"
-                                                onClick={() => setLeftMenuOpen(false)}
-                                            >
-                                                {cat}
-                                            </Link>
-                                        );
-                                    })
-                                )}
-
-                                <Link href="/stores" className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition" onClick={() => setLeftMenuOpen(false)}>
-                                    {t('stores')}
-                                </Link>
-                                <Link href="/offers" className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition" onClick={() => setLeftMenuOpen(false)}>
-                                    🔥 {t('offers')}
-                                </Link>
-                                <Link href="/contact" className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition" onClick={() => setLeftMenuOpen(false)}>
-                                    {t('contact')}
-                                </Link>
-                                <Link href="/help" className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition" onClick={() => setLeftMenuOpen(false)}>
-                                    📘 {t('help')}
-                                </Link>
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
-                </div>
-
-                {/* Right side icons: wishlist, cart, user */}
+                {/* LEFT SIDE (end of bar) – Hamburger + Icons */}
                 <div className="flex items-center gap-1.5 md:gap-3 flex-shrink-0">
+                    {/* Hamburger menu */}
+                    <div className="relative" onClick={(e) => e.stopPropagation()}>
+                        <button
+                            onClick={() => setLeftMenuOpen(!leftMenuOpen)}
+                            className="p-1.5 md:p-2 rounded-md hover:bg-primary-dark/10 transition text-navbar-text"
+                            aria-label="Main menu"
+                        >
+                            <Bars3Icon className="w-5 h-5 md:w-6 md:h-6" />
+                        </button>
+                        <AnimatePresence>
+                            {leftMenuOpen && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                    className={`absolute ${isRTL ? 'right-0' : 'left-0'} top-full mt-2 w-64 max-w-[calc(100vw-2rem)] max-h-[80vh] overflow-y-auto bg-white rounded-xl shadow-strong border border-border py-2 z-[999]`}
+                                >
+                                    <Link href="/" className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition" onClick={() => setLeftMenuOpen(false)}>
+                                        {t('home')}
+                                    </Link>
+
+                                    {loadingCategories ? (
+                                        <span className="block px-4 py-2 text-text-muted text-sm">جاري التحميل...</span>
+                                    ) : (
+                                        categories.map((cat) => {
+                                            const slug = getCategorySlug(cat);
+                                            return (
+                                                <Link
+                                                    key={cat}
+                                                    href={`/${slug}`}
+                                                    className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition"
+                                                    onClick={() => setLeftMenuOpen(false)}
+                                                >
+                                                    {cat}
+                                                </Link>
+                                            );
+                                        })
+                                    )}
+
+                                    <Link href="/stores" className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition" onClick={() => setLeftMenuOpen(false)}>
+                                        {t('stores')}
+                                    </Link>
+                                    <Link href="/offers" className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition" onClick={() => setLeftMenuOpen(false)}>
+                                        🔥 {t('offers')}
+                                    </Link>
+                                    <Link href="/contact" className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition" onClick={() => setLeftMenuOpen(false)}>
+                                        {t('contact')}
+                                    </Link>
+                                    <Link href="/help" className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition" onClick={() => setLeftMenuOpen(false)}>
+                                        📘 {t('help')}
+                                    </Link>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
+
+                    {/* Wishlist */}
                     <motion.button whileHover={{ scale: 1.1 }} className="text-navbar-text hover:text-navbar-hover transition relative hidden sm:block">
                         <HeartIcon className="w-5 h-5 md:w-6 md:h-6" />
                         <span className="absolute -top-1.5 -right-1.5 bg-secondary text-white text-[10px] font-bold w-[18px] h-[18px] rounded-full flex items-center justify-center">
@@ -274,6 +276,7 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
                         </span>
                     </motion.button>
 
+                    {/* Cart */}
                     <span ref={cartIconRef} className="relative inline-flex">
                         <Link href="/cart" className="text-navbar-text hover:text-navbar-hover transition">
                             <ShoppingCartIcon className="w-5 h-5 md:w-6 md:h-6" />
@@ -376,7 +379,7 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
                     </div>
                 </div>
 
-                {/* Logo – rightmost (black & bold) */}
+                {/* RIGHT SIDE (start of bar) – Logo & Name */}
                 <div className="flex-shrink-0">
                     <Logo />
                 </div>
