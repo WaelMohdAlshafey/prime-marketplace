@@ -1,7 +1,8 @@
 'use client';
 
 import Image from 'next/image';
-import { Heart, ShoppingBag, Plus, Minus } from 'lucide-react';
+import { Heart, Plus, Minus } from 'lucide-react';
+import { ShoppingCartIcon } from '@heroicons/react/24/outline'; // ← same as header
 import { useState, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
@@ -149,7 +150,7 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
             className="cursor-pointer p-2"
             onClick={handleCardClick}
         >
-            {/* Transparent outer card – with border and shadow */}
+            {/* Transparent outer card */}
             <div className="border border-gray-200 rounded-2xl overflow-hidden bg-transparent shadow-sm hover:shadow-xl transition-all duration-300">
 
                 {/* BLOCK 1 – Picture + Name + Description (white background) */}
@@ -167,14 +168,12 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
                             />
                         </motion.button>
 
-                        {/* Discount badge */}
                         {hasDiscount && (
                             <span className="absolute top-2 left-2 z-10 bg-red-500 text-white text-xs font-bold px-2.5 py-1 rounded-full">
                                 -{product.discount}%
                             </span>
                         )}
 
-                        {/* Product image */}
                         <div className="relative w-full aspect-square max-h-[200px] mx-auto">
                             <Image
                                 src={imgSrc}
@@ -188,7 +187,6 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
                         </div>
                     </div>
 
-                    {/* Product info */}
                     <div className="mt-3 space-y-1.5 text-center">
                         {product.category && (
                             <span className="inline-block text-[10px] font-semibold text-primary bg-primary/10 px-2.5 py-0.5 rounded-full">
@@ -216,9 +214,8 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
                     </div>
                 </div>
 
-                {/* BLOCK 2 – Controls as "Chocolate Bar" (no gaps, equal squares) */}
+                {/* BLOCK 2 – Controls as "Chocolate Bar" with header cart icon */}
                 <div className="bg-[#4E8C9E] p-2 flex items-stretch" onClick={(e) => e.stopPropagation()}>
-                    {/* Minus */}
                     <button
                         onClick={decrement}
                         disabled={quantity <= 1}
@@ -227,12 +224,10 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
                         <Minus className="w-5 h-5" />
                     </button>
 
-                    {/* Quantity */}
                     <div className="flex-1 py-3 text-white font-semibold text-center border-r border-white/20 flex items-center justify-center">
                         {quantity}
                     </div>
 
-                    {/* Plus */}
                     <button
                         onClick={increment}
                         disabled={quantity >= product.stockQuantity}
@@ -241,7 +236,7 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
                         <Plus className="w-5 h-5" />
                     </button>
 
-                    {/* Add to Cart – icon only (same as header cart) */}
+                    {/* Add to Cart – uses SAME icon as header */}
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
@@ -255,12 +250,11 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
                         ) : product.stockQuantity === 0 ? (
                             <span className="text-xs">غير متوفر</span>
                         ) : (
-                            <ShoppingBag className="w-5 h-5" />
+                            <ShoppingCartIcon className="w-5 h-5" /> // ✅ Same as header
                         )}
                     </button>
                 </div>
 
-                {/* Low stock warning */}
                 {product.stockQuantity > 0 && product.stockQuantity <= 5 && (
                     <p className="text-xs text-amber-600 text-center py-1 bg-white/80">
                         ⚠️ متبقي {product.stockQuantity} فقط
@@ -289,7 +283,7 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
                         }
                     }}
                 >
-                    <ShoppingBag className="w-7 h-7 text-white" />
+                    <ShoppingCartIcon className="w-7 h-7 text-white" />
                 </div>
             )}
         </motion.div>
