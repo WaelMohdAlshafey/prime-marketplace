@@ -146,15 +146,14 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
             whileHover={{ y: -6 }}
             onHoverStart={() => setIsHovered(true)}
             onHoverEnd={() => setIsHovered(false)}
-            className="cursor-pointer p-2" // ← Small space around card
+            className="cursor-pointer p-2"
             onClick={handleCardClick}
         >
-            {/* Transparent outer card – no background, just edges */}
+            {/* Transparent outer card – with border and shadow */}
             <div className="border border-gray-200 rounded-2xl overflow-hidden bg-transparent shadow-sm hover:shadow-xl transition-all duration-300">
 
-                {/* BLOCK 1 – Picture + Name + Description (white background, rounded top) */}
+                {/* BLOCK 1 – Picture + Name + Description (white background) */}
                 <div className="bg-white p-4">
-                    {/* Image section */}
                     <div className="relative bg-gray-50/80 rounded-xl p-4">
                         {/* Wishlist heart */}
                         <motion.button
@@ -217,42 +216,39 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
                     </div>
                 </div>
 
-                {/* BLOCK 2 – Controls (colored background, rounded bottom) */}
-                <div className="bg-[#4E8C9E] p-3 flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
-                    {/* Increment / Decrement */}
-                    <div className="flex items-center gap-1 bg-white/20 rounded-full p-1 border border-white/30 flex-shrink-0">
-                        <button
-                            onClick={decrement}
-                            disabled={quantity <= 1}
-                            className="w-8 h-8 rounded-full flex items-center justify-center text-white hover:bg-white/30 transition disabled:opacity-30 disabled:cursor-not-allowed text-lg font-bold"
-                        >
-                            <Minus className="w-4 h-4" />
-                        </button>
-                        <span className="w-8 text-center text-sm font-medium text-white">
-                            {quantity}
-                        </span>
-                        <button
-                            onClick={increment}
-                            disabled={quantity >= product.stockQuantity}
-                            className="w-8 h-8 rounded-full flex items-center justify-center text-white hover:bg-white/30 transition disabled:opacity-30 disabled:cursor-not-allowed text-lg font-bold"
-                        >
-                            <Plus className="w-4 h-4" />
-                        </button>
+                {/* BLOCK 2 – Controls as "Chocolate Bar" (no gaps, equal squares) */}
+                <div className="bg-[#4E8C9E] p-2 flex items-stretch" onClick={(e) => e.stopPropagation()}>
+                    {/* Minus */}
+                    <button
+                        onClick={decrement}
+                        disabled={quantity <= 1}
+                        className="flex-1 py-3 text-white hover:bg-white/20 transition disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center border-r border-white/20"
+                    >
+                        <Minus className="w-5 h-5" />
+                    </button>
+
+                    {/* Quantity */}
+                    <div className="flex-1 py-3 text-white font-semibold text-center border-r border-white/20 flex items-center justify-center">
+                        {quantity}
                     </div>
 
-                    {/* Add to Cart – icon only */}
+                    {/* Plus */}
+                    <button
+                        onClick={increment}
+                        disabled={quantity >= product.stockQuantity}
+                        className="flex-1 py-3 text-white hover:bg-white/20 transition disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center border-r border-white/20"
+                    >
+                        <Plus className="w-5 h-5" />
+                    </button>
+
+                    {/* Add to Cart – icon only (same as header cart) */}
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
                             handleAddToCart(e);
                         }}
                         disabled={isAdding || product.stockQuantity === 0}
-                        className={`flex-1 py-2.5 rounded-full font-medium text-sm transition-all duration-300 flex items-center justify-center ${product.stockQuantity === 0
-                                ? 'bg-gray-400 text-white cursor-not-allowed'
-                                : isAdding
-                                    ? 'bg-white/40 text-white cursor-wait'
-                                    : 'bg-white text-[#4E8C9E] hover:bg-white/90 hover:shadow-lg'
-                            }`}
+                        className="flex-[2] py-3 bg-white text-[#4E8C9E] hover:bg-white/90 transition disabled:opacity-50 flex items-center justify-center rounded-r-lg"
                     >
                         {isAdding ? (
                             <div className="animate-spin rounded-full h-5 w-5 border-2 border-[#4E8C9E] border-t-transparent" />
