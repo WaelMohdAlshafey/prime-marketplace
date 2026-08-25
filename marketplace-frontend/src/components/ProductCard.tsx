@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { Heart, ShoppingBag } from 'lucide-react';
+import { Heart, ShoppingBag, Plus, Minus } from 'lucide-react';
 import { useState, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
@@ -38,7 +38,7 @@ interface ProductCardProps {
 export default function ProductCard({ product, onCardClick }: ProductCardProps) {
     const { i18n } = useTranslation();
     const [isAdding, setIsAdding] = useState(false);
-    const [quantity] = useState(1); // always 1 – quantity selector removed for cleaner design
+    const [quantity, setQuantity] = useState(1);
 
     const initialImage = product.imageUrl
         ? getImageUrl(product.imageUrl)
@@ -56,7 +56,6 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
     const { cartIconRef } = useCartIconRef();
 
     const isWishlist = isFavorite(product.id);
-    // ✅ Safe discount handling – discount is optional
     const hasDiscount = product.discount !== undefined && product.discount > 0;
     const discountPrice = hasDiscount ? product.price * (1 - (product.discount ?? 0) / 100) : null;
 
@@ -100,16 +99,33 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
             setTimeout(() => {
                 setFly(false);
                 setIsAdding(true);
-                addToCart(product.id, 1).finally(() => setIsAdding(false));
+                addToCart(product.id, quantity).finally(() => setIsAdding(false));
             }, 800);
         } else {
             setIsAdding(true);
-            await addToCart(product.id, 1);
+            await addToCart(product.id, quantity);
             setIsAdding(false);
         }
     };
 
-    const handleCardClick = () => {
+    const increment = (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (quantity < product.stockQuantity) {
+            setQuantity(q => q + 1);
+        }
+    };
+
+    const decrement = (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (quantity > 1) {
+            setQuantity(q => q - 1);
+        }
+    };
+
+    const handleCardClick = (e: React.MouseEvent) => {
+        e.preventDefault();
         if (onCardClick) onCardClick(product.id);
     };
 
@@ -130,112 +146,133 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
             whileHover={{ y: -6 }}
             onHoverStart={() => setIsHovered(true)}
             onHoverEnd={() => setIsHovered(false)}
-            className="cursor-pointer"
+            className="cursor-pointer p-2" // ← Small space around card
             onClick={handleCardClick}
         >
-            {/* Clean minimal card – white, shadow, centered content */}
-            <div className="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100/50">
+            {/* Transparent outer card – no background, just edges */}
+            <div className="border border-gray-200 rounded-2xl overflow-hidden bg-transparent shadow-sm hover:shadow-xl transition-all duration-300">
 
-                {/* Image section */}
-                <div className="relative bg-gray-50/80 p-4">
-                    {/* Wishlist heart */}
-                    <motion.button
-                        whileHover={{ scale: 1.2 }}
-                        whileTap={{ scale: 0.8 }}
-                        onClick={handleWishlistToggle}
-                        className="absolute top-3 right-3 z-10 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-sm hover:shadow-md transition"
-                    >
-                        <Heart
-                            className={`w-4 h-4 transition ${isWishlist ? 'fill-red-500 text-red-500' : 'text-gray-400'}`}
-                        />
-                    </motion.button>
+                {/* BLOCK 1 – Picture + Name + Description (white background, rounded top) */}
+                <div className="bg-white p-4">
+                    {/* Image section */}
+                    <div className="relative bg-gray-50/80 rounded-xl p-4">
+                        {/* Wishlist heart */}
+                        <motion.button
+                            whileHover={{ scale: 1.2 }}
+                            whileTap={{ scale: 0.8 }}
+                            onClick={handleWishlistToggle}
+                            className="absolute top-2 right-2 z-10 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-sm hover:shadow-md transition"
+                        >
+                            <Heart
+                                className={`w-4 h-4 transition ${isWishlist ? 'fill-red-500 text-red-500' : 'text-gray-400'}`}
+                            />
+                        </motion.button>
 
-                    {/* Discount badge */}
-                    {hasDiscount && (
-                        <span className="absolute top-3 left-3 z-10 bg-red-500 text-white text-xs font-bold px-2.5 py-1 rounded-full">
-                            -{product.discount}%
-                        </span>
-                    )}
+                        {/* Discount badge */}
+                        {hasDiscount && (
+                            <span className="absolute top-2 left-2 z-10 bg-red-500 text-white text-xs font-bold px-2.5 py-1 rounded-full">
+                                -{product.discount}%
+                            </span>
+                        )}
 
-                    {/* Product image – centered */}
-                    <div className="relative w-full aspect-square max-h-[200px] mx-auto">
-                        <Image
-                            src={imgSrc}
-                            alt={displayName}
-                            fill
-                            className={`object-contain p-2 transition-transform duration-500 ${isHovered ? 'scale-105' : 'scale-100'}`}
-                            sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-                            priority={false}
-                            onError={handleImageError}
-                        />
+                        {/* Product image */}
+                        <div className="relative w-full aspect-square max-h-[200px] mx-auto">
+                            <Image
+                                src={imgSrc}
+                                alt={displayName}
+                                fill
+                                className={`object-contain p-2 transition-transform duration-500 ${isHovered ? 'scale-105' : 'scale-100'}`}
+                                sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                                priority={false}
+                                onError={handleImageError}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Product info */}
+                    <div className="mt-3 space-y-1.5 text-center">
+                        {product.category && (
+                            <span className="inline-block text-[10px] font-semibold text-primary bg-primary/10 px-2.5 py-0.5 rounded-full">
+                                {product.category}
+                            </span>
+                        )}
+                        <h3 className="font-semibold text-gray-800 text-base line-clamp-1">
+                            {displayName}
+                        </h3>
+                        {displayDescription && (
+                            <p className="text-gray-500 text-sm line-clamp-2 leading-relaxed">
+                                {displayDescription}
+                            </p>
+                        )}
+                        <div className="flex items-center justify-center gap-2 pt-1">
+                            <span className="text-xl font-bold text-gray-900">
+                                {CURRENCY}{(discountPrice || product.price).toFixed(2)}
+                            </span>
+                            {hasDiscount && (
+                                <span className="text-sm text-gray-400 line-through">
+                                    {CURRENCY}{product.price.toFixed(2)}
+                                </span>
+                            )}
+                        </div>
                     </div>
                 </div>
 
-                {/* Content section */}
-                <div className="p-4 space-y-2 text-center">
-                    {/* Category badge (if available) */}
-                    {product.category && (
-                        <span className="inline-block text-[10px] font-semibold text-primary bg-primary/10 px-2.5 py-0.5 rounded-full">
-                            {product.category}
+                {/* BLOCK 2 – Controls (colored background, rounded bottom) */}
+                <div className="bg-[#4E8C9E] p-3 flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                    {/* Increment / Decrement */}
+                    <div className="flex items-center gap-1 bg-white/20 rounded-full p-1 border border-white/30 flex-shrink-0">
+                        <button
+                            onClick={decrement}
+                            disabled={quantity <= 1}
+                            className="w-8 h-8 rounded-full flex items-center justify-center text-white hover:bg-white/30 transition disabled:opacity-30 disabled:cursor-not-allowed text-lg font-bold"
+                        >
+                            <Minus className="w-4 h-4" />
+                        </button>
+                        <span className="w-8 text-center text-sm font-medium text-white">
+                            {quantity}
                         </span>
-                    )}
-
-                    {/* Product name */}
-                    <h3 className="font-semibold text-gray-800 text-base line-clamp-1">
-                        {displayName}
-                    </h3>
-
-                    {/* Description (short) */}
-                    {displayDescription && (
-                        <p className="text-gray-500 text-sm line-clamp-2 leading-relaxed">
-                            {displayDescription}
-                        </p>
-                    )}
-
-                    {/* Price */}
-                    <div className="flex items-center justify-center gap-2 pt-1">
-                        <span className="text-xl font-bold text-gray-900">
-                            {CURRENCY}{(discountPrice || product.price).toFixed(2)}
-                        </span>
-                        {hasDiscount && (
-                            <span className="text-sm text-gray-400 line-through">
-                                {CURRENCY}{product.price.toFixed(2)}
-                            </span>
-                        )}
+                        <button
+                            onClick={increment}
+                            disabled={quantity >= product.stockQuantity}
+                            className="w-8 h-8 rounded-full flex items-center justify-center text-white hover:bg-white/30 transition disabled:opacity-30 disabled:cursor-not-allowed text-lg font-bold"
+                        >
+                            <Plus className="w-4 h-4" />
+                        </button>
                     </div>
 
-                    {/* Add to Cart – full width */}
+                    {/* Add to Cart – icon only */}
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
                             handleAddToCart(e);
                         }}
                         disabled={isAdding || product.stockQuantity === 0}
-                        className={`w-full py-2.5 rounded-xl font-medium text-sm transition-all duration-300 flex items-center justify-center gap-2 ${product.stockQuantity === 0
-                                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                        className={`flex-1 py-2.5 rounded-full font-medium text-sm transition-all duration-300 flex items-center justify-center ${product.stockQuantity === 0
+                                ? 'bg-gray-400 text-white cursor-not-allowed'
                                 : isAdding
-                                    ? 'bg-primary/70 text-white cursor-wait'
-                                    : 'bg-primary text-white hover:bg-primary-dark hover:shadow-md'
+                                    ? 'bg-white/40 text-white cursor-wait'
+                                    : 'bg-white text-[#4E8C9E] hover:bg-white/90 hover:shadow-lg'
                             }`}
                     >
-                        <ShoppingBag className="w-4 h-4" />
-                        {isAdding
-                            ? 'جاري الإضافة...'
-                            : product.stockQuantity === 0
-                                ? 'غير متوفر'
-                                : 'أضف إلى السلة'}
+                        {isAdding ? (
+                            <div className="animate-spin rounded-full h-5 w-5 border-2 border-[#4E8C9E] border-t-transparent" />
+                        ) : product.stockQuantity === 0 ? (
+                            <span className="text-xs">غير متوفر</span>
+                        ) : (
+                            <ShoppingBag className="w-5 h-5" />
+                        )}
                     </button>
-
-                    {/* Low stock warning */}
-                    {product.stockQuantity > 0 && product.stockQuantity <= 5 && (
-                        <p className="text-xs text-amber-600 text-center">
-                            ⚠️ متبقي {product.stockQuantity} فقط
-                        </p>
-                    )}
                 </div>
+
+                {/* Low stock warning */}
+                {product.stockQuantity > 0 && product.stockQuantity <= 5 && (
+                    <p className="text-xs text-amber-600 text-center py-1 bg-white/80">
+                        ⚠️ متبقي {product.stockQuantity} فقط
+                    </p>
+                )}
             </div>
 
-            {/* Fly animation – optional, but kept */}
+            {/* Fly animation */}
             {fly && (
                 <div
                     className="fixed pointer-events-none z-50 w-14 h-14 bg-primary rounded-full shadow-lg flex items-center justify-center"

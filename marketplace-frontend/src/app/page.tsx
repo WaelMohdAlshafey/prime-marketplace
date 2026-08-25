@@ -5,11 +5,10 @@ import { useTranslation } from 'react-i18next';
 import api from '@/lib/api';
 import { Product } from '@/types';
 import HeroBanner from '@/components/HeroBanner';
-import CategoryGrid from '@/components/CategoryGrid';
 import FilterSidebar from '@/components/Filters/FilterSidebar';
 import ProductCard from '@/components/ProductCard';
 import ProductDetailModal from '@/components/ProductDetailModal';
-import { ShoppingBag, Sparkles, TrendingUp, Award } from 'lucide-react';
+import { ShoppingBag, Sparkles } from 'lucide-react';
 
 export default function Home() {
     const { t } = useTranslation('common');
@@ -72,8 +71,10 @@ export default function Home() {
 
     return (
         <div className="bg-background min-h-screen">
+            {/* Hero Banner – kept */}
             <HeroBanner />
-            <CategoryGrid />
+
+            {/* Categories are REMOVED from here – only in menu */}
 
             {/* Main Content with Filters */}
             <div className="container mx-auto px-4 py-6 md:py-10">
@@ -102,7 +103,7 @@ export default function Home() {
                         </div>
 
                         {loading ? (
-                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-5">
                                 {[...Array(6)].map((_, i) => (
                                     <div key={i} className="bg-white rounded-2xl shadow-soft p-4 animate-pulse">
                                         <div className="w-full aspect-square bg-gray-200 rounded-xl"></div>
@@ -133,7 +134,7 @@ export default function Home() {
                                 </button>
                             </div>
                         ) : (
-                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-5">
                                 {products.map((product) => (
                                     <ProductCard
                                         key={product.id}
@@ -146,27 +147,6 @@ export default function Home() {
                     </div>
                 </div>
             </div>
-
-            {/* Premium CTA Banner */}
-            <section className="container mx-auto px-4 py-8 md:py-12">
-                <div className="relative bg-gradient-to-br from-primary to-primary-dark rounded-2xl p-6 md:p-10 text-white overflow-hidden">
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/3"></div>
-                    <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/4"></div>
-
-                    <div className="relative z-10 text-center md:text-right">
-                        <Award className="w-10 h-10 md:w-14 md:h-14 text-secondary mx-auto md:mx-0 mb-3" />
-                        <h2 className="text-2xl md:text-4xl font-bold">انضم إلى برايم اليوم</h2>
-                        <p className="text-white/80 text-sm md:text-base max-w-2xl mx-auto md:mx-0 mt-2">
-                            احصل على أفضل المنتجات بأسعار تنافسية وشحن سريع لجميع المحافظات.
-                            اشترك الآن واستمتع بتجربة تسوق فاخرة.
-                        </p>
-                        <button className="mt-4 bg-secondary hover:bg-secondary-dark text-white px-6 md:px-8 py-2 md:py-3 rounded-pill font-semibold transition hover:shadow-lg hover:-translate-y-1 inline-flex items-center gap-2 text-sm md:text-base">
-                            <TrendingUp className="w-4 h-4" />
-                            اكتشف المزيد
-                        </button>
-                    </div>
-                </div>
-            </section>
 
             {/* Product Detail Modal */}
             <ProductDetailModal
