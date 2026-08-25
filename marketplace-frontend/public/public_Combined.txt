@@ -202,7 +202,15 @@
   "invoiceItems": "المنتجات",
   "invoiceTotal": "الإجمالي",
   "invoicePrint": "🖨️ طباعة الفاتورة",
-  "profile": "الملف الشخصي"
+
+  "profile": "الملف الشخصي",
+
+  "help": "دليل المستخدم",
+  "helpTitle": "📘 دليل المستخدم الشامل",
+  "helpCustomer": "👤 عميل",
+  "helpVendor": "🏪 بائع",
+  "helpEmployee": "👔 موظف",
+  "helpAdmin": "⚙️ مدير"
 }
 
 // ===== products.json =====
@@ -420,7 +428,15 @@
   "invoiceItems": "Items",
   "invoiceTotal": "Total",
   "invoicePrint": "🖨️ Print Invoice",
-  "profile": "الملف الشخصي"
+
+  "profile": "Profile",
+
+  "help": "User Guide",
+  "helpTitle": "📘 Complete User Guide",
+  "helpCustomer": "👤 Customer",
+  "helpVendor": "🏪 Vendor",
+  "helpEmployee": "👔 Employee",
+  "helpAdmin": "⚙️ Admin"
 }
 
 // ===== products.json =====

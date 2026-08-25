@@ -1834,7 +1834,6 @@ public class AddToCartDto
     [Range(1, 100, ErrorMessage = "Quantity must be between 1 and 100.")]
     public int Quantity { get; set; }
 }
-
 public class CartItemDto
 {
     public int Id { get; set; }
@@ -7643,38 +7642,52 @@ public class OrderService : IOrderService
 
     public async Task<CartResponseDto> AddToCartAsync(int userId, AddToCartDto addToCartDto)
     {
-        var product = await _context.Products
-            .FirstOrDefaultAsync(p => p.Id == addToCartDto.ProductId && p.IsActive);
-
-        if (product == null)
-            throw new Exception("Product not available.");
-
-        if (product.StockQuantity < addToCartDto.Quantity)
-            throw new Exception($"Only {product.StockQuantity} items available.");
-
-        var existingItem = await _context.CartItems
-            .FirstOrDefaultAsync(ci => ci.UserId == userId && ci.ProductId == addToCartDto.ProductId);
-
-        if (existingItem != null)
+        try
         {
-            existingItem.Quantity += addToCartDto.Quantity;
-            if (existingItem.Quantity > product.StockQuantity)
-                existingItem.Quantity = product.StockQuantity;
-        }
-        else
-        {
-            var cartItem = new CartItem
+            var product = await _context.Products
+                .FirstOrDefaultAsync(p => p.Id == addToCartDto.ProductId && p.IsActive);
+
+            if (product == null)
+                throw new Exception("Product not available.");
+
+            if (product.StockQuantity < addToCartDto.Quantity)
+                throw new Exception($"Only {product.StockQuantity} items available.");
+
+            var existingItem = await _context.CartItems
+                .FirstOrDefaultAsync(ci => ci.UserId == userId && ci.ProductId == addToCartDto.ProductId);
+
+            if (existingItem != null)
             {
-                UserId = userId,
-                ProductId = addToCartDto.ProductId,
-                Quantity = addToCartDto.Quantity,
-                AddedAt = DateTime.UtcNow
-            };
-            _context.CartItems.Add(cartItem);
-        }
+                existingItem.Quantity += addToCartDto.Quantity;
+                if (existingItem.Quantity > product.StockQuantity)
+                    existingItem.Quantity = product.StockQuantity;
+            }
+            else
+            {
+                var cartItem = new CartItem
+                {
+                    UserId = userId,
+                    ProductId = addToCartDto.ProductId,
+                    Quantity = addToCartDto.Quantity,
+                    AddedAt = DateTime.UtcNow
+                };
+                _context.CartItems.Add(cartItem);
+            }
 
-        await _context.SaveChangesAsync();
-        return await GetCartAsync(userId);
+            await _context.SaveChangesAsync();
+            return await GetCartAsync(userId);
+        }
+        catch (DbUpdateException dbEx)
+        {
+            Console.WriteLine($"❌ Cart DB Update Error: {dbEx.InnerException?.Message}");
+            Console.WriteLine($"Stack Trace: {dbEx.InnerException?.StackTrace}");
+            throw;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Cart General Error: {ex.Message}");
+            throw;
+        }
     }
 
     public async Task<CartResponseDto> RemoveFromCartAsync(int userId, int cartItemId)
@@ -7943,9 +7956,6 @@ public class OrderService : IOrderService
     }
 
     // ============================================================
-    // UPDATE ORDER STATUS – WITH DUPLICATE PREVENTION & SHIPPEDAT
-    // ============================================================
-    // ============================================================
     // UPDATE ORDER STATUS – WITH DUPLICATE PREVENTION, SHIPPEDAT, AND CARRIER UPDATE
     // ============================================================
     public async Task<OrderDto> UpdateOrderStatusAsync(int userId, int orderId, string newStatus, string? note = null, string? carrier = null)
@@ -7987,23 +7997,20 @@ public class OrderService : IOrderService
                 throw new Exception("You cannot cancel an order that has already been shipped or delivered.");
         }
 
-        // ✅ Prevent duplicate logs: only proceed if status actually changes OR carrier is updated
+        // Prevent duplicate logs: only proceed if status actually changes OR carrier is updated
         if (order.CurrentStatus == newStatus && string.IsNullOrEmpty(carrier))
         {
-            // No changes – just return the current order
             return await GetOrderByIdAsync(order.UserId, orderId);
         }
 
         var oldStatus = order.CurrentStatus;
         order.CurrentStatus = newStatus;
 
-        // ✅ Update carrier if provided
         if (!string.IsNullOrEmpty(carrier))
         {
             order.ShippingCarrier = carrier;
         }
 
-        // Set ShippedAt when status becomes Shipped or In Transit
         if (newStatus == "Shipped" || newStatus == "In Transit")
         {
             order.ShippedAt = DateTime.UtcNow;
@@ -8014,7 +8021,6 @@ public class OrderService : IOrderService
 
         await _context.SaveChangesAsync();
 
-        // Create a log entry (only when status changed)
         var log = new ShipmentStatusLog
         {
             OrderId = orderId,

@@ -2453,13 +2453,17 @@ public class AppDbContext : DbContext
 
         // ---- CartItem configurations ----
         modelBuilder.Entity<CartItem>()
+            .Property(e => e.Id)
+            .ValueGeneratedOnAdd();   // ✅ This tells EF Core the database generates the Id
+
+        modelBuilder.Entity<CartItem>()
             .HasIndex(ci => ci.UserId);
+
         modelBuilder.Entity<CartItem>()
             .HasOne(ci => ci.Product)
             .WithMany()
             .HasForeignKey(ci => ci.ProductId)
             .OnDelete(DeleteBehavior.Restrict);
-
         // ---- Order configurations ----
         modelBuilder.Entity<Order>()
             .Property(o => o.TotalAmount)
