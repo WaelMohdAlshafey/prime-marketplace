@@ -8,7 +8,6 @@ import { useAuth } from '@/context/AuthContext';
 import { useWishlist } from '@/context/WishlistContext';
 import { useCart } from '@/context/CartContext';
 import { useCartIconRef } from '@/context/CartIconRefContext';
-import { useTheme } from '@/context/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import { getImageUrl } from '@/lib/getImageUrl';
 import { getProductImage } from '@/lib/productImages';
@@ -37,10 +36,9 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product, onCardClick }: ProductCardProps) {
-    const { template = 'standard' } = useTheme();
     const { i18n } = useTranslation();
     const [isAdding, setIsAdding] = useState(false);
-    const [quantity, setQuantity] = useState(1);
+    const [quantity] = useState(1); // always 1 – quantity selector removed for cleaner design
 
     const initialImage = product.imageUrl
         ? getImageUrl(product.imageUrl)
@@ -58,8 +56,9 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
     const { cartIconRef } = useCartIconRef();
 
     const isWishlist = isFavorite(product.id);
-    const discountPrice = product.discount ? product.price * (1 - product.discount / 100) : null;
-    const hasDiscount = product.discount && product.discount > 0;
+    // ✅ Safe discount handling – discount is optional
+    const hasDiscount = product.discount !== undefined && product.discount > 0;
+    const discountPrice = hasDiscount ? product.price * (1 - (product.discount ?? 0) / 100) : null;
 
     const handleImageError = useCallback(() => {
         setImgSrc('/images/placeholder.jpg');
@@ -71,7 +70,7 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
         toggleFavorite(product.id);
     };
 
-    const handleAddToCart = async (e: React.MouseEvent, qty: number) => {
+    const handleAddToCart = async (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
 
@@ -101,20 +100,17 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
             setTimeout(() => {
                 setFly(false);
                 setIsAdding(true);
-                addToCart(product.id, qty).finally(() => setIsAdding(false));
+                addToCart(product.id, 1).finally(() => setIsAdding(false));
             }, 800);
         } else {
             setIsAdding(true);
-            await addToCart(product.id, qty);
+            await addToCart(product.id, 1);
             setIsAdding(false);
         }
     };
 
-    const handleCardClick = (e: React.MouseEvent) => {
-        e.preventDefault();
-        if (onCardClick) {
-            onCardClick(product.id);
-        }
+    const handleCardClick = () => {
+        if (onCardClick) onCardClick(product.id);
     };
 
     const lang = i18n.language || 'en';
@@ -137,12 +133,12 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
             className="cursor-pointer"
             onClick={handleCardClick}
         >
-            {/* Premium Card – White background with shadow */}
+            {/* Clean minimal card – white, shadow, centered content */}
             <div className="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100/50">
 
-                {/* Image Section */}
+                {/* Image section */}
                 <div className="relative bg-gray-50/80 p-4">
-                    {/* Wishlist Heart – top right */}
+                    {/* Wishlist heart */}
                     <motion.button
                         whileHover={{ scale: 1.2 }}
                         whileTap={{ scale: 0.8 }}
@@ -154,15 +150,15 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
                         />
                     </motion.button>
 
-                    {/* Discount Badge */}
+                    {/* Discount badge */}
                     {hasDiscount && (
-                        <span className="absolute top-3 left-3 z-10 bg-[#D27736] text-white text-xs font-bold px-2.5 py-1 rounded-full">
+                        <span className="absolute top-3 left-3 z-10 bg-red-500 text-white text-xs font-bold px-2.5 py-1 rounded-full">
                             -{product.discount}%
                         </span>
                     )}
 
-                    {/* Product Image */}
-                    <div className="relative w-full aspect-square max-h-[220px] mx-auto">
+                    {/* Product image – centered */}
+                    <div className="relative w-full aspect-square max-h-[200px] mx-auto">
                         <Image
                             src={imgSrc}
                             alt={displayName}
@@ -175,21 +171,21 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
                     </div>
                 </div>
 
-                {/* Content Section */}
-                <div className="p-4 space-y-2">
-                    {/* Category/Vendor Badge */}
+                {/* Content section */}
+                <div className="p-4 space-y-2 text-center">
+                    {/* Category badge (if available) */}
                     {product.category && (
                         <span className="inline-block text-[10px] font-semibold text-primary bg-primary/10 px-2.5 py-0.5 rounded-full">
                             {product.category}
                         </span>
                     )}
 
-                    {/* Product Name */}
+                    {/* Product name */}
                     <h3 className="font-semibold text-gray-800 text-base line-clamp-1">
                         {displayName}
                     </h3>
 
-                    {/* Description */}
+                    {/* Description (short) */}
                     {displayDescription && (
                         <p className="text-gray-500 text-sm line-clamp-2 leading-relaxed">
                             {displayDescription}
@@ -197,7 +193,7 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
                     )}
 
                     {/* Price */}
-                    <div className="flex items-center gap-2 pt-1">
+                    <div className="flex items-center justify-center gap-2 pt-1">
                         <span className="text-xl font-bold text-gray-900">
                             {CURRENCY}{(discountPrice || product.price).toFixed(2)}
                         </span>
@@ -208,11 +204,11 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
                         )}
                     </div>
 
-                    {/* Add to Cart Button */}
+                    {/* Add to Cart – full width */}
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
-                            handleAddToCart(e, quantity);
+                            handleAddToCart(e);
                         }}
                         disabled={isAdding || product.stockQuantity === 0}
                         className={`w-full py-2.5 rounded-xl font-medium text-sm transition-all duration-300 flex items-center justify-center gap-2 ${product.stockQuantity === 0
@@ -239,7 +235,7 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
                 </div>
             </div>
 
-            {/* Fly animation */}
+            {/* Fly animation – optional, but kept */}
             {fly && (
                 <div
                     className="fixed pointer-events-none z-50 w-14 h-14 bg-primary rounded-full shadow-lg flex items-center justify-center"
