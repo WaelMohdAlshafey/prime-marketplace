@@ -144,12 +144,30 @@ if (app.Environment.IsDevelopment())
 }
 
 // ============================================================
-// 11. Use CORS – MUST be before Authentication/Authorization
+// 11. CORS – MUST BE BEFORE AUTH
 // ============================================================
 app.UseCors("AllowAll");
 
 // ============================================================
-// 12. Request Logging Middleware (helps debug)
+// 12. FALLBACK CORS MIDDLEWARE – Sets headers for every request
+// ============================================================
+app.Use(async (context, next) =>
+{
+    context.Response.Headers["Access-Control-Allow-Origin"] = "*";
+    context.Response.Headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH";
+    context.Response.Headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With, Accept, Origin";
+
+    if (context.Request.Method == "OPTIONS")
+    {
+        context.Response.StatusCode = 204;
+        return;
+    }
+
+    await next();
+});
+
+// ============================================================
+// 13. Request Logging Middleware (helps debug)
 // ============================================================
 app.Use(async (context, next) =>
 {
@@ -159,23 +177,23 @@ app.Use(async (context, next) =>
 });
 
 // ============================================================
-// 13. Serve static files (product images, etc.)
+// 14. Serve static files (product images, etc.)
 // ============================================================
 app.UseStaticFiles();
 
 // ============================================================
-// 14. Authentication & Authorization
+// 15. Authentication & Authorization
 // ============================================================
 app.UseAuthentication();
 app.UseAuthorization();
 
 // ============================================================
-// 15. Map Controllers
+// 16. Map Controllers
 // ============================================================
 app.MapControllers();
 
 // ============================================================
-// 16. Additional Endpoints
+// 17. Additional Endpoints
 // ============================================================
 app.MapGet("/db-test", async (AppDbContext dbContext) =>
 {
@@ -194,7 +212,7 @@ app.MapGet("/", () => "Prime Marketplace API is running!");
 app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = DateTime.UtcNow }));
 
 // ============================================================
-// 17. Database Migration – Apply pending migrations
+// 18. Database Migration – Apply pending migrations
 // ============================================================
 using (var scope = app.Services.CreateScope())
 {
@@ -212,6 +230,6 @@ using (var scope = app.Services.CreateScope())
 }
 
 // ============================================================
-// 18. Run the App
+// 19. Run the App
 // ============================================================
 app.Run();
