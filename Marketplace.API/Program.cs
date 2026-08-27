@@ -14,26 +14,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 // ============================================================
-// 2. Add CORS (official middleware)
-// ============================================================
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAll",
-        policy =>
-        {
-            policy.AllowAnyOrigin()
-                  .AllowAnyMethod()
-                  .AllowAnyHeader();
-        });
-});
-
-// ============================================================
-// 3. Add Memory Cache
+// 2. Add Memory Cache
 // ============================================================
 builder.Services.AddMemoryCache();
 
 // ============================================================
-// 4. Add Swagger/OpenAPI (with JWT support)
+// 3. Add Swagger/OpenAPI (with JWT support)
 // ============================================================
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -64,7 +50,7 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 // ============================================================
-// 5. Register Application Services (Dependency Injection)
+// 4. Register Application Services (Dependency Injection)
 // ============================================================
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -77,7 +63,7 @@ builder.Services.AddScoped<IStoreService, StoreService>();
 builder.Services.AddScoped<IGoldenLinkService, GoldenLinkService>();
 
 // ============================================================
-// 6. Database Context – with Retry & Detailed Logging
+// 5. Database Context – with Retry & Detailed Logging
 // ============================================================
 builder.Services.AddDbContext<AppDbContext>((serviceProvider, options) =>
 {
@@ -99,7 +85,7 @@ builder.Services.AddDbContext<AppDbContext>((serviceProvider, options) =>
 });
 
 // ============================================================
-// 7. JWT Authentication
+// 6. JWT Authentication
 // ============================================================
 var key = Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Key"] ?? "ThisIsASuperSecretKeyWithAtLeast32CharactersLongForJWT!");
 builder.Services.AddAuthentication(options =>
@@ -122,12 +108,12 @@ builder.Services.AddAuthentication(options =>
 });
 
 // ============================================================
-// 8. Build the App
+// 7. Build the App
 // ============================================================
 var app = builder.Build();
 
 // ============================================================
-// 9. Development Middleware (Swagger)
+// 8. Development Middleware (Swagger)
 // ============================================================
 if (app.Environment.IsDevelopment())
 {
@@ -136,7 +122,7 @@ if (app.Environment.IsDevelopment())
 }
 
 // ============================================================
-// 10. Security & Routing – Conditional HTTPS Redirection
+// 9. Security & Routing – Conditional HTTPS Redirection
 // ============================================================
 if (app.Environment.IsDevelopment())
 {
@@ -144,22 +130,20 @@ if (app.Environment.IsDevelopment())
 }
 
 // ============================================================
-// 11. CORS – MUST BE BEFORE AUTH
-// ============================================================
-app.UseCors("AllowAll");
-
-// ============================================================
-// 12. FALLBACK CORS MIDDLEWARE – Sets headers for every request
+// 10. 🔥 CUSTOM CORS MIDDLEWARE – runs BEFORE everything else
 // ============================================================
 app.Use(async (context, next) =>
 {
+    // Always set headers
     context.Response.Headers["Access-Control-Allow-Origin"] = "*";
     context.Response.Headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH";
     context.Response.Headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With, Accept, Origin";
 
+    // Handle preflight (OPTIONS) immediately
     if (context.Request.Method == "OPTIONS")
     {
         context.Response.StatusCode = 204;
+        await context.Response.CompleteAsync();
         return;
     }
 
@@ -167,7 +151,7 @@ app.Use(async (context, next) =>
 });
 
 // ============================================================
-// 13. Request Logging Middleware (helps debug)
+// 11. Request Logging Middleware (helps debug)
 // ============================================================
 app.Use(async (context, next) =>
 {
@@ -177,23 +161,23 @@ app.Use(async (context, next) =>
 });
 
 // ============================================================
-// 14. Serve static files (product images, etc.)
+// 12. Serve static files (product images, etc.)
 // ============================================================
 app.UseStaticFiles();
 
 // ============================================================
-// 15. Authentication & Authorization
+// 13. Authentication & Authorization
 // ============================================================
 app.UseAuthentication();
 app.UseAuthorization();
 
 // ============================================================
-// 16. Map Controllers
+// 14. Map Controllers
 // ============================================================
 app.MapControllers();
 
 // ============================================================
-// 17. Additional Endpoints
+// 15. Additional Endpoints
 // ============================================================
 app.MapGet("/db-test", async (AppDbContext dbContext) =>
 {
@@ -212,7 +196,7 @@ app.MapGet("/", () => "Prime Marketplace API is running!");
 app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = DateTime.UtcNow }));
 
 // ============================================================
-// 18. Database Migration – Apply pending migrations
+// 16. Database Migration – Apply pending migrations
 // ============================================================
 using (var scope = app.Services.CreateScope())
 {
@@ -230,6 +214,6 @@ using (var scope = app.Services.CreateScope())
 }
 
 // ============================================================
-// 19. Run the App
+// 17. Run the App
 // ============================================================
 app.Run();
