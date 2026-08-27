@@ -14,12 +14,26 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 // ============================================================
-// 2. Add Memory Cache
+// 2. Add CORS Policy (official middleware) – KEEP THIS
+// ============================================================
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        policy =>
+        {
+            policy.AllowAnyOrigin()
+                  .AllowAnyMethod()
+                  .AllowAnyHeader();
+        });
+});
+
+// ============================================================
+// 3. Add Memory Cache
 // ============================================================
 builder.Services.AddMemoryCache();
 
 // ============================================================
-// 3. Add Swagger/OpenAPI (with JWT support)
+// 4. Add Swagger/OpenAPI (with JWT support)
 // ============================================================
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -50,7 +64,7 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 // ============================================================
-// 4. Register Application Services (Dependency Injection)
+// 5. Register Application Services (Dependency Injection)
 // ============================================================
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -63,7 +77,7 @@ builder.Services.AddScoped<IStoreService, StoreService>();
 builder.Services.AddScoped<IGoldenLinkService, GoldenLinkService>();
 
 // ============================================================
-// 5. Database Context – with Retry & Detailed Logging
+// 6. Database Context – with Retry & Detailed Logging
 // ============================================================
 builder.Services.AddDbContext<AppDbContext>((serviceProvider, options) =>
 {
@@ -85,7 +99,7 @@ builder.Services.AddDbContext<AppDbContext>((serviceProvider, options) =>
 });
 
 // ============================================================
-// 6. JWT Authentication
+// 7. JWT Authentication
 // ============================================================
 var key = Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Key"] ?? "ThisIsASuperSecretKeyWithAtLeast32CharactersLongForJWT!");
 builder.Services.AddAuthentication(options =>
@@ -108,12 +122,12 @@ builder.Services.AddAuthentication(options =>
 });
 
 // ============================================================
-// 7. Build the App
+// 8. Build the App
 // ============================================================
 var app = builder.Build();
 
 // ============================================================
-// 8. Development Middleware (Swagger)
+// 9. Development Middleware (Swagger)
 // ============================================================
 if (app.Environment.IsDevelopment())
 {
@@ -122,7 +136,7 @@ if (app.Environment.IsDevelopment())
 }
 
 // ============================================================
-// 9. Security & Routing – Conditional HTTPS Redirection
+// 10. Security & Routing – Conditional HTTPS Redirection
 // ============================================================
 if (app.Environment.IsDevelopment())
 {
@@ -130,11 +144,12 @@ if (app.Environment.IsDevelopment())
 }
 
 // ============================================================
-// 10. 🔥 CUSTOM CORS MIDDLEWARE – runs BEFORE everything else
+// 11. 🔥 CORS MIDDLEWARE – runs BEFORE everything else
+//     This guarantees headers on ALL responses, even errors.
 // ============================================================
 app.Use(async (context, next) =>
 {
-    // Always set headers
+    // Set CORS headers for EVERY response
     context.Response.Headers["Access-Control-Allow-Origin"] = "*";
     context.Response.Headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH";
     context.Response.Headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With, Accept, Origin";
@@ -151,7 +166,7 @@ app.Use(async (context, next) =>
 });
 
 // ============================================================
-// 11. Request Logging Middleware (helps debug)
+// 12. Request Logging Middleware (helps debug)
 // ============================================================
 app.Use(async (context, next) =>
 {
@@ -161,23 +176,23 @@ app.Use(async (context, next) =>
 });
 
 // ============================================================
-// 12. Serve static files (product images, etc.)
+// 13. Serve static files (product images, etc.)
 // ============================================================
 app.UseStaticFiles();
 
 // ============================================================
-// 13. Authentication & Authorization
+// 14. Authentication & Authorization
 // ============================================================
 app.UseAuthentication();
 app.UseAuthorization();
 
 // ============================================================
-// 14. Map Controllers
+// 15. Map Controllers
 // ============================================================
 app.MapControllers();
 
 // ============================================================
-// 15. Additional Endpoints
+// 16. Additional Endpoints
 // ============================================================
 app.MapGet("/db-test", async (AppDbContext dbContext) =>
 {
@@ -196,7 +211,7 @@ app.MapGet("/", () => "Prime Marketplace API is running!");
 app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = DateTime.UtcNow }));
 
 // ============================================================
-// 16. Database Migration – Apply pending migrations
+// 17. Database Migration – Apply pending migrations
 // ============================================================
 using (var scope = app.Services.CreateScope())
 {
@@ -214,6 +229,6 @@ using (var scope = app.Services.CreateScope())
 }
 
 // ============================================================
-// 17. Run the App
+// 18. Run the App
 // ============================================================
 app.Run();
