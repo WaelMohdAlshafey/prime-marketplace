@@ -144,26 +144,22 @@ if (app.Environment.IsDevelopment())
 }
 
 // ============================================================
-// 11. 🔥 CRITICAL: UseRouting() – REQUIRED before CORS
-// ============================================================
-app.UseRouting();
-
-// ============================================================
-// 12. 🔥 OFFICIAL CORS MIDDLEWARE – handles preflight automatically
-// ============================================================
-app.UseCors("AllowAll");
-
-// ============================================================
-// 13. FALLBACK CORS HEADERS – ensures headers on ALL responses
+// 11. 🔥🔥🔥 CORS MIDDLEWARE – MUST BE BEFORE UseRouting() 🔥🔥🔥
 // ============================================================
 app.Use(async (context, next) =>
 {
+    // Log every request including OPTIONS
+    Console.WriteLine($"🌐 {context.Request.Method} {context.Request.Path}");
+
+    // Set headers for ALL responses
     context.Response.Headers["Access-Control-Allow-Origin"] = "*";
     context.Response.Headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH";
     context.Response.Headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With, Accept, Origin";
 
+    // Handle preflight (OPTIONS) immediately
     if (context.Request.Method == "OPTIONS")
     {
+        Console.WriteLine("✅ Preflight OPTIONS request handled");
         context.Response.StatusCode = 204;
         await context.Response.CompleteAsync();
         return;
@@ -173,7 +169,17 @@ app.Use(async (context, next) =>
 });
 
 // ============================================================
-// 14. Request Logging Middleware (helps debug)
+// 12. UseRouting – NOW CORS IS ALREADY SET
+// ============================================================
+app.UseRouting();
+
+// ============================================================
+// 13. UseCors (Official) – as an extra layer
+// ============================================================
+app.UseCors("AllowAll");
+
+// ============================================================
+// 14. Logging Middleware (after routing)
 // ============================================================
 app.Use(async (context, next) =>
 {
