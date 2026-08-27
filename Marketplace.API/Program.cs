@@ -14,7 +14,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 // ============================================================
-// 2. Add CORS Policy (official middleware) – KEEP THIS
+// 2. Add CORS Policy
 // ============================================================
 builder.Services.AddCors(options =>
 {
@@ -144,17 +144,24 @@ if (app.Environment.IsDevelopment())
 }
 
 // ============================================================
-// 11. 🔥 CORS MIDDLEWARE – runs BEFORE everything else
-//     This guarantees headers on ALL responses, even errors.
+// 11. 🔥 CRITICAL: UseRouting() – REQUIRED before CORS
+// ============================================================
+app.UseRouting();
+
+// ============================================================
+// 12. 🔥 OFFICIAL CORS MIDDLEWARE – handles preflight automatically
+// ============================================================
+app.UseCors("AllowAll");
+
+// ============================================================
+// 13. FALLBACK CORS HEADERS – ensures headers on ALL responses
 // ============================================================
 app.Use(async (context, next) =>
 {
-    // Set CORS headers for EVERY response
     context.Response.Headers["Access-Control-Allow-Origin"] = "*";
     context.Response.Headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH";
     context.Response.Headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With, Accept, Origin";
 
-    // Handle preflight (OPTIONS) immediately
     if (context.Request.Method == "OPTIONS")
     {
         context.Response.StatusCode = 204;
@@ -166,7 +173,7 @@ app.Use(async (context, next) =>
 });
 
 // ============================================================
-// 12. Request Logging Middleware (helps debug)
+// 14. Request Logging Middleware (helps debug)
 // ============================================================
 app.Use(async (context, next) =>
 {
@@ -176,23 +183,23 @@ app.Use(async (context, next) =>
 });
 
 // ============================================================
-// 13. Serve static files (product images, etc.)
+// 15. Serve static files (product images, etc.)
 // ============================================================
 app.UseStaticFiles();
 
 // ============================================================
-// 14. Authentication & Authorization
+// 16. Authentication & Authorization
 // ============================================================
 app.UseAuthentication();
 app.UseAuthorization();
 
 // ============================================================
-// 15. Map Controllers
+// 17. Map Controllers
 // ============================================================
 app.MapControllers();
 
 // ============================================================
-// 16. Additional Endpoints
+// 18. Additional Endpoints
 // ============================================================
 app.MapGet("/db-test", async (AppDbContext dbContext) =>
 {
@@ -211,7 +218,7 @@ app.MapGet("/", () => "Prime Marketplace API is running!");
 app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = DateTime.UtcNow }));
 
 // ============================================================
-// 17. Database Migration – Apply pending migrations
+// 19. Database Migration – Apply pending migrations
 // ============================================================
 using (var scope = app.Services.CreateScope())
 {
@@ -229,6 +236,6 @@ using (var scope = app.Services.CreateScope())
 }
 
 // ============================================================
-// 18. Run the App
+// 20. Run the App
 // ============================================================
 app.Run();
