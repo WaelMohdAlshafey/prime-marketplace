@@ -24,7 +24,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import api from '@/lib/api';
 
 // ============================================================
-// TOP BAR – all items with text labels, responsive
+// TOP BAR
 // ============================================================
 const TopBar = () => {
     const { t, i18n } = useTranslation('common');
@@ -33,31 +33,26 @@ const TopBar = () => {
     const supportRef = useRef<HTMLDivElement>(null);
     const currencyRef = useRef<HTMLDivElement>(null);
 
-    // Language toggle – simple click, no dropdown
     const toggleLanguage = () => {
-        const nextLang = i18n.language === 'ar' ? 'en' : 'ar';
-        i18n.changeLanguage(nextLang);
+        i18n.changeLanguage(i18n.language === 'ar' ? 'en' : 'ar');
     };
 
     // Close dropdowns on outside click
     useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (supportRef.current && !supportRef.current.contains(event.target as Node)) setSupportOpen(false);
-            if (currencyRef.current && !currencyRef.current.contains(event.target as Node)) setCurrencyOpen(false);
+        const handler = (e: MouseEvent) => {
+            if (supportRef.current && !supportRef.current.contains(e.target as Node)) setSupportOpen(false);
+            if (currencyRef.current && !currencyRef.current.contains(e.target as Node)) setCurrencyOpen(false);
         };
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
+        document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
     }, []);
 
     return (
         <div className="bg-primary-dark text-white text-[10px] sm:text-xs py-1 relative z-50">
-            <div className="container mx-auto px-2 sm:px-4 flex items-center justify-between gap-1 sm:gap-3 flex-nowrap overflow-x-auto">
-                {/* LEFT SIDE (end of bar) – Language toggle + free shipping */}
+            <div className="container flex items-center justify-between gap-1 flex-nowrap overflow-x-auto">
+                {/* Left side */}
                 <div className="flex items-center gap-1 sm:gap-3 flex-shrink-0 whitespace-nowrap">
-                    <button
-                        onClick={toggleLanguage}
-                        className="flex items-center gap-0.5 sm:gap-1 hover:text-yellow-400 transition px-1 sm:px-2 py-0.5 rounded-md hover:bg-white/10"
-                    >
+                    <button onClick={toggleLanguage} className="flex items-center gap-0.5 hover:text-yellow-400 transition px-1 py-0.5 rounded hover:bg-white/10">
                         <GlobeAltIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                         <span>{i18n.language === 'ar' ? 'العربية' : 'English'}</span>
                     </button>
@@ -65,17 +60,20 @@ const TopBar = () => {
                     <span className="hidden xs:inline">🚚 {t('freeShipping')}</span>
                 </div>
 
-                {/* RIGHT SIDE (start of bar) – Support, Currency, Track Order with labels */}
+                {/* Right side */}
                 <div className="flex items-center gap-1 sm:gap-3 flex-shrink-0">
-                    {/* Support Dropdown – click only */}
+                    {/* Support dropdown – click only */}
                     <div className="relative" ref={supportRef}>
                         <button
-                            onClick={() => setSupportOpen(!supportOpen)}
-                            className="flex items-center gap-0.5 sm:gap-1 hover:text-yellow-400 transition px-1 sm:px-2 py-0.5 rounded-md hover:bg-white/10 whitespace-nowrap"
+                            onClick={(e) => {
+                                e.stopPropagation(); // ← Prevents parent interference
+                                setSupportOpen(!supportOpen);
+                            }}
+                            className="flex items-center gap-0.5 hover:text-yellow-400 transition px-1 py-0.5 rounded hover:bg-white/10 whitespace-nowrap"
                         >
                             <LifebuoyIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                             <span className="hidden xs:inline">{t('support')}</span>
-                            <ChevronDownIcon className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+                            <ChevronDownIcon className="w-2.5 h-2.5" />
                         </button>
                         <AnimatePresence>
                             {supportOpen && (
@@ -83,20 +81,12 @@ const TopBar = () => {
                                     initial={{ opacity: 0, y: -10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: -10 }}
-                                    className="absolute right-0 top-full mt-1 bg-white text-gray-800 rounded-lg shadow-lg py-1 min-w-[120px] max-w-[calc(100vw-2rem)] z-50"
+                                    className="absolute right-0 top-full mt-1 bg-white text-gray-800 rounded-lg shadow-lg py-1 min-w-[100px] max-w-[calc(100vw-1rem)] z-50"
                                 >
-                                    <Link href="/help" className="block w-full text-right px-3 sm:px-4 py-1.5 sm:py-2 hover:bg-gray-100 transition text-xs sm:text-sm" onClick={() => setSupportOpen(false)}>
-                                        {t('help')}
-                                    </Link>
-                                    <Link href="/faq" className="block w-full text-right px-3 sm:px-4 py-1.5 sm:py-2 hover:bg-gray-100 transition text-xs sm:text-sm" onClick={() => setSupportOpen(false)}>
-                                        {t('footer.faq')}
-                                    </Link>
-                                    <Link href="/returns" className="block w-full text-right px-3 sm:px-4 py-1.5 sm:py-2 hover:bg-gray-100 transition text-xs sm:text-sm" onClick={() => setSupportOpen(false)}>
-                                        {t('footer.returns')}
-                                    </Link>
-                                    <Link href="/shipping" className="block w-full text-right px-3 sm:px-4 py-1.5 sm:py-2 hover:bg-gray-100 transition text-xs sm:text-sm" onClick={() => setSupportOpen(false)}>
-                                        {t('footer.shipping')}
-                                    </Link>
+                                    <Link href="/help" className="block px-3 py-1.5 hover:bg-gray-100 text-xs sm:text-sm" onClick={() => setSupportOpen(false)}>{t('help')}</Link>
+                                    <Link href="/faq" className="block px-3 py-1.5 hover:bg-gray-100 text-xs sm:text-sm" onClick={() => setSupportOpen(false)}>{t('footer.faq')}</Link>
+                                    <Link href="/returns" className="block px-3 py-1.5 hover:bg-gray-100 text-xs sm:text-sm" onClick={() => setSupportOpen(false)}>{t('footer.returns')}</Link>
+                                    <Link href="/shipping" className="block px-3 py-1.5 hover:bg-gray-100 text-xs sm:text-sm" onClick={() => setSupportOpen(false)}>{t('footer.shipping')}</Link>
                                 </motion.div>
                             )}
                         </AnimatePresence>
@@ -104,15 +94,18 @@ const TopBar = () => {
 
                     <span className="text-white/30 hidden xs:inline">|</span>
 
-                    {/* Currency Dropdown – click only */}
+                    {/* Currency dropdown – click only */}
                     <div className="relative" ref={currencyRef}>
                         <button
-                            onClick={() => setCurrencyOpen(!currencyOpen)}
-                            className="flex items-center gap-0.5 sm:gap-1 hover:text-yellow-400 transition px-1 sm:px-2 py-0.5 rounded-md hover:bg-white/10 whitespace-nowrap"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setCurrencyOpen(!currencyOpen);
+                            }}
+                            className="flex items-center gap-0.5 hover:text-yellow-400 transition px-1 py-0.5 rounded hover:bg-white/10 whitespace-nowrap"
                         >
                             <CurrencyDollarIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                             <span className="hidden xs:inline">{t('currency')}</span>
-                            <ChevronDownIcon className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+                            <ChevronDownIcon className="w-2.5 h-2.5" />
                         </button>
                         <AnimatePresence>
                             {currencyOpen && (
@@ -120,14 +113,10 @@ const TopBar = () => {
                                     initial={{ opacity: 0, y: -10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: -10 }}
-                                    className="absolute right-0 top-full mt-1 bg-white text-gray-800 rounded-lg shadow-lg py-1 min-w-[80px] max-w-[calc(100vw-2rem)] z-50"
+                                    className="absolute right-0 top-full mt-1 bg-white text-gray-800 rounded-lg shadow-lg py-1 min-w-[80px] max-w-[calc(100vw-1rem)] z-50"
                                 >
-                                    <button className="block w-full text-right px-3 sm:px-4 py-1.5 sm:py-2 hover:bg-gray-100 transition text-xs sm:text-sm">
-                                        EGP
-                                    </button>
-                                    <button className="block w-full text-right px-3 sm:px-4 py-1.5 sm:py-2 hover:bg-gray-100 transition text-xs sm:text-sm">
-                                        USD
-                                    </button>
+                                    <button className="block w-full text-right px-3 py-1.5 hover:bg-gray-100 text-xs sm:text-sm">EGP</button>
+                                    <button className="block w-full text-right px-3 py-1.5 hover:bg-gray-100 text-xs sm:text-sm">USD</button>
                                 </motion.div>
                             )}
                         </AnimatePresence>
@@ -135,8 +124,7 @@ const TopBar = () => {
 
                     <span className="text-white/30 hidden xs:inline">|</span>
 
-                    {/* Track Order – simple link with label */}
-                    <Link href="/tracking" className="flex items-center gap-0.5 sm:gap-1 hover:text-yellow-400 transition px-1 sm:px-2 py-0.5 rounded-md hover:bg-white/10 whitespace-nowrap">
+                    <Link href="/tracking" className="flex items-center gap-0.5 hover:text-yellow-400 transition px-1 py-0.5 rounded hover:bg-white/10 whitespace-nowrap">
                         <TruckIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                         <span className="hidden xs:inline">{t('trackOrder')}</span>
                     </Link>
@@ -147,7 +135,7 @@ const TopBar = () => {
 };
 
 // ============================================================
-// MAIN HEADER – Logo right, hamburger (no label) for main menu
+// MAIN HEADER
 // ============================================================
 const MainHeader = ({ user }: { user: AuthResponse | null }) => {
     const { t, i18n } = useTranslation('common');
@@ -162,41 +150,27 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
     const [categories, setCategories] = useState<string[]>([]);
     const [loadingCategories, setLoadingCategories] = useState(true);
 
-    // Fetch categories for the main menu
     useEffect(() => {
-        const fetchCategories = async () => {
-            try {
-                const response = await api.get('/api/Categories');
-                setCategories(response.data);
-            } catch (error) {
-                console.error('Failed to fetch categories:', error);
-            } finally {
-                setLoadingCategories(false);
-            }
-        };
-        fetchCategories();
+        api.get('/api/Categories')
+            .then(res => { setCategories(res.data); setLoadingCategories(false); })
+            .catch(() => setLoadingCategories(false));
     }, []);
 
-    // Close menus on outside click
     useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (mainMenuRef.current && !mainMenuRef.current.contains(event.target as Node)) setMainMenuOpen(false);
-            if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) setUserMenuOpen(false);
+        const handler = (e: MouseEvent) => {
+            if (mainMenuRef.current && !mainMenuRef.current.contains(e.target as Node)) setMainMenuOpen(false);
+            if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) setUserMenuOpen(false);
         };
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
+        document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
     }, []);
 
     const isRTL = typeof document !== 'undefined' && document.documentElement.dir === 'rtl';
 
-    // Main navigation links – include categories as separate items
     const navLinks = [
         { href: '/', label: t('home') },
         { href: '/products', label: t('products') },
-        ...categories.map((cat) => ({
-            href: `/${cat.toLowerCase().replace(/\s+/g, '-')}`,
-            label: cat,
-        })),
+        ...categories.map(cat => ({ href: `/${cat.toLowerCase().replace(/\s+/g, '-')}`, label: cat })),
         { href: '/stores', label: t('stores') },
         { href: '/offers', label: t('offers') },
         { href: '/contact', label: t('contact') },
@@ -204,17 +178,51 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
     ];
 
     return (
-        <div className="navbar">
-            <div className="container mx-auto px-2 sm:px-4 flex items-center justify-between gap-2 sm:gap-4 py-2">
-                {/* LEFT SIDE (end of bar) – Wishlist, Cart, User menu */}
-                <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
+        <div className="navbar border-b border-border bg-white">
+            <div className="container flex items-center justify-between gap-2 py-2 sm:py-3">
+                {/* Left side – icons */}
+                <div className="flex items-center gap-1 sm:gap-3 flex-shrink-0">
+                    {/* Main menu hamburger */}
+                    <div className="relative" ref={mainMenuRef} onClick={(e) => e.stopPropagation()}>
+                        <button
+                            onClick={() => setMainMenuOpen(!mainMenuOpen)}
+                            className="p-1.5 rounded hover:bg-primary-dark/10 transition text-navbar-text"
+                        >
+                            <Bars3Icon className="w-5 h-5 sm:w-6 sm:h-6" />
+                        </button>
+                        <AnimatePresence>
+                            {mainMenuOpen && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                    className={`absolute ${isRTL ? 'right-0' : 'left-0'} top-full mt-2 min-w-[140px] max-w-[calc(100vw-1rem)] max-h-[80vh] overflow-y-auto bg-white rounded-xl shadow-strong border border-border py-2 z-[999]`}
+                                >
+                                    {navLinks.map(link => (
+                                        <Link
+                                            key={link.href}
+                                            href={link.href}
+                                            className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition"
+                                            onClick={() => setMainMenuOpen(false)}
+                                        >
+                                            {link.label}
+                                        </Link>
+                                    ))}
+                                    {loadingCategories && (
+                                        <span className="block px-4 py-2 text-text-muted text-sm">جاري التحميل...</span>
+                                    )}
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
+
                     {/* Wishlist */}
-                    <motion.button whileHover={{ scale: 1.1 }} className="text-navbar-text hover:text-navbar-hover transition relative hidden sm:block">
+                    <button className="text-navbar-text hover:text-navbar-hover transition relative hidden sm:block">
                         <HeartIcon className="w-5 h-5 sm:w-6 sm:h-6" />
                         <span className="absolute -top-1.5 -right-1.5 bg-secondary text-white text-[10px] font-bold w-[18px] h-[18px] rounded-full flex items-center justify-center">
                             {totalFavorites}
                         </span>
-                    </motion.button>
+                    </button>
 
                     {/* Cart */}
                     <span ref={cartIconRef} className="relative inline-flex">
@@ -229,31 +237,29 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
                         </Link>
                     </span>
 
-                    {/* User menu – click only */}
+                    {/* User menu */}
                     <div className="relative" ref={userMenuRef} onClick={(e) => e.stopPropagation()}>
                         <button
                             onClick={() => setUserMenuOpen(!userMenuOpen)}
-                            className="flex items-center gap-0.5 sm:gap-1 p-1.5 sm:p-2 rounded-md hover:bg-primary-dark/10 transition text-navbar-text"
-                            aria-label="User menu"
+                            className="flex items-center gap-0.5 p-1.5 rounded hover:bg-primary-dark/10 transition text-navbar-text"
                         >
                             {user ? (
                                 <>
-                                    <span className="hidden sm:inline text-xs sm:text-sm font-medium">{user.username}</span>
+                                    <span className="hidden sm:inline text-xs font-medium">{user.username}</span>
                                     <UserIcon className="w-5 h-5 sm:w-6 sm:h-6" />
                                 </>
                             ) : (
                                 <UserIcon className="w-5 h-5 sm:w-6 sm:h-6" />
                             )}
-                            <ChevronDownIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                            <ChevronDownIcon className="w-3 h-3 sm:w-4 sm:h-4" />
                         </button>
-
                         <AnimatePresence>
                             {userMenuOpen && (
                                 <motion.div
                                     initial={{ opacity: 0, y: -10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: -10 }}
-                                    className={`absolute ${isRTL ? 'left-0' : 'right-0'} top-full mt-2 min-w-[160px] max-w-[calc(100vw-2rem)] max-h-[80vh] overflow-y-auto bg-white rounded-xl shadow-strong border border-border py-2 z-[999]`}
+                                    className={`absolute ${isRTL ? 'left-0' : 'right-0'} top-full mt-2 min-w-[140px] max-w-[calc(100vw-1rem)] max-h-[80vh] overflow-y-auto bg-white rounded-xl shadow-strong border border-border py-2 z-[999]`}
                                 >
                                     {!user ? (
                                         <>
@@ -319,44 +325,8 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
                     </div>
                 </div>
 
-                {/* RIGHT SIDE (start of bar) – Hamburger (no label) + Logo */}
-                <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
-                    {/* Main menu – hamburger icon only (no text) */}
-                    <div className="relative" ref={mainMenuRef} onClick={(e) => e.stopPropagation()}>
-                        <button
-                            onClick={() => setMainMenuOpen(!mainMenuOpen)}
-                            className="p-1.5 sm:p-2 rounded-md hover:bg-primary-dark/10 transition text-navbar-text"
-                            aria-label="Main menu"
-                        >
-                            <Bars3Icon className="w-5 h-5 sm:w-6 sm:h-6" />
-                        </button>
-                        <AnimatePresence>
-                            {mainMenuOpen && (
-                                <motion.div
-                                    initial={{ opacity: 0, y: -10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -10 }}
-                                    className={`absolute ${isRTL ? 'right-0' : 'left-0'} top-full mt-2 min-w-[160px] max-w-[calc(100vw-2rem)] max-h-[80vh] overflow-y-auto bg-white rounded-xl shadow-strong border border-border py-2 z-[999]`}
-                                >
-                                    {navLinks.map((link) => (
-                                        <Link
-                                            key={link.href}
-                                            href={link.href}
-                                            className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition"
-                                            onClick={() => setMainMenuOpen(false)}
-                                        >
-                                            {link.label}
-                                        </Link>
-                                    ))}
-                                    {loadingCategories && (
-                                        <span className="block px-4 py-2 text-text-muted text-sm">جاري التحميل...</span>
-                                    )}
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-                    </div>
-
-                    {/* Logo */}
+                {/* Right side – Logo */}
+                <div className="flex-shrink-0">
                     <Logo />
                 </div>
             </div>
@@ -364,16 +334,9 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
     );
 };
 
-// ============================================================
-// MAIN EXPORT
-// ============================================================
 export default function Navbar() {
     const { user, isLoading } = useAuth();
-
-    if (isLoading) {
-        return <div className="bg-surface shadow-md py-4 text-center text-text-muted animate-pulse">Loading...</div>;
-    }
-
+    if (isLoading) return <div className="bg-surface shadow-md py-4 text-center text-text-muted animate-pulse">Loading...</div>;
     return (
         <header className="fixed top-0 left-0 right-0 z-[1000] bg-white shadow-sm">
             <TopBar />
