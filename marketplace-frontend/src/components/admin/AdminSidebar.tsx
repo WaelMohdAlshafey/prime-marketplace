@@ -58,7 +58,7 @@ export default function AdminSidebar({ onLinkClick }: AdminSidebarProps) {
                 </div>
             </div>
 
-            <nav className="flex-1 space-y-1 overflow-y-auto">
+            <nav className="flex-1 space-y-1 overflow-y-auto pb-4">
                 {navItems.map((item) => {
                     const isActive = pathname === item.href || pathname?.startsWith(item.href + '/');
                     return (
@@ -79,7 +79,7 @@ export default function AdminSidebar({ onLinkClick }: AdminSidebarProps) {
                 })}
             </nav>
 
-            {/* ✅ Fixed Logout – uses function, not Link */}
+            {/* Fixed logout at bottom */}
             <div className="border-t border-gray-700 pt-4 mt-4">
                 <button
                     onClick={handleLogout}
