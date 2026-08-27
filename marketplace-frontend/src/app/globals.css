@@ -853,34 +853,3 @@ header {
         font-size: 20px;
     }
 }
-
-/* ============================================================
-   RESPONSIVE MENU FIXES – keep dropdowns inside viewport
-   ============================================================ */
-
-/* Ensure all dropdown menus stay inside the screen */
-.dropdown-menu {
-    max-width: calc(100vw - 1rem) !important;
-    min-width: 120px !important;
-}
-
-/* Admin sidebar on mobile – ensure it doesn't overflow */
-@media (max-width: 1023px) {
-    .admin-sidebar {
-        max-width: 85vw !important;
-        min-width: 260px !important;
-    }
-}
-
-/* Fix for very small screens (under 360px) */
-@media (max-width: 360px) {
-    .dropdown-menu {
-        min-width: 80px !important;
-        max-width: calc(100vw - 0.5rem) !important;
-    }
-
-    .navbar .container {
-        padding-left: 4px !important;
-        padding-right: 4px !important;
-    }
-}

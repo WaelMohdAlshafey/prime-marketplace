@@ -24,7 +24,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import api from '@/lib/api';
 
 // ============================================================
-// TOP BAR – all items with text labels, click-only dropdowns
+// TOP BAR – all items with text labels, responsive
 // ============================================================
 const TopBar = () => {
     const { t, i18n } = useTranslation('common');
@@ -33,24 +33,21 @@ const TopBar = () => {
     const supportRef = useRef<HTMLDivElement>(null);
     const currencyRef = useRef<HTMLDivElement>(null);
 
-    // Language toggle – simple click, no dropdown
     const toggleLanguage = () => {
         i18n.changeLanguage(i18n.language === 'ar' ? 'en' : 'ar');
     };
 
-    // Close dropdowns on outside click
     useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (supportRef.current && !supportRef.current.contains(event.target as Node)) {
-                setSupportOpen(false);
-            }
-            if (currencyRef.current && !currencyRef.current.contains(event.target as Node)) {
-                setCurrencyOpen(false);
-            }
+        const handler = (e: MouseEvent) => {
+            if (supportRef.current && !supportRef.current.contains(e.target as Node)) setSupportOpen(false);
+            if (currencyRef.current && !currencyRef.current.contains(e.target as Node)) setCurrencyOpen(false);
         };
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
+        document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
     }, []);
+
+    // Detect RTL for dropdown positioning
+    const isRTL = typeof document !== 'undefined' && document.documentElement.dir === 'rtl';
 
     return (
         <div className="bg-primary-dark text-white text-[10px] sm:text-xs py-1 relative z-50">
@@ -70,14 +67,10 @@ const TopBar = () => {
 
                 {/* RIGHT SIDE – Support, Currency, Track Order */}
                 <div className="flex items-center gap-1 sm:gap-3 flex-shrink-0">
-                    {/* Support Dropdown – click only */}
+                    {/* Support Dropdown */}
                     <div className="relative" ref={supportRef}>
                         <button
-                            onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                setSupportOpen(!supportOpen);
-                            }}
+                            onClick={() => setSupportOpen(!supportOpen)}
                             className="flex items-center gap-0.5 sm:gap-1 hover:text-yellow-400 transition px-1 sm:px-2 py-0.5 rounded-md hover:bg-white/10 whitespace-nowrap"
                         >
                             <LifebuoyIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
@@ -90,34 +83,18 @@ const TopBar = () => {
                                     initial={{ opacity: 0, y: -10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: -10 }}
-                                    className="absolute right-0 top-full mt-1 bg-white text-gray-800 rounded-lg shadow-lg py-1 min-w-[100px] max-w-[calc(100vw-1rem)] z-50"
+                                    className={`absolute ${isRTL ? 'left-0' : 'right-0'} top-full mt-1 bg-white text-gray-800 rounded-lg shadow-lg py-1 min-w-[120px] max-w-[calc(100vw-2rem)] z-50`}
                                 >
-                                    <Link
-                                        href="/help"
-                                        className="block w-full text-right px-3 sm:px-4 py-1.5 sm:py-2 hover:bg-gray-100 transition text-xs sm:text-sm"
-                                        onClick={() => setSupportOpen(false)}
-                                    >
+                                    <Link href="/help" className="block w-full text-right px-3 sm:px-4 py-1.5 sm:py-2 hover:bg-gray-100 transition text-xs sm:text-sm" onClick={() => setSupportOpen(false)}>
                                         {t('help')}
                                     </Link>
-                                    <Link
-                                        href="/faq"
-                                        className="block w-full text-right px-3 sm:px-4 py-1.5 sm:py-2 hover:bg-gray-100 transition text-xs sm:text-sm"
-                                        onClick={() => setSupportOpen(false)}
-                                    >
+                                    <Link href="/faq" className="block w-full text-right px-3 sm:px-4 py-1.5 sm:py-2 hover:bg-gray-100 transition text-xs sm:text-sm" onClick={() => setSupportOpen(false)}>
                                         {t('footer.faq')}
                                     </Link>
-                                    <Link
-                                        href="/returns"
-                                        className="block w-full text-right px-3 sm:px-4 py-1.5 sm:py-2 hover:bg-gray-100 transition text-xs sm:text-sm"
-                                        onClick={() => setSupportOpen(false)}
-                                    >
+                                    <Link href="/returns" className="block w-full text-right px-3 sm:px-4 py-1.5 sm:py-2 hover:bg-gray-100 transition text-xs sm:text-sm" onClick={() => setSupportOpen(false)}>
                                         {t('footer.returns')}
                                     </Link>
-                                    <Link
-                                        href="/shipping"
-                                        className="block w-full text-right px-3 sm:px-4 py-1.5 sm:py-2 hover:bg-gray-100 transition text-xs sm:text-sm"
-                                        onClick={() => setSupportOpen(false)}
-                                    >
+                                    <Link href="/shipping" className="block w-full text-right px-3 sm:px-4 py-1.5 sm:py-2 hover:bg-gray-100 transition text-xs sm:text-sm" onClick={() => setSupportOpen(false)}>
                                         {t('footer.shipping')}
                                     </Link>
                                 </motion.div>
@@ -127,14 +104,10 @@ const TopBar = () => {
 
                     <span className="text-white/30 hidden xs:inline">|</span>
 
-                    {/* Currency Dropdown – click only */}
+                    {/* Currency Dropdown */}
                     <div className="relative" ref={currencyRef}>
                         <button
-                            onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                setCurrencyOpen(!currencyOpen);
-                            }}
+                            onClick={() => setCurrencyOpen(!currencyOpen)}
                             className="flex items-center gap-0.5 sm:gap-1 hover:text-yellow-400 transition px-1 sm:px-2 py-0.5 rounded-md hover:bg-white/10 whitespace-nowrap"
                         >
                             <CurrencyDollarIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
@@ -147,7 +120,7 @@ const TopBar = () => {
                                     initial={{ opacity: 0, y: -10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: -10 }}
-                                    className="absolute right-0 top-full mt-1 bg-white text-gray-800 rounded-lg shadow-lg py-1 min-w-[80px] max-w-[calc(100vw-1rem)] z-50"
+                                    className={`absolute ${isRTL ? 'left-0' : 'right-0'} top-full mt-1 bg-white text-gray-800 rounded-lg shadow-lg py-1 min-w-[80px] max-w-[calc(100vw-2rem)] z-50`}
                                 >
                                     <button className="block w-full text-right px-3 sm:px-4 py-1.5 sm:py-2 hover:bg-gray-100 transition text-xs sm:text-sm">
                                         EGP
@@ -162,11 +135,8 @@ const TopBar = () => {
 
                     <span className="text-white/30 hidden xs:inline">|</span>
 
-                    {/* Track Order – simple link */}
-                    <Link
-                        href="/tracking"
-                        className="flex items-center gap-0.5 sm:gap-1 hover:text-yellow-400 transition px-1 sm:px-2 py-0.5 rounded-md hover:bg-white/10 whitespace-nowrap"
-                    >
+                    {/* Track Order */}
+                    <Link href="/tracking" className="flex items-center gap-0.5 sm:gap-1 hover:text-yellow-400 transition px-1 sm:px-2 py-0.5 rounded-md hover:bg-white/10 whitespace-nowrap">
                         <TruckIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                         <span className="hidden xs:inline">{t('trackOrder')}</span>
                     </Link>
@@ -177,7 +147,7 @@ const TopBar = () => {
 };
 
 // ============================================================
-// MAIN HEADER – Logo right, hamburger (no label) for main menu
+// MAIN HEADER
 // ============================================================
 const MainHeader = ({ user }: { user: AuthResponse | null }) => {
     const { t, i18n } = useTranslation('common');
@@ -192,38 +162,26 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
     const [categories, setCategories] = useState<string[]>([]);
     const [loadingCategories, setLoadingCategories] = useState(true);
 
-    // Fetch categories for the main menu
     useEffect(() => {
-        const fetchCategories = async () => {
-            try {
-                const response = await api.get('/api/Categories');
-                setCategories(response.data);
-            } catch (error) {
-                console.error('Failed to fetch categories:', error);
-            } finally {
+        api.get('/api/Categories')
+            .then((res) => {
+                setCategories(res.data);
                 setLoadingCategories(false);
-            }
-        };
-        fetchCategories();
+            })
+            .catch(() => setLoadingCategories(false));
     }, []);
 
-    // Close menus on outside click
     useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (mainMenuRef.current && !mainMenuRef.current.contains(event.target as Node)) {
-                setMainMenuOpen(false);
-            }
-            if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
-                setUserMenuOpen(false);
-            }
+        const handler = (e: MouseEvent) => {
+            if (mainMenuRef.current && !mainMenuRef.current.contains(e.target as Node)) setMainMenuOpen(false);
+            if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) setUserMenuOpen(false);
         };
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
+        document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
     }, []);
 
     const isRTL = typeof document !== 'undefined' && document.documentElement.dir === 'rtl';
 
-    // Main navigation links – include categories as separate items
     const navLinks = [
         { href: '/', label: t('home') },
         { href: '/products', label: t('products') },
@@ -240,18 +198,47 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
     return (
         <div className="navbar">
             <div className="container mx-auto px-2 sm:px-4 flex items-center justify-between gap-2 sm:gap-4 py-2">
-                {/* LEFT SIDE – Wishlist, Cart, User menu */}
+                {/* LEFT SIDE – Icons + menus */}
                 <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
+                    {/* Main Menu (Hamburger) */}
+                    <div className="relative" ref={mainMenuRef} onClick={(e) => e.stopPropagation()}>
+                        <button
+                            onClick={() => setMainMenuOpen(!mainMenuOpen)}
+                            className="p-1.5 sm:p-2 rounded-md hover:bg-primary-dark/10 transition text-navbar-text"
+                            aria-label="Main menu"
+                        >
+                            <Bars3Icon className="w-5 h-5 sm:w-6 sm:h-6" />
+                        </button>
+                        <AnimatePresence>
+                            {mainMenuOpen && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                    className={`absolute ${isRTL ? 'left-0' : 'right-0'} top-full mt-2 min-w-[160px] max-w-[calc(100vw-2rem)] max-h-[80vh] overflow-y-auto bg-white rounded-xl shadow-strong border border-border py-2 z-[999]`}
+                                >
+                                    {navLinks.map((link) => (
+                                        <Link
+                                            key={link.href}
+                                            href={link.href}
+                                            className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition"
+                                            onClick={() => setMainMenuOpen(false)}
+                                        >
+                                            {link.label}
+                                        </Link>
+                                    ))}
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
+
                     {/* Wishlist */}
-                    <motion.button
-                        whileHover={{ scale: 1.1 }}
-                        className="text-navbar-text hover:text-navbar-hover transition relative hidden sm:block"
-                    >
+                    <button className="text-navbar-text hover:text-navbar-hover transition relative hidden sm:block">
                         <HeartIcon className="w-5 h-5 sm:w-6 sm:h-6" />
                         <span className="absolute -top-1.5 -right-1.5 bg-secondary text-white text-[10px] font-bold w-[18px] h-[18px] rounded-full flex items-center justify-center">
                             {totalFavorites}
                         </span>
-                    </motion.button>
+                    </button>
 
                     {/* Cart */}
                     <span ref={cartIconRef} className="relative inline-flex">
@@ -266,7 +253,7 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
                         </Link>
                     </span>
 
-                    {/* User menu – click only */}
+                    {/* User Menu */}
                     <div className="relative" ref={userMenuRef} onClick={(e) => e.stopPropagation()}>
                         <button
                             onClick={() => setUserMenuOpen(!userMenuOpen)}
@@ -290,103 +277,55 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
                                     initial={{ opacity: 0, y: -10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: -10 }}
-                                    className={`absolute ${isRTL ? 'left-0' : 'right-0'} top-full mt-2 min-w-[140px] max-w-[calc(100vw-1rem)] max-h-[80vh] overflow-y-auto bg-white rounded-xl shadow-strong border border-border py-2 z-[999]`}
+                                    className={`absolute ${isRTL ? 'left-0' : 'right-0'} top-full mt-2 min-w-[160px] max-w-[calc(100vw-2rem)] max-h-[80vh] overflow-y-auto bg-white rounded-xl shadow-strong border border-border py-2 z-[999]`}
                                 >
                                     {!user ? (
                                         <>
-                                            <Link
-                                                href="/auth/login"
-                                                className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition"
-                                                onClick={() => setUserMenuOpen(false)}
-                                            >
+                                            <Link href="/auth/login" className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition" onClick={() => setUserMenuOpen(false)}>
                                                 {t('loginTitle')}
                                             </Link>
-                                            <Link
-                                                href="/auth/register"
-                                                className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition"
-                                                onClick={() => setUserMenuOpen(false)}
-                                            >
+                                            <Link href="/auth/register" className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition" onClick={() => setUserMenuOpen(false)}>
                                                 {t('registerTitle')}
                                             </Link>
                                         </>
                                     ) : (
                                         <>
-                                            <Link
-                                                href="/cart"
-                                                className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition"
-                                                onClick={() => setUserMenuOpen(false)}
-                                            >
+                                            <Link href="/cart" className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition" onClick={() => setUserMenuOpen(false)}>
                                                 🛒 {t('cart')}
                                             </Link>
-                                            <Link
-                                                href="/orders"
-                                                className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition"
-                                                onClick={() => setUserMenuOpen(false)}
-                                            >
+                                            <Link href="/orders" className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition" onClick={() => setUserMenuOpen(false)}>
                                                 📋 {t('orders')}
                                             </Link>
-                                            <Link
-                                                href="/suggest"
-                                                className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition"
-                                                onClick={() => setUserMenuOpen(false)}
-                                            >
+                                            <Link href="/suggest" className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition" onClick={() => setUserMenuOpen(false)}>
                                                 💡 Suggest
                                             </Link>
                                             {(user.role === 'Vendor' || user.role === 'Admin') && (
-                                                <Link
-                                                    href="/vendor/dashboard"
-                                                    className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition"
-                                                    onClick={() => setUserMenuOpen(false)}
-                                                >
+                                                <Link href="/vendor/dashboard" className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition" onClick={() => setUserMenuOpen(false)}>
                                                     📊 {t('dashboard')}
                                                 </Link>
                                             )}
                                             {(user.role === 'Vendor' || user.role === 'Admin' || user.role === 'Employee') && (
-                                                <Link
-                                                    href="/admin/orders"
-                                                    className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition"
-                                                    onClick={() => setUserMenuOpen(false)}
-                                                >
+                                                <Link href="/admin/orders" className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition" onClick={() => setUserMenuOpen(false)}>
                                                     📦 Manage Orders
                                                 </Link>
                                             )}
                                             {user.role === 'Admin' && (
                                                 <>
-                                                    <Link
-                                                        href="/admin/users"
-                                                        className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition"
-                                                        onClick={() => setUserMenuOpen(false)}
-                                                    >
+                                                    <Link href="/admin/users" className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition" onClick={() => setUserMenuOpen(false)}>
                                                         👥 {t('users')}
                                                     </Link>
-                                                    <Link
-                                                        href="/admin"
-                                                        className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition"
-                                                        onClick={() => setUserMenuOpen(false)}
-                                                    >
+                                                    <Link href="/admin" className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition" onClick={() => setUserMenuOpen(false)}>
                                                         ⚙️ {t('admin')}
                                                     </Link>
-                                                    <Link
-                                                        href="/admin/golden-links"
-                                                        className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition"
-                                                        onClick={() => setUserMenuOpen(false)}
-                                                    >
+                                                    <Link href="/admin/golden-links" className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition" onClick={() => setUserMenuOpen(false)}>
                                                         🔗 Golden Links
                                                     </Link>
                                                 </>
                                             )}
-                                            <Link
-                                                href="/chat"
-                                                className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition"
-                                                onClick={() => setUserMenuOpen(false)}
-                                            >
+                                            <Link href="/chat" className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition" onClick={() => setUserMenuOpen(false)}>
                                                 💬 Chat
                                             </Link>
-                                            <Link
-                                                href="/profile"
-                                                className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition"
-                                                onClick={() => setUserMenuOpen(false)}
-                                            >
+                                            <Link href="/profile" className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition" onClick={() => setUserMenuOpen(false)}>
                                                 👤 {t('profile')}
                                             </Link>
                                             <hr className="my-2 border-border" />
@@ -407,44 +346,8 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
                     </div>
                 </div>
 
-                {/* RIGHT SIDE – Hamburger (no label) + Logo */}
-                <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
-                    {/* Main menu – hamburger icon only (no text) */}
-                    <div className="relative" ref={mainMenuRef} onClick={(e) => e.stopPropagation()}>
-                        <button
-                            onClick={() => setMainMenuOpen(!mainMenuOpen)}
-                            className="p-1.5 sm:p-2 rounded-md hover:bg-primary-dark/10 transition text-navbar-text"
-                            aria-label="Main menu"
-                        >
-                            <Bars3Icon className="w-5 h-5 sm:w-6 sm:h-6" />
-                        </button>
-                        <AnimatePresence>
-                            {mainMenuOpen && (
-                                <motion.div
-                                    initial={{ opacity: 0, y: -10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -10 }}
-                                    className={`absolute ${isRTL ? 'right-0' : 'left-0'} top-full mt-2 min-w-[140px] max-w-[calc(100vw-1rem)] max-h-[80vh] overflow-y-auto bg-white rounded-xl shadow-strong border border-border py-2 z-[999]`}
-                                >
-                                    {navLinks.map((link) => (
-                                        <Link
-                                            key={link.href}
-                                            href={link.href}
-                                            className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition"
-                                            onClick={() => setMainMenuOpen(false)}
-                                        >
-                                            {link.label}
-                                        </Link>
-                                    ))}
-                                    {loadingCategories && (
-                                        <span className="block px-4 py-2 text-text-muted text-sm">جاري التحميل...</span>
-                                    )}
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-                    </div>
-
-                    {/* Logo */}
+                {/* RIGHT SIDE – Logo */}
+                <div className="flex-shrink-0">
                     <Logo />
                 </div>
             </div>
@@ -452,20 +355,12 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
     );
 };
 
-// ============================================================
-// MAIN EXPORT
-// ============================================================
 export default function Navbar() {
     const { user, isLoading } = useAuth();
-
-    if (isLoading) {
+    if (isLoading)
         return (
-            <div className="bg-surface shadow-md py-4 text-center text-text-muted animate-pulse">
-                Loading...
-            </div>
+            <div className="bg-surface shadow-md py-4 text-center text-text-muted animate-pulse">Loading...</div>
         );
-    }
-
     return (
         <header className="fixed top-0 left-0 right-0 z-[1000] bg-white shadow-sm">
             <TopBar />
