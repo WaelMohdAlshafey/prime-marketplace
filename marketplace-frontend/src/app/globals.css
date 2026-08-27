@@ -116,7 +116,7 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     line-height: 1.6;
-    padding-top: 110px; /* Space for fixed header – adjust if needed */
+    padding-top: 110px; /* Space for fixed header */
 }
 
 /* ============================================================
@@ -246,10 +246,19 @@ header {
     }
 
 /* ============================================================
-   SEARCH BAR
+   SEARCH BAR – hidden (but keep styles)
    ============================================================ */
 .search-bar {
+    flex: 1;
     display: none !important;
+    align-items: center;
+    background: var(--color-background);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-pill);
+    height: 44px;
+    padding: 4px;
+    max-width: 600px;
+    transition: all 0.3s ease;
 }
 
     .search-bar:focus-within {
@@ -476,12 +485,12 @@ header {
     }
 
 /* ============================================================
-   PRODUCT GRID – Premium Spacing
+   PRODUCT GRID – Premium Spacing (responsive)
    ============================================================ */
 .product-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 24px; /* Space between cards */
+    gap: 24px;
 }
 
 /* Each card wrapper gets a small padding for extra breathing room */
@@ -762,5 +771,85 @@ header {
 
     .hero-content .description {
         font-size: 13px;
+    }
+}
+
+/* ============================================================
+   RESPONSIVE FINE-TUNING FOR EXTREME SCREENS
+   ============================================================ */
+/* Watches and very small screens (under 360px) */
+@media (max-width: 360px) {
+    body {
+        font-size: 12px;
+        padding-top: 90px;
+    }
+
+    .container {
+        padding: 0 6px;
+    }
+
+    .product-grid {
+        gap: 8px;
+    }
+
+    .hero {
+        padding: 12px;
+        min-height: 160px;
+    }
+
+    .hero-content h1 {
+        font-size: 16px;
+    }
+
+    .hero-content .subtitle {
+        font-size: 12px;
+    }
+
+    .hero-content .description {
+        font-size: 11px;
+    }
+
+    .hero-content .hero-btn {
+        padding: 6px 12px;
+        font-size: 11px;
+    }
+
+    .navbar .logo {
+        font-size: 18px;
+    }
+
+    .top-bar {
+        font-size: 9px;
+    }
+}
+
+/* Large TVs (1920px and up) */
+@media (min-width: 1920px) {
+    .container {
+        max-width: 1800px;
+        padding: 0 40px;
+    }
+
+    .product-grid {
+        grid-template-columns: repeat(6, 1fr);
+        gap: 32px;
+    }
+
+    .hero {
+        padding: 80px 100px;
+        min-height: 500px;
+    }
+
+    .hero-content h1 {
+        font-size: 56px;
+    }
+
+    .hero-content .description {
+        font-size: 20px;
+    }
+
+    .hero-content .hero-btn {
+        padding: 18px 48px;
+        font-size: 20px;
     }
 }

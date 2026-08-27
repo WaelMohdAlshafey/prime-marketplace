@@ -24,7 +24,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import api from '@/lib/api';
 
 // ============================================================
-// TOP BAR – all items with text labels
+// TOP BAR – all items with text labels, responsive
 // ============================================================
 const TopBar = () => {
     const { t, i18n } = useTranslation('common');
@@ -50,15 +50,15 @@ const TopBar = () => {
     }, []);
 
     return (
-        <div className="bg-primary-dark text-white text-[10px] md:text-xs py-1 relative z-50">
-            <div className="container mx-auto px-2 md:px-4 flex items-center justify-between gap-1 md:gap-3 flex-nowrap overflow-x-auto">
+        <div className="bg-primary-dark text-white text-[10px] sm:text-xs py-1 relative z-50">
+            <div className="container mx-auto px-2 sm:px-4 flex items-center justify-between gap-1 sm:gap-3 flex-nowrap overflow-x-auto">
                 {/* LEFT SIDE (end of bar) – Language toggle + free shipping */}
-                <div className="flex items-center gap-1 md:gap-3 flex-shrink-0 whitespace-nowrap">
+                <div className="flex items-center gap-1 sm:gap-3 flex-shrink-0 whitespace-nowrap">
                     <button
                         onClick={toggleLanguage}
-                        className="flex items-center gap-0.5 md:gap-1 hover:text-yellow-400 transition px-1 md:px-2 py-0.5 rounded-md hover:bg-white/10"
+                        className="flex items-center gap-0.5 sm:gap-1 hover:text-yellow-400 transition px-1 sm:px-2 py-0.5 rounded-md hover:bg-white/10"
                     >
-                        <GlobeAltIcon className="w-3 h-3 md:w-3.5 md:h-3.5" />
+                        <GlobeAltIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                         <span>{i18n.language === 'ar' ? 'العربية' : 'English'}</span>
                     </button>
                     <span className="text-white/30 hidden xs:inline">|</span>
@@ -66,16 +66,16 @@ const TopBar = () => {
                 </div>
 
                 {/* RIGHT SIDE (start of bar) – Support, Currency, Track Order with labels */}
-                <div className="flex items-center gap-1 md:gap-3 flex-shrink-0">
+                <div className="flex items-center gap-1 sm:gap-3 flex-shrink-0">
                     {/* Support Dropdown – click only */}
                     <div className="relative" ref={supportRef}>
                         <button
                             onClick={() => setSupportOpen(!supportOpen)}
-                            className="flex items-center gap-0.5 md:gap-1 hover:text-yellow-400 transition px-1 md:px-2 py-0.5 rounded-md hover:bg-white/10 whitespace-nowrap"
+                            className="flex items-center gap-0.5 sm:gap-1 hover:text-yellow-400 transition px-1 sm:px-2 py-0.5 rounded-md hover:bg-white/10 whitespace-nowrap"
                         >
-                            <LifebuoyIcon className="w-3 h-3 md:w-3.5 md:h-3.5" />
+                            <LifebuoyIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                             <span className="hidden xs:inline">{t('support')}</span>
-                            <ChevronDownIcon className="w-2.5 h-2.5 md:w-3 md:h-3" />
+                            <ChevronDownIcon className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                         </button>
                         <AnimatePresence>
                             {supportOpen && (
@@ -83,18 +83,18 @@ const TopBar = () => {
                                     initial={{ opacity: 0, y: -10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: -10 }}
-                                    className="absolute right-0 top-full mt-1 bg-white text-gray-800 rounded-lg shadow-lg py-1 w-36 md:w-40 z-50"
+                                    className="absolute right-0 top-full mt-1 bg-white text-gray-800 rounded-lg shadow-lg py-1 min-w-[120px] max-w-[calc(100vw-2rem)] z-50"
                                 >
-                                    <Link href="/help" className="block w-full text-right px-3 md:px-4 py-1.5 md:py-2 hover:bg-gray-100 transition text-xs md:text-sm" onClick={() => setSupportOpen(false)}>
+                                    <Link href="/help" className="block w-full text-right px-3 sm:px-4 py-1.5 sm:py-2 hover:bg-gray-100 transition text-xs sm:text-sm" onClick={() => setSupportOpen(false)}>
                                         {t('help')}
                                     </Link>
-                                    <Link href="/faq" className="block w-full text-right px-3 md:px-4 py-1.5 md:py-2 hover:bg-gray-100 transition text-xs md:text-sm" onClick={() => setSupportOpen(false)}>
+                                    <Link href="/faq" className="block w-full text-right px-3 sm:px-4 py-1.5 sm:py-2 hover:bg-gray-100 transition text-xs sm:text-sm" onClick={() => setSupportOpen(false)}>
                                         {t('footer.faq')}
                                     </Link>
-                                    <Link href="/returns" className="block w-full text-right px-3 md:px-4 py-1.5 md:py-2 hover:bg-gray-100 transition text-xs md:text-sm" onClick={() => setSupportOpen(false)}>
+                                    <Link href="/returns" className="block w-full text-right px-3 sm:px-4 py-1.5 sm:py-2 hover:bg-gray-100 transition text-xs sm:text-sm" onClick={() => setSupportOpen(false)}>
                                         {t('footer.returns')}
                                     </Link>
-                                    <Link href="/shipping" className="block w-full text-right px-3 md:px-4 py-1.5 md:py-2 hover:bg-gray-100 transition text-xs md:text-sm" onClick={() => setSupportOpen(false)}>
+                                    <Link href="/shipping" className="block w-full text-right px-3 sm:px-4 py-1.5 sm:py-2 hover:bg-gray-100 transition text-xs sm:text-sm" onClick={() => setSupportOpen(false)}>
                                         {t('footer.shipping')}
                                     </Link>
                                 </motion.div>
@@ -108,11 +108,11 @@ const TopBar = () => {
                     <div className="relative" ref={currencyRef}>
                         <button
                             onClick={() => setCurrencyOpen(!currencyOpen)}
-                            className="flex items-center gap-0.5 md:gap-1 hover:text-yellow-400 transition px-1 md:px-2 py-0.5 rounded-md hover:bg-white/10 whitespace-nowrap"
+                            className="flex items-center gap-0.5 sm:gap-1 hover:text-yellow-400 transition px-1 sm:px-2 py-0.5 rounded-md hover:bg-white/10 whitespace-nowrap"
                         >
-                            <CurrencyDollarIcon className="w-3 h-3 md:w-3.5 md:h-3.5" />
+                            <CurrencyDollarIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                             <span className="hidden xs:inline">{t('currency')}</span>
-                            <ChevronDownIcon className="w-2.5 h-2.5 md:w-3 md:h-3" />
+                            <ChevronDownIcon className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                         </button>
                         <AnimatePresence>
                             {currencyOpen && (
@@ -120,12 +120,12 @@ const TopBar = () => {
                                     initial={{ opacity: 0, y: -10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: -10 }}
-                                    className="absolute right-0 top-full mt-1 bg-white text-gray-800 rounded-lg shadow-lg py-1 w-24 md:w-32 z-50"
+                                    className="absolute right-0 top-full mt-1 bg-white text-gray-800 rounded-lg shadow-lg py-1 min-w-[80px] max-w-[calc(100vw-2rem)] z-50"
                                 >
-                                    <button className="block w-full text-right px-3 md:px-4 py-1.5 md:py-2 hover:bg-gray-100 transition text-xs md:text-sm">
+                                    <button className="block w-full text-right px-3 sm:px-4 py-1.5 sm:py-2 hover:bg-gray-100 transition text-xs sm:text-sm">
                                         EGP
                                     </button>
-                                    <button className="block w-full text-right px-3 md:px-4 py-1.5 md:py-2 hover:bg-gray-100 transition text-xs md:text-sm">
+                                    <button className="block w-full text-right px-3 sm:px-4 py-1.5 sm:py-2 hover:bg-gray-100 transition text-xs sm:text-sm">
                                         USD
                                     </button>
                                 </motion.div>
@@ -136,8 +136,8 @@ const TopBar = () => {
                     <span className="text-white/30 hidden xs:inline">|</span>
 
                     {/* Track Order – simple link with label */}
-                    <Link href="/tracking" className="flex items-center gap-0.5 md:gap-1 hover:text-yellow-400 transition px-1 md:px-2 py-0.5 rounded-md hover:bg-white/10 whitespace-nowrap">
-                        <TruckIcon className="w-3 h-3 md:w-3.5 md:h-3.5" />
+                    <Link href="/tracking" className="flex items-center gap-0.5 sm:gap-1 hover:text-yellow-400 transition px-1 sm:px-2 py-0.5 rounded-md hover:bg-white/10 whitespace-nowrap">
+                        <TruckIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                         <span className="hidden xs:inline">{t('trackOrder')}</span>
                     </Link>
                 </div>
@@ -205,12 +205,12 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
 
     return (
         <div className="navbar">
-            <div className="container mx-auto px-2 md:px-4 flex items-center justify-between gap-2 md:gap-4 py-2">
+            <div className="container mx-auto px-2 sm:px-4 flex items-center justify-between gap-2 sm:gap-4 py-2">
                 {/* LEFT SIDE (end of bar) – Wishlist, Cart, User menu */}
-                <div className="flex items-center gap-1.5 md:gap-3 flex-shrink-0">
+                <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
                     {/* Wishlist */}
                     <motion.button whileHover={{ scale: 1.1 }} className="text-navbar-text hover:text-navbar-hover transition relative hidden sm:block">
-                        <HeartIcon className="w-5 h-5 md:w-6 md:h-6" />
+                        <HeartIcon className="w-5 h-5 sm:w-6 sm:h-6" />
                         <span className="absolute -top-1.5 -right-1.5 bg-secondary text-white text-[10px] font-bold w-[18px] h-[18px] rounded-full flex items-center justify-center">
                             {totalFavorites}
                         </span>
@@ -219,7 +219,7 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
                     {/* Cart */}
                     <span ref={cartIconRef} className="relative inline-flex">
                         <Link href="/cart" className="text-navbar-text hover:text-navbar-hover transition">
-                            <ShoppingCartIcon className="w-5 h-5 md:w-6 md:h-6" />
+                            <ShoppingCartIcon className="w-5 h-5 sm:w-6 sm:h-6" />
                             <motion.span
                                 animate={{ scale: totalItems > 0 ? 1.2 : 1 }}
                                 className="absolute -top-1.5 -right-1.5 bg-secondary text-white text-[10px] font-bold w-[18px] h-[18px] rounded-full flex items-center justify-center"
@@ -233,18 +233,18 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
                     <div className="relative" ref={userMenuRef} onClick={(e) => e.stopPropagation()}>
                         <button
                             onClick={() => setUserMenuOpen(!userMenuOpen)}
-                            className="flex items-center gap-0.5 md:gap-1 p-1.5 md:p-2 rounded-md hover:bg-primary-dark/10 transition text-navbar-text"
+                            className="flex items-center gap-0.5 sm:gap-1 p-1.5 sm:p-2 rounded-md hover:bg-primary-dark/10 transition text-navbar-text"
                             aria-label="User menu"
                         >
                             {user ? (
                                 <>
-                                    <span className="hidden sm:inline text-xs md:text-sm font-medium">{user.username}</span>
-                                    <UserIcon className="w-5 h-5 md:w-6 md:h-6" />
+                                    <span className="hidden sm:inline text-xs sm:text-sm font-medium">{user.username}</span>
+                                    <UserIcon className="w-5 h-5 sm:w-6 sm:h-6" />
                                 </>
                             ) : (
-                                <UserIcon className="w-5 h-5 md:w-6 md:h-6" />
+                                <UserIcon className="w-5 h-5 sm:w-6 sm:h-6" />
                             )}
-                            <ChevronDownIcon className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                            <ChevronDownIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                         </button>
 
                         <AnimatePresence>
@@ -253,7 +253,7 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
                                     initial={{ opacity: 0, y: -10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: -10 }}
-                                    className={`absolute ${isRTL ? 'left-0' : 'right-0'} top-full mt-2 w-56 max-w-[calc(100vw-2rem)] max-h-[80vh] overflow-y-auto bg-white rounded-xl shadow-strong border border-border py-2 z-[999]`}
+                                    className={`absolute ${isRTL ? 'left-0' : 'right-0'} top-full mt-2 min-w-[160px] max-w-[calc(100vw-2rem)] max-h-[80vh] overflow-y-auto bg-white rounded-xl shadow-strong border border-border py-2 z-[999]`}
                                 >
                                     {!user ? (
                                         <>
@@ -320,15 +320,15 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
                 </div>
 
                 {/* RIGHT SIDE (start of bar) – Hamburger (no label) + Logo */}
-                <div className="flex items-center gap-2 md:gap-4 flex-shrink-0">
+                <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
                     {/* Main menu – hamburger icon only (no text) */}
                     <div className="relative" ref={mainMenuRef} onClick={(e) => e.stopPropagation()}>
                         <button
                             onClick={() => setMainMenuOpen(!mainMenuOpen)}
-                            className="p-1.5 md:p-2 rounded-md hover:bg-primary-dark/10 transition text-navbar-text"
+                            className="p-1.5 sm:p-2 rounded-md hover:bg-primary-dark/10 transition text-navbar-text"
                             aria-label="Main menu"
                         >
-                            <Bars3Icon className="w-5 h-5 md:w-6 md:h-6" />
+                            <Bars3Icon className="w-5 h-5 sm:w-6 sm:h-6" />
                         </button>
                         <AnimatePresence>
                             {mainMenuOpen && (
@@ -336,7 +336,7 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
                                     initial={{ opacity: 0, y: -10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: -10 }}
-                                    className={`absolute ${isRTL ? 'right-0' : 'left-0'} top-full mt-2 w-56 max-w-[calc(100vw-2rem)] max-h-[80vh] overflow-y-auto bg-white rounded-xl shadow-strong border border-border py-2 z-[999]`}
+                                    className={`absolute ${isRTL ? 'right-0' : 'left-0'} top-full mt-2 min-w-[160px] max-w-[calc(100vw-2rem)] max-h-[80vh] overflow-y-auto bg-white rounded-xl shadow-strong border border-border py-2 z-[999]`}
                                 >
                                     {navLinks.map((link) => (
                                         <Link
@@ -348,7 +348,6 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
                                             {link.label}
                                         </Link>
                                     ))}
-                                    {/* Separator and extra links if needed */}
                                     {loadingCategories && (
                                         <span className="block px-4 py-2 text-text-muted text-sm">جاري التحميل...</span>
                                     )}

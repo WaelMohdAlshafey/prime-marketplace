@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { Heart, Plus, Minus } from 'lucide-react';
-import { ShoppingCartIcon } from '@heroicons/react/24/outline'; // ← same as header
+import { ShoppingCartIcon } from '@heroicons/react/24/outline';
 import { useState, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
@@ -147,21 +147,21 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
             whileHover={{ y: -6 }}
             onHoverStart={() => setIsHovered(true)}
             onHoverEnd={() => setIsHovered(false)}
-            className="cursor-pointer p-2"
+            className="cursor-pointer p-1 sm:p-2"
             onClick={handleCardClick}
         >
             {/* Transparent outer card */}
             <div className="border border-gray-200 rounded-2xl overflow-hidden bg-transparent shadow-sm hover:shadow-xl transition-all duration-300">
 
                 {/* BLOCK 1 – Picture + Name + Description (white background) */}
-                <div className="bg-white p-4">
-                    <div className="relative bg-gray-50/80 rounded-xl p-4">
+                <div className="bg-white p-3 sm:p-4">
+                    <div className="relative bg-gray-50/80 rounded-xl p-2 sm:p-4">
                         {/* Wishlist heart */}
                         <motion.button
                             whileHover={{ scale: 1.2 }}
                             whileTap={{ scale: 0.8 }}
                             onClick={handleWishlistToggle}
-                            className="absolute top-2 right-2 z-10 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-sm hover:shadow-md transition"
+                            className="absolute top-1 sm:top-2 right-1 sm:right-2 z-10 bg-white/90 backdrop-blur-sm rounded-full p-1.5 sm:p-2 shadow-sm hover:shadow-md transition"
                         >
                             <Heart
                                 className={`w-4 h-4 transition ${isWishlist ? 'fill-red-500 text-red-500' : 'text-gray-400'}`}
@@ -169,40 +169,40 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
                         </motion.button>
 
                         {hasDiscount && (
-                            <span className="absolute top-2 left-2 z-10 bg-red-500 text-white text-xs font-bold px-2.5 py-1 rounded-full">
+                            <span className="absolute top-1 sm:top-2 left-1 sm:left-2 z-10 bg-red-500 text-white text-[10px] sm:text-xs font-bold px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full">
                                 -{product.discount}%
                             </span>
                         )}
 
-                        <div className="relative w-full aspect-square max-h-[200px] mx-auto">
+                        <div className="relative w-full aspect-square max-h-[140px] sm:max-h-[200px] mx-auto">
                             <Image
                                 src={imgSrc}
                                 alt={displayName}
                                 fill
                                 className={`object-contain p-2 transition-transform duration-500 ${isHovered ? 'scale-105' : 'scale-100'}`}
-                                sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                                 priority={false}
                                 onError={handleImageError}
                             />
                         </div>
                     </div>
 
-                    <div className="mt-3 space-y-1.5 text-center">
+                    <div className="mt-2 sm:mt-3 space-y-1 text-center">
                         {product.category && (
-                            <span className="inline-block text-[10px] font-semibold text-primary bg-primary/10 px-2.5 py-0.5 rounded-full">
+                            <span className="inline-block text-[10px] font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded-full">
                                 {product.category}
                             </span>
                         )}
-                        <h3 className="font-semibold text-gray-800 text-base line-clamp-1">
+                        <h3 className="font-semibold text-gray-800 text-sm sm:text-base line-clamp-1">
                             {displayName}
                         </h3>
                         {displayDescription && (
-                            <p className="text-gray-500 text-sm line-clamp-2 leading-relaxed">
+                            <p className="text-gray-500 text-xs sm:text-sm line-clamp-2 leading-relaxed">
                                 {displayDescription}
                             </p>
                         )}
                         <div className="flex items-center justify-center gap-2 pt-1">
-                            <span className="text-xl font-bold text-gray-900">
+                            <span className="text-lg sm:text-xl font-bold text-gray-900">
                                 {CURRENCY}{(discountPrice || product.price).toFixed(2)}
                             </span>
                             {hasDiscount && (
@@ -215,25 +215,25 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
                 </div>
 
                 {/* BLOCK 2 – Controls as "Chocolate Bar" with header cart icon */}
-                <div className="bg-[#4E8C9E] p-2 flex items-stretch" onClick={(e) => e.stopPropagation()}>
+                <div className="bg-[#4E8C9E] p-1.5 sm:p-2 flex items-stretch" onClick={(e) => e.stopPropagation()}>
                     <button
                         onClick={decrement}
                         disabled={quantity <= 1}
-                        className="flex-1 py-3 text-white hover:bg-white/20 transition disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center border-r border-white/20"
+                        className="flex-1 py-2 sm:py-3 text-white hover:bg-white/20 transition disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center border-r border-white/20"
                     >
-                        <Minus className="w-5 h-5" />
+                        <Minus className="w-4 h-4 sm:w-5 sm:h-5" />
                     </button>
 
-                    <div className="flex-1 py-3 text-white font-semibold text-center border-r border-white/20 flex items-center justify-center">
+                    <div className="flex-1 py-2 sm:py-3 text-white font-semibold text-center border-r border-white/20 flex items-center justify-center text-sm sm:text-base">
                         {quantity}
                     </div>
 
                     <button
                         onClick={increment}
                         disabled={quantity >= product.stockQuantity}
-                        className="flex-1 py-3 text-white hover:bg-white/20 transition disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center border-r border-white/20"
+                        className="flex-1 py-2 sm:py-3 text-white hover:bg-white/20 transition disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center border-r border-white/20"
                     >
-                        <Plus className="w-5 h-5" />
+                        <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
                     </button>
 
                     {/* Add to Cart – uses SAME icon as header */}
@@ -243,20 +243,20 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
                             handleAddToCart(e);
                         }}
                         disabled={isAdding || product.stockQuantity === 0}
-                        className="flex-[2] py-3 bg-white text-[#4E8C9E] hover:bg-white/90 transition disabled:opacity-50 flex items-center justify-center rounded-r-lg"
+                        className="flex-[2] py-2 sm:py-3 bg-white text-[#4E8C9E] hover:bg-white/90 transition disabled:opacity-50 flex items-center justify-center rounded-r-lg"
                     >
                         {isAdding ? (
-                            <div className="animate-spin rounded-full h-5 w-5 border-2 border-[#4E8C9E] border-t-transparent" />
+                            <div className="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-2 border-[#4E8C9E] border-t-transparent" />
                         ) : product.stockQuantity === 0 ? (
-                            <span className="text-xs">غير متوفر</span>
+                            <span className="text-xs sm:text-sm">غير متوفر</span>
                         ) : (
-                            <ShoppingCartIcon className="w-5 h-5" /> // ✅ Same as header
+                            <ShoppingCartIcon className="w-4 h-4 sm:w-5 sm:h-5" />
                         )}
                     </button>
                 </div>
 
                 {product.stockQuantity > 0 && product.stockQuantity <= 5 && (
-                    <p className="text-xs text-amber-600 text-center py-1 bg-white/80">
+                    <p className="text-[10px] sm:text-xs text-amber-600 text-center py-1 bg-white/80">
                         ⚠️ متبقي {product.stockQuantity} فقط
                     </p>
                 )}
@@ -265,7 +265,7 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
             {/* Fly animation */}
             {fly && (
                 <div
-                    className="fixed pointer-events-none z-50 w-14 h-14 bg-primary rounded-full shadow-lg flex items-center justify-center"
+                    className="fixed pointer-events-none z-50 w-10 h-10 sm:w-14 sm:h-14 bg-primary rounded-full shadow-lg flex items-center justify-center"
                     style={{
                         left: flyStart.x,
                         top: flyStart.y,
@@ -283,7 +283,7 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
                         }
                     }}
                 >
-                    <ShoppingCartIcon className="w-7 h-7 text-white" />
+                    <ShoppingCartIcon className="w-5 h-5 sm:w-7 sm:h-7 text-white" />
                 </div>
             )}
         </motion.div>

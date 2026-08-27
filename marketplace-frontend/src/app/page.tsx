@@ -70,17 +70,15 @@ export default function Home() {
     };
 
     return (
-        <div className="bg-background min-h-screen">
+        <div className="bg-background min-h-screen pt-2 sm:pt-4 md:pt-6">
             {/* Hero Banner – kept */}
             <HeroBanner />
 
-            {/* Categories are REMOVED from here – only in menu */}
-
             {/* Main Content with Filters */}
-            <div className="container mx-auto px-4 py-6 md:py-10">
-                <div className="flex flex-col md:flex-row gap-6">
+            <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 md:py-10">
+                <div className="flex flex-col md:flex-row gap-4 md:gap-6">
                     {/* Sidebar */}
-                    <div className="md:w-72 flex-shrink-0">
+                    <div className="md:w-64 lg:w-72 flex-shrink-0">
                         <FilterSidebar
                             onApplyFilters={handleApplyFilters}
                             onResetFilters={handleResetFilters}
@@ -89,26 +87,25 @@ export default function Home() {
 
                     {/* Products */}
                     <div className="flex-1">
-                        <div className="flex items-center justify-between mb-6">
+                        <div className="flex items-center justify-between mb-4 sm:mb-6">
                             <div>
-                                <h2 className="text-2xl md:text-3xl font-bold text-text flex items-center gap-2">
-                                    <Sparkles className="w-6 h-6 text-primary" />
+                                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-text flex items-center gap-2">
+                                    <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
                                     {t('featuredProducts')}
                                 </h2>
-                                <p className="text-sm text-text-muted mt-1">{t('featuredProductsSub')}</p>
+                                <p className="text-xs sm:text-sm text-text-muted mt-1">{t('featuredProductsSub')}</p>
                             </div>
-                            <span className="text-sm text-primary font-medium bg-primary/10 px-4 py-1 rounded-pill">
+                            <span className="text-xs sm:text-sm text-primary font-medium bg-primary/10 px-2 sm:px-4 py-1 rounded-pill">
                                 {products.length} {t('productCount')}
                             </span>
                         </div>
 
                         {loading ? (
-                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-5">
+                            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-2 sm:gap-3 md:gap-4">
                                 {[...Array(6)].map((_, i) => (
-                                    <div key={i} className="bg-white rounded-2xl shadow-soft p-4 animate-pulse">
+                                    <div key={i} className="bg-white rounded-2xl shadow-soft p-3 animate-pulse">
                                         <div className="w-full aspect-square bg-gray-200 rounded-xl"></div>
                                         <div className="h-4 bg-gray-200 rounded mt-3 w-3/4"></div>
-                                        <div className="h-6 bg-gray-200 rounded mt-2 w-1/3"></div>
                                     </div>
                                 ))}
                             </div>
@@ -117,7 +114,7 @@ export default function Home() {
                                 <p className="text-red-500">{error}</p>
                                 <button
                                     onClick={() => fetchProducts()}
-                                    className="mt-4 bg-primary text-white px-6 py-2 rounded-pill hover:bg-primary-dark transition"
+                                    className="mt-4 bg-primary text-white px-4 py-2 rounded-pill hover:bg-primary-dark transition"
                                 >
                                     إعادة المحاولة
                                 </button>
@@ -128,13 +125,13 @@ export default function Home() {
                                 <p className="text-text-muted">لا توجد منتجات تطابق الفلاتر المحددة</p>
                                 <button
                                     onClick={handleResetFilters}
-                                    className="mt-4 bg-primary text-white px-6 py-2 rounded-pill hover:bg-primary-dark transition"
+                                    className="mt-4 bg-primary text-white px-4 py-2 rounded-pill hover:bg-primary-dark transition"
                                 >
                                     إعادة تعيين الفلاتر
                                 </button>
                             </div>
                         ) : (
-                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-5">
+                            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-2 sm:gap-3 md:gap-4">
                                 {products.map((product) => (
                                     <ProductCard
                                         key={product.id}
