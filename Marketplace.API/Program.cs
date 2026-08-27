@@ -14,8 +14,18 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 // ============================================================
-// 2. (No need for CORS policy – we'll use custom middleware)
+// 2. Add CORS (official middleware)
 // ============================================================
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        policy =>
+        {
+            policy.AllowAnyOrigin()
+                  .AllowAnyMethod()
+                  .AllowAnyHeader();
+        });
+});
 
 // ============================================================
 // 3. Add Memory Cache
@@ -134,22 +144,9 @@ if (app.Environment.IsDevelopment())
 }
 
 // ============================================================
-// 11. CUSTOM CORS MIDDLEWARE – Handles ALL requests and OPTIONS
+// 11. Use CORS – MUST be before Authentication/Authorization
 // ============================================================
-app.Use(async (context, next) =>
-{
-    context.Response.Headers["Access-Control-Allow-Origin"] = "*";
-    context.Response.Headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS";
-    context.Response.Headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With";
-
-    if (context.Request.Method == "OPTIONS")
-    {
-        context.Response.StatusCode = 204;
-        return;
-    }
-
-    await next();
-});
+app.UseCors("AllowAll");
 
 // ============================================================
 // 12. Request Logging Middleware (helps debug)
