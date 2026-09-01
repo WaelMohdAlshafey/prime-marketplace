@@ -24,7 +24,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import api from '@/lib/api';
 
 // ============================================================
-// TOP BAR – all items with text labels, responsive
+// TOP BAR
 // ============================================================
 const TopBar = () => {
     const { t, i18n } = useTranslation('common');
@@ -46,14 +46,14 @@ const TopBar = () => {
         return () => document.removeEventListener('mousedown', handler);
     }, []);
 
-    // Centered dropdowns using translateX
+    // ✅ Centered dropdown – works for both RTL and LTR
     const dropdownClasses =
         "absolute top-full mt-1 bg-white text-gray-800 rounded-lg shadow-lg py-1 z-50 min-w-[120px] max-w-[calc(100vw-2rem)] left-1/2 -translate-x-1/2";
 
     return (
         <div className="bg-primary-dark text-white text-[10px] sm:text-xs py-1 relative z-50">
             <div className="container mx-auto px-2 sm:px-4 flex items-center justify-between gap-1 sm:gap-3 flex-nowrap overflow-x-auto">
-                {/* LEFT SIDE */}
+                {/* LEFT */}
                 <div className="flex items-center gap-1 sm:gap-3 flex-shrink-0 whitespace-nowrap">
                     <button
                         onClick={toggleLanguage}
@@ -66,7 +66,7 @@ const TopBar = () => {
                     <span className="hidden xs:inline">🚚 {t('freeShipping')}</span>
                 </div>
 
-                {/* RIGHT SIDE */}
+                {/* RIGHT */}
                 <div className="flex items-center gap-1 sm:gap-3 flex-shrink-0">
                     {/* Support Dropdown */}
                     <div className="relative" ref={supportRef}>
@@ -86,16 +86,32 @@ const TopBar = () => {
                                     exit={{ opacity: 0, y: -10 }}
                                     className={dropdownClasses}
                                 >
-                                    <Link href="/help" className="block w-full text-right px-3 sm:px-4 py-1.5 sm:py-2 hover:bg-gray-100 transition text-xs sm:text-sm" onClick={() => setSupportOpen(false)}>
+                                    <Link
+                                        href="/help"
+                                        className="block w-full text-right px-3 sm:px-4 py-1.5 sm:py-2 hover:bg-gray-100 transition text-xs sm:text-sm"
+                                        onClick={() => setSupportOpen(false)}
+                                    >
                                         {t('help')}
                                     </Link>
-                                    <Link href="/faq" className="block w-full text-right px-3 sm:px-4 py-1.5 sm:py-2 hover:bg-gray-100 transition text-xs sm:text-sm" onClick={() => setSupportOpen(false)}>
+                                    <Link
+                                        href="/faq"
+                                        className="block w-full text-right px-3 sm:px-4 py-1.5 sm:py-2 hover:bg-gray-100 transition text-xs sm:text-sm"
+                                        onClick={() => setSupportOpen(false)}
+                                    >
                                         {t('footer.faq')}
                                     </Link>
-                                    <Link href="/returns" className="block w-full text-right px-3 sm:px-4 py-1.5 sm:py-2 hover:bg-gray-100 transition text-xs sm:text-sm" onClick={() => setSupportOpen(false)}>
+                                    <Link
+                                        href="/returns"
+                                        className="block w-full text-right px-3 sm:px-4 py-1.5 sm:py-2 hover:bg-gray-100 transition text-xs sm:text-sm"
+                                        onClick={() => setSupportOpen(false)}
+                                    >
                                         {t('footer.returns')}
                                     </Link>
-                                    <Link href="/shipping" className="block w-full text-right px-3 sm:px-4 py-1.5 sm:py-2 hover:bg-gray-100 transition text-xs sm:text-sm" onClick={() => setSupportOpen(false)}>
+                                    <Link
+                                        href="/shipping"
+                                        className="block w-full text-right px-3 sm:px-4 py-1.5 sm:py-2 hover:bg-gray-100 transition text-xs sm:text-sm"
+                                        onClick={() => setSupportOpen(false)}
+                                    >
                                         {t('footer.shipping')}
                                     </Link>
                                 </motion.div>
@@ -136,7 +152,11 @@ const TopBar = () => {
 
                     <span className="text-white/30 hidden xs:inline">|</span>
 
-                    <Link href="/tracking" className="flex items-center gap-0.5 sm:gap-1 hover:text-yellow-400 transition px-1 sm:px-2 py-0.5 rounded-md hover:bg-white/10 whitespace-nowrap">
+                    {/* Track Order Link */}
+                    <Link
+                        href="/tracking"
+                        className="flex items-center gap-0.5 sm:gap-1 hover:text-yellow-400 transition px-1 sm:px-2 py-0.5 rounded-md hover:bg-white/10 whitespace-nowrap"
+                    >
                         <TruckIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                         <span className="hidden xs:inline">{t('trackOrder')}</span>
                     </Link>
@@ -147,7 +167,7 @@ const TopBar = () => {
 };
 
 // ============================================================
-// MAIN HEADER – Logo right, hamburger left
+// MAIN HEADER
 // ============================================================
 const MainHeader = ({ user }: { user: AuthResponse | null }) => {
     const { t, i18n } = useTranslation('common');
@@ -163,10 +183,12 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
     const [loadingCategories, setLoadingCategories] = useState(true);
 
     useEffect(() => {
-        api.get('/api/Categories').then(res => {
-            setCategories(res.data);
-            setLoadingCategories(false);
-        }).catch(() => setLoadingCategories(false));
+        api.get('/api/Categories')
+            .then((res) => {
+                setCategories(res.data);
+                setLoadingCategories(false);
+            })
+            .catch(() => setLoadingCategories(false));
     }, []);
 
     useEffect(() => {
@@ -178,26 +200,27 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
         return () => document.removeEventListener('mousedown', handler);
     }, []);
 
-    const isRTL = typeof document !== 'undefined' && document.documentElement.dir === 'rtl';
+    // ✅ Centered dropdown – works for both RTL and LTR
+    const dropdownClasses =
+        "absolute top-full mt-2 bg-white rounded-xl shadow-strong border border-border py-2 z-[999] min-w-[180px] max-w-[calc(100vw-2rem)] left-1/2 -translate-x-1/2 max-h-[80vh] overflow-y-auto";
 
     const navLinks = [
         { href: '/', label: t('home') },
         { href: '/products', label: t('products') },
-        ...categories.map(cat => ({ href: `/${cat.toLowerCase().replace(/\s+/g, '-')}`, label: cat })),
+        ...categories.map((cat) => ({
+            href: `/${cat.toLowerCase().replace(/\s+/g, '-')}`,
+            label: cat,
+        })),
         { href: '/stores', label: t('stores') },
         { href: '/offers', label: t('offers') },
         { href: '/contact', label: t('contact') },
         { href: '/help', label: t('help') },
     ];
 
-    // Centered dropdowns for both menus
-    const dropdownClasses =
-        "absolute top-full mt-2 bg-white rounded-xl shadow-strong border border-border py-2 z-[999] min-w-[180px] max-w-[calc(100vw-2rem)] left-1/2 -translate-x-1/2";
-
     return (
         <div className="navbar">
             <div className="container mx-auto px-2 sm:px-4 flex items-center justify-between gap-2 sm:gap-4 py-2">
-                {/* LEFT SIDE – icons + menus */}
+                {/* LEFT SIDE – Icons + menus */}
                 <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
                     {/* Main Menu (Hamburger) */}
                     <div className="relative" ref={mainMenuRef} onClick={(e) => e.stopPropagation()}>
@@ -231,7 +254,7 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
                         </AnimatePresence>
                     </div>
 
-                    {/* Wishlist */}
+                    {/* Wishlist Icon */}
                     <button className="text-navbar-text hover:text-navbar-hover transition relative hidden sm:block">
                         <HeartIcon className="w-5 h-5 sm:w-6 sm:h-6" />
                         <span className="absolute -top-1.5 -right-1.5 bg-secondary text-white text-[10px] font-bold w-[18px] h-[18px] rounded-full flex items-center justify-center">
@@ -239,7 +262,7 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
                         </span>
                     </button>
 
-                    {/* Cart */}
+                    {/* Cart Icon */}
                     <span ref={cartIconRef} className="relative inline-flex">
                         <Link href="/cart" className="text-navbar-text hover:text-navbar-hover transition">
                             <ShoppingCartIcon className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -280,51 +303,99 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
                                 >
                                     {!user ? (
                                         <>
-                                            <Link href="/auth/login" className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition" onClick={() => setUserMenuOpen(false)}>
+                                            <Link
+                                                href="/auth/login"
+                                                className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition"
+                                                onClick={() => setUserMenuOpen(false)}
+                                            >
                                                 {t('loginTitle')}
                                             </Link>
-                                            <Link href="/auth/register" className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition" onClick={() => setUserMenuOpen(false)}>
+                                            <Link
+                                                href="/auth/register"
+                                                className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition"
+                                                onClick={() => setUserMenuOpen(false)}
+                                            >
                                                 {t('registerTitle')}
                                             </Link>
                                         </>
                                     ) : (
                                         <>
-                                            <Link href="/cart" className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition" onClick={() => setUserMenuOpen(false)}>
+                                            <Link
+                                                href="/cart"
+                                                className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition"
+                                                onClick={() => setUserMenuOpen(false)}
+                                            >
                                                 🛒 {t('cart')}
                                             </Link>
-                                            <Link href="/orders" className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition" onClick={() => setUserMenuOpen(false)}>
+                                            <Link
+                                                href="/orders"
+                                                className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition"
+                                                onClick={() => setUserMenuOpen(false)}
+                                            >
                                                 📋 {t('orders')}
                                             </Link>
-                                            <Link href="/suggest" className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition" onClick={() => setUserMenuOpen(false)}>
+                                            <Link
+                                                href="/suggest"
+                                                className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition"
+                                                onClick={() => setUserMenuOpen(false)}
+                                            >
                                                 💡 Suggest
                                             </Link>
                                             {(user.role === 'Vendor' || user.role === 'Admin') && (
-                                                <Link href="/vendor/dashboard" className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition" onClick={() => setUserMenuOpen(false)}>
+                                                <Link
+                                                    href="/vendor/dashboard"
+                                                    className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition"
+                                                    onClick={() => setUserMenuOpen(false)}
+                                                >
                                                     📊 {t('dashboard')}
                                                 </Link>
                                             )}
                                             {(user.role === 'Vendor' || user.role === 'Admin' || user.role === 'Employee') && (
-                                                <Link href="/admin/orders" className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition" onClick={() => setUserMenuOpen(false)}>
+                                                <Link
+                                                    href="/admin/orders"
+                                                    className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition"
+                                                    onClick={() => setUserMenuOpen(false)}
+                                                >
                                                     📦 Manage Orders
                                                 </Link>
                                             )}
                                             {user.role === 'Admin' && (
                                                 <>
-                                                    <Link href="/admin/users" className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition" onClick={() => setUserMenuOpen(false)}>
+                                                    <Link
+                                                        href="/admin/users"
+                                                        className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition"
+                                                        onClick={() => setUserMenuOpen(false)}
+                                                    >
                                                         👥 {t('users')}
                                                     </Link>
-                                                    <Link href="/admin" className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition" onClick={() => setUserMenuOpen(false)}>
+                                                    <Link
+                                                        href="/admin"
+                                                        className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition"
+                                                        onClick={() => setUserMenuOpen(false)}
+                                                    >
                                                         ⚙️ {t('admin')}
                                                     </Link>
-                                                    <Link href="/admin/golden-links" className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition" onClick={() => setUserMenuOpen(false)}>
+                                                    <Link
+                                                        href="/admin/golden-links"
+                                                        className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition"
+                                                        onClick={() => setUserMenuOpen(false)}
+                                                    >
                                                         🔗 Golden Links
                                                     </Link>
                                                 </>
                                             )}
-                                            <Link href="/chat" className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition" onClick={() => setUserMenuOpen(false)}>
+                                            <Link
+                                                href="/chat"
+                                                className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition"
+                                                onClick={() => setUserMenuOpen(false)}
+                                            >
                                                 💬 Chat
                                             </Link>
-                                            <Link href="/profile" className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition" onClick={() => setUserMenuOpen(false)}>
+                                            <Link
+                                                href="/profile"
+                                                className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition"
+                                                onClick={() => setUserMenuOpen(false)}
+                                            >
                                                 👤 {t('profile')}
                                             </Link>
                                             <hr className="my-2 border-border" />
