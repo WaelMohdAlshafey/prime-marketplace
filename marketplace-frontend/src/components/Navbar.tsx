@@ -46,9 +46,14 @@ const TopBar = () => {
         return () => document.removeEventListener('mousedown', handler);
     }, []);
 
-    // ✅ Centered dropdown – works for both RTL and LTR
-    const dropdownClasses =
-        "absolute top-full mt-1 bg-white text-gray-800 rounded-lg shadow-lg py-1 z-50 min-w-[120px] max-w-[calc(100vw-2rem)] left-1/2 -translate-x-1/2";
+    // RTL detection
+    const isRTL = typeof document !== 'undefined' && document.documentElement.dir === 'rtl';
+
+    // Dropdown positioning: center under button
+    // In LTR: left-1/2 -translate-x-1/2
+    // In RTL: right-1/2 translate-x-1/2
+    const dropdownClasses = `absolute top-full mt-1 bg-white text-gray-800 rounded-lg shadow-lg py-1 z-50 min-w-[120px] max-w-[calc(100vw-2rem)] ${isRTL ? 'right-1/2 translate-x-1/2' : 'left-1/2 -translate-x-1/2'
+        }`;
 
     return (
         <div className="bg-primary-dark text-white text-[10px] sm:text-xs py-1 relative z-50">
@@ -200,9 +205,10 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
         return () => document.removeEventListener('mousedown', handler);
     }, []);
 
-    // ✅ Centered dropdown – works for both RTL and LTR
-    const dropdownClasses =
-        "absolute top-full mt-2 bg-white rounded-xl shadow-strong border border-border py-2 z-[999] min-w-[180px] max-w-[calc(100vw-2rem)] left-1/2 -translate-x-1/2 max-h-[80vh] overflow-y-auto";
+    const isRTL = typeof document !== 'undefined' && document.documentElement.dir === 'rtl';
+
+    const dropdownClasses = `absolute top-full mt-2 bg-white rounded-xl shadow-strong border border-border py-2 z-[999] min-w-[180px] max-w-[calc(100vw-2rem)] ${isRTL ? 'right-1/2 translate-x-1/2' : 'left-1/2 -translate-x-1/2'
+        } max-h-[80vh] overflow-y-auto`;
 
     const navLinks = [
         { href: '/', label: t('home') },
