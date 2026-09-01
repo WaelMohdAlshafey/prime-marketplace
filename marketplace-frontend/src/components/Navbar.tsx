@@ -24,7 +24,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import api from '@/lib/api';
 
 // ============================================================
-// TOP BAR – all items with text labels
+// TOP BAR – all items with text labels, responsive
 // ============================================================
 const TopBar = () => {
     const { t, i18n } = useTranslation('common');
@@ -46,14 +46,14 @@ const TopBar = () => {
         return () => document.removeEventListener('mousedown', handler);
     }, []);
 
-    // ✅ Centered dropdowns using translateX(-50%)
+    // Centered dropdowns using translateX
     const dropdownClasses =
         "absolute top-full mt-1 bg-white text-gray-800 rounded-lg shadow-lg py-1 z-50 min-w-[120px] max-w-[calc(100vw-2rem)] left-1/2 -translate-x-1/2";
 
     return (
         <div className="bg-primary-dark text-white text-[10px] sm:text-xs py-1 relative z-50">
             <div className="container mx-auto px-2 sm:px-4 flex items-center justify-between gap-1 sm:gap-3 flex-nowrap overflow-x-auto">
-                {/* LEFT */}
+                {/* LEFT SIDE */}
                 <div className="flex items-center gap-1 sm:gap-3 flex-shrink-0 whitespace-nowrap">
                     <button
                         onClick={toggleLanguage}
@@ -66,9 +66,9 @@ const TopBar = () => {
                     <span className="hidden xs:inline">🚚 {t('freeShipping')}</span>
                 </div>
 
-                {/* RIGHT */}
+                {/* RIGHT SIDE */}
                 <div className="flex items-center gap-1 sm:gap-3 flex-shrink-0">
-                    {/* Support */}
+                    {/* Support Dropdown */}
                     <div className="relative" ref={supportRef}>
                         <button
                             onClick={() => setSupportOpen(!supportOpen)}
@@ -105,7 +105,7 @@ const TopBar = () => {
 
                     <span className="text-white/30 hidden xs:inline">|</span>
 
-                    {/* Currency */}
+                    {/* Currency Dropdown */}
                     <div className="relative" ref={currencyRef}>
                         <button
                             onClick={() => setCurrencyOpen(!currencyOpen)}
@@ -136,7 +136,6 @@ const TopBar = () => {
 
                     <span className="text-white/30 hidden xs:inline">|</span>
 
-                    {/* Track Order */}
                     <Link href="/tracking" className="flex items-center gap-0.5 sm:gap-1 hover:text-yellow-400 transition px-1 sm:px-2 py-0.5 rounded-md hover:bg-white/10 whitespace-nowrap">
                         <TruckIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                         <span className="hidden xs:inline">{t('trackOrder')}</span>
@@ -148,7 +147,7 @@ const TopBar = () => {
 };
 
 // ============================================================
-// MAIN HEADER
+// MAIN HEADER – Logo right, hamburger left
 // ============================================================
 const MainHeader = ({ user }: { user: AuthResponse | null }) => {
     const { t, i18n } = useTranslation('common');
@@ -164,12 +163,10 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
     const [loadingCategories, setLoadingCategories] = useState(true);
 
     useEffect(() => {
-        api.get('/api/Categories')
-            .then((res) => {
-                setCategories(res.data);
-                setLoadingCategories(false);
-            })
-            .catch(() => setLoadingCategories(false));
+        api.get('/api/Categories').then(res => {
+            setCategories(res.data);
+            setLoadingCategories(false);
+        }).catch(() => setLoadingCategories(false));
     }, []);
 
     useEffect(() => {
@@ -186,17 +183,14 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
     const navLinks = [
         { href: '/', label: t('home') },
         { href: '/products', label: t('products') },
-        ...categories.map((cat) => ({
-            href: `/${cat.toLowerCase().replace(/\s+/g, '-')}`,
-            label: cat,
-        })),
+        ...categories.map(cat => ({ href: `/${cat.toLowerCase().replace(/\s+/g, '-')}`, label: cat })),
         { href: '/stores', label: t('stores') },
         { href: '/offers', label: t('offers') },
         { href: '/contact', label: t('contact') },
         { href: '/help', label: t('help') },
     ];
 
-    // ✅ Centered dropdowns for main and user menus
+    // Centered dropdowns for both menus
     const dropdownClasses =
         "absolute top-full mt-2 bg-white rounded-xl shadow-strong border border-border py-2 z-[999] min-w-[180px] max-w-[calc(100vw-2rem)] left-1/2 -translate-x-1/2";
 
@@ -363,7 +357,6 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
 export default function Navbar() {
     const { user, isLoading } = useAuth();
 
-    // During static generation (server), return a placeholder
     if (typeof window === 'undefined') {
         return <div className="bg-surface shadow-md py-4 text-center text-text-muted animate-pulse">Loading...</div>;
     }
