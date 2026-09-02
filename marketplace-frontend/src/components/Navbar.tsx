@@ -23,9 +23,6 @@ import { AuthResponse } from '@/types';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '@/lib/api';
 
-// ============================================================
-// SINGLE HEADER – ONE BAR with ALL menus
-// ============================================================
 const Navbar = () => {
     const { t, i18n } = useTranslation('common');
     const { user, isLoading, logout } = useAuth();
@@ -55,7 +52,6 @@ const Navbar = () => {
             .catch(() => setLoadingCategories(false));
     }, []);
 
-    // Close dropdowns on outside click
     useEffect(() => {
         const handler = (e: MouseEvent) => {
             if (mainMenuRef.current && !mainMenuRef.current.contains(e.target as Node)) setMainMenuOpen(false);
@@ -73,7 +69,6 @@ const Navbar = () => {
 
     const isRTL = typeof document !== 'undefined' && document.documentElement.dir === 'rtl';
 
-    // ✅ Highest z-index – dropdowns open ON TOP of everything
     const dropdownClasses = `absolute top-full mt-1 bg-white text-gray-800 rounded-lg shadow-lg py-1 z-[9999] min-w-[120px] max-w-[calc(100vw-2rem)] ${isRTL ? 'right-1/2 translate-x-1/2' : 'left-1/2 -translate-x-1/2'
         }`;
 
@@ -100,7 +95,7 @@ const Navbar = () => {
                 <div className="container mx-auto px-2 sm:px-4 flex items-center justify-between gap-1 sm:gap-2 py-1.5 sm:py-2">
 
                     {/* ============================================
-                        LEFT SIDE – Hamburger + ALL Menus
+                        LEFT SIDE – ALL MENUS WITH LABELS
                         ============================================ */}
                     <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0 flex-wrap">
 
@@ -115,14 +110,14 @@ const Navbar = () => {
 
                         <span className="text-gray-300 hidden xs:inline">|</span>
 
-                        {/* 2. Support Dropdown */}
+                        {/* 2. Support – with label */}
                         <div className="relative" ref={supportRef}>
                             <button
                                 onClick={() => setSupportOpen(!supportOpen)}
                                 className="flex items-center gap-0.5 sm:gap-1 hover:text-primary transition px-1 py-0.5 rounded hover:bg-primary/10 text-[10px] sm:text-xs whitespace-nowrap"
                             >
                                 <LifebuoyIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                                <span className="hidden xs:inline">{t('support')}</span>
+                                <span>{t('support')}</span>
                                 <ChevronDownIcon className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                             </button>
                             <AnimatePresence>
@@ -152,14 +147,14 @@ const Navbar = () => {
 
                         <span className="text-gray-300 hidden xs:inline">|</span>
 
-                        {/* 3. Currency Dropdown */}
+                        {/* 3. Currency – with label */}
                         <div className="relative" ref={currencyRef}>
                             <button
                                 onClick={() => setCurrencyOpen(!currencyOpen)}
                                 className="flex items-center gap-0.5 sm:gap-1 hover:text-primary transition px-1 py-0.5 rounded hover:bg-primary/10 text-[10px] sm:text-xs whitespace-nowrap"
                             >
                                 <CurrencyDollarIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                                <span className="hidden xs:inline">{t('currency')}</span>
+                                <span>{t('currency')}</span>
                                 <ChevronDownIcon className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                             </button>
                             <AnimatePresence>
@@ -179,27 +174,24 @@ const Navbar = () => {
 
                         <span className="text-gray-300 hidden xs:inline">|</span>
 
-                        {/* 4. Track Order */}
+                        {/* 4. Track Order – with label */}
                         <Link
                             href="/tracking"
                             className="flex items-center gap-0.5 sm:gap-1 hover:text-primary transition px-1 py-0.5 rounded hover:bg-primary/10 text-[10px] sm:text-xs whitespace-nowrap"
                         >
                             <TruckIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                            <span className="hidden xs:inline">{t('trackOrder')}</span>
+                            <span>{t('trackOrder')}</span>
                         </Link>
 
-                        <span className="text-gray-300 hidden xs:inline">|</span>
-
-                        {/* 5. Free Shipping (icon only on mobile, text on desktop) */}
-                        <span className="text-[10px] sm:text-xs text-gray-500 hidden sm:inline">🚚 {t('freeShipping')}</span>
+                        {/* ❌ Free shipping REMOVED – not needed */}
                     </div>
 
                     {/* ============================================
-                        RIGHT SIDE – Logo + Wishlist + Cart + User
+                        RIGHT SIDE – Logo + Icons
                         ============================================ */}
                     <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
 
-                        {/* Hamburger Menu */}
+                        {/* Hamburger */}
                         <div className="relative" ref={mainMenuRef} onClick={(e) => e.stopPropagation()}>
                             <button
                                 onClick={() => setMainMenuOpen(!mainMenuOpen)}
