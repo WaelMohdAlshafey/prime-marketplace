@@ -154,6 +154,9 @@ namespace Marketplace.Application.Services
             var productCount = await _context.Products
                 .CountAsync(p => p.VendorId == store.VendorId && p.IsActive);
 
+            // 🔍 DEBUG: Log the vendor information to see if it's being loaded
+            Console.WriteLine($"🔍 MapToDto: Store={store.Name}, VendorId={store.VendorId}, Vendor={(store.Vendor?.Username ?? "NULL")}");
+
             // ✅ This should now work because Vendor is included
             string vendorUsername = store.Vendor?.Username ?? "Unknown";
 
