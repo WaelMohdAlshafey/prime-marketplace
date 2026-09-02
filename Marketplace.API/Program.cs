@@ -14,7 +14,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 // ============================================================
-// 2. Add CORS Policy
+// 2. Add CORS Policy (official)
 // ============================================================
 builder.Services.AddCors(options =>
 {
@@ -144,17 +144,19 @@ if (app.Environment.IsDevelopment())
 }
 
 // ============================================================
-// 11. 🔥🔥🔥 CORS MIDDLEWARE – MUST BE BEFORE UseRouting() 🔥🔥🔥
+// 11. 🔥🔥🔥 MANUAL OPTIONS HANDLER – MUST BE FIRST 🔥🔥🔥
+//     This runs BEFORE any routing, authentication, etc.
 // ============================================================
 app.Use(async (context, next) =>
 {
-    // Log every request including OPTIONS
+    // Log every request for debugging
     Console.WriteLine($"🌐 {context.Request.Method} {context.Request.Path}");
 
-    // Set headers for ALL responses
+    // Always set these headers for ALL responses
     context.Response.Headers["Access-Control-Allow-Origin"] = "*";
     context.Response.Headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH";
     context.Response.Headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With, Accept, Origin";
+    context.Response.Headers["Access-Control-Max-Age"] = "86400";
 
     // Handle preflight (OPTIONS) immediately
     if (context.Request.Method == "OPTIONS")
@@ -169,17 +171,17 @@ app.Use(async (context, next) =>
 });
 
 // ============================================================
-// 12. UseRouting – NOW CORS IS ALREADY SET
+// 12. UseRouting – REQUIRED before UseCors and UseAuthorization
 // ============================================================
 app.UseRouting();
 
 // ============================================================
-// 13. UseCors (Official) – as an extra layer
+// 13. UseCors (official) – as an extra safety layer
 // ============================================================
 app.UseCors("AllowAll");
 
 // ============================================================
-// 14. Logging Middleware (after routing)
+// 14. Request Logging Middleware (helps debug)
 // ============================================================
 app.Use(async (context, next) =>
 {

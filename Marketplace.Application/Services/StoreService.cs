@@ -106,7 +106,7 @@ namespace Marketplace.Application.Services
         public async Task<PagedResult<StoreResponseDto>> GetAllStoresAsync(int page, int pageSize, bool? isActive = null)
         {
             var query = _context.Stores
-                .Include(s => s.Vendor)   // ✅ Include Vendor to avoid null reference
+                .Include(s => s.Vendor)   // ← ✅ ADD THIS LINE
                 .AsQueryable();
 
             if (isActive.HasValue)
@@ -154,7 +154,7 @@ namespace Marketplace.Application.Services
             var productCount = await _context.Products
                 .CountAsync(p => p.VendorId == store.VendorId && p.IsActive);
 
-            // ✅ Handle null Vendor gracefully
+            // ✅ This should now work because Vendor is included
             string vendorUsername = store.Vendor?.Username ?? "Unknown";
 
             return new StoreResponseDto
