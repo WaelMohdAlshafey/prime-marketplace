@@ -122,6 +122,12 @@ namespace Marketplace.Application.Services
                 .Take(pageSize)
                 .ToListAsync();
 
+            // 🔍 DEBUG: Log what the query actually returned
+            foreach (var item in results)
+            {
+                Console.WriteLine($"🔍 DEBUG: Store={item.store.Name}, VendorId={item.store.VendorId}, VendorUsername={item.vendor?.Username ?? "NULL"}");
+            }
+
             var dtos = results.Select(x => new StoreResponseDto
             {
                 Id = x.store.Id,
@@ -132,10 +138,9 @@ namespace Marketplace.Application.Services
                 VendorUsername = x.vendor?.Username ?? "Unknown",
                 IsActive = x.store.IsActive,
                 CreatedAt = x.store.CreatedAt,
-                ProductCount = 0 // Will be filled below
+                ProductCount = 0
             }).ToList();
 
-            // Count products for each store
             foreach (var dto in dtos)
             {
                 dto.ProductCount = await _context.Products
