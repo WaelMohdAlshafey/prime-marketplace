@@ -24,7 +24,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import api from '@/lib/api';
 
 // ============================================================
-// TOP BAR
+// TOP BAR – all items in one line
 // ============================================================
 const TopBar = () => {
     const { t, i18n } = useTranslation('common');
@@ -46,19 +46,14 @@ const TopBar = () => {
         return () => document.removeEventListener('mousedown', handler);
     }, []);
 
-    // RTL detection
-    const isRTL = typeof document !== 'undefined' && document.documentElement.dir === 'rtl';
-
-    // Dropdown positioning: center under button
-    // In LTR: left-1/2 -translate-x-1/2
-    // In RTL: right-1/2 translate-x-1/2
-    const dropdownClasses = `absolute top-full mt-1 bg-white text-gray-800 rounded-lg shadow-lg py-1 z-50 min-w-[120px] max-w-[calc(100vw-2rem)] ${isRTL ? 'right-1/2 translate-x-1/2' : 'left-1/2 -translate-x-1/2'
-        }`;
+    // ✅ Centered dropdown with higher z-index (100)
+    const dropdownClasses =
+        "absolute top-full mt-1 bg-white text-gray-800 rounded-lg shadow-lg py-1 z-[100] min-w-[120px] max-w-[calc(100vw-2rem)] left-1/2 -translate-x-1/2";
 
     return (
-        <div className="bg-primary-dark text-white text-[10px] sm:text-xs py-1 relative z-50">
+        <div className="bg-primary-dark text-white text-[10px] sm:text-xs py-1 relative z-40">
             <div className="container mx-auto px-2 sm:px-4 flex items-center justify-between gap-1 sm:gap-3 flex-nowrap overflow-x-auto">
-                {/* LEFT */}
+                {/* LEFT SIDE */}
                 <div className="flex items-center gap-1 sm:gap-3 flex-shrink-0 whitespace-nowrap">
                     <button
                         onClick={toggleLanguage}
@@ -71,7 +66,7 @@ const TopBar = () => {
                     <span className="hidden xs:inline">🚚 {t('freeShipping')}</span>
                 </div>
 
-                {/* RIGHT */}
+                {/* RIGHT SIDE – Support, Currency, Track Order */}
                 <div className="flex items-center gap-1 sm:gap-3 flex-shrink-0">
                     {/* Support Dropdown */}
                     <div className="relative" ref={supportRef}>
@@ -157,7 +152,7 @@ const TopBar = () => {
 
                     <span className="text-white/30 hidden xs:inline">|</span>
 
-                    {/* Track Order Link */}
+                    {/* Track Order */}
                     <Link
                         href="/tracking"
                         className="flex items-center gap-0.5 sm:gap-1 hover:text-yellow-400 transition px-1 sm:px-2 py-0.5 rounded-md hover:bg-white/10 whitespace-nowrap"
@@ -205,10 +200,9 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
         return () => document.removeEventListener('mousedown', handler);
     }, []);
 
-    const isRTL = typeof document !== 'undefined' && document.documentElement.dir === 'rtl';
-
-    const dropdownClasses = `absolute top-full mt-2 bg-white rounded-xl shadow-strong border border-border py-2 z-[999] min-w-[180px] max-w-[calc(100vw-2rem)] ${isRTL ? 'right-1/2 translate-x-1/2' : 'left-1/2 -translate-x-1/2'
-        } max-h-[80vh] overflow-y-auto`;
+    // ✅ Centered dropdown with higher z-index (100)
+    const dropdownClasses =
+        "absolute top-full mt-2 bg-white rounded-xl shadow-strong border border-border py-2 z-[100] min-w-[180px] max-w-[calc(100vw-2rem)] left-1/2 -translate-x-1/2 max-h-[80vh] overflow-y-auto";
 
     const navLinks = [
         { href: '/', label: t('home') },
@@ -226,9 +220,9 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
     return (
         <div className="navbar">
             <div className="container mx-auto px-2 sm:px-4 flex items-center justify-between gap-2 sm:gap-4 py-2">
-                {/* LEFT SIDE – Icons + menus */}
+                {/* LEFT SIDE */}
                 <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
-                    {/* Main Menu (Hamburger) */}
+                    {/* Main Menu */}
                     <div className="relative" ref={mainMenuRef} onClick={(e) => e.stopPropagation()}>
                         <button
                             onClick={() => setMainMenuOpen(!mainMenuOpen)}
@@ -260,15 +254,15 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
                         </AnimatePresence>
                     </div>
 
-                    {/* Wishlist Icon */}
-                    <button className="text-navbar-text hover:text-navbar-hover transition relative hidden sm:block">
+                    {/* Wishlist – always visible on mobile */}
+                    <button className="text-navbar-text hover:text-navbar-hover transition relative">
                         <HeartIcon className="w-5 h-5 sm:w-6 sm:h-6" />
                         <span className="absolute -top-1.5 -right-1.5 bg-secondary text-white text-[10px] font-bold w-[18px] h-[18px] rounded-full flex items-center justify-center">
                             {totalFavorites}
                         </span>
                     </button>
 
-                    {/* Cart Icon */}
+                    {/* Cart */}
                     <span ref={cartIconRef} className="relative inline-flex">
                         <Link href="/cart" className="text-navbar-text hover:text-navbar-hover transition">
                             <ShoppingCartIcon className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -290,7 +284,7 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
                         >
                             {user ? (
                                 <>
-                                    <span className="hidden sm:inline text-xs sm:text-sm font-medium">{user.username}</span>
+                                    <span className="text-xs sm:text-sm font-medium hidden sm:inline">{user.username}</span>
                                     <UserIcon className="w-5 h-5 sm:w-6 sm:h-6" />
                                 </>
                             ) : (
