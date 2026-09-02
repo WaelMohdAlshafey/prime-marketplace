@@ -24,7 +24,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import api from '@/lib/api';
 
 // ============================================================
-// TOP BAR
+// TOP BAR – All items with labels, opens ABOVE the header
 // ============================================================
 const TopBar = () => {
     const { t, i18n } = useTranslation('common');
@@ -48,36 +48,36 @@ const TopBar = () => {
 
     const isRTL = typeof document !== 'undefined' && document.documentElement.dir === 'rtl';
 
-    // ✅ Centered dropdown – works for both LTR and RTL
-    const dropdownClasses = `absolute top-full mt-1 bg-white text-gray-800 rounded-lg shadow-lg py-1 z-[100] min-w-[120px] max-w-[calc(100vw-2rem)] ${isRTL ? 'right-1/2 translate-x-1/2' : 'left-1/2 -translate-x-1/2'
+    // ✅ HIGHEST z-index – ensures dropdowns open ON TOP of everything
+    const dropdownClasses = `absolute top-full mt-1 bg-white text-gray-800 rounded-lg shadow-lg py-1 z-[9999] min-w-[120px] max-w-[calc(100vw-2rem)] ${isRTL ? 'right-1/2 translate-x-1/2' : 'left-1/2 -translate-x-1/2'
         }`;
 
     return (
-        <div className="bg-primary-dark text-white text-[10px] sm:text-xs py-1 relative z-40">
+        <div className="bg-primary-dark text-white text-[10px] sm:text-xs py-1 relative z-[100]">
             <div className="container mx-auto px-2 sm:px-4 flex items-center justify-between gap-1 sm:gap-3 flex-nowrap overflow-x-auto">
-                {/* LEFT SIDE – Language + Free Shipping */}
+                {/* LEFT SIDE – Language with label */}
                 <div className="flex items-center gap-1 sm:gap-3 flex-shrink-0 whitespace-nowrap">
                     <button
                         onClick={toggleLanguage}
                         className="flex items-center gap-0.5 sm:gap-1 hover:text-yellow-400 transition px-1 sm:px-2 py-0.5 rounded-md hover:bg-white/10"
                     >
                         <GlobeAltIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                        <span>{i18n.language === 'ar' ? 'العربية' : 'English'}</span>
+                        <span className="text-[9px] sm:text-xs">{i18n.language === 'ar' ? 'العربية' : 'English'}</span>
                     </button>
                     <span className="text-white/30 hidden xs:inline">|</span>
-                    <span className="hidden xs:inline">🚚 {t('freeShipping')}</span>
+                    <span className="hidden xs:inline text-[9px] sm:text-xs">🚚 {t('freeShipping')}</span>
                 </div>
 
-                {/* RIGHT SIDE – Support, Currency, Track Order */}
+                {/* RIGHT SIDE – Support, Currency, Track Order – ALL WITH LABELS */}
                 <div className="flex items-center gap-1 sm:gap-3 flex-shrink-0">
-                    {/* Support Dropdown */}
+                    {/* Support Dropdown – with label */}
                     <div className="relative" ref={supportRef}>
                         <button
                             onClick={() => setSupportOpen(!supportOpen)}
                             className="flex items-center gap-0.5 sm:gap-1 hover:text-yellow-400 transition px-1 sm:px-2 py-0.5 rounded-md hover:bg-white/10 whitespace-nowrap"
                         >
                             <LifebuoyIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                            <span className="hidden xs:inline">{t('support')}</span>
+                            <span className="text-[9px] sm:text-xs">{t('support')}</span>
                             <ChevronDownIcon className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                         </button>
                         <AnimatePresence>
@@ -123,14 +123,14 @@ const TopBar = () => {
 
                     <span className="text-white/30 hidden xs:inline">|</span>
 
-                    {/* Currency Dropdown */}
+                    {/* Currency Dropdown – with label */}
                     <div className="relative" ref={currencyRef}>
                         <button
                             onClick={() => setCurrencyOpen(!currencyOpen)}
                             className="flex items-center gap-0.5 sm:gap-1 hover:text-yellow-400 transition px-1 sm:px-2 py-0.5 rounded-md hover:bg-white/10 whitespace-nowrap"
                         >
                             <CurrencyDollarIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                            <span className="hidden xs:inline">{t('currency')}</span>
+                            <span className="text-[9px] sm:text-xs">{t('currency')}</span>
                             <ChevronDownIcon className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                         </button>
                         <AnimatePresence>
@@ -154,13 +154,13 @@ const TopBar = () => {
 
                     <span className="text-white/30 hidden xs:inline">|</span>
 
-                    {/* Track Order Link */}
+                    {/* Track Order – with label */}
                     <Link
                         href="/tracking"
                         className="flex items-center gap-0.5 sm:gap-1 hover:text-yellow-400 transition px-1 sm:px-2 py-0.5 rounded-md hover:bg-white/10 whitespace-nowrap"
                     >
                         <TruckIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                        <span className="hidden xs:inline">{t('trackOrder')}</span>
+                        <span className="text-[9px] sm:text-xs">{t('trackOrder')}</span>
                     </Link>
                 </div>
             </div>
@@ -169,7 +169,7 @@ const TopBar = () => {
 };
 
 // ============================================================
-// MAIN HEADER
+// MAIN HEADER – UNCHANGED (preserved exactly as you had it)
 // ============================================================
 const MainHeader = ({ user }: { user: AuthResponse | null }) => {
     const { t, i18n } = useTranslation('common');
@@ -204,7 +204,6 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
 
     const isRTL = typeof document !== 'undefined' && document.documentElement.dir === 'rtl';
 
-    // ✅ Centered dropdown – works for both LTR and RTL
     const dropdownClasses = `absolute top-full mt-2 bg-white rounded-xl shadow-strong border border-border py-2 z-[100] min-w-[180px] max-w-[calc(100vw-2rem)] ${isRTL ? 'right-1/2 translate-x-1/2' : 'left-1/2 -translate-x-1/2'
         } max-h-[80vh] overflow-y-auto`;
 
@@ -224,9 +223,7 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
     return (
         <div className="navbar">
             <div className="container mx-auto px-2 sm:px-4 flex items-center justify-between gap-2 sm:gap-4 py-2">
-                {/* LEFT SIDE – Icons + menus */}
                 <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
-                    {/* Main Menu (Hamburger) */}
                     <div className="relative" ref={mainMenuRef} onClick={(e) => e.stopPropagation()}>
                         <button
                             onClick={() => setMainMenuOpen(!mainMenuOpen)}
@@ -258,7 +255,6 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
                         </AnimatePresence>
                     </div>
 
-                    {/* Wishlist Icon – always visible on mobile */}
                     <button className="text-navbar-text hover:text-navbar-hover transition relative">
                         <HeartIcon className="w-5 h-5 sm:w-6 sm:h-6" />
                         <span className="absolute -top-1.5 -right-1.5 bg-secondary text-white text-[10px] font-bold w-[18px] h-[18px] rounded-full flex items-center justify-center">
@@ -266,7 +262,6 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
                         </span>
                     </button>
 
-                    {/* Cart Icon */}
                     <span ref={cartIconRef} className="relative inline-flex">
                         <Link href="/cart" className="text-navbar-text hover:text-navbar-hover transition">
                             <ShoppingCartIcon className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -279,7 +274,6 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
                         </Link>
                     </span>
 
-                    {/* User Menu – username visible on mobile */}
                     <div className="relative" ref={userMenuRef} onClick={(e) => e.stopPropagation()}>
                         <button
                             onClick={() => setUserMenuOpen(!userMenuOpen)}
@@ -422,7 +416,6 @@ const MainHeader = ({ user }: { user: AuthResponse | null }) => {
                     </div>
                 </div>
 
-                {/* RIGHT SIDE – Logo */}
                 <div className="flex-shrink-0">
                     <Logo />
                 </div>
