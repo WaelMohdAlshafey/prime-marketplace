@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using Marketplace.Application.DTOs;
 using Marketplace.Application.Interfaces;
 using Marketplace.Domain.Entities;
@@ -101,50 +102,67 @@ namespace Marketplace.Application.Services
         }
 
         // ============================================================
-        // GET ALL STORES (with optional active filter)
+        // GET ALL STORES (with optional active filter) – RAW SQL
         // ============================================================
         public async Task<PagedResult<StoreResponseDto>> GetAllStoresAsync(int page, int pageSize, bool? isActive = null)
         {
-            // ✅ Manual join – guaranteed to load the vendor name
-            var query = from store in _context.Stores
-                        join user in _context.Users on store.VendorId equals user.Id into vendorGroup
-                        from vendor in vendorGroup.DefaultIfEmpty()
-                        select new { store, vendor };
+            // ✅ Raw SQL query – guaranteed to work
+            var sql = @"
+                SELECT 
+                    s.""Id"", 
+                    s.""Name"", 
+                    s.""LogoUrl"", 
+                    s.""Description"", 
+                    s.""VendorId"", 
+                    s.""IsActive"", 
+                    s.""CreatedAt"",
+                    u.""Username"" as ""VendorUsername""
+                FROM ""Stores"" s
+                LEFT JOIN ""Users"" u ON s.""VendorId"" = u.""Id""
+                WHERE (@p_isActive IS NULL OR s.""IsActive"" = @p_isActive)
+                ORDER BY s.""Name""
+                OFFSET @p_offset ROWS FETCH NEXT @p_limit ROWS ONLY;
+            ";
 
-            if (isActive.HasValue)
-                query = query.Where(x => x.store.IsActive == isActive.Value);
+            // Count query
+            var countSql = @"
+                SELECT COUNT(*)
+                FROM ""Stores"" s
+                WHERE (@p_isActive IS NULL OR s.""IsActive"" = @p_isActive);
+            ";
 
-            var totalCount = await query.CountAsync();
+            var isActiveParam = new NpgsqlParameter("p_isActive", isActive ?? (object)DBNull.Value);
+            var offsetParam = new NpgsqlParameter("p_offset", (page - 1) * pageSize);
+            var limitParam = new NpgsqlParameter("p_limit", pageSize);
 
-            var results = await query
-                .OrderBy(x => x.store.Name)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
+            // Execute count query
+            var totalCount = await _context.Database
+                .ExecuteSqlRawAsync(countSql, isActiveParam);
+
+            // Execute main query
+            var results = await _context.Database
+                .SqlQueryRaw<StoreRawDto>(sql, isActiveParam, offsetParam, limitParam)
                 .ToListAsync();
 
-            // 🔍 DEBUG: Log what the query actually returned
-            foreach (var item in results)
+            // Map to DTOs and count products
+            var dtos = new List<StoreResponseDto>();
+            foreach (var raw in results)
             {
-                Console.WriteLine($"🔍 DEBUG: Store={item.store.Name}, VendorId={item.store.VendorId}, VendorUsername={item.vendor?.Username ?? "NULL"}");
-            }
+                var productCount = await _context.Products
+                    .CountAsync(p => p.VendorId == raw.VendorId && p.IsActive);
 
-            var dtos = results.Select(x => new StoreResponseDto
-            {
-                Id = x.store.Id,
-                Name = x.store.Name,
-                LogoUrl = x.store.LogoUrl,
-                Description = x.store.Description,
-                VendorId = x.store.VendorId,
-                VendorUsername = x.vendor?.Username ?? "Unknown",
-                IsActive = x.store.IsActive,
-                CreatedAt = x.store.CreatedAt,
-                ProductCount = 0
-            }).ToList();
-
-            foreach (var dto in dtos)
-            {
-                dto.ProductCount = await _context.Products
-                    .CountAsync(p => p.VendorId == dto.VendorId && p.IsActive);
+                dtos.Add(new StoreResponseDto
+                {
+                    Id = raw.Id,
+                    Name = raw.Name,
+                    LogoUrl = raw.LogoUrl,
+                    Description = raw.Description,
+                    VendorId = raw.VendorId,
+                    VendorUsername = raw.VendorUsername ?? "Unknown",
+                    IsActive = raw.IsActive,
+                    CreatedAt = raw.CreatedAt,
+                    ProductCount = productCount
+                });
             }
 
             return new PagedResult<StoreResponseDto>
@@ -155,6 +173,7 @@ namespace Marketplace.Application.Services
                 PageSize = pageSize
             };
         }
+
         // ============================================================
         // GET PRODUCTS OF A STORE (using the store's vendor)
         // ============================================================
@@ -178,7 +197,6 @@ namespace Marketplace.Application.Services
             // 🔍 DEBUG: Log the vendor information to see if it's being loaded
             Console.WriteLine($"🔍 MapToDto: Store={store.Name}, VendorId={store.VendorId}, Vendor={(store.Vendor?.Username ?? "NULL")}");
 
-            // ✅ This should now work because Vendor is included
             string vendorUsername = store.Vendor?.Username ?? "Unknown";
 
             return new StoreResponseDto
@@ -194,5 +212,20 @@ namespace Marketplace.Application.Services
                 ProductCount = productCount
             };
         }
+    }
+
+    // ============================================================
+    // DTO FOR RAW SQL RESULTS
+    // ============================================================
+    public class StoreRawDto
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string? LogoUrl { get; set; }
+        public string? Description { get; set; }
+        public int VendorId { get; set; }
+        public bool IsActive { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public string? VendorUsername { get; set; }
     }
 }
