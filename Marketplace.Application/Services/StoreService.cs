@@ -105,24 +105,41 @@ namespace Marketplace.Application.Services
         // ============================================================
         public async Task<PagedResult<StoreResponseDto>> GetAllStoresAsync(int page, int pageSize, bool? isActive = null)
         {
-            var query = _context.Stores
-                .Include(s => s.Vendor)   // ← ✅ ADD THIS LINE
-                .AsQueryable();
+            // ✅ Manual join – guaranteed to load the vendor name
+            var query = from store in _context.Stores
+                        join user in _context.Users on store.VendorId equals user.Id into vendorGroup
+                        from vendor in vendorGroup.DefaultIfEmpty()
+                        select new { store, vendor };
 
             if (isActive.HasValue)
-                query = query.Where(s => s.IsActive == isActive.Value);
+                query = query.Where(x => x.store.IsActive == isActive.Value);
 
             var totalCount = await query.CountAsync();
-            var stores = await query
-                .OrderBy(s => s.Name)
+
+            var results = await query
+                .OrderBy(x => x.store.Name)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
 
-            var dtos = new List<StoreResponseDto>();
-            foreach (var store in stores)
+            var dtos = results.Select(x => new StoreResponseDto
             {
-                dtos.Add(await MapToDto(store));
+                Id = x.store.Id,
+                Name = x.store.Name,
+                LogoUrl = x.store.LogoUrl,
+                Description = x.store.Description,
+                VendorId = x.store.VendorId,
+                VendorUsername = x.vendor?.Username ?? "Unknown",
+                IsActive = x.store.IsActive,
+                CreatedAt = x.store.CreatedAt,
+                ProductCount = 0 // Will be filled below
+            }).ToList();
+
+            // Count products for each store
+            foreach (var dto in dtos)
+            {
+                dto.ProductCount = await _context.Products
+                    .CountAsync(p => p.VendorId == dto.VendorId && p.IsActive);
             }
 
             return new PagedResult<StoreResponseDto>
@@ -133,7 +150,6 @@ namespace Marketplace.Application.Services
                 PageSize = pageSize
             };
         }
-
         // ============================================================
         // GET PRODUCTS OF A STORE (using the store's vendor)
         // ============================================================
