@@ -4,22 +4,22 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import api from '@/lib/api';
-import PerfumeIcon from '@/components/icons/PerfumeIcon';
+import PerfumeIcon from '@/components/icons/PerfumeIcon';  // ✅ Import the custom icon
 
-// ✅ Updated category icons - using React components for fashion (Perfume)
+// ✅ Category icons - using PerfumeIcon for fashion/perfumes
 const categoryIcons = {
     software: '💻',
     'hair-care': '💇',
     'skin-care': '🧴',
-    fashion: <PerfumeIcon className="w-6 h-6 text-rose-500" />,
-    perfumes: <PerfumeIcon className="w-6 h-6 text-rose-500" />,
+    fashion: <PerfumeIcon className="w-6 h-6 text-rose-500" />,   // ✅ Custom perfume icon
+    perfumes: <PerfumeIcon className="w-6 h-6 text-rose-500" />,   // ✅ Custom perfume icon
     accessories: '💎',
     electronics: '📱',
     supplements: '💊',
     home: '🏠',
 };
 
-// ✅ Updated category colors
+// ✅ Category colors
 const categoryColors = {
     software: 'bg-indigo-50 text-indigo-600',
     'hair-care': 'bg-pink-50 text-pink-600',
@@ -58,21 +58,7 @@ const categoryNameMapAr = {
     home: 'المنزل',
 };
 
-// ✅ Category emojis - fallback
-const categoryEmojis = {
-    software: '💻',
-    'hair-care': '💇',
-    'skin-care': '🧴',
-    fashion: '🌸',
-    perfumes: '🌸',
-    accessories: '💎',
-    electronics: '📱',
-    supplements: '💊',
-    home: '🏠',
-};
-
 const normalizeCategory = (cat) => {
-    // Special handling for fashion/perfumes
     if (cat === 'Fashion' || cat === 'fashion') {
         return 'perfumes';
     }
