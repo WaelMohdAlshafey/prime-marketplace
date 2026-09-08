@@ -25,9 +25,6 @@ namespace Marketplace.API.Controllers
             _context = context;
         }
 
-        // ============================================================
-        // HELPER: Check if user is Client/Customer
-        // ============================================================
         private bool IsClientRole()
         {
             var role = User.FindFirst(ClaimTypes.Role)?.Value;
@@ -35,9 +32,9 @@ namespace Marketplace.API.Controllers
         }
 
         // ============================================================
-        // PUBLIC – Get all stores
-        // ✅ Clients see ONLY public stores (IsPublic = true)
-        // ✅ Admin/Vendor/Employee see ALL stores
+        // GET: api/stores
+        // Clients see ONLY public stores (Pharmacy & Library)
+        // Admin/Vendor/Employee see ALL stores
         // ============================================================
         [HttpGet]
         public async Task<IActionResult> GetStores([FromQuery] int page = 1, [FromQuery] int pageSize = 20)
@@ -49,7 +46,6 @@ namespace Marketplace.API.Controllers
                 var query = _context.Stores
                     .Where(s => s.IsActive);
 
-                // ✅ If Client, show ONLY public stores
                 if (isClient)
                 {
                     query = query.Where(s => s.IsPublic == true);
@@ -98,8 +94,7 @@ namespace Marketplace.API.Controllers
         }
 
         // ============================================================
-        // PUBLIC – Get a single store by ID
-        // ✅ Clients can only see public stores
+        // GET: api/stores/{id}
         // ============================================================
         [HttpGet("{id}")]
         public async Task<IActionResult> GetStore(int id)
@@ -111,7 +106,6 @@ namespace Marketplace.API.Controllers
                 var query = _context.Stores
                     .Where(s => s.Id == id && s.IsActive);
 
-                // ✅ If Client, only allow public stores
                 if (isClient)
                 {
                     query = query.Where(s => s.IsPublic == true);
@@ -149,8 +143,7 @@ namespace Marketplace.API.Controllers
         }
 
         // ============================================================
-        // PUBLIC – Get products of a store
-        // ✅ Clients can only see products from public stores
+        // GET: api/stores/{id}/products
         // ============================================================
         [HttpGet("{id}/products")]
         public async Task<IActionResult> GetStoreProducts(int id, [FromQuery] int page = 1, [FromQuery] int pageSize = 20)
@@ -162,7 +155,6 @@ namespace Marketplace.API.Controllers
                 var storeQuery = _context.Stores
                     .Where(s => s.Id == id && s.IsActive);
 
-                // ✅ If Client, only allow public stores
                 if (isClient)
                 {
                     storeQuery = storeQuery.Where(s => s.IsPublic == true);
@@ -184,7 +176,8 @@ namespace Marketplace.API.Controllers
         }
 
         // ============================================================
-        // ADMIN ONLY – Create a store
+        // POST: api/stores - Admin only
+        // ✅ Admin can set IsPublic checkbox
         // ============================================================
         [HttpPost]
         [Authorize(Roles = "Admin")]
@@ -222,7 +215,8 @@ namespace Marketplace.API.Controllers
         }
 
         // ============================================================
-        // ADMIN ONLY – Update a store
+        // PUT: api/stores/{id} - Admin only
+        // ✅ Admin can update IsPublic checkbox
         // ============================================================
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
@@ -260,7 +254,7 @@ namespace Marketplace.API.Controllers
         }
 
         // ============================================================
-        // ADMIN ONLY – Delete a store (soft delete)
+        // DELETE: api/stores/{id} - Admin only
         // ============================================================
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]

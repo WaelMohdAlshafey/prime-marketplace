@@ -21,9 +21,6 @@ namespace Marketplace.Application.Services
             _productService = productService;
         }
 
-        // ============================================================
-        // CREATE STORE – accepts optional logoUrl from uploaded file
-        // ============================================================
         public async Task<StoreResponseDto> CreateStoreAsync(StoreCreateDto dto, string? logoUrl = null)
         {
             var vendor = await _context.Users.FindAsync(dto.VendorId);
@@ -42,7 +39,7 @@ namespace Marketplace.Application.Services
                 VendorId = dto.VendorId,
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow,
-                IsPublic = dto.IsPublic
+                IsPublic = dto.IsPublic  // ✅ Admin decides
             };
 
             _context.Stores.Add(store);
@@ -51,9 +48,6 @@ namespace Marketplace.Application.Services
             return await MapToDto(store);
         }
 
-        // ============================================================
-        // UPDATE STORE – accepts optional logoUrl from uploaded file
-        // ============================================================
         public async Task<StoreResponseDto> UpdateStoreAsync(int storeId, StoreUpdateDto dto, string? logoUrl = null)
         {
             var store = await _context.Stores.FindAsync(storeId);
@@ -63,7 +57,7 @@ namespace Marketplace.Application.Services
             store.Name = dto.Name;
             store.Description = dto.Description;
             store.IsActive = dto.IsActive;
-            store.IsPublic = dto.IsPublic;
+            store.IsPublic = dto.IsPublic;  // ✅ Admin can update
 
             if (!string.IsNullOrEmpty(logoUrl))
                 store.LogoUrl = logoUrl;
@@ -75,9 +69,6 @@ namespace Marketplace.Application.Services
             return await MapToDto(store);
         }
 
-        // ============================================================
-        // SOFT DELETE STORE
-        // ============================================================
         public async Task DeleteStoreAsync(int storeId)
         {
             var store = await _context.Stores.FindAsync(storeId);
@@ -88,9 +79,6 @@ namespace Marketplace.Application.Services
             await _context.SaveChangesAsync();
         }
 
-        // ============================================================
-        // GET STORE BY ID
-        // ============================================================
         public async Task<StoreResponseDto> GetStoreByIdAsync(int storeId)
         {
             var store = await _context.Stores
@@ -103,12 +91,8 @@ namespace Marketplace.Application.Services
             return await MapToDto(store);
         }
 
-        // ============================================================
-        // GET ALL STORES (with optional active filter) – RAW SQL
-        // ============================================================
         public async Task<PagedResult<StoreResponseDto>> GetAllStoresAsync(int page, int pageSize, bool? isActive = null)
         {
-            // ✅ Raw SQL query – includes IsPublic column
             var sql = @"
                 SELECT 
                     s.""Id"", 
@@ -127,7 +111,6 @@ namespace Marketplace.Application.Services
                 OFFSET @p_offset ROWS FETCH NEXT @p_limit ROWS ONLY;
             ";
 
-            // Count query
             var countSql = @"
                 SELECT COUNT(*)
                 FROM ""Stores"" s
@@ -138,16 +121,13 @@ namespace Marketplace.Application.Services
             var offsetParam = new NpgsqlParameter("p_offset", (page - 1) * pageSize);
             var limitParam = new NpgsqlParameter("p_limit", pageSize);
 
-            // Execute count query
             var totalCount = await _context.Database
                 .ExecuteSqlRawAsync(countSql, isActiveParam);
 
-            // Execute main query
             var results = await _context.Database
                 .SqlQueryRaw<StoreRawDto>(sql, isActiveParam, offsetParam, limitParam)
                 .ToListAsync();
 
-            // Map to DTOs and count products
             var dtos = new List<StoreResponseDto>();
             foreach (var raw in results)
             {
@@ -178,9 +158,6 @@ namespace Marketplace.Application.Services
             };
         }
 
-        // ============================================================
-        // GET PRODUCTS OF A STORE (using the store's vendor)
-        // ============================================================
         public async Task<PagedResult<ProductDto>> GetStoreProductsAsync(int storeId, int page, int pageSize)
         {
             var store = await _context.Stores.FindAsync(storeId);
@@ -190,9 +167,6 @@ namespace Marketplace.Application.Services
             return await _productService.GetVendorProductsAsync(store.VendorId, page, pageSize);
         }
 
-        // ============================================================
-        // HELPER: Map Store entity to StoreResponseDto
-        // ============================================================
         private async Task<StoreResponseDto> MapToDto(Store store)
         {
             var productCount = await _context.Products
@@ -216,9 +190,6 @@ namespace Marketplace.Application.Services
         }
     }
 
-    // ============================================================
-    // DTO FOR RAW SQL RESULTS
-    // ============================================================
     public class StoreRawDto
     {
         public int Id { get; set; }

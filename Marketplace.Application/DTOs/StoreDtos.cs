@@ -8,7 +8,7 @@ namespace Marketplace.Application.DTOs
         public string? LogoUrl { get; set; }
         public string? Description { get; set; }
         public int VendorId { get; set; }
-        public bool IsPublic { get; set; } = false;
+        public bool IsPublic { get; set; } = false;  // ✅ NEW - Default is private
     }
 
     public class StoreUpdateDto
@@ -17,7 +17,7 @@ namespace Marketplace.Application.DTOs
         public string? LogoUrl { get; set; }
         public string? Description { get; set; }
         public bool IsActive { get; set; }
-        public bool IsPublic { get; set; } = false;
+        public bool IsPublic { get; set; } = false;  // ✅ NEW
     }
 
     public class StoreResponseDto
@@ -31,6 +31,6 @@ namespace Marketplace.Application.DTOs
         public bool IsActive { get; set; }
         public DateTime CreatedAt { get; set; }
         public int ProductCount { get; set; }
-        public bool IsPublic { get; set; } = false;
+        public bool IsPublic { get; set; } = false;  // ✅ NEW
     }
 }

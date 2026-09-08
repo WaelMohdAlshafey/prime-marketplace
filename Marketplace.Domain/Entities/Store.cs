@@ -11,7 +11,9 @@ namespace Marketplace.Domain.Entities
         public int VendorId { get; set; }
         public bool IsActive { get; set; } = true;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public bool IsPublic { get; set; } = false;  // ✅ NEW
+
+        // ✅ NEW: Public stores are visible to all users including Clients
+        public bool IsPublic { get; set; } = false;
 
         public virtual User? Vendor { get; set; }
     }
