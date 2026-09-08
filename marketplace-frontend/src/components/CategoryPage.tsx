@@ -9,14 +9,15 @@ import { Product, PagedResult } from '@/types';
 import ProductCard from '@/components/ProductCard';
 import FilterSidebar from '@/components/Filters/FilterSidebar';
 import { Sparkles } from 'lucide-react';
+import PerfumeIcon from '@/components/icons/PerfumeIcon';
 
 // ✅ Category mapping - maps URL slug to database category name
 const categoryNameMap = {
     software: 'Software',
     'hair-care': 'Hair Care',
     'skin-care': 'Skin Care',
-    fashion: 'Perfumes',        // ✅ Maps /fashion to Perfumes
-    perfumes: 'Perfumes',        // ✅ Maps /perfumes to Perfumes
+    fashion: 'Perfumes',
+    perfumes: 'Perfumes',
     accessories: 'Accessories',
     electronics: 'Electronics',
     supplements: 'Supplements',
@@ -28,21 +29,21 @@ const categoryNameMapAr = {
     software: 'برامج',
     'hair-care': 'العناية بالشعر',
     'skin-care': 'العناية بالبشرة',
-    fashion: 'عطور',            // ✅ Arabic for /fashion
-    perfumes: 'عطور',            // ✅ Arabic for /perfumes
+    fashion: 'عطور',
+    perfumes: 'عطور',
     accessories: 'إكسسوارات',
     electronics: 'إلكترونيات',
     supplements: 'مكملات غذائية',
     home: 'المنزل',
 };
 
-// ✅ Category emojis
-const categoryEmojis = {
+// ✅ Category icons
+const categoryIcons = {
     software: '💻',
     'hair-care': '💇',
     'skin-care': '🧴',
-    fashion: '🌸',              // ✅ Flower - elegant
-    perfumes: '🌸',
+    fashion: <PerfumeIcon className="w-16 h-16 text-primary" />,
+    perfumes: <PerfumeIcon className="w-16 h-16 text-primary" />,
     accessories: '💎',
     electronics: '📱',
     supplements: '💊',
@@ -57,7 +58,6 @@ const getCategoryDisplayName = (slug, lang) => {
 };
 
 const getCategoryNameForApi = (slug) => {
-    // If the slug is 'fashion' or 'perfumes', use 'Perfumes' for the API
     if (slug === 'fashion' || slug === 'perfumes') {
         return 'Perfumes';
     }
@@ -74,7 +74,7 @@ export default function CategoryPage({ category }) {
 
     const normalizedCategory = category.toLowerCase();
     const displayName = getCategoryDisplayName(normalizedCategory, i18n.language || 'en');
-    const emoji = categoryEmojis[normalizedCategory] || '📂';
+    const icon = categoryIcons[normalizedCategory] || '📂';
     const apiCategoryName = getCategoryNameForApi(normalizedCategory);
 
     const fetchProducts = async (filterOverrides) => {
@@ -92,7 +92,6 @@ export default function CategoryPage({ category }) {
                 if (finalFilters.rating !== undefined) params.append('rating', finalFilters.rating.toString());
                 url = `/api/Products/filter?${params.toString()}&page=1&pageSize=100`;
             } else {
-                // ✅ Use the mapped database category name
                 url = `/api/Products/category/${encodeURIComponent(apiCategoryName)}?page=1&pageSize=100`;
             }
 
@@ -122,7 +121,6 @@ export default function CategoryPage({ category }) {
         fetchProducts({});
     };
 
-    // ✅ Check if category is valid
     const isValidCategory = categoryNameMap[normalizedCategory] || categoryNameMapAr[normalizedCategory];
     if (!isValidCategory) {
         return (
@@ -144,7 +142,9 @@ export default function CategoryPage({ category }) {
             {/* Category Hero */}
             <section className="bg-gradient-to-br from-primary-bg to-background py-12 md:py-16">
                 <div className="container mx-auto px-4 text-center">
-                    <div className="text-6xl md:text-7xl mb-4">{emoji}</div>
+                    <div className="text-6xl md:text-7xl mb-4 flex justify-center">
+                        {icon}
+                    </div>
                     <h1 className="text-3xl md:text-5xl font-bold text-text">{displayName}</h1>
                     <p className="text-text-muted mt-3 text-lg">
                         {t('categories.discover', { category: displayName })}

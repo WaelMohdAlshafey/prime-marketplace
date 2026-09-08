@@ -23,15 +23,30 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '@/lib/api';
 
-// ✅ Category display name mapping
+// ✅ Full category name mapping - English
 const categoryDisplayNames: Record<string, string> = {
     'Fashion': 'Perfumes',
     'fashion': 'Perfumes',
+    'Hair Care': 'Hair Care',
+    'Skin Care': 'Skin Care',
+    'Accessories': 'Accessories',
+    'Electronics': 'Electronics',
+    'Supplements': 'Supplements',
+    'Home': 'Home',
+    'Software': 'Software',
 };
 
+// ✅ Full category name mapping - Arabic
 const categoryDisplayNamesAr: Record<string, string> = {
     'Fashion': 'عطور',
     'fashion': 'عطور',
+    'Hair Care': 'العناية بالشعر',
+    'Skin Care': 'العناية بالبشرة',
+    'Accessories': 'إكسسوارات',
+    'Electronics': 'إلكترونيات',
+    'Supplements': 'مكملات غذائية',
+    'Home': 'المنزل',
+    'Software': 'برامج',
 };
 
 const normalizeCategory = (cat) => {
@@ -39,6 +54,13 @@ const normalizeCategory = (cat) => {
         return 'perfumes';
     }
     return cat.toLowerCase().replace(/\s+/g, '-');
+};
+
+const getCategoryDisplayName = (cat, lang) => {
+    if (lang === 'ar') {
+        return categoryDisplayNamesAr[cat] || cat;
+    }
+    return categoryDisplayNames[cat] || cat;
 };
 
 const Navbar = () => {
@@ -103,16 +125,8 @@ const Navbar = () => {
         { href: '/', label: t('home') },
         { href: '/products', label: t('products') },
         ...categories.map((cat) => {
-            // ✅ Apply the mapping
-            let displayName = cat;
-            let slug = normalizeCategory(cat);
-
-            if (i18n.language === 'ar') {
-                displayName = categoryDisplayNamesAr[cat] || cat;
-            } else {
-                displayName = categoryDisplayNames[cat] || cat;
-            }
-
+            const slug = normalizeCategory(cat);
+            const displayName = getCategoryDisplayName(cat, i18n.language || 'en');
             return {
                 href: `/${slug}`,
                 label: displayName,

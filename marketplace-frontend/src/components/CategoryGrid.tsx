@@ -4,15 +4,15 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import api from '@/lib/api';
-import PerfumeIcon from '@/components/icons/PerfumeIcon';  // ✅ Import the custom icon
+import PerfumeIcon from '@/components/icons/PerfumeIcon';
 
 // ✅ Category icons - using PerfumeIcon for fashion/perfumes
 const categoryIcons = {
     software: '💻',
     'hair-care': '💇',
     'skin-care': '🧴',
-    fashion: <PerfumeIcon className="w-6 h-6 text-rose-500" />,   // ✅ Custom perfume icon
-    perfumes: <PerfumeIcon className="w-6 h-6 text-rose-500" />,   // ✅ Custom perfume icon
+    fashion: <PerfumeIcon className="w-6 h-6 text-rose-500" />,
+    perfumes: <PerfumeIcon className="w-6 h-6 text-rose-500" />,
     accessories: '💎',
     electronics: '📱',
     supplements: '💊',
@@ -56,6 +56,19 @@ const categoryNameMapAr = {
     electronics: 'إلكترونيات',
     supplements: 'مكملات غذائية',
     home: 'المنزل',
+};
+
+// ✅ Category emojis - fallback
+const categoryEmojis = {
+    software: '💻',
+    'hair-care': '💇',
+    'skin-care': '🧴',
+    fashion: '🌸',
+    perfumes: '🌸',
+    accessories: '💎',
+    electronics: '📱',
+    supplements: '💊',
+    home: '🏠',
 };
 
 const normalizeCategory = (cat) => {
