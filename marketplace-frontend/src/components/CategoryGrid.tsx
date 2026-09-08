@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';  // ✅ Fixed: added missing dash
+import { useTranslation } from 'react-i18next';
 import api from '@/lib/api';
 import PerfumeIcon from '@/components/icons/PerfumeIcon';
 
@@ -12,6 +12,7 @@ const categoryIcons = {
     'hair-care': '💇',
     'skin-care': '🧴',
     fashion: <PerfumeIcon className="w-6 h-6 text-rose-500" />,
+    perfumes: <PerfumeIcon className="w-6 h-6 text-rose-500" />,
     accessories: '💎',
     electronics: '📱',
     supplements: '💊',
@@ -24,6 +25,7 @@ const categoryColors = {
     'hair-care': 'bg-pink-50 text-pink-600',
     'skin-care': 'bg-amber-50 text-amber-600',
     fashion: 'bg-rose-50 text-rose-600',
+    perfumes: 'bg-rose-50 text-rose-600',
     accessories: 'bg-yellow-50 text-yellow-600',
     electronics: 'bg-blue-50 text-blue-600',
     supplements: 'bg-green-50 text-green-600',
@@ -36,6 +38,7 @@ const categoryNameMap = {
     'hair-care': 'Hair Care',
     'skin-care': 'Skin Care',
     fashion: 'Perfumes',
+    perfumes: 'Perfumes',
     accessories: 'Accessories',
     electronics: 'Electronics',
     supplements: 'Supplements',
@@ -48,6 +51,7 @@ const categoryNameMapAr = {
     'hair-care': 'العناية بالشعر',
     'skin-care': 'العناية بالبشرة',
     fashion: 'عطور',
+    perfumes: 'عطور',
     accessories: 'إكسسوارات',
     electronics: 'إلكترونيات',
     supplements: 'مكملات غذائية',
@@ -60,13 +64,20 @@ const categoryEmojis = {
     'hair-care': '💇',
     'skin-care': '🧴',
     fashion: '🌸',
+    perfumes: '🌸',
     accessories: '💎',
     electronics: '📱',
     supplements: '💊',
     home: '🏠',
 };
 
-const normalizeCategory = (cat) => cat.toLowerCase().replace(/\s+/g, '-');
+const normalizeCategory = (cat) => {
+    // Special handling for fashion/perfumes
+    if (cat === 'Fashion' || cat === 'fashion') {
+        return 'perfumes';
+    }
+    return cat.toLowerCase().replace(/\s+/g, '-');
+};
 
 const getCategoryDisplayName = (cat, lang) => {
     const key = normalizeCategory(cat);

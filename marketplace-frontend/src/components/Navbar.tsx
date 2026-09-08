@@ -26,10 +26,19 @@ import api from '@/lib/api';
 // ✅ Category display name mapping
 const categoryDisplayNames: Record<string, string> = {
     'Fashion': 'Perfumes',
+    'fashion': 'Perfumes',
 };
 
 const categoryDisplayNamesAr: Record<string, string> = {
     'Fashion': 'عطور',
+    'fashion': 'عطور',
+};
+
+const normalizeCategory = (cat) => {
+    if (cat === 'Fashion' || cat === 'fashion') {
+        return 'perfumes';
+    }
+    return cat.toLowerCase().replace(/\s+/g, '-');
 };
 
 const Navbar = () => {
@@ -87,8 +96,7 @@ const Navbar = () => {
 
     const isRTL = typeof document !== 'undefined' && document.documentElement.dir === 'rtl';
 
-    const dropdownClasses = `absolute top-full mt-1 bg-white text-gray-800 rounded-lg shadow-lg py-1 z-[9999] min-w-[120px] max-w-[calc(100vw-2rem)] ${isRTL ? 'right-1/2 translate-x-1/2' : 'left-1/2 -translate-x-1/2'
-        }`;
+    const dropdownClasses = `absolute top-full mt-1 bg-white text-gray-800 rounded-lg shadow-lg py-1 z-[9999] min-w-[120px] max-w-[calc(100vw-2rem)] ${isRTL ? 'right-1/2 translate-x-1/2' : 'left-1/2 -translate-x-1/2'}`;
 
     // ✅ Build navLinks with category name mapping
     const navLinks = [
@@ -97,13 +105,16 @@ const Navbar = () => {
         ...categories.map((cat) => {
             // ✅ Apply the mapping
             let displayName = cat;
+            let slug = normalizeCategory(cat);
+
             if (i18n.language === 'ar') {
                 displayName = categoryDisplayNamesAr[cat] || cat;
             } else {
                 displayName = categoryDisplayNames[cat] || cat;
             }
+
             return {
-                href: `/${cat.toLowerCase().replace(/\s+/g, '-')}`,
+                href: `/${slug}`,
                 label: displayName,
             };
         }),

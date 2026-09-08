@@ -11,7 +11,7 @@ const PerfumeIcon = ({ className = "w-6 h-6" }) => (
         {/* Golden liquid */}
         <path d="M8.5 10C8.5 10 8.5 14 10 15.5C11 16.5 13 16.5 14 15.5C15.5 14 15.5 10 15.5 10H8.5Z"
             fill="#D4A54A" opacity="0.6" />
-        {/* Decorative lines on bottle */}
+        {/* Decorative lines */}
         <line x1="9" y1="8" x2="15" y2="8" stroke="#D4A54A" strokeWidth="0.5" opacity="0.4" />
         <line x1="9.5" y1="12" x2="14.5" y2="12" stroke="#D4A54A" strokeWidth="0.5" opacity="0.4" />
         {/* Sparkle accents */}
