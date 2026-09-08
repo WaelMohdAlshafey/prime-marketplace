@@ -5,18 +5,25 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import api from '@/lib/api';
 import PerfumeIcon from '@/components/icons/PerfumeIcon';
+import SoftwareIcon from '@/components/icons/SoftwareIcon';
+import HairCareIcon from '@/components/icons/HairCareIcon';
+import SkinCareIcon from '@/components/icons/SkinCareIcon';
+import AccessoriesIcon from '@/components/icons/AccessoriesIcon';
+import ElectronicsIcon from '@/components/icons/ElectronicsIcon';
+import SupplementsIcon from '@/components/icons/SupplementsIcon';
+import HomeIcon from '@/components/icons/HomeIcon';
 
-// ✅ Category icons - using PerfumeIcon for fashion/perfumes
+// ✅ Category icons - Custom SVG icons for ALL categories
 const categoryIcons = {
-    software: '💻',
-    'hair-care': '💇',
-    'skin-care': '🧴',
+    software: <SoftwareIcon className="w-6 h-6 text-indigo-500" />,
+    'hair-care': <HairCareIcon className="w-6 h-6 text-pink-500" />,
+    'skin-care': <SkinCareIcon className="w-6 h-6 text-amber-500" />,
     fashion: <PerfumeIcon className="w-6 h-6 text-rose-500" />,
     perfumes: <PerfumeIcon className="w-6 h-6 text-rose-500" />,
-    accessories: '💎',
-    electronics: '📱',
-    supplements: '💊',
-    home: '🏠',
+    accessories: <AccessoriesIcon className="w-6 h-6 text-yellow-500" />,
+    electronics: <ElectronicsIcon className="w-6 h-6 text-blue-500" />,
+    supplements: <SupplementsIcon className="w-6 h-6 text-green-500" />,
+    home: <HomeIcon className="w-6 h-6 text-gray-500" />,
 };
 
 // ✅ Category colors
@@ -58,21 +65,8 @@ const categoryNameMapAr = {
     home: 'المنزل',
 };
 
-// ✅ Category emojis - fallback
-const categoryEmojis = {
-    software: '💻',
-    'hair-care': '💇',
-    'skin-care': '🧴',
-    fashion: '🌸',
-    perfumes: '🌸',
-    accessories: '💎',
-    electronics: '📱',
-    supplements: '💊',
-    home: '🏠',
-};
-
 const normalizeCategory = (cat) => {
-    if (cat === 'Fashion' || cat === 'fashion') {
+    if (cat === 'Fashion' || cat === 'fashion' || cat === 'Perfumes' || cat === 'perfumes') {
         return 'perfumes';
     }
     return cat.toLowerCase().replace(/\s+/g, '-');
@@ -147,7 +141,7 @@ export default function CategoryGrid() {
                             className="bg-card-bg rounded-2xl shadow-soft hover:shadow-card-hover transition p-4 md:p-5 text-center hover:-translate-y-1 duration-300 border border-border/50 cursor-pointer w-full group"
                             type="button"
                         >
-                            <div className={`w-12 h-12 md:w-14 md:h-14 rounded-full ${colorClass} flex items-center justify-center mx-auto mb-2 md:mb-3 group-hover:scale-110 transition-transform duration-300 text-2xl md:text-3xl`}>
+                            <div className={`w-12 h-12 md:w-14 md:h-14 rounded-full ${colorClass} flex items-center justify-center mx-auto mb-2 md:mb-3 group-hover:scale-110 transition-transform duration-300`}>
                                 {icon}
                             </div>
                             <h3 className="font-semibold text-text text-xs md:text-sm">{displayName}</h3>

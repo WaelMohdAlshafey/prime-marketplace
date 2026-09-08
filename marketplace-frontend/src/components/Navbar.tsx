@@ -27,6 +27,8 @@ import api from '@/lib/api';
 const categoryDisplayNames: Record<string, string> = {
     'Fashion': 'Perfumes',
     'fashion': 'Perfumes',
+    'Perfumes': 'Perfumes',
+    'perfumes': 'Perfumes',
     'Hair Care': 'Hair Care',
     'Skin Care': 'Skin Care',
     'Accessories': 'Accessories',
@@ -40,6 +42,8 @@ const categoryDisplayNames: Record<string, string> = {
 const categoryDisplayNamesAr: Record<string, string> = {
     'Fashion': 'عطور',
     'fashion': 'عطور',
+    'Perfumes': 'عطور',
+    'perfumes': 'عطور',
     'Hair Care': 'العناية بالشعر',
     'Skin Care': 'العناية بالبشرة',
     'Accessories': 'إكسسوارات',
@@ -50,7 +54,7 @@ const categoryDisplayNamesAr: Record<string, string> = {
 };
 
 const normalizeCategory = (cat) => {
-    if (cat === 'Fashion' || cat === 'fashion') {
+    if (cat === 'Fashion' || cat === 'fashion' || cat === 'Perfumes' || cat === 'perfumes') {
         return 'perfumes';
     }
     return cat.toLowerCase().replace(/\s+/g, '-');

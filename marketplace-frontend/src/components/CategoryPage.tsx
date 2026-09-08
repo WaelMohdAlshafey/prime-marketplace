@@ -37,13 +37,26 @@ const categoryNameMapAr = {
     home: 'المنزل',
 };
 
-// ✅ Category icons
+// ✅ Category icons - PRETTY versions
 const categoryIcons = {
     software: '💻',
     'hair-care': '💇',
     'skin-care': '🧴',
     fashion: <PerfumeIcon className="w-16 h-16 text-primary" />,
     perfumes: <PerfumeIcon className="w-16 h-16 text-primary" />,
+    accessories: '💎',
+    electronics: '📱',
+    supplements: '💊',
+    home: '🏠',
+};
+
+// ✅ Category emojis - fallback
+const categoryEmojis = {
+    software: '💻',
+    'hair-care': '💇',
+    'skin-care': '🧴',
+    fashion: '🌸',
+    perfumes: '🌸',
     accessories: '💎',
     electronics: '📱',
     supplements: '💊',
@@ -73,7 +86,8 @@ export default function CategoryPage({ category }) {
     const [filters, setFilters] = useState({});
 
     const normalizedCategory = category.toLowerCase();
-    const displayName = getCategoryDisplayName(normalizedCategory, i18n.language || 'en');
+    const lang = i18n.language || 'en';
+    const displayName = getCategoryDisplayName(normalizedCategory, lang);
     const icon = categoryIcons[normalizedCategory] || '📂';
     const apiCategoryName = getCategoryNameForApi(normalizedCategory);
 
@@ -147,7 +161,9 @@ export default function CategoryPage({ category }) {
                     </div>
                     <h1 className="text-3xl md:text-5xl font-bold text-text">{displayName}</h1>
                     <p className="text-text-muted mt-3 text-lg">
-                        {t('categories.discover', { category: displayName })}
+                        {lang === 'ar'
+                            ? `اكتشف أفضل منتجات ${displayName} من بائعين موثوقين`
+                            : `Discover the best ${displayName} products from trusted vendors`}
                     </p>
                 </div>
             </section>
