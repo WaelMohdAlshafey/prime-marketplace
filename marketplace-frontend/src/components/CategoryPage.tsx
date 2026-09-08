@@ -10,12 +10,12 @@ import ProductCard from '@/components/ProductCard';
 import FilterSidebar from '@/components/Filters/FilterSidebar';
 import { Sparkles } from 'lucide-react';
 
-// ✅ Updated category mapping
+// ✅ Updated category mapping - maps URL slug to database category name
 const categoryNameMap = {
     software: 'Software',
     'hair-care': 'Hair Care',
     'skin-care': 'Skin Care',
-    fashion: 'Perfumes',
+    fashion: 'Perfumes',        // ✅ Changed from 'Fashion' to 'Perfumes'
     accessories: 'Accessories',
     electronics: 'Electronics',
     supplements: 'Supplements',
@@ -26,19 +26,31 @@ const categoryNameMapAr = {
     software: 'برامج',
     'hair-care': 'العناية بالشعر',
     'skin-care': 'العناية بالبشرة',
-    fashion: 'عطور',
+    fashion: 'عطور',            // ✅ Changed from 'أزياء' to 'عطور'
     accessories: 'إكسسوارات',
     electronics: 'إلكترونيات',
     supplements: 'مكملات غذائية',
     home: 'المنزل',
 };
 
-// ✅ Updated category emojis
+// ✅ Updated category emojis - perfume bottle for fashion
 const categoryEmojis = {
     software: '💻',
     'hair-care': '💇',
     'skin-care': '🧴',
-    fashion: '🧴',
+    fashion: '🧴',              // ✅ Changed from '👗' to perfume bottle
+    accessories: '💎',
+    electronics: '📱',
+    supplements: '💊',
+    home: '🏠',
+};
+
+// ✅ Updated category icons - delicate perfume/droplet style
+const categoryIcons = {
+    software: '💻',
+    'hair-care': '💇',
+    'skin-care': '🧴',
+    fashion: '🌸',              // ✅ Alternative: flower for elegance
     accessories: '💎',
     electronics: '📱',
     supplements: '💊',
@@ -54,7 +66,6 @@ const getCategoryDisplayName = (slug, lang) => {
 
 export default function CategoryPage({ category }) {
     const { t, i18n } = useTranslation('common');
-    const router = useRouter();
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -63,6 +74,7 @@ export default function CategoryPage({ category }) {
     const normalizedCategory = category.toLowerCase();
     const displayName = getCategoryDisplayName(normalizedCategory, i18n.language || 'en');
     const emoji = categoryEmojis[normalizedCategory] || '📂';
+    const icon = categoryIcons[normalizedCategory] || '📂';
 
     const fetchProducts = async (filterOverrides) => {
         setLoading(true);
@@ -79,6 +91,7 @@ export default function CategoryPage({ category }) {
                 if (finalFilters.rating !== undefined) params.append('rating', finalFilters.rating.toString());
                 url = `/api/Products/filter?${params.toString()}&page=1&pageSize=100`;
             } else {
+                // ✅ Use the mapped database category name
                 const categoryName = categoryNameMap[normalizedCategory] || normalizedCategory;
                 url = `/api/Products/category/${encodeURIComponent(categoryName)}?page=1&pageSize=100`;
             }
@@ -129,7 +142,7 @@ export default function CategoryPage({ category }) {
             {/* Category Hero */}
             <section className="bg-gradient-to-br from-primary-bg to-background py-12 md:py-16">
                 <div className="container mx-auto px-4 text-center">
-                    <div className="text-5xl md:text-6xl mb-4">{emoji}</div>
+                    <div className="text-6xl md:text-7xl mb-4">{icon}</div>
                     <h1 className="text-3xl md:text-5xl font-bold text-text">{displayName}</h1>
                     <p className="text-text-muted mt-3 text-lg">
                         {t('categories.discover', { category: displayName })}

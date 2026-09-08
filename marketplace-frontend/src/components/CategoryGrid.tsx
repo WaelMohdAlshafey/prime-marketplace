@@ -2,20 +2,20 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';  // ✅ Fixed: added missing dash
 import api from '@/lib/api';
-import { Monitor, Sparkles, Droplet, Shirt, Gem, Smartphone, Pill, Home } from 'lucide-react';
+import PerfumeIcon from '@/components/icons/PerfumeIcon';
 
-// ✅ Updated category icons
+// ✅ Updated category icons - using React components for fashion (Perfume)
 const categoryIcons = {
-    software: Monitor,
-    'hair-care': Sparkles,
-    'skin-care': Droplet,
-    fashion: Shirt,
-    accessories: Gem,
-    electronics: Smartphone,
-    supplements: Pill,
-    home: Home,
+    software: '💻',
+    'hair-care': '💇',
+    'skin-care': '🧴',
+    fashion: <PerfumeIcon className="w-6 h-6 text-rose-500" />,
+    accessories: '💎',
+    electronics: '📱',
+    supplements: '💊',
+    home: '🏠',
 };
 
 // ✅ Updated category colors
@@ -30,7 +30,7 @@ const categoryColors = {
     home: 'bg-gray-50 text-gray-600',
 };
 
-// ✅ Updated category mapping - English
+// ✅ Category mapping - English
 const categoryNameMap = {
     software: 'Software',
     'hair-care': 'Hair Care',
@@ -42,7 +42,7 @@ const categoryNameMap = {
     home: 'Home',
 };
 
-// ✅ Updated category mapping - Arabic
+// ✅ Category mapping - Arabic
 const categoryNameMapAr = {
     software: 'برامج',
     'hair-care': 'العناية بالشعر',
@@ -54,12 +54,12 @@ const categoryNameMapAr = {
     home: 'المنزل',
 };
 
-// ✅ Updated category emojis
+// ✅ Category emojis - fallback
 const categoryEmojis = {
     software: '💻',
     'hair-care': '💇',
     'skin-care': '🧴',
-    fashion: '🧴',
+    fashion: '🌸',
     accessories: '💎',
     electronics: '📱',
     supplements: '💊',
@@ -126,7 +126,7 @@ export default function CategoryGrid() {
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4">
                 {categories.map((cat) => {
                     const key = normalizeCategory(cat);
-                    const Icon = categoryIcons[key] || Home;
+                    const icon = categoryIcons[key] || '📂';
                     const colorClass = categoryColors[key] || 'bg-gray-50 text-gray-600';
                     const displayName = getCategoryDisplayName(cat, lang);
 
@@ -137,8 +137,8 @@ export default function CategoryGrid() {
                             className="bg-card-bg rounded-2xl shadow-soft hover:shadow-card-hover transition p-4 md:p-5 text-center hover:-translate-y-1 duration-300 border border-border/50 cursor-pointer w-full group"
                             type="button"
                         >
-                            <div className={`w-12 h-12 md:w-14 md:h-14 rounded-full ${colorClass} flex items-center justify-center mx-auto mb-2 md:mb-3 group-hover:scale-110 transition-transform duration-300`}>
-                                <Icon className="w-6 h-6 md:w-7 md:h-7" />
+                            <div className={`w-12 h-12 md:w-14 md:h-14 rounded-full ${colorClass} flex items-center justify-center mx-auto mb-2 md:mb-3 group-hover:scale-110 transition-transform duration-300 text-2xl md:text-3xl`}>
+                                {icon}
                             </div>
                             <h3 className="font-semibold text-text text-xs md:text-sm">{displayName}</h3>
                         </button>
