@@ -41,7 +41,8 @@ namespace Marketplace.Application.Services
                 Description = dto.Description,
                 VendorId = dto.VendorId,
                 IsActive = true,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                IsPublic = dto.IsPublic  // ✅ NEW
             };
 
             _context.Stores.Add(store);
@@ -62,6 +63,7 @@ namespace Marketplace.Application.Services
             store.Name = dto.Name;
             store.Description = dto.Description;
             store.IsActive = dto.IsActive;
+            store.IsPublic = dto.IsPublic;  // ✅ NEW
 
             if (!string.IsNullOrEmpty(logoUrl))
                 store.LogoUrl = logoUrl;
@@ -106,7 +108,7 @@ namespace Marketplace.Application.Services
         // ============================================================
         public async Task<PagedResult<StoreResponseDto>> GetAllStoresAsync(int page, int pageSize, bool? isActive = null)
         {
-            // ✅ Raw SQL query – guaranteed to work
+            // ✅ Raw SQL query – includes IsPublic
             var sql = @"
                 SELECT 
                     s.""Id"", 
@@ -116,6 +118,7 @@ namespace Marketplace.Application.Services
                     s.""VendorId"", 
                     s.""IsActive"", 
                     s.""CreatedAt"",
+                    s.""IsPublic"",
                     u.""Username"" as ""VendorUsername""
                 FROM ""Stores"" s
                 LEFT JOIN ""Users"" u ON s.""VendorId"" = u.""Id""
@@ -161,7 +164,8 @@ namespace Marketplace.Application.Services
                     VendorUsername = raw.VendorUsername ?? "Unknown",
                     IsActive = raw.IsActive,
                     CreatedAt = raw.CreatedAt,
-                    ProductCount = productCount
+                    ProductCount = productCount,
+                    IsPublic = raw.IsPublic  // ✅ NEW
                 });
             }
 
@@ -194,9 +198,6 @@ namespace Marketplace.Application.Services
             var productCount = await _context.Products
                 .CountAsync(p => p.VendorId == store.VendorId && p.IsActive);
 
-            // 🔍 DEBUG: Log the vendor information to see if it's being loaded
-            Console.WriteLine($"🔍 MapToDto: Store={store.Name}, VendorId={store.VendorId}, Vendor={(store.Vendor?.Username ?? "NULL")}");
-
             string vendorUsername = store.Vendor?.Username ?? "Unknown";
 
             return new StoreResponseDto
@@ -209,7 +210,8 @@ namespace Marketplace.Application.Services
                 VendorUsername = vendorUsername,
                 IsActive = store.IsActive,
                 CreatedAt = store.CreatedAt,
-                ProductCount = productCount
+                ProductCount = productCount,
+                IsPublic = store.IsPublic  // ✅ NEW
             };
         }
     }
@@ -227,5 +229,6 @@ namespace Marketplace.Application.Services
         public bool IsActive { get; set; }
         public DateTime CreatedAt { get; set; }
         public string? VendorUsername { get; set; }
+        public bool IsPublic { get; set; }  // ✅ NEW
     }
 }

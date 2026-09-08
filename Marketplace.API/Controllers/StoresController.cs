@@ -4,6 +4,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Security.Claims;
 using Marketplace.Application.DTOs;
 using Marketplace.Application.Interfaces;
 using Marketplace.Infrastructure.Data;
@@ -25,16 +26,36 @@ namespace Marketplace.API.Controllers
         }
 
         // ============================================================
-        // PUBLIC – Get all stores (active only)
+        // HELPER: Check if user is Client/Customer
+        // ============================================================
+        private bool IsClientRole()
+        {
+            var role = User.FindFirst(ClaimTypes.Role)?.Value;
+            return role == "Client" || role == "Customer";
+        }
+
+        // ============================================================
+        // PUBLIC – Get all stores
+        // ✅ Clients see only public stores (IsPublic = true)
+        // ✅ Admin/Vendor/Employee see ALL stores
         // ============================================================
         [HttpGet]
         public async Task<IActionResult> GetStores([FromQuery] int page = 1, [FromQuery] int pageSize = 20)
         {
             try
             {
+                var isClient = IsClientRole();
+
                 var query = _context.Stores
-                    .Where(s => s.IsActive)
-                    .OrderBy(s => s.Name);
+                    .Where(s => s.IsActive);
+
+                // ✅ If Client, show ONLY public stores
+                if (isClient)
+                {
+                    query = query.Where(s => s.IsPublic == true);
+                }
+
+                query = query.OrderBy(s => s.Name);
 
                 var totalCount = await query.CountAsync();
 
@@ -48,10 +69,14 @@ namespace Marketplace.API.Controllers
                         LogoUrl = s.LogoUrl,
                         Description = s.Description,
                         VendorId = s.VendorId,
-                        VendorUsername = "Unknown",
+                        VendorUsername = _context.Users
+                            .Where(u => u.Id == s.VendorId)
+                            .Select(u => u.Username)
+                            .FirstOrDefault() ?? "Unknown",
                         IsActive = s.IsActive,
                         CreatedAt = s.CreatedAt,
-                        ProductCount = _context.Products.Count(p => p.VendorId == s.VendorId && p.IsActive)
+                        ProductCount = _context.Products.Count(p => p.VendorId == s.VendorId && p.IsActive),
+                        IsPublic = s.IsPublic  // ✅ NEW
                     })
                     .ToListAsync();
 
@@ -68,21 +93,31 @@ namespace Marketplace.API.Controllers
             catch (Exception ex)
             {
                 Console.WriteLine($"❌ GetStores ERROR: {ex.Message}");
-                Console.WriteLine(ex.StackTrace);
-                return StatusCode(500, new { message = ex.Message, stackTrace = ex.StackTrace });
+                return StatusCode(500, new { message = ex.Message });
             }
         }
 
         // ============================================================
         // PUBLIC – Get a single store by ID
+        // ✅ Clients can only see public stores
         // ============================================================
         [HttpGet("{id}")]
         public async Task<IActionResult> GetStore(int id)
         {
             try
             {
-                var store = await _context.Stores
-                    .Where(s => s.Id == id && s.IsActive)
+                var isClient = IsClientRole();
+
+                var query = _context.Stores
+                    .Where(s => s.Id == id && s.IsActive);
+
+                // ✅ If Client, only allow public stores
+                if (isClient)
+                {
+                    query = query.Where(s => s.IsPublic == true);
+                }
+
+                var store = await query
                     .Select(s => new StoreResponseDto
                     {
                         Id = s.Id,
@@ -90,10 +125,14 @@ namespace Marketplace.API.Controllers
                         LogoUrl = s.LogoUrl,
                         Description = s.Description,
                         VendorId = s.VendorId,
-                        VendorUsername = "Unknown",
+                        VendorUsername = _context.Users
+                            .Where(u => u.Id == s.VendorId)
+                            .Select(u => u.Username)
+                            .FirstOrDefault() ?? "Unknown",
                         IsActive = s.IsActive,
                         CreatedAt = s.CreatedAt,
-                        ProductCount = _context.Products.Count(p => p.VendorId == s.VendorId && p.IsActive)
+                        ProductCount = _context.Products.Count(p => p.VendorId == s.VendorId && p.IsActive),
+                        IsPublic = s.IsPublic
                     })
                     .FirstOrDefaultAsync();
 
@@ -111,13 +150,26 @@ namespace Marketplace.API.Controllers
 
         // ============================================================
         // PUBLIC – Get products of a store
+        // ✅ Clients can only see products from public stores
         // ============================================================
         [HttpGet("{id}/products")]
         public async Task<IActionResult> GetStoreProducts(int id, [FromQuery] int page = 1, [FromQuery] int pageSize = 20)
         {
             try
             {
-                var store = await _context.Stores.FindAsync(id);
+                var isClient = IsClientRole();
+
+                var storeQuery = _context.Stores
+                    .Where(s => s.Id == id && s.IsActive);
+
+                // ✅ If Client, only allow public stores
+                if (isClient)
+                {
+                    storeQuery = storeQuery.Where(s => s.IsPublic == true);
+                }
+
+                var store = await storeQuery.FirstOrDefaultAsync();
+
                 if (store == null)
                     return NotFound(new { message = "Store not found." });
 
@@ -132,7 +184,8 @@ namespace Marketplace.API.Controllers
         }
 
         // ============================================================
-        // ADMIN ONLY – Create a store (with logo upload)
+        // ADMIN ONLY – Create a store
+        // ✅ Admin can set IsPublic flag
         // ============================================================
         [HttpPost]
         [Authorize(Roles = "Admin")]
@@ -170,7 +223,8 @@ namespace Marketplace.API.Controllers
         }
 
         // ============================================================
-        // ADMIN ONLY – Update a store (with logo upload)
+        // ADMIN ONLY – Update a store
+        // ✅ Admin can update IsPublic flag
         // ============================================================
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
