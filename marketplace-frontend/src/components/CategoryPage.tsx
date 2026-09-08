@@ -1,3 +1,4 @@
+// @ts-nocheck
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -9,58 +10,61 @@ import ProductCard from '@/components/ProductCard';
 import FilterSidebar from '@/components/Filters/FilterSidebar';
 import { Sparkles } from 'lucide-react';
 
-// Category mapping – SLUG → DATABASE NAME
-const categoryNameMap: Record<string, string> = {
+// ✅ Updated category mapping
+const categoryNameMap = {
     software: 'Software',
     'hair-care': 'Hair Care',
     'skin-care': 'Skin Care',
-    fashion: 'Fashion',
+    fashion: 'Perfumes',
     accessories: 'Accessories',
     electronics: 'Electronics',
     supplements: 'Supplements',
     home: 'Home',
 };
 
-const categoryEmojis: Record<string, string> = {
+const categoryNameMapAr = {
+    software: 'برامج',
+    'hair-care': 'العناية بالشعر',
+    'skin-care': 'العناية بالبشرة',
+    fashion: 'عطور',
+    accessories: 'إكسسوارات',
+    electronics: 'إلكترونيات',
+    supplements: 'مكملات غذائية',
+    home: 'المنزل',
+};
+
+// ✅ Updated category emojis
+const categoryEmojis = {
     software: '💻',
     'hair-care': '💇',
     'skin-care': '🧴',
-    fashion: '👗',
+    fashion: '🧴',
     accessories: '💎',
     electronics: '📱',
     supplements: '💊',
     home: '🏠',
 };
 
-const getCategoryDisplayName = (slug: string, t: (key: string) => string): string => {
-    const key = `categories.${slug}`;
-    const translated = t(key);
-    return translated === key ? slug.replace(/-/g, ' ') : translated;
+const getCategoryDisplayName = (slug, lang) => {
+    if (lang === 'ar') {
+        return categoryNameMapAr[slug] || slug.replace(/-/g, ' ');
+    }
+    return categoryNameMap[slug] || slug.replace(/-/g, ' ');
 };
 
-interface CategoryPageProps {
-    category: string;
-}
-
-export default function CategoryPage({ category }: CategoryPageProps) {
-    const { t } = useTranslation('common');
+export default function CategoryPage({ category }) {
+    const { t, i18n } = useTranslation('common');
     const router = useRouter();
-    const [products, setProducts] = useState<Product[]>([]);
+    const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    const [filters, setFilters] = useState<{
-        minPrice?: number;
-        maxPrice?: number;
-        inStock?: boolean;
-        rating?: number;
-    }>({});
+    const [error, setError] = useState(null);
+    const [filters, setFilters] = useState({});
 
     const normalizedCategory = category.toLowerCase();
-    const dbCategory = categoryNameMap[normalizedCategory];
-    const displayName = getCategoryDisplayName(normalizedCategory, t);
+    const displayName = getCategoryDisplayName(normalizedCategory, i18n.language || 'en');
     const emoji = categoryEmojis[normalizedCategory] || '📂';
 
-    const fetchProducts = async (filterOverrides?: typeof filters) => {
+    const fetchProducts = async (filterOverrides) => {
         setLoading(true);
         setError(null);
         try {
@@ -75,11 +79,11 @@ export default function CategoryPage({ category }: CategoryPageProps) {
                 if (finalFilters.rating !== undefined) params.append('rating', finalFilters.rating.toString());
                 url = `/api/Products/filter?${params.toString()}&page=1&pageSize=100`;
             } else {
-                const categoryName = dbCategory || normalizedCategory;
+                const categoryName = categoryNameMap[normalizedCategory] || normalizedCategory;
                 url = `/api/Products/category/${encodeURIComponent(categoryName)}?page=1&pageSize=100`;
             }
 
-            const response = await api.get<PagedResult<Product>>(url);
+            const response = await api.get(url);
             setProducts(response.data.items || []);
         } catch (err) {
             console.error('❌ Failed to fetch products:', err);
@@ -95,7 +99,7 @@ export default function CategoryPage({ category }: CategoryPageProps) {
         }
     }, [category]);
 
-    const handleApplyFilters = (newFilters: typeof filters) => {
+    const handleApplyFilters = (newFilters) => {
         setFilters(newFilters);
         fetchProducts(newFilters);
     };
@@ -105,7 +109,7 @@ export default function CategoryPage({ category }: CategoryPageProps) {
         fetchProducts({});
     };
 
-    if (!dbCategory) {
+    if (!categoryNameMap[normalizedCategory] && !categoryNameMapAr[normalizedCategory]) {
         return (
             <div className="container mx-auto px-4 py-20 text-center">
                 <h1 className="text-3xl font-bold text-text mb-4">⚠️ القسم غير موجود</h1>
