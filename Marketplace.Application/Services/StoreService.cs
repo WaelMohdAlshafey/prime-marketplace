@@ -42,7 +42,7 @@ namespace Marketplace.Application.Services
                 VendorId = dto.VendorId,
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow,
-                IsPublic = dto.IsPublic  // ✅ NEW
+                IsPublic = dto.IsPublic
             };
 
             _context.Stores.Add(store);
@@ -63,7 +63,7 @@ namespace Marketplace.Application.Services
             store.Name = dto.Name;
             store.Description = dto.Description;
             store.IsActive = dto.IsActive;
-            store.IsPublic = dto.IsPublic;  // ✅ NEW
+            store.IsPublic = dto.IsPublic;
 
             if (!string.IsNullOrEmpty(logoUrl))
                 store.LogoUrl = logoUrl;
@@ -108,7 +108,7 @@ namespace Marketplace.Application.Services
         // ============================================================
         public async Task<PagedResult<StoreResponseDto>> GetAllStoresAsync(int page, int pageSize, bool? isActive = null)
         {
-            // ✅ Raw SQL query – includes IsPublic
+            // ✅ Raw SQL query – includes IsPublic column
             var sql = @"
                 SELECT 
                     s.""Id"", 
@@ -165,7 +165,7 @@ namespace Marketplace.Application.Services
                     IsActive = raw.IsActive,
                     CreatedAt = raw.CreatedAt,
                     ProductCount = productCount,
-                    IsPublic = raw.IsPublic  // ✅ NEW
+                    IsPublic = raw.IsPublic
                 });
             }
 
@@ -211,7 +211,7 @@ namespace Marketplace.Application.Services
                 IsActive = store.IsActive,
                 CreatedAt = store.CreatedAt,
                 ProductCount = productCount,
-                IsPublic = store.IsPublic  // ✅ NEW
+                IsPublic = store.IsPublic
             };
         }
     }
@@ -229,6 +229,6 @@ namespace Marketplace.Application.Services
         public bool IsActive { get; set; }
         public DateTime CreatedAt { get; set; }
         public string? VendorUsername { get; set; }
-        public bool IsPublic { get; set; }  // ✅ NEW
+        public bool IsPublic { get; set; }
     }
 }

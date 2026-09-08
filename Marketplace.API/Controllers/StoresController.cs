@@ -36,7 +36,7 @@ namespace Marketplace.API.Controllers
 
         // ============================================================
         // PUBLIC – Get all stores
-        // ✅ Clients see only public stores (IsPublic = true)
+        // ✅ Clients see ONLY public stores (IsPublic = true)
         // ✅ Admin/Vendor/Employee see ALL stores
         // ============================================================
         [HttpGet]
@@ -76,7 +76,7 @@ namespace Marketplace.API.Controllers
                         IsActive = s.IsActive,
                         CreatedAt = s.CreatedAt,
                         ProductCount = _context.Products.Count(p => p.VendorId == s.VendorId && p.IsActive),
-                        IsPublic = s.IsPublic  // ✅ NEW
+                        IsPublic = s.IsPublic
                     })
                     .ToListAsync();
 
@@ -185,7 +185,6 @@ namespace Marketplace.API.Controllers
 
         // ============================================================
         // ADMIN ONLY – Create a store
-        // ✅ Admin can set IsPublic flag
         // ============================================================
         [HttpPost]
         [Authorize(Roles = "Admin")]
@@ -224,7 +223,6 @@ namespace Marketplace.API.Controllers
 
         // ============================================================
         // ADMIN ONLY – Update a store
-        // ✅ Admin can update IsPublic flag
         // ============================================================
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
