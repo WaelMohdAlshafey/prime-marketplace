@@ -21,7 +21,7 @@ public class AppDbContext : DbContext
         if (!optionsBuilder.IsConfigured)
         {
             optionsBuilder.UseNpgsql(
-                "Host=db.rgnanibivkruuryndplle.supabase.co;Database=postgres;Username=postgres;Password=MyMarketplaceDB#2026!Secure;Port=5432;SslMode=Require;Trust Server Certificate=true;"
+                "Host=44.216.29.125;Database=postgres;Username=postgres.rgnanbivkruuryndplle;Password=MyMarketplaceDB%232026%21Secure;Port=5432;SslMode=Require;Trust Server Certificate=true;"
             );
         }
     }
@@ -41,6 +41,9 @@ public class AppDbContext : DbContext
     public DbSet<Store> Stores { get; set; }
     public DbSet<ProductReview> ProductReviews { get; set; }
     public DbSet<GoldenLink> GoldenLinks { get; set; }
+
+    // ✅ NEW: Pages DbSet
+    public DbSet<Page> Pages { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -65,7 +68,7 @@ public class AppDbContext : DbContext
         // ---- CartItem configurations ----
         modelBuilder.Entity<CartItem>()
             .Property(e => e.Id)
-            .ValueGeneratedOnAdd();   // ✅ This tells EF Core the database generates the Id
+            .ValueGeneratedOnAdd();
 
         modelBuilder.Entity<CartItem>()
             .HasIndex(ci => ci.UserId);
@@ -75,6 +78,7 @@ public class AppDbContext : DbContext
             .WithMany()
             .HasForeignKey(ci => ci.ProductId)
             .OnDelete(DeleteBehavior.Restrict);
+
         // ---- Order configurations ----
         modelBuilder.Entity<Order>()
             .Property(o => o.TotalAmount)
@@ -201,6 +205,31 @@ public class AppDbContext : DbContext
                   .WithMany()
                   .HasForeignKey(e => e.UserId)
                   .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // ---- Page configurations ----
+        modelBuilder.Entity<Page>(entity =>
+        {
+            entity.HasKey(p => p.Id);
+            entity.HasIndex(p => p.Slug).IsUnique();
+            entity.HasIndex(p => p.IsPublished);
+            entity.HasIndex(p => p.DisplayOrder);
+
+            entity.Property(p => p.Title).IsRequired().HasMaxLength(255);
+            entity.Property(p => p.Slug).IsRequired().HasMaxLength(255);
+            entity.Property(p => p.Content).HasColumnType("text");
+            entity.Property(p => p.MetaDescription).HasMaxLength(500);
+            entity.Property(p => p.MetaKeywords).HasMaxLength(500);
+
+            entity.HasOne(p => p.CreatedBy)
+                .WithMany()
+                .HasForeignKey(p => p.CreatedByUserId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasOne(p => p.UpdatedBy)
+                .WithMany()
+                .HasForeignKey(p => p.UpdatedByUserId)
+                .OnDelete(DeleteBehavior.SetNull);
         });
     }
 }
