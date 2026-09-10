@@ -4,80 +4,17 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import api from '@/lib/api';
-import PerfumeIcon from '@/components/icons/PerfumeIcon';
-import SoftwareIcon from '@/components/icons/SoftwareIcon';
-import HairCareIcon from '@/components/icons/HairCareIcon';
-import SkinCareIcon from '@/components/icons/SkinCareIcon';
-import AccessoriesIcon from '@/components/icons/AccessoriesIcon';
-import ElectronicsIcon from '@/components/icons/ElectronicsIcon';
-import SupplementsIcon from '@/components/icons/SupplementsIcon';
-import HomeIcon from '@/components/icons/HomeIcon';
 
-// ✅ Category icons - Custom SVG icons for ALL categories
-const categoryIcons = {
-    software: <SoftwareIcon className="w-6 h-6 text-indigo-500" />,
-    'hair-care': <HairCareIcon className="w-6 h-6 text-pink-500" />,
-    'skin-care': <SkinCareIcon className="w-6 h-6 text-amber-500" />,
-    fashion: <PerfumeIcon className="w-6 h-6 text-rose-500" />,
-    perfumes: <PerfumeIcon className="w-6 h-6 text-rose-500" />,
-    accessories: <AccessoriesIcon className="w-6 h-6 text-yellow-500" />,
-    electronics: <ElectronicsIcon className="w-6 h-6 text-blue-500" />,
-    supplements: <SupplementsIcon className="w-6 h-6 text-green-500" />,
-    home: <HomeIcon className="w-6 h-6 text-gray-500" />,
-};
-
-// ✅ Category colors
-const categoryColors = {
-    software: 'bg-indigo-50 text-indigo-600',
-    'hair-care': 'bg-pink-50 text-pink-600',
-    'skin-care': 'bg-amber-50 text-amber-600',
-    fashion: 'bg-rose-50 text-rose-600',
-    perfumes: 'bg-rose-50 text-rose-600',
-    accessories: 'bg-yellow-50 text-yellow-600',
-    electronics: 'bg-blue-50 text-blue-600',
-    supplements: 'bg-green-50 text-green-600',
-    home: 'bg-gray-50 text-gray-600',
-};
-
-// ✅ Category mapping - English
-const categoryNameMap = {
-    software: 'Software',
-    'hair-care': 'Hair Care',
-    'skin-care': 'Skin Care',
-    fashion: 'Perfumes',
-    perfumes: 'Perfumes',
-    accessories: 'Accessories',
-    electronics: 'Electronics',
-    supplements: 'Supplements',
-    home: 'Home',
-};
-
-// ✅ Category mapping - Arabic
-const categoryNameMapAr = {
-    software: 'برامج',
-    'hair-care': 'العناية بالشعر',
-    'skin-care': 'العناية بالبشرة',
-    fashion: 'عطور',
-    perfumes: 'عطور',
-    accessories: 'إكسسوارات',
-    electronics: 'إلكترونيات',
-    supplements: 'مكملات غذائية',
-    home: 'المنزل',
-};
-
-const normalizeCategory = (cat) => {
-    if (cat === 'Fashion' || cat === 'fashion' || cat === 'Perfumes' || cat === 'perfumes') {
-        return 'perfumes';
-    }
-    return cat.toLowerCase().replace(/\s+/g, '-');
-};
-
-const getCategoryDisplayName = (cat, lang) => {
-    const key = normalizeCategory(cat);
-    if (lang === 'ar') {
-        return categoryNameMapAr[key] || cat;
-    }
-    return categoryNameMap[key] || cat;
+// Fallback icons in case the API returns nothing for a category
+const fallbackIcons = {
+    software: '💻',
+    'hair-care': '💇',
+    'skin-care': '🧴',
+    perfumes: '🌸',
+    accessories: '💎',
+    electronics: '📱',
+    supplements: '💊',
+    home: '🏠',
 };
 
 export default function CategoryGrid() {
@@ -89,7 +26,7 @@ export default function CategoryGrid() {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const response = await api.get('/api/Categories');
+                const response = await api.get('/api/ProductCategories?onlyActive=true');
                 setCategories(response.data);
             } catch (error) {
                 console.error('Failed to fetch categories:', error);
@@ -101,8 +38,7 @@ export default function CategoryGrid() {
     }, []);
 
     const handleCategoryClick = (category) => {
-        const slug = normalizeCategory(category);
-        window.location.href = `/${slug}`;
+        window.location.href = `/${category.slug}`;
     };
 
     if (loading) {
@@ -129,25 +65,28 @@ export default function CategoryGrid() {
 
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4">
                 {categories.map((cat) => {
-                    const key = normalizeCategory(cat);
-                    const icon = categoryIcons[key] || '📂';
-                    const colorClass = categoryColors[key] || 'bg-gray-50 text-gray-600';
-                    const displayName = getCategoryDisplayName(cat, lang);
+                    const icon = cat.icon || fallbackIcons[cat.slug] || '📦';
+                    const colorClass = cat.colorClass || 'bg-gray-50 text-gray-600';
 
                     return (
                         <button
-                            key={cat}
+                            key={cat.id}
                             onClick={() => handleCategoryClick(cat)}
                             className="bg-card-bg rounded-2xl shadow-soft hover:shadow-card-hover transition p-4 md:p-5 text-center hover:-translate-y-1 duration-300 border border-border/50 cursor-pointer w-full group"
                             type="button"
                         >
-                            <div className={`w-12 h-12 md:w-14 md:h-14 rounded-full ${colorClass} flex items-center justify-center mx-auto mb-2 md:mb-3 group-hover:scale-110 transition-transform duration-300`}>
+                            <div className={`w-12 h-12 md:w-14 md:h-14 rounded-full ${colorClass} flex items-center justify-center mx-auto mb-2 md:mb-3 group-hover:scale-110 transition-transform duration-300 text-2xl md:text-3xl`}>
                                 {icon}
                             </div>
-                            <h3 className="font-semibold text-text text-xs md:text-sm">{displayName}</h3>
+                            <h3 className="font-semibold text-text text-xs md:text-sm">{cat.name}</h3>
                         </button>
                     );
                 })}
+                {categories.length === 0 && (
+                    <div className="col-span-full text-center py-12 text-text-muted">
+                        No categories yet.
+                    </div>
+                )}
             </div>
         </section>
     );

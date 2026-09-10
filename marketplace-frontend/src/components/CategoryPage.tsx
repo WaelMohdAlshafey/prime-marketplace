@@ -2,60 +2,16 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import api from '@/lib/api';
-import { Product, PagedResult } from '@/types';
 import ProductCard from '@/components/ProductCard';
 import FilterSidebar from '@/components/Filters/FilterSidebar';
 import { Sparkles } from 'lucide-react';
-import PerfumeIcon from '@/components/icons/PerfumeIcon';
 
-// ✅ Category mapping - maps URL slug to database category name
-const categoryNameMap = {
-    software: 'Software',
-    'hair-care': 'Hair Care',
-    'skin-care': 'Skin Care',
-    fashion: 'Perfumes',
-    perfumes: 'Perfumes',
-    accessories: 'Accessories',
-    electronics: 'Electronics',
-    supplements: 'Supplements',
-    home: 'Home',
-};
-
-// ✅ Category mapping - Arabic display names
-const categoryNameMapAr = {
-    software: 'برامج',
-    'hair-care': 'العناية بالشعر',
-    'skin-care': 'العناية بالبشرة',
-    fashion: 'عطور',
-    perfumes: 'عطور',
-    accessories: 'إكسسوارات',
-    electronics: 'إلكترونيات',
-    supplements: 'مكملات غذائية',
-    home: 'المنزل',
-};
-
-// ✅ Category icons - PRETTY versions
-const categoryIcons = {
+const fallbackIcons = {
     software: '💻',
     'hair-care': '💇',
     'skin-care': '🧴',
-    fashion: <PerfumeIcon className="w-16 h-16 text-primary" />,
-    perfumes: <PerfumeIcon className="w-16 h-16 text-primary" />,
-    accessories: '💎',
-    electronics: '📱',
-    supplements: '💊',
-    home: '🏠',
-};
-
-// ✅ Category emojis - fallback
-const categoryEmojis = {
-    software: '💻',
-    'hair-care': '💇',
-    'skin-care': '🧴',
-    fashion: '🌸',
     perfumes: '🌸',
     accessories: '💎',
     electronics: '📱',
@@ -63,33 +19,34 @@ const categoryEmojis = {
     home: '🏠',
 };
 
-const getCategoryDisplayName = (slug, lang) => {
-    if (lang === 'ar') {
-        return categoryNameMapAr[slug] || slug.replace(/-/g, ' ');
-    }
-    return categoryNameMap[slug] || slug.replace(/-/g, ' ');
-};
-
-const getCategoryNameForApi = (slug) => {
-    if (slug === 'fashion' || slug === 'perfumes') {
-        return 'Perfumes';
-    }
-    return categoryNameMap[slug] || slug;
-};
-
 export default function CategoryPage({ category }) {
     const { t, i18n } = useTranslation('common');
-    const router = useRouter();
     const [products, setProducts] = useState([]);
+    const [categoryInfo, setCategoryInfo] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [filters, setFilters] = useState({});
 
-    const normalizedCategory = category.toLowerCase();
     const lang = i18n.language || 'en';
-    const displayName = getCategoryDisplayName(normalizedCategory, lang);
-    const icon = categoryIcons[normalizedCategory] || '📂';
-    const apiCategoryName = getCategoryNameForApi(normalizedCategory);
+    const slug = category.toLowerCase();
+
+    // Load category metadata from API
+    useEffect(() => {
+        const fetchCategoryInfo = async () => {
+            try {
+                const res = await api.get('/api/ProductCategories?onlyActive=true');
+                const found = res.data.find(c => c.slug === slug);
+                if (found) setCategoryInfo(found);
+            } catch (err) {
+                console.error('Failed to load category info:', err);
+            }
+        };
+        fetchCategoryInfo();
+    }, [slug]);
+
+    const displayName = categoryInfo?.name || slug.replace(/-/g, ' ');
+    const icon = categoryInfo?.icon || fallbackIcons[slug] || '📂';
+    const apiCategoryName = categoryInfo?.name || slug;
 
     const fetchProducts = async (filterOverrides) => {
         setLoading(true);
@@ -120,10 +77,10 @@ export default function CategoryPage({ category }) {
     };
 
     useEffect(() => {
-        if (category) {
+        if (apiCategoryName) {
             fetchProducts();
         }
-    }, [category]);
+    }, [apiCategoryName]);
 
     const handleApplyFilters = (newFilters) => {
         setFilters(newFilters);
@@ -135,17 +92,16 @@ export default function CategoryPage({ category }) {
         fetchProducts({});
     };
 
-    const isValidCategory = categoryNameMap[normalizedCategory] || categoryNameMapAr[normalizedCategory];
-    if (!isValidCategory) {
+    if (categoryInfo === null && !loading) {
         return (
             <div className="container mx-auto px-4 py-20 text-center">
-                <h1 className="text-3xl font-bold text-text mb-4">⚠️ القسم غير موجود</h1>
-                <p className="text-text-muted">عذراً، القسم "{category}" غير مدعوم حالياً.</p>
+                <h1 className="text-3xl font-bold text-text mb-4">⚠️ Category not found</h1>
+                <p className="text-text-muted">The category "{category}" is not available.</p>
                 <button
                     onClick={() => window.location.href = '/'}
                     className="mt-6 bg-primary text-white px-6 py-3 rounded-pill hover:bg-primary-dark transition"
                 >
-                    العودة إلى الرئيسية
+                    Back to Home
                 </button>
             </div>
         );
@@ -160,11 +116,9 @@ export default function CategoryPage({ category }) {
                         {icon}
                     </div>
                     <h1 className="text-3xl md:text-5xl font-bold text-text">{displayName}</h1>
-                    <p className="text-text-muted mt-3 text-lg">
-                        {lang === 'ar'
-                            ? `اكتشف أفضل منتجات ${displayName} من بائعين موثوقين`
-                            : `Discover the best ${displayName} products from trusted vendors`}
-                    </p>
+                    {categoryInfo?.description && (
+                        <p className="text-text-muted mt-3 text-lg">{categoryInfo.description}</p>
+                    )}
                 </div>
             </section>
 
@@ -208,7 +162,7 @@ export default function CategoryPage({ category }) {
                                     onClick={() => fetchProducts()}
                                     className="mt-4 bg-primary text-white px-6 py-2 rounded-pill hover:bg-primary-dark transition"
                                 >
-                                    إعادة المحاولة
+                                    Retry
                                 </button>
                             </div>
                         ) : products.length === 0 ? (
@@ -218,7 +172,7 @@ export default function CategoryPage({ category }) {
                                     onClick={handleResetFilters}
                                     className="mt-4 bg-primary text-white px-6 py-2 rounded-pill hover:bg-primary-dark transition"
                                 >
-                                    إعادة تعيين الفلاتر
+                                    Reset Filters
                                 </button>
                             </div>
                         ) : (
