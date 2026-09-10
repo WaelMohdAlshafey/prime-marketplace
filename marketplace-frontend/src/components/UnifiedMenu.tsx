@@ -31,27 +31,15 @@ const categoryIcons = {
 };
 
 const categoryNameMap = {
-    software: 'Software',
-    'hair-care': 'Hair Care',
-    'skin-care': 'Skin Care',
-    fashion: 'Perfumes',
-    perfumes: 'Perfumes',
-    accessories: 'Accessories',
-    electronics: 'Electronics',
-    supplements: 'Supplements',
-    home: 'Home',
+    software: 'Software', 'hair-care': 'Hair Care', 'skin-care': 'Skin Care',
+    fashion: 'Perfumes', perfumes: 'Perfumes', accessories: 'Accessories',
+    electronics: 'Electronics', supplements: 'Supplements', home: 'Home',
 };
 
 const categoryNameMapAr = {
-    software: 'برامج',
-    'hair-care': 'العناية بالشعر',
-    'skin-care': 'العناية بالبشرة',
-    fashion: 'عطور',
-    perfumes: 'عطور',
-    accessories: 'إكسسوارات',
-    electronics: 'إلكترونيات',
-    supplements: 'مكملات غذائية',
-    home: 'المنزل',
+    software: 'برامج', 'hair-care': 'العناية بالشعر', 'skin-care': 'العناية بالبشرة',
+    fashion: 'عطور', perfumes: 'عطور', accessories: 'إكسسوارات',
+    electronics: 'إلكترونيات', supplements: 'مكملات غذائية', home: 'المنزل',
 };
 
 const normalizeCategory = (cat) => {
@@ -67,21 +55,24 @@ export default function UnifiedMenu({ isOpen, onClose }) {
     const lang = i18n.language || 'en';
     const isRTL = lang === 'ar';
 
+    // ✅ Menu slides from the SAME side as the hamburger.
+    // Hamburger is on the flex "start" side → RTL: right, LTR: left.
+    const panelPositionClass = isRTL ? 'right-0' : 'left-0';
+    const slideStart = isRTL ? '100%' : '-100%';
+    const slideEnd = isRTL ? '100%' : '-100%';
+
     useEffect(() => {
         if (!isOpen) return;
-        api.get('/api/Categories').then(r => setCategories(r.data)).catch(() => {});
-        api.get('/api/Pages/navigation').then(r => setNavPages(r.data.navbarPages || [])).catch(() => {});
-        api.get('/api/Stores?page=1&pageSize=20').then(r => setStores(r.data.items || [])).catch(() => {});
+        api.get('/api/Categories').then(r => setCategories(r.data)).catch(() => { });
+        api.get('/api/Pages/navigation').then(r => setNavPages(r.data.navbarPages || [])).catch(() => { });
+        api.get('/api/Stores?page=1&pageSize=20').then(r => setStores(r.data.items || [])).catch(() => { });
     }, [isOpen]);
 
-    // Lock body scroll
     useEffect(() => {
-        if (isOpen) document.body.style.overflow = 'hidden';
-        else document.body.style.overflow = '';
+        document.body.style.overflow = isOpen ? 'hidden' : '';
         return () => { document.body.style.overflow = ''; };
     }, [isOpen]);
 
-    // Close on Escape
     useEffect(() => {
         const handler = (e) => { if (e.key === 'Escape' && isOpen) onClose(); };
         window.addEventListener('keydown', handler);
@@ -105,13 +96,13 @@ export default function UnifiedMenu({ isOpen, onClose }) {
                         onClick={onClose}
                     />
 
-                    {/* Slide-in panel */}
+                    {/* Slide-in panel — from the SAME side as the hamburger */}
                     <motion.aside
-                        initial={{ x: isRTL ? '-100%' : '100%' }}
+                        initial={{ x: slideStart }}
                         animate={{ x: 0 }}
-                        exit={{ x: isRTL ? '-100%' : '100%' }}
+                        exit={{ x: slideEnd }}
                         transition={{ type: 'spring', damping: 28, stiffness: 220 }}
-                        className={`fixed top-0 bottom-0 w-full sm:w-[440px] max-w-[92vw] bg-white z-[2001] overflow-y-auto shadow-2xl ${isRTL ? 'left-0' : 'right-0'}`}
+                        className={`fixed top-0 bottom-0 w-full sm:w-[440px] max-w-[92vw] bg-white z-[2001] overflow-y-auto shadow-2xl ${panelPositionClass}`}
                     >
                         {/* Header */}
                         <div className="sticky top-0 bg-[#0F5C45] text-white px-5 py-4 flex items-center justify-between z-10 shadow-md">
@@ -128,8 +119,6 @@ export default function UnifiedMenu({ isOpen, onClose }) {
                         </div>
 
                         <div className="p-5 space-y-7">
-
-                            {/* 1. Popular */}
                             <Section title={lang === 'ar' ? 'الأكثر شيوعاً' : 'Most Popular'}>
                                 <MenuLink href="/products" onClick={onClose} isRTL={isRTL}>
                                     {lang === 'ar' ? 'المنتجات الأكثر مبيعاً' : 'Best Sellers'}
@@ -142,7 +131,6 @@ export default function UnifiedMenu({ isOpen, onClose }) {
                                 </MenuLink>
                             </Section>
 
-                            {/* 2. Categories */}
                             <Section title={lang === 'ar' ? 'تسوق حسب القسم' : 'Shop by Category'}>
                                 {categories.map(cat => {
                                     const key = normalizeCategory(cat);
@@ -159,7 +147,6 @@ export default function UnifiedMenu({ isOpen, onClose }) {
                                 })}
                             </Section>
 
-                            {/* 3. Stores */}
                             {stores.length > 0 && (
                                 <Section title={lang === 'ar' ? 'المتاجر' : 'Stores'}>
                                     {stores.map(s => (
@@ -170,7 +157,6 @@ export default function UnifiedMenu({ isOpen, onClose }) {
                                 </Section>
                             )}
 
-                            {/* 4. Pages */}
                             {navPages.length > 0 && (
                                 <Section title={lang === 'ar' ? 'صفحات' : 'Pages'}>
                                     {navPages.map(p => (
@@ -181,7 +167,6 @@ export default function UnifiedMenu({ isOpen, onClose }) {
                                 </Section>
                             )}
 
-                            {/* 5. Support */}
                             <Section title={lang === 'ar' ? 'الدعم' : 'Support'}>
                                 <MenuLink href="/help" onClick={onClose} isRTL={isRTL}>
                                     {lang === 'ar' ? 'دليل المستخدم' : 'Help Center'}
@@ -194,7 +179,6 @@ export default function UnifiedMenu({ isOpen, onClose }) {
                                 </MenuLink>
                             </Section>
 
-                            {/* 6. Account */}
                             <Section title={lang === 'ar' ? 'حسابي' : 'My Account'}>
                                 <MenuLink href="/profile" onClick={onClose} isRTL={isRTL}>
                                     {lang === 'ar' ? 'الملف الشخصي' : 'Profile'}
@@ -206,7 +190,6 @@ export default function UnifiedMenu({ isOpen, onClose }) {
                                     {lang === 'ar' ? 'السلة' : 'Cart'}
                                 </MenuLink>
                             </Section>
-
                         </div>
                     </motion.aside>
                 </>
@@ -218,9 +201,7 @@ export default function UnifiedMenu({ isOpen, onClose }) {
 function Section({ title, children }) {
     return (
         <div>
-            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 px-2">
-                {title}
-            </h3>
+            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 px-2">{title}</h3>
             <div className="space-y-0.5">{children}</div>
         </div>
     );
