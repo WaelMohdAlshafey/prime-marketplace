@@ -228,19 +228,23 @@ app.MapGet("/", () => "Prime Marketplace API is running!");
 app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = DateTime.UtcNow }));
 
 // ============================================================
-// 19. Database Migration – Apply pending migrations
+// 19. ✅ Database connection check (schema managed via Supabase)
+//     Auto-migration is DISABLED because the schema is
+//     maintained manually through the Supabase SQL Editor.
 // ============================================================
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     try
     {
-        dbContext.Database.Migrate();
-        Console.WriteLine("✅ Database migrations applied successfully.");
+        var canConnect = await dbContext.Database.CanConnectAsync();
+        Console.WriteLine(canConnect
+            ? "✅ Database connection verified."
+            : "⚠️ Cannot connect to database.");
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"❌ Database migration error: {ex.Message}");
+        Console.WriteLine($"❌ Database connection error: {ex.Message}");
         Console.WriteLine($"Stack trace: {ex.StackTrace}");
     }
 }
