@@ -1,4 +1,3 @@
-@"
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,7 +8,7 @@ using Marketplace.Infrastructure.Data;
 namespace Marketplace.API.Controllers;
 
 [ApiController]
-[Route("api / [controller]")]
+[Route("api/[controller]")]
 public class PagesController : ControllerBase
 {
     private readonly AppDbContext _context;
@@ -25,7 +24,6 @@ public class PagesController : ControllerBase
         return claim != null ? int.Parse(claim.Value) : 0;
     }
 
-    // PUBLIC — all published pages
     [HttpGet]
     public async Task<IActionResult> GetPages()
     {
@@ -52,7 +50,6 @@ public class PagesController : ControllerBase
         return Ok(pages);
     }
 
-    // PUBLIC — get by slug
     [HttpGet("slug/{slug}")]
     public async Task<IActionResult> GetPageBySlug(string slug)
     {
@@ -79,7 +76,6 @@ public class PagesController : ControllerBase
         });
     }
 
-    // PUBLIC — navigation (navbar + footer)
     [HttpGet("navigation")]
     public async Task<IActionResult> GetNavigation()
     {
@@ -98,7 +94,6 @@ public class PagesController : ControllerBase
         return Ok(new { navbarPages, footerPages });
     }
 
-    // ADMIN — all pages (including unpublished)
     [HttpGet("admin/all")]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> GetAllAdmin()
@@ -125,7 +120,6 @@ public class PagesController : ControllerBase
         return Ok(pages);
     }
 
-    // ADMIN — get by id
     [HttpGet("admin/{id}")]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> GetById(int id)
@@ -135,7 +129,6 @@ public class PagesController : ControllerBase
         return Ok(page);
     }
 
-    // ADMIN — create
     [HttpPost]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Create([FromBody] CreatePageDto dto)
@@ -167,7 +160,6 @@ public class PagesController : ControllerBase
         return Ok(page);
     }
 
-    // ADMIN — update
     [HttpPut("{id}")]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Update(int id, [FromBody] UpdatePageDto dto)
@@ -198,7 +190,6 @@ public class PagesController : ControllerBase
         return Ok(page);
     }
 
-    // ADMIN — hard delete
     [HttpDelete("{id}")]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(int id)
@@ -237,4 +228,3 @@ public class UpdatePageDto
     public bool ShowInNavbar { get; set; }
     public int? DisplayOrder { get; set; }
 }
-"@ | Out-File -FilePath E:\prime-marketplace\Marketplace.API\Controllers\PagesController.cs -Encoding utf8
