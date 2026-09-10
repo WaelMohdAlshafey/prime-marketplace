@@ -351,3 +351,26 @@ export interface Page {
     createdAt: string;
     updatedAt?: string;
 }
+export interface ProductCategory {
+    id: number;
+    name: string;
+    slug: string;
+    description?: string;
+    icon?: string;
+    colorClass?: string;
+    displayOrder?: number;
+    isActive: boolean;
+    productCount: number;
+}
+
+export interface CreateProductCategoryDto {
+    name: string;
+    slug: string;
+    description?: string;
+    icon?: string;
+    colorClass?: string;
+    displayOrder?: number;
+    isActive: boolean;
+}
+
+export interface UpdateProductCategoryDto extends CreateProductCategoryDto { }
