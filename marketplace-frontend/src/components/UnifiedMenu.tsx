@@ -8,64 +8,12 @@ import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
 import api from '@/lib/api';
 
-// Custom icons
-import PerfumeIcon from '@/components/icons/PerfumeIcon';
-import SoftwareIcon from '@/components/icons/SoftwareIcon';
-import HairCareIcon from '@/components/icons/HairCareIcon';
-import SkinCareIcon from '@/components/icons/SkinCareIcon';
-import AccessoriesIcon from '@/components/icons/AccessoriesIcon';
-import ElectronicsIcon from '@/components/icons/ElectronicsIcon';
-import SupplementsIcon from '@/components/icons/SupplementsIcon';
-import HomeIcon from '@/components/icons/HomeIcon';
-
-const categoryIcons = {
-    software: <SoftwareIcon className="w-5 h-5 text-indigo-500" />,
-    'hair-care': <HairCareIcon className="w-5 h-5 text-pink-500" />,
-    'skin-care': <SkinCareIcon className="w-5 h-5 text-amber-500" />,
-    fashion: <PerfumeIcon className="w-5 h-5 text-rose-500" />,
-    perfumes: <PerfumeIcon className="w-5 h-5 text-rose-500" />,
-    accessories: <AccessoriesIcon className="w-5 h-5 text-yellow-500" />,
-    electronics: <ElectronicsIcon className="w-5 h-5 text-blue-500" />,
-    supplements: <SupplementsIcon className="w-5 h-5 text-green-500" />,
-    home: <HomeIcon className="w-5 h-5 text-gray-500" />,
-};
-
-const categoryNameMap = {
-    software: 'Software',
-    'hair-care': 'Hair Care',
-    'skin-care': 'Skin Care',
-    fashion: 'Perfumes',
-    perfumes: 'Perfumes',
-    accessories: 'Accessories',
-    electronics: 'Electronics',
-    supplements: 'Supplements',
-    home: 'Home',
-};
-
-const categoryNameMapAr = {
-    software: 'برامج',
-    'hair-care': 'العناية بالشعر',
-    'skin-care': 'العناية بالبشرة',
-    fashion: 'عطور',
-    perfumes: 'عطور',
-    accessories: 'إكسسوارات',
-    electronics: 'إلكترونيات',
-    supplements: 'مكملات غذائية',
-    home: 'المنزل',
-};
-
-const normalizeCategory = (cat) => {
-    if (['Fashion', 'fashion', 'Perfumes', 'perfumes'].includes(cat)) return 'perfumes';
-    return cat.toLowerCase().replace(/\s+/g, '-');
-};
-
 export default function UnifiedMenu({ isOpen, onClose }) {
     const { i18n } = useTranslation('common');
     const [categories, setCategories] = useState([]);
     const [navPages, setNavPages] = useState([]);
     const [stores, setStores] = useState([]);
 
-    // ✅ ROBUST language + RTL detection
     const lang = (i18n.language || 'ar').startsWith('ar') ? 'ar' : 'en';
     const [isRTL, setIsRTL] = useState(true);
 
@@ -77,31 +25,29 @@ export default function UnifiedMenu({ isOpen, onClose }) {
 
     useEffect(() => {
         if (!isOpen) return;
-        api.get('/api/Categories').then(r => setCategories(r.data)).catch(() => { });
-        api.get('/api/Pages/navigation').then(r => setNavPages(r.data.navbarPages || [])).catch(() => { });
-        api.get('/api/Stores?page=1&pageSize=20').then(r => setStores(r.data.items || [])).catch(() => { });
+        api.get('/api/ProductCategories?onlyActive=true')
+            .then(r => setCategories(r.data || []))
+            .catch(() => { });
+        api.get('/api/Pages/navigation')
+            .then(r => setNavPages(r.data.navbarPages || []))
+            .catch(() => { });
+        api.get('/api/Stores?page=1&pageSize=20')
+            .then(r => setStores(r.data.items || []))
+            .catch(() => { });
     }, [isOpen]);
 
-    // Lock body scroll
     useEffect(() => {
         if (isOpen) document.body.style.overflow = 'hidden';
         else document.body.style.overflow = '';
         return () => { document.body.style.overflow = ''; };
     }, [isOpen]);
 
-    // Close on Escape
     useEffect(() => {
         const handler = (e) => { if (e.key === 'Escape' && isOpen) onClose(); };
         window.addEventListener('keydown', handler);
         return () => window.removeEventListener('keydown', handler);
     }, [isOpen, onClose]);
 
-    const getCategoryName = (cat) => {
-        const key = normalizeCategory(cat);
-        return lang === 'ar' ? (categoryNameMapAr[key] || cat) : (categoryNameMap[key] || cat);
-    };
-
-    // ✅ RTL → panel slides from RIGHT. LTR → from LEFT.
     const panelPositionClass = isRTL ? 'right-0' : 'left-0';
     const slideOffscreen = isRTL ? '100%' : '-100%';
 
@@ -109,7 +55,6 @@ export default function UnifiedMenu({ isOpen, onClose }) {
         <AnimatePresence>
             {isOpen && (
                 <>
-                    {/* Backdrop */}
                     <motion.div
                         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                         transition={{ duration: 0.2 }}
@@ -117,7 +62,6 @@ export default function UnifiedMenu({ isOpen, onClose }) {
                         onClick={onClose}
                     />
 
-                    {/* Slide-in panel */}
                     <motion.aside
                         initial={{ x: slideOffscreen }}
                         animate={{ x: 0 }}
@@ -125,7 +69,6 @@ export default function UnifiedMenu({ isOpen, onClose }) {
                         transition={{ type: 'spring', damping: 28, stiffness: 220 }}
                         className={`fixed top-0 bottom-0 w-full sm:w-[440px] max-w-[92vw] bg-white z-[2001] overflow-y-auto shadow-2xl ${panelPositionClass}`}
                     >
-                        {/* Header */}
                         <div className="sticky top-0 bg-[#0F5C45] text-white px-5 py-4 flex items-center justify-between z-10 shadow-md">
                             <h2 className="text-xl font-bold">
                                 {lang === 'ar' ? 'القائمة الرئيسية' : 'Main Menu'}
@@ -140,7 +83,6 @@ export default function UnifiedMenu({ isOpen, onClose }) {
                         </div>
 
                         <div className="p-5 space-y-7">
-
                             {/* 1. Popular */}
                             <Section title={lang === 'ar' ? 'الأكثر شيوعاً' : 'Most Popular'}>
                                 <MenuLink href="/products" onClick={onClose} isRTL={isRTL}>
@@ -154,21 +96,23 @@ export default function UnifiedMenu({ isOpen, onClose }) {
                                 </MenuLink>
                             </Section>
 
-                            {/* 2. Categories */}
+                            {/* 2. Categories — DYNAMIC */}
                             <Section title={lang === 'ar' ? 'تسوق حسب القسم' : 'Shop by Category'}>
-                                {categories.map(cat => {
-                                    const key = normalizeCategory(cat);
-                                    return (
-                                        <MenuLink key={cat} href={`/${key}`} onClick={onClose} isRTL={isRTL}>
-                                            <span className="flex items-center gap-3">
-                                                <span className="w-7 h-7 flex items-center justify-center">
-                                                    {categoryIcons[key] || '📦'}
-                                                </span>
-                                                <span>{getCategoryName(cat)}</span>
+                                {categories.map(cat => (
+                                    <MenuLink key={cat.id} href={`/${cat.slug}`} onClick={onClose} isRTL={isRTL}>
+                                        <span className="flex items-center gap-3">
+                                            <span className="w-7 h-7 flex items-center justify-center text-lg">
+                                                {cat.icon || '📦'}
                                             </span>
-                                        </MenuLink>
-                                    );
-                                })}
+                                            <span>{cat.name}</span>
+                                        </span>
+                                    </MenuLink>
+                                ))}
+                                {categories.length === 0 && (
+                                    <p className="px-3 py-2 text-sm text-gray-400">
+                                        {lang === 'ar' ? 'لا توجد أقسام' : 'No categories'}
+                                    </p>
+                                )}
                             </Section>
 
                             {/* 3. Stores */}
