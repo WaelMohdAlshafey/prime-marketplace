@@ -20,7 +20,6 @@ import {
     GlobeAltIcon,
     LifebuoyIcon,
     TruckIcon,
-    X,
 } from '@heroicons/react/24/outline';
 
 const Navbar = () => {
@@ -187,32 +186,15 @@ const Navbar = () => {
                                             className="fixed inset-0 bg-black/50 z-[9998] md:hidden"
                                             onClick={closeUser}
                                         />
-                                        {/* Panel — bottom sheet on mobile, dropdown on desktop */}
+                                        {/* Panel — opens directly under the user icon on all screens */}
                                         <div
                                             className={[
-                                                'fixed bottom-0 left-0 right-0 z-[9999]',
-                                                'md:absolute md:top-full md:mt-1 md:bottom-auto',
-                                                isAr ? 'md:left-0' : 'md:right-0',
-                                                'bg-white rounded-t-2xl md:rounded-lg shadow-2xl',
+                                                'absolute top-full mt-2 z-[9999]',
+                                                isAr ? 'left-0' : 'right-0',
+                                                'w-64 max-w-[90vw] bg-white rounded-xl shadow-2xl',
                                                 'max-h-[80vh] overflow-y-auto',
-                                                'md:min-w-[240px]',
                                             ].join(' ')}
                                         >
-                                            {/* Mobile header */}
-                                            <div className="md:hidden flex items-center justify-between px-5 py-4 border-b border-gray-100 sticky top-0 bg-white rounded-t-2xl">
-                                                <div>
-                                                    <p className="text-xs text-gray-500">
-                                                        {user ? (isAr ? 'مرحباً بعودتك' : 'Welcome back') : (isAr ? 'مرحباً بك' : 'Welcome')}
-                                                    </p>
-                                                    <h3 className="text-lg font-bold text-gray-900">
-                                                        {user?.username || (isAr ? 'تسجيل الدخول / حساب جديد' : 'Sign in / Register')}
-                                                    </h3>
-                                                </div>
-                                                <button onClick={closeUser} className="p-1 hover:bg-gray-100 rounded-lg">
-                                                    <X className="w-5 h-5" />
-                                                </button>
-                                            </div>
-
                                             <div>{userLinks}</div>
                                         </div>
                                     </>

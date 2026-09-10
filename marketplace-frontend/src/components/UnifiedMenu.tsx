@@ -65,6 +65,7 @@ export default function UnifiedMenu({ isOpen, onClose }) {
     const [navPages, setNavPages] = useState([]);
     const [stores, setStores] = useState([]);
 
+    // ✅ ROBUST language + RTL detection
     const lang = (i18n.language || 'ar').startsWith('ar') ? 'ar' : 'en';
     const [isRTL, setIsRTL] = useState(true);
 
@@ -100,6 +101,10 @@ export default function UnifiedMenu({ isOpen, onClose }) {
         return lang === 'ar' ? (categoryNameMapAr[key] || cat) : (categoryNameMap[key] || cat);
     };
 
+    // ✅ RTL → panel slides from RIGHT. LTR → from LEFT.
+    const panelPositionClass = isRTL ? 'right-0' : 'left-0';
+    const slideOffscreen = isRTL ? '100%' : '-100%';
+
     return (
         <AnimatePresence>
             {isOpen && (
@@ -112,24 +117,13 @@ export default function UnifiedMenu({ isOpen, onClose }) {
                         onClick={onClose}
                     />
 
-                    {/* 
-                        ✅ FIXED: Mobile -> Centered Modal. Desktop -> Side Drawer.
-                        This prevents the menu from opening outside the screen on mobile.
-                    */}
+                    {/* Slide-in panel */}
                     <motion.aside
-                        initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                        transition={{ duration: 0.2 }}
-                        className={`
-                            fixed z-[2001] bg-white shadow-2xl overflow-y-auto
-                            /* Mobile: Centered modal */
-                            top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
-                            w-[90vw] max-w-md max-h-[80vh] rounded-2xl
-                            /* Desktop: Side drawer */
-                            md:top-0 md:bottom-0 md:translate-x-0 md:translate-y-0 md:max-h-none md:rounded-none md:w-[440px] md:max-w-[92vw]
-                            ${isRTL ? 'md:right-0 md:left-auto' : 'md:left-0 md:right-auto'}
-                        `}
+                        initial={{ x: slideOffscreen }}
+                        animate={{ x: 0 }}
+                        exit={{ x: slideOffscreen }}
+                        transition={{ type: 'spring', damping: 28, stiffness: 220 }}
+                        className={`fixed top-0 bottom-0 w-full sm:w-[440px] max-w-[92vw] bg-white z-[2001] overflow-y-auto shadow-2xl ${panelPositionClass}`}
                     >
                         {/* Header */}
                         <div className="sticky top-0 bg-[#0F5C45] text-white px-5 py-4 flex items-center justify-between z-10 shadow-md">
@@ -146,6 +140,7 @@ export default function UnifiedMenu({ isOpen, onClose }) {
                         </div>
 
                         <div className="p-5 space-y-7">
+
                             {/* 1. Popular */}
                             <Section title={lang === 'ar' ? 'الأكثر شيوعاً' : 'Most Popular'}>
                                 <MenuLink href="/products" onClick={onClose} isRTL={isRTL}>
