@@ -23,6 +23,7 @@ export default function CategoryPage({ category }) {
     const { t, i18n } = useTranslation('common');
     const [products, setProducts] = useState([]);
     const [categoryInfo, setCategoryInfo] = useState(null);
+    const [infoLoading, setInfoLoading] = useState(true);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [filters, setFilters] = useState({});
@@ -30,7 +31,7 @@ export default function CategoryPage({ category }) {
     const lang = i18n.language || 'en';
     const slug = category.toLowerCase();
 
-    // Load category metadata from API
+    // Load category metadata
     useEffect(() => {
         const fetchCategoryInfo = async () => {
             try {
@@ -39,6 +40,8 @@ export default function CategoryPage({ category }) {
                 if (found) setCategoryInfo(found);
             } catch (err) {
                 console.error('Failed to load category info:', err);
+            } finally {
+                setInfoLoading(false);
             }
         };
         fetchCategoryInfo();
@@ -77,10 +80,10 @@ export default function CategoryPage({ category }) {
     };
 
     useEffect(() => {
-        if (apiCategoryName) {
+        if (!infoLoading) {
             fetchProducts();
         }
-    }, [apiCategoryName]);
+    }, [infoLoading, apiCategoryName]);
 
     const handleApplyFilters = (newFilters) => {
         setFilters(newFilters);
@@ -92,7 +95,8 @@ export default function CategoryPage({ category }) {
         fetchProducts({});
     };
 
-    if (categoryInfo === null && !loading) {
+    // Show "not found" ONLY when category info finished loading AND category doesn't exist
+    if (!infoLoading && categoryInfo === null) {
         return (
             <div className="container mx-auto px-4 py-20 text-center">
                 <h1 className="text-3xl font-bold text-text mb-4">⚠️ Category not found</h1>
@@ -109,12 +113,9 @@ export default function CategoryPage({ category }) {
 
     return (
         <div className="bg-background min-h-screen">
-            {/* Category Hero */}
             <section className="bg-gradient-to-br from-primary-bg to-background py-12 md:py-16">
                 <div className="container mx-auto px-4 text-center">
-                    <div className="text-6xl md:text-7xl mb-4 flex justify-center">
-                        {icon}
-                    </div>
+                    <div className="text-6xl md:text-7xl mb-4 flex justify-center">{icon}</div>
                     <h1 className="text-3xl md:text-5xl font-bold text-text">{displayName}</h1>
                     {categoryInfo?.description && (
                         <p className="text-text-muted mt-3 text-lg">{categoryInfo.description}</p>
@@ -122,7 +123,6 @@ export default function CategoryPage({ category }) {
                 </div>
             </section>
 
-            {/* Main Content */}
             <div className="container mx-auto px-4 py-8">
                 <div className="flex flex-col md:flex-row gap-6">
                     <div className="md:w-72 flex-shrink-0">
@@ -167,7 +167,11 @@ export default function CategoryPage({ category }) {
                             </div>
                         ) : products.length === 0 ? (
                             <div className="text-center py-12 bg-white rounded-2xl shadow-soft">
-                                <p className="text-text-muted">{t('categories.noProducts')}</p>
+                                <p className="text-text-muted">
+                                    {lang === 'ar'
+                                        ? 'لا توجد منتجات في هذا القسم بعد.'
+                                        : 'No products in this category yet.'}
+                                </p>
                                 <button
                                     onClick={handleResetFilters}
                                     className="mt-4 bg-primary text-white px-6 py-2 rounded-pill hover:bg-primary-dark transition"

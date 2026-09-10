@@ -3,13 +3,13 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ArrowRight, ShoppingBag } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ShoppingBag, FileText } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import api from '@/lib/api';
 import type { ProductCategory } from '@/types';
 
 interface HeroSlide {
-    id: number;
+    id: string;
     badge: string;
     title: string;
     subtitle: string;
@@ -17,6 +17,15 @@ interface HeroSlide {
     cta: string;
     link: string;
     icon: string;
+    isPage?: boolean;
+}
+
+interface SimplePage {
+    id: number;
+    title: string;
+    slug: string;
+    displayOrder?: number;
+    showInNavbar?: boolean;
 }
 
 export default function HeroBanner() {
@@ -29,7 +38,7 @@ export default function HeroBanner() {
     const lang = i18n.language || 'ar';
 
     const fallbackSlide: HeroSlide = {
-        id: 0,
+        id: 'fallback',
         badge: '🛍️ ' + (lang === 'ar' ? 'وجهة التسوق الأولى' : 'Your #1 Shopping Destination'),
         title: lang === 'ar' ? 'اكتشف متعة التسوق في برايم' : 'Discover the Joy of Shopping at Prime',
         subtitle: lang === 'ar' ? 'وجهتك الأولى للعديد من المنتجات الأصلية' : 'Your #1 Destination for Authentic Products',
@@ -42,17 +51,26 @@ export default function HeroBanner() {
     };
 
     useEffect(() => {
-        const fetchCategories = async () => {
+        const fetchAll = async () => {
             try {
-                const res = await api.get<ProductCategory[]>('/api/ProductCategories?onlyActive=true');
-                const list: ProductCategory[] = res.data || [];
-                const top: ProductCategory[] = list
-                    .sort((a: ProductCategory, b: ProductCategory) =>
-                        (a.displayOrder ?? 999) - (b.displayOrder ?? 999))
-                    .slice(0, 4);
+                const [catRes, pageRes] = await Promise.all([
+                    api.get<ProductCategory[]>('/api/ProductCategories?onlyActive=true'),
+                    api.get<SimplePage[]>('/api/Pages'),
+                ]);
 
-                const built: HeroSlide[] = top.map((c: ProductCategory) => ({
-                    id: c.id,
+                // ✅ ALL active categories by Display Order
+                const cats: ProductCategory[] = (catRes.data || [])
+                    .sort((a: ProductCategory, b: ProductCategory) =>
+                        (a.displayOrder ?? 999) - (b.displayOrder ?? 999));
+
+                // ✅ ALL navbar pages by Display Order
+                const pages: SimplePage[] = (pageRes.data || [])
+                    .filter((p: SimplePage) => p.showInNavbar)
+                    .sort((a: SimplePage, b: SimplePage) =>
+                        (a.displayOrder ?? 999) - (b.displayOrder ?? 999));
+
+                const catSlides: HeroSlide[] = cats.map((c) => ({
+                    id: `cat-${c.id}`,
                     badge: `${c.icon || '🛍️'} ${lang === 'ar' ? 'قسم مميز' : 'Featured Category'}`,
                     title: c.name,
                     subtitle: c.description || (lang === 'ar' ? 'اكتشف منتجاتنا المميزة' : 'Explore our featured products'),
@@ -62,17 +80,33 @@ export default function HeroBanner() {
                     cta: lang === 'ar' ? `تسوق ${c.name}` : `Shop ${c.name}`,
                     link: `/${c.slug}`,
                     icon: c.icon || '🛍️',
+                    isPage: false,
                 }));
 
-                setSlides(built.length > 0 ? built : [fallbackSlide]);
+                const pageSlides: HeroSlide[] = pages.map((p) => ({
+                    id: `page-${p.id}`,
+                    badge: `📄 ${lang === 'ar' ? 'صفحة' : 'Page'}`,
+                    title: p.title,
+                    subtitle: lang === 'ar' ? 'تعرف على المزيد' : 'Learn more',
+                    description: lang === 'ar'
+                        ? `اكتشف صفحة "${p.title}" لمزيد من التفاصيل.`
+                        : `Discover the "${p.title}" page for more details.`,
+                    cta: lang === 'ar' ? 'اقرأ المزيد' : 'Read more',
+                    link: `/${p.slug}`,
+                    icon: '📄',
+                    isPage: true,
+                }));
+
+                const all = [...catSlides, ...pageSlides];
+                setSlides(all.length > 0 ? all : [fallbackSlide]);
             } catch (err) {
-                console.error('Hero banner: failed to load categories', err);
+                console.error('Hero banner: failed to load data', err);
                 setSlides([fallbackSlide]);
             } finally {
                 setLoading(false);
             }
         };
-        fetchCategories();
+        fetchAll();
     }, [lang]);
 
     useEffect(() => {
@@ -144,7 +178,11 @@ export default function HeroBanner() {
                                     href={slide.link}
                                     className="inline-flex items-center gap-2 bg-button-secondary-bg hover:bg-button-secondary-hover text-button-secondary-text px-4 md:px-6 py-2 md:py-3 rounded-pill font-semibold transition hover:shadow-lg hover:-translate-y-1 text-sm md:text-base"
                                 >
-                                    <ShoppingBag className="w-4 h-4 md:w-5 md:h-5" />
+                                    {slide.isPage ? (
+                                        <FileText className="w-4 h-4 md:w-5 md:h-5" />
+                                    ) : (
+                                        <ShoppingBag className="w-4 h-4 md:w-5 md:h-5" />
+                                    )}
                                     {slide.cta}
                                 </Link>
                             </div>
