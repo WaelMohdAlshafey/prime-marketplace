@@ -166,14 +166,23 @@ export default function Home() {
 
 // ===== globals.css =====
 /* ============================================================
-   PREVENT HORIZONTAL SCROLL
+   PREVENT HORIZONTAL SCROLL – but do NOT break fixed header
    ============================================================ */
 html,
 body {
-    overflow-x: hidden !important;
-    max-width: 100vw !important;
+    max-width: 100vw;
     margin: 0;
     padding: 0;
+}
+
+    /* Apply overflow-x: hidden ONLY to wrappers inside the body */
+    body > * {
+        overflow-x: hidden;
+    }
+
+/* Main container also gets overflow protection */
+main {
+    overflow-x: hidden;
 }
 
 * {
@@ -183,7 +192,6 @@ body {
 
 /* ============================================================
    NEMOCARE-INSPIRED PREMIUM THEME
-   Soft, Trustworthy, Premium
    ============================================================ */
 
 @tailwind base;
@@ -275,10 +283,11 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     line-height: 1.6;
+    padding-top: 110px; /* Space for fixed header */
 }
 
 /* ============================================================
-   SCROLLBAR
+   SCROLLBAR (Global)
    ============================================================ */
 ::-webkit-scrollbar {
     width: 6px;
@@ -298,6 +307,18 @@ body {
         background: var(--color-primary-dark);
     }
 
+/* ============================================================
+   HIDE SCROLLBAR UTILITY
+   Use: className="scrollbar-hide"
+   ============================================================ */
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+
+.scrollbar-hide {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+}
 /* ============================================================
    CONTAINER
    ============================================================ */
@@ -364,15 +385,25 @@ body {
     }
 
 /* ============================================================
+   HEADER – FIXED (no sticky)
+   ============================================================ */
+header {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 1000 !important;
+    background: var(--color-navbar-bg, #FFFFFF) !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* ============================================================
    NAVBAR
    ============================================================ */
 .navbar {
     background: var(--color-navbar-bg);
     border-bottom: 1px solid var(--color-navbar-border);
     padding: 12px 0;
-    position: sticky;
-    top: 0;
-    z-index: 100;
 }
 
     .navbar .container {
@@ -394,11 +425,11 @@ body {
     }
 
 /* ============================================================
-   SEARCH BAR
+   SEARCH BAR – hidden (but keep styles)
    ============================================================ */
 .search-bar {
     flex: 1;
-    display: flex;
+    display: none !important;
     align-items: center;
     background: var(--color-background);
     border: 1px solid var(--color-border);
@@ -633,19 +664,22 @@ body {
     }
 
 /* ============================================================
-   PRODUCT GRID
+   PRODUCT GRID – Premium Spacing (responsive)
    ============================================================ */
 .product-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
+    gap: 24px;
+}
+
+/* Each card wrapper gets a small padding for extra breathing room */
+.product-card-wrapper {
+    padding: 8px;
 }
 
 /* ============================================================
    PREMIUM UI/UX – Modern Shapes, Colors, and Feel
    ============================================================ */
-
-/* ----- Modern Card Styles ----- */
 .rounded-card {
     border-radius: var(--radius-card, 12px);
 }
@@ -658,7 +692,6 @@ body {
     box-shadow: var(--shadow-card-hover, 0 12px 40px rgba(78, 140, 158, 0.15));
 }
 
-/* ----- Premium Gradient Backgrounds ----- */
 .bg-premium-gradient {
     background: linear-gradient(135deg, #E8F4F7 0%, #F8F8F8 100%);
 }
@@ -667,7 +700,6 @@ body {
     background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 100%);
 }
 
-/* ----- Modern Button Styles ----- */
 .btn-premium {
     background: var(--color-button-primary-bg);
     color: var(--color-button-primary-text);
@@ -699,7 +731,6 @@ body {
         box-shadow: 0 8px 24px rgba(210, 119, 54, 0.3);
     }
 
-/* ----- Premium Badge Styles ----- */
 .badge-premium {
     display: inline-block;
     padding: 2px 12px;
@@ -725,7 +756,6 @@ body {
     color: #FFFFFF;
 }
 
-/* ----- Trust Badge Styles ----- */
 .trust-badge {
     background: var(--color-card-bg);
     border-radius: var(--radius-md, 12px);
@@ -757,7 +787,6 @@ body {
         color: var(--color-text-muted);
     }
 
-/* ----- Premium Section Divider ----- */
 .section-divider {
     height: 2px;
     background: linear-gradient(to right, transparent, var(--color-primary-light), transparent);
@@ -766,11 +795,27 @@ body {
 }
 
 /* ============================================================
-   RESPONSIVE
+   FLY ANIMATION – used by ProductCard
+   ============================================================ */
+@keyframes flyToCart {
+    0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translate(-50%, -50%) scale(0.2);
+        opacity: 0;
+    }
+}
+
+/* ============================================================
+   RESPONSIVE – Adjust gaps and layout
    ============================================================ */
 @media (max-width: 1200px) {
     .product-grid {
         grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
     }
 
     .category-grid {
@@ -800,6 +845,7 @@ body {
 @media (max-width: 992px) {
     .product-grid {
         grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
     }
 
     .category-grid {
@@ -883,6 +929,7 @@ body {
 @media (max-width: 480px) {
     .product-grid {
         grid-template-columns: 1fr;
+        gap: 16px;
     }
 
     .category-grid {
@@ -903,6 +950,86 @@ body {
 
     .hero-content .description {
         font-size: 13px;
+    }
+}
+
+/* ============================================================
+   RESPONSIVE FINE-TUNING FOR EXTREME SCREENS
+   ============================================================ */
+/* Watches and very small screens (under 360px) */
+@media (max-width: 360px) {
+    body {
+        font-size: 12px;
+        padding-top: 90px;
+    }
+
+    .container {
+        padding: 0 6px;
+    }
+
+    .product-grid {
+        gap: 8px;
+    }
+
+    .hero {
+        padding: 12px;
+        min-height: 160px;
+    }
+
+    .hero-content h1 {
+        font-size: 16px;
+    }
+
+    .hero-content .subtitle {
+        font-size: 12px;
+    }
+
+    .hero-content .description {
+        font-size: 11px;
+    }
+
+    .hero-content .hero-btn {
+        padding: 6px 12px;
+        font-size: 11px;
+    }
+
+    .navbar .logo {
+        font-size: 18px;
+    }
+
+    .top-bar {
+        font-size: 9px;
+    }
+}
+
+/* Large TVs (1920px and up) */
+@media (min-width: 1920px) {
+    .container {
+        max-width: 1800px;
+        padding: 0 40px;
+    }
+
+    .product-grid {
+        grid-template-columns: repeat(6, 1fr);
+        gap: 32px;
+    }
+
+    .hero {
+        padding: 80px 100px;
+        min-height: 500px;
+    }
+
+    .hero-content h1 {
+        font-size: 56px;
+    }
+
+    .hero-content .description {
+        font-size: 20px;
+    }
+
+    .hero-content .hero-btn {
+        padding: 18px 48px;
+        font-size: 20px;
     }
 }
 
@@ -1006,15 +1133,15 @@ export default function HomeContent({ initialQuery }: HomeContentProps) {
 // ===== layout.tsx =====
 // M:\Marketplace\marketplace-frontend\app\layout.tsx
 
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Cairo, Inter } from 'next/font/google';
 import './globals.css';
 import { I18nProvider } from '@/providers/I18nProvider';
-import { AuthProvider } from '@/context/AuthContext';
 import { CartProvider } from '@/context/CartContext';
 import { WishlistProvider } from '@/context/WishlistContext';
 import { CartIconRefProvider } from '@/context/CartIconRefContext';
 import { ThemeProvider } from '@/context/ThemeContext';
+import ClientAuthWrapper from '@/components/ClientAuthWrapper';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
@@ -1034,30 +1161,31 @@ export const metadata: Metadata = {
     description: 'The best marketplace for premium products.',
 };
 
-export default function RootLayout({
-    children,
-}: {
-    children: React.ReactNode;
-}) {
+export const viewport: Viewport = {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 5,
+    userScalable: true,
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
     return (
         <html lang="ar" dir="rtl" className={`${cairo.variable} ${inter.variable}`}>
             <body className={cairo.className}>
                 <I18nProvider>
-                    <AuthProvider>
+                    <ClientAuthWrapper>
                         <CartProvider>
                             <WishlistProvider>
                                 <CartIconRefProvider>
                                     <ThemeProvider>
                                         <Navbar />
-                                        <main className="min-h-screen bg-[#F8F9FA]">
-                                            {children}
-                                        </main>
+                                        <main className="min-h-screen bg-[#F8F9FA]">{children}</main>
                                         <Footer />
                                     </ThemeProvider>
                                 </CartIconRefProvider>
                             </WishlistProvider>
                         </CartProvider>
-                    </AuthProvider>
+                    </ClientAuthWrapper>
                 </I18nProvider>
             </body>
         </html>
@@ -1091,11 +1219,10 @@ import { useTranslation } from 'react-i18next';
 import api from '@/lib/api';
 import { Product } from '@/types';
 import HeroBanner from '@/components/HeroBanner';
-import CategoryGrid from '@/components/CategoryGrid';
 import FilterSidebar from '@/components/Filters/FilterSidebar';
 import ProductCard from '@/components/ProductCard';
 import ProductDetailModal from '@/components/ProductDetailModal';
-import { ShoppingBag, Shield, Truck, Headphones, Clock, Sparkles, TrendingUp, Award } from 'lucide-react';
+import { ShoppingBag, Sparkles } from 'lucide-react';
 
 export default function Home() {
     const { t } = useTranslation('common');
@@ -1156,42 +1283,16 @@ export default function Home() {
         setIsModalOpen(true);
     };
 
-    // Premium Trust Badges
-    const trustBadges = [
-        { icon: Truck, label: 'شحن سريع', sub: 'توصيل خلال 2-5 أيام', color: 'bg-blue-50 text-blue-600' },
-        { icon: Shield, label: 'ضمان الجودة', sub: 'منتجات أصلية 100%', color: 'bg-green-50 text-green-600' },
-        { icon: Headphones, label: 'دعم 24/7', sub: 'خدمة عملاء على مدار الساعة', color: 'bg-purple-50 text-purple-600' },
-        { icon: Clock, label: 'إرجاع مجاني', sub: '30 يوم لإرجاع المنتج', color: 'bg-amber-50 text-amber-600' },
-    ];
-
     return (
-        <div className="bg-background min-h-screen">
+        <div className="bg-background min-h-screen pt-2 sm:pt-4 md:pt-6">
+            {/* Hero Banner – kept */}
             <HeroBanner />
 
-            {/* Trust Badges */}
-            <div className="container mx-auto px-4 -mt-4 md:-mt-6 relative z-10">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-                    {trustBadges.map((badge, index) => {
-                        const Icon = badge.icon;
-                        return (
-                            <div
-                                key={index}
-                                className={`${badge.color} rounded-xl shadow-soft p-3 md:p-4 text-center transition-all duration-300 hover:shadow-card-hover hover:-translate-y-1 cursor-default border border-white/50`}
-                            >
-                                <Icon className="w-5 h-5 md:w-6 md:h-6 mx-auto mb-1 md:mb-2" />
-                                <p className="text-xs md:text-sm font-bold text-text">{badge.label}</p>
-                                <p className="text-[10px] md:text-xs text-text-muted">{badge.sub}</p>
-                            </div>
-                        );
-                    })}
-                </div>
-            </div>
-
             {/* Main Content with Filters */}
-            <div className="container mx-auto px-4 py-6 md:py-10">
-                <div className="flex flex-col md:flex-row gap-6">
+            <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 md:py-10">
+                <div className="flex flex-col md:flex-row gap-4 md:gap-6">
                     {/* Sidebar */}
-                    <div className="md:w-72 flex-shrink-0">
+                    <div className="md:w-64 lg:w-72 flex-shrink-0">
                         <FilterSidebar
                             onApplyFilters={handleApplyFilters}
                             onResetFilters={handleResetFilters}
@@ -1200,26 +1301,25 @@ export default function Home() {
 
                     {/* Products */}
                     <div className="flex-1">
-                        <div className="flex items-center justify-between mb-6">
+                        <div className="flex items-center justify-between mb-4 sm:mb-6">
                             <div>
-                                <h2 className="text-2xl md:text-3xl font-bold text-text flex items-center gap-2">
-                                    <Sparkles className="w-6 h-6 text-primary" />
+                                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-text flex items-center gap-2">
+                                    <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
                                     {t('featuredProducts')}
                                 </h2>
-                                <p className="text-sm text-text-muted mt-1">{t('featuredProductsSub')}</p>
+                                <p className="text-xs sm:text-sm text-text-muted mt-1">{t('featuredProductsSub')}</p>
                             </div>
-                            <span className="text-sm text-primary font-medium bg-primary/10 px-4 py-1 rounded-pill">
+                            <span className="text-xs sm:text-sm text-primary font-medium bg-primary/10 px-2 sm:px-4 py-1 rounded-pill">
                                 {products.length} {t('productCount')}
                             </span>
                         </div>
 
                         {loading ? (
-                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-2 sm:gap-3 md:gap-4">
                                 {[...Array(6)].map((_, i) => (
-                                    <div key={i} className="bg-white rounded-2xl shadow-soft p-4 animate-pulse">
+                                    <div key={i} className="bg-white rounded-2xl shadow-soft p-3 animate-pulse">
                                         <div className="w-full aspect-square bg-gray-200 rounded-xl"></div>
                                         <div className="h-4 bg-gray-200 rounded mt-3 w-3/4"></div>
-                                        <div className="h-6 bg-gray-200 rounded mt-2 w-1/3"></div>
                                     </div>
                                 ))}
                             </div>
@@ -1228,7 +1328,7 @@ export default function Home() {
                                 <p className="text-red-500">{error}</p>
                                 <button
                                     onClick={() => fetchProducts()}
-                                    className="mt-4 bg-primary text-white px-6 py-2 rounded-pill hover:bg-primary-dark transition"
+                                    className="mt-4 bg-primary text-white px-4 py-2 rounded-pill hover:bg-primary-dark transition"
                                 >
                                     إعادة المحاولة
                                 </button>
@@ -1239,13 +1339,13 @@ export default function Home() {
                                 <p className="text-text-muted">لا توجد منتجات تطابق الفلاتر المحددة</p>
                                 <button
                                     onClick={handleResetFilters}
-                                    className="mt-4 bg-primary text-white px-6 py-2 rounded-pill hover:bg-primary-dark transition"
+                                    className="mt-4 bg-primary text-white px-4 py-2 rounded-pill hover:bg-primary-dark transition"
                                 >
                                     إعادة تعيين الفلاتر
                                 </button>
                             </div>
                         ) : (
-                            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-5">
+                            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-2 sm:gap-3 md:gap-4">
                                 {products.map((product) => (
                                     <ProductCard
                                         key={product.id}
@@ -1258,27 +1358,6 @@ export default function Home() {
                     </div>
                 </div>
             </div>
-
-            {/* Premium CTA Banner */}
-            <section className="container mx-auto px-4 py-8 md:py-12">
-                <div className="relative bg-gradient-to-br from-primary to-primary-dark rounded-2xl p-6 md:p-10 text-white overflow-hidden">
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/3"></div>
-                    <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/4"></div>
-
-                    <div className="relative z-10 text-center md:text-right">
-                        <Award className="w-10 h-10 md:w-14 md:h-14 text-secondary mx-auto md:mx-0 mb-3" />
-                        <h2 className="text-2xl md:text-4xl font-bold">انضم إلى برايم اليوم</h2>
-                        <p className="text-white/80 text-sm md:text-base max-w-2xl mx-auto md:mx-0 mt-2">
-                            احصل على أفضل المنتجات بأسعار تنافسية وشحن سريع لجميع المحافظات.
-                            اشترك الآن واستمتع بتجربة تسوق فاخرة.
-                        </p>
-                        <button className="mt-4 bg-secondary hover:bg-secondary-dark text-white px-6 md:px-8 py-2 md:py-3 rounded-pill font-semibold transition hover:shadow-lg hover:-translate-y-1 inline-flex items-center gap-2 text-sm md:text-base">
-                            <TrendingUp className="w-4 h-4" />
-                            اكتشف المزيد
-                        </button>
-                    </div>
-                </div>
-            </section>
 
             {/* Product Detail Modal */}
             <ProductDetailModal
@@ -2603,6 +2682,251 @@ export default function AdminOrders() {
 }
 
 // ===== page.tsx =====
+// @ts-nocheck
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import api from '@/lib/api';
+import { useAuth } from '@/context/AuthContext';
+import { FileText, Plus, Pencil, Trash2, Eye, EyeOff } from 'lucide-react';
+
+export default function AdminPages() {
+    const { user, isLoading } = useAuth();
+    const router = useRouter();
+    const [pages, setPages] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [showModal, setShowModal] = useState(false);
+    const [editing, setEditing] = useState(null);
+    const [submitting, setSubmitting] = useState(false);
+    const [form, setForm] = useState({
+        title: '', slug: '', content: '',
+        metaDescription: '', metaKeywords: '',
+        isPublished: true, showInFooter: false,
+        showInNavbar: false, displayOrder: 0,
+    });
+
+    useEffect(() => {
+        if (isLoading) return;
+        if (!user || user.role !== 'Admin') { router.push('/'); return; }
+        fetchPages();
+    }, [user, isLoading, router]);
+
+    const fetchPages = async () => {
+        try {
+            const res = await api.get('/api/Pages/admin/all');
+            setPages(res.data);
+        } catch (err) { console.error(err); }
+        finally { setLoading(false); }
+    };
+
+    const openCreate = () => {
+        setEditing(null);
+        setForm({
+            title: '', slug: '', content: '',
+            metaDescription: '', metaKeywords: '',
+            isPublished: true, showInFooter: false,
+            showInNavbar: false, displayOrder: pages.length + 1,
+        });
+        setShowModal(true);
+    };
+
+    const openEdit = (page) => {
+        setEditing(page);
+        setForm({
+            title: page.title,
+            slug: page.slug,
+            content: page.content || '',
+            metaDescription: page.metaDescription || '',
+            metaKeywords: page.metaKeywords || '',
+            isPublished: page.isPublished,
+            showInFooter: page.showInFooter,
+            showInNavbar: page.showInNavbar,
+            displayOrder: page.displayOrder || 0,
+        });
+        setShowModal(true);
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setSubmitting(true);
+        try {
+            if (editing) await api.put(`/api/Pages/${editing.id}`, form);
+            else await api.post('/api/Pages', form);
+            setShowModal(false);
+            await fetchPages();
+        } catch (err) {
+            alert(err.response?.data?.message || 'Failed to save page.');
+        } finally { setSubmitting(false); }
+    };
+
+    const handleDelete = async (id) => {
+        if (!confirm('Delete this page permanently?')) return;
+        try { await api.delete(`/api/Pages/${id}`); await fetchPages(); }
+        catch { alert('Failed to delete.'); }
+    };
+
+    const handleTogglePublish = async (page) => {
+        try {
+            await api.put(`/api/Pages/${page.id}`, { ...page, isPublished: !page.isPublished });
+            await fetchPages();
+        } catch { alert('Failed to toggle.'); }
+    };
+
+    if (loading) return <div className="p-12 text-center">Loading...</div>;
+
+    return (
+        <div>
+            <div className="flex justify-between items-center mb-8">
+                <div className="flex items-center gap-3">
+                    <FileText className="w-8 h-8 text-[#0F5C45]" />
+                    <div>
+                        <h1 className="text-3xl font-bold">Pages</h1>
+                        <p className="text-gray-500 text-sm">Manage dynamic pages</p>
+                    </div>
+                </div>
+                <button onClick={openCreate}
+                    className="flex items-center gap-2 bg-[#0F5C45] text-white px-4 py-2 rounded-xl hover:bg-[#0A4735]">
+                    <Plus className="w-5 h-5" /> Add Page
+                </button>
+            </div>
+
+            <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+                <table className="w-full text-right">
+                    <thead className="bg-gray-50 border-b">
+                        <tr>
+                            <th className="px-6 py-3 text-xs font-semibold text-gray-600">Title</th>
+                            <th className="px-6 py-3 text-xs font-semibold text-gray-600">Slug</th>
+                            <th className="px-6 py-3 text-xs font-semibold text-gray-600">Status</th>
+                            <th className="px-6 py-3 text-xs font-semibold text-gray-600">Navbar</th>
+                            <th className="px-6 py-3 text-xs font-semibold text-gray-600">Footer</th>
+                            <th className="px-6 py-3 text-xs font-semibold text-gray-600">Order</th>
+                            <th className="px-6 py-3 text-xs font-semibold text-gray-600">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y">
+                        {pages.map(p => (
+                            <tr key={p.id} className="hover:bg-gray-50">
+                                <td className="px-6 py-4 text-sm">{p.title}</td>
+                                <td className="px-6 py-4 text-sm text-gray-500">/{p.slug}</td>
+                                <td className="px-6 py-4 text-sm">
+                                    <button onClick={() => handleTogglePublish(p)}
+                                        className={`px-2 py-1 rounded-full text-xs flex items-center gap-1 ${p.isPublished ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
+                                        {p.isPublished ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
+                                        {p.isPublished ? 'Published' : 'Draft'}
+                                    </button>
+                                </td>
+                                <td className="px-6 py-4 text-sm">{p.showInNavbar ? '✅' : '—'}</td>
+                                <td className="px-6 py-4 text-sm">{p.showInFooter ? '✅' : '—'}</td>
+                                <td className="px-6 py-4 text-sm text-gray-500">{p.displayOrder ?? '—'}</td>
+                                <td className="px-6 py-4 text-sm space-x-2">
+                                    <button onClick={() => openEdit(p)} className="text-blue-600 hover:text-blue-800">
+                                        <Pencil className="w-4 h-4 inline" />
+                                    </button>
+                                    <button onClick={() => handleDelete(p.id)} className="text-red-600 hover:text-red-800">
+                                        <Trash2 className="w-4 h-4 inline" />
+                                    </button>
+                                    <a href={`/${p.slug}`} target="_blank" className="text-[#0F5C45] hover:text-[#0A4735]">
+                                        <Eye className="w-4 h-4 inline" />
+                                    </a>
+                                </td>
+                            </tr>
+                        ))}
+                        {pages.length === 0 && (
+                            <tr><td colSpan={7} className="px-6 py-8 text-center text-gray-500">No pages yet.</td></tr>
+                        )}
+                    </tbody>
+                </table>
+            </div>
+
+            {showModal && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-2xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                        <div className="flex justify-between items-center mb-4">
+                            <h2 className="text-2xl font-bold">{editing ? 'Edit Page' : 'New Page'}</h2>
+                            <button onClick={() => setShowModal(false)} className="text-gray-400 text-2xl">×</button>
+                        </div>
+                        <form onSubmit={handleSubmit} className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium mb-1">Title *</label>
+                                <input type="text" required value={form.title}
+                                    onChange={e => {
+                                        const title = e.target.value;
+                                        setForm({
+                                            ...form, title,
+                                            slug: editing ? form.slug : title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
+                                        });
+                                    }}
+                                    className="w-full px-4 py-2 border rounded-lg" />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium mb-1">Slug *</label>
+                                <input type="text" required value={form.slug}
+                                    onChange={e => setForm({ ...form, slug: e.target.value })}
+                                    className="w-full px-4 py-2 border rounded-lg" />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium mb-1">Content (HTML)</label>
+                                <textarea rows={8} value={form.content}
+                                    onChange={e => setForm({ ...form, content: e.target.value })}
+                                    className="w-full px-4 py-2 border rounded-lg font-mono text-sm" />
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Meta Description</label>
+                                    <input type="text" value={form.metaDescription}
+                                        onChange={e => setForm({ ...form, metaDescription: e.target.value })}
+                                        className="w-full px-4 py-2 border rounded-lg" />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Meta Keywords</label>
+                                    <input type="text" value={form.metaKeywords}
+                                        onChange={e => setForm({ ...form, metaKeywords: e.target.value })}
+                                        className="w-full px-4 py-2 border rounded-lg" />
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-3 gap-4">
+                                <label className="flex items-center gap-2">
+                                    <input type="checkbox" checked={form.isPublished}
+                                        onChange={e => setForm({ ...form, isPublished: e.target.checked })} />
+                                    Published
+                                </label>
+                                <label className="flex items-center gap-2">
+                                    <input type="checkbox" checked={form.showInNavbar}
+                                        onChange={e => setForm({ ...form, showInNavbar: e.target.checked })} />
+                                    Show in Navbar
+                                </label>
+                                <label className="flex items-center gap-2">
+                                    <input type="checkbox" checked={form.showInFooter}
+                                        onChange={e => setForm({ ...form, showInFooter: e.target.checked })} />
+                                    Show in Footer
+                                </label>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium mb-1">Display Order</label>
+                                <input type="number" value={form.displayOrder}
+                                    onChange={e => setForm({ ...form, displayOrder: parseInt(e.target.value) || 0 })}
+                                    className="w-24 px-4 py-2 border rounded-lg" />
+                            </div>
+                            <div className="flex gap-3 pt-4">
+                                <button type="submit" disabled={submitting}
+                                    className="flex-1 py-3 bg-[#0F5C45] text-white rounded-xl disabled:opacity-50">
+                                    {submitting ? 'Saving...' : editing ? 'Update' : 'Create'}
+                                </button>
+                                <button type="button" onClick={() => setShowModal(false)}
+                                    className="flex-1 py-3 bg-gray-200 rounded-xl">
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}
+
+// ===== page.tsx =====
 // app/admin/products/page.tsx
 'use client';
 
@@ -3783,72 +4107,48 @@ export default function AdminStores() {
 }
 
 // ===== page.tsx =====
+// @ts-nocheck
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import api from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 
-interface User {
-    id: number;
-    username: string;
-    email: string;
-    role: string;
-}
-
 export default function CreateStorePage() {
     const { user, isLoading } = useAuth();
     const router = useRouter();
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
+    const [vendors, setVendors] = useState([]);
     const [form, setForm] = useState({
         name: '',
         description: '',
         vendorId: '',
+        isPublic: false,
     });
-    const [logoFile, setLogoFile] = useState<File | null>(null);
-    const [vendors, setVendors] = useState<User[]>([]);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
-    const [vendorsLoading, setVendorsLoading] = useState(true);
-
-    const fetchVendors = useCallback(async () => {
-        try {
-            const response = await api.get('/api/Users');
-            const allUsers: User[] = response.data;
-            const vendorUsers = allUsers.filter((u) => u.role === 'Vendor');
-            setVendors(vendorUsers);
-        } catch (error) {
-            console.error('Failed to fetch vendors:', error);
-        } finally {
-            setVendorsLoading(false);
-        }
-    }, []);
+    const [logoFile, setLogoFile] = useState(null);
 
     useEffect(() => {
         if (isLoading) return;
-        if (!user) {
-            router.push('/auth/login');
-            return;
-        }
-        if (user.role !== 'Admin') {
+        if (!user || user.role !== 'Admin') {
             router.push('/');
             return;
         }
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchVendors();
-    }, [user, isLoading, router, fetchVendors]);
+    }, [user, isLoading, router]);
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
-    };
-
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
-            setLogoFile(e.target.files[0]);
+    const fetchVendors = async () => {
+        try {
+            const res = await api.get('/api/Users');
+            const vendorUsers = res.data.filter((u) => u.role === 'Vendor');
+            setVendors(vendorUsers);
+        } catch (err) {
+            console.error('Failed to fetch vendors:', err);
         }
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         setError('');
@@ -3864,24 +4164,41 @@ export default function CreateStorePage() {
             formData.append('name', form.name);
             formData.append('description', form.description);
             formData.append('vendorId', form.vendorId);
-            if (logoFile) {
-                formData.append('logo', logoFile);
-            }
+            formData.append('isPublic', form.isPublic ? 'true' : 'false');
+            if (logoFile) formData.append('logo', logoFile);
 
             await api.post('/api/Stores', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
             router.push('/admin/stores');
-        } catch (error) {
-            console.error('Create store failed:', error);
+        } catch (err) {
             setError('Failed to create store. Please try again.');
+            console.error(err);
         } finally {
             setLoading(false);
         }
     };
 
-    if (isLoading || vendorsLoading) {
-        return <div className="text-center py-12">Loading...</div>;
+    const handleChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        setForm({
+            ...form,
+            [name]: type === 'checkbox' ? checked : value,
+        });
+    };
+
+    const handleFileChange = (e) => {
+        if (e.target.files && e.target.files[0]) {
+            setLogoFile(e.target.files[0]);
+        }
+    };
+
+    if (isLoading) {
+        return (
+            <div className="flex justify-center items-center min-h-[60vh]">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0F5C45]" />
+            </div>
+        );
     }
 
     return (
@@ -3890,13 +4207,15 @@ export default function CreateStorePage() {
 
             {error && (
                 <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-lg mb-6">
-                    {error}
+                    ⚠️ {error}
                 </div>
             )}
 
             <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-md p-6 space-y-4">
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Store Name *</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Store Name <span className="text-red-500">*</span>
+                    </label>
                     <input
                         type="text"
                         name="name"
@@ -3904,6 +4223,7 @@ export default function CreateStorePage() {
                         value={form.name}
                         onChange={handleChange}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0F5C45] focus:border-transparent"
+                        placeholder="Enter store name"
                     />
                 </div>
 
@@ -3915,6 +4235,7 @@ export default function CreateStorePage() {
                         value={form.description}
                         onChange={handleChange}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0F5C45] focus:border-transparent"
+                        placeholder="Store description"
                     />
                 </div>
 
@@ -3926,11 +4247,15 @@ export default function CreateStorePage() {
                         onChange={handleFileChange}
                         className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#0F5C45] file:text-white hover:file:bg-[#0A4735]"
                     />
-                    {logoFile && <p className="text-sm text-green-600 mt-1">📷 {logoFile.name} selected</p>}
+                    {logoFile && (
+                        <p className="text-sm text-green-600 mt-1">📷 {logoFile.name} selected</p>
+                    )}
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Vendor *</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Vendor <span className="text-red-500">*</span>
+                    </label>
                     <select
                         name="vendorId"
                         required
@@ -3947,15 +4272,37 @@ export default function CreateStorePage() {
                     </select>
                     {vendors.length === 0 && (
                         <p className="text-sm text-yellow-600 mt-1">
-                            No vendors found. Create a vendor user first.
+                            ⚠️ No vendors found. Create a vendor user first.
                         </p>
                     )}
+                </div>
+
+                {/* ✅ Public/Private Toggle */}
+                <div className="border-t border-gray-200 pt-4 mt-2">
+                    <div className="flex items-center gap-3">
+                        <input
+                            type="checkbox"
+                            name="isPublic"
+                            id="isPublic"
+                            checked={form.isPublic}
+                            onChange={handleChange}
+                            className="w-5 h-5 accent-[#0F5C45] rounded"
+                        />
+                        <label htmlFor="isPublic" className="text-sm font-medium text-gray-700">
+                            Make this store <span className="text-green-600 font-semibold">Public</span>
+                        </label>
+                    </div>
+                    <p className="text-xs text-gray-400 mt-1 ml-8">
+                        {form.isPublic
+                            ? '✅ Visible to ALL users (including Clients)'
+                            : '🔒 Visible ONLY to Admin, Vendor, and Employee'}
+                    </p>
                 </div>
 
                 <button
                     type="submit"
                     disabled={loading || vendors.length === 0}
-                    className="w-full py-3 bg-[#0F5C45] text-white font-semibold rounded-lg hover:bg-[#0A4735] transition disabled:opacity-50"
+                    className="w-full py-3 bg-[#0F5C45] text-white font-semibold rounded-lg hover:bg-[#0A4735] transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     {loading ? 'Creating...' : 'Create Store'}
                 </button>
@@ -6639,146 +6986,136 @@ export default function OrderDetail() {
 // ===== page.tsx =====
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 import api from '@/lib/api';
-import { useAuth } from '@/context/AuthContext';
+import { Product } from '@/types';
+import ProductCard from '@/components/ProductCard';
+import FilterSidebar from '@/components/Filters/FilterSidebar';
+import { ShoppingBag, Sparkles } from 'lucide-react';
 
-export default function AdminProducts() {
-    const { user, isLoading } = useAuth();
+export default function ProductsPage() {
+    const { t } = useTranslation('common');
     const router = useRouter();
-    const [form, setForm] = useState({
-        name: '',
-        description: '',
-        price: 0,
-        costPrice: 0,
-        stockQuantity: 0,
-    });
-    const [image, setImage] = useState<File | null>(null);
-    const [loading, setLoading] = useState(false);
-    const [message, setMessage] = useState('');
+    const [products, setProducts] = useState<Product[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [filters, setFilters] = useState<{
+        minPrice?: number;
+        maxPrice?: number;
+        inStock?: boolean;
+        rating?: number;
+    }>({});
 
-    if (isLoading) return <div className="text-center py-12">Loading...</div>;
-    if (!user) {
-        router.push('/auth/login');
-        return null;
-    }
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
+    const fetchProducts = async (filterOverrides?: typeof filters) => {
         setLoading(true);
-        setMessage('');
-
-        const data = new FormData();
-        data.append('name', form.name);
-        data.append('description', form.description);
-        data.append('price', form.price.toString());
-        data.append('costPrice', form.costPrice.toString());
-        data.append('stockQuantity', form.stockQuantity.toString());
-        if (image) data.append('image', image);
-
+        setError(null);
         try {
-            await api.post('/api/Products', data, {
-                headers: { 'Content-Type': 'multipart/form-data' }
-            });
-            setMessage('✅ Product added successfully!');
-            setForm({ name: '', description: '', price: 0, costPrice: 0, stockQuantity: 0 });
-            setImage(null);
-        } catch (error) {
-            console.error('Failed to add product:', error);
-            setMessage('❌ Failed to add product. Please try again.');
+            const finalFilters = filterOverrides || filters;
+            let url = '/api/Products?page=1&pageSize=20';
+
+            if (Object.keys(finalFilters).length > 0) {
+                const params = new URLSearchParams();
+                if (finalFilters.minPrice !== undefined) params.append('minPrice', finalFilters.minPrice.toString());
+                if (finalFilters.maxPrice !== undefined) params.append('maxPrice', finalFilters.maxPrice.toString());
+                if (finalFilters.inStock !== undefined) params.append('inStock', finalFilters.inStock.toString());
+                if (finalFilters.rating !== undefined) params.append('rating', finalFilters.rating.toString());
+                url = `/api/Products/filter?${params.toString()}&page=1&pageSize=20`;
+            }
+
+            const response = await api.get<{ items: Product[] }>(url);
+            setProducts(response.data.items || []);
+        } catch (err) {
+            console.error('❌ Failed to fetch products:', err);
+            setError('Failed to load products. Please try again.');
         } finally {
             setLoading(false);
         }
     };
 
+    useEffect(() => {
+        fetchProducts();
+    }, []);
+
+    const handleApplyFilters = (newFilters: typeof filters) => {
+        setFilters(newFilters);
+        fetchProducts(newFilters);
+    };
+
+    const handleResetFilters = () => {
+        setFilters({});
+        fetchProducts({});
+    };
+
+    const handleCardClick = (productId: number) => {
+        router.push(`/products/${productId}`);
+    };
+
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center min-h-[60vh]">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#4E8C9E]"></div>
+            </div>
+        );
+    }
+
     return (
-        <div className="container mx-auto px-4 py-12 max-w-2xl">
-            <h1 className="text-3xl font-bold text-gray-800 mb-8">📦 Add New Product</h1>
-
-            {message && (
-                <div className={`p-3 rounded-lg mb-4 ${message.startsWith('✅') ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
-                    {message}
-                </div>
-            )}
-
-            <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-md p-6 space-y-4">
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Product Name *</label>
-                    <input
-                        type="text"
-                        required
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                        value={form.name}
-                        onChange={(e) => setForm({ ...form, name: e.target.value })}
-                    />
-                </div>
-
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                    <textarea
-                        rows={3}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                        value={form.description}
-                        onChange={(e) => setForm({ ...form, description: e.target.value })}
-                    />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="bg-background min-h-screen py-8">
+            <div className="container mx-auto px-4">
+                <div className="flex items-center gap-3 mb-6">
+                    <ShoppingBag className="w-8 h-8 text-primary" />
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Sales Price *</label>
-                        <input
-                            type="number"
-                            step="0.01"
-                            required
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                            value={form.price || ''}
-                            onChange={(e) => setForm({ ...form, price: parseFloat(e.target.value) || 0 })}
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Cost Price (Hidden) *</label>
-                        <input
-                            type="number"
-                            step="0.01"
-                            required
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                            value={form.costPrice || ''}
-                            onChange={(e) => setForm({ ...form, costPrice: parseFloat(e.target.value) || 0 })}
-                        />
+                        <h1 className="text-3xl font-bold text-text">All Products</h1>
+                        <p className="text-text-muted text-sm">{products.length} products available</p>
                     </div>
                 </div>
 
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Stock Quantity *</label>
-                    <input
-                        type="number"
-                        required
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                        value={form.stockQuantity || ''}
-                        onChange={(e) => setForm({ ...form, stockQuantity: parseInt(e.target.value) || 0 })}
-                    />
-                </div>
+                <div className="flex flex-col md:flex-row gap-6">
+                    {/* Sidebar */}
+                    <div className="md:w-72 flex-shrink-0">
+                        <FilterSidebar
+                            onApplyFilters={handleApplyFilters}
+                            onResetFilters={handleResetFilters}
+                        />
+                    </div>
 
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Product Image</label>
-                    <input
-                        type="file"
-                        accept="image/*"
-                        className="w-full"
-                        onChange={(e) => setImage(e.target.files?.[0] || null)}
-                    />
-                    {image && <p className="text-sm text-green-600 mt-1">📷 {image.name} selected</p>}
+                    {/* Products */}
+                    <div className="flex-1">
+                        {error ? (
+                            <div className="text-center py-12 bg-white rounded-2xl shadow-soft">
+                                <p className="text-red-500">{error}</p>
+                                <button
+                                    onClick={() => fetchProducts()}
+                                    className="mt-4 bg-primary text-white px-6 py-2 rounded-pill hover:bg-primary-dark transition"
+                                >
+                                    Retry
+                                </button>
+                            </div>
+                        ) : products.length === 0 ? (
+                            <div className="text-center py-12 bg-white rounded-2xl shadow-soft">
+                                <p className="text-text-muted">No products found matching your criteria.</p>
+                                <button
+                                    onClick={handleResetFilters}
+                                    className="mt-4 bg-primary text-white px-6 py-2 rounded-pill hover:bg-primary-dark transition"
+                                >
+                                    Reset Filters
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                {products.map((product) => (
+                                    <ProductCard
+                                        key={product.id}
+                                        product={product}
+                                        onCardClick={() => handleCardClick(product.id)}
+                                    />
+                                ))}
+                            </div>
+                        )}
+                    </div>
                 </div>
-
-                <button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
-                >
-                    {loading ? 'Adding...' : '➕ Add Product'}
-                </button>
-            </form>
+            </div>
         </div>
     );
 }
@@ -8865,47 +9202,93 @@ export default function CategoryRoute({ params }: { params: { category: string }
 }
 
 // ===== CategoryGrid.tsx =====
+// @ts-nocheck
 'use client';
 
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import api from '@/lib/api';
-import { Monitor, Sparkles, Droplet, Shirt, Gem, Smartphone, Pill, Home } from 'lucide-react';
+import PerfumeIcon from '@/components/icons/PerfumeIcon';
+import SoftwareIcon from '@/components/icons/SoftwareIcon';
+import HairCareIcon from '@/components/icons/HairCareIcon';
+import SkinCareIcon from '@/components/icons/SkinCareIcon';
+import AccessoriesIcon from '@/components/icons/AccessoriesIcon';
+import ElectronicsIcon from '@/components/icons/ElectronicsIcon';
+import SupplementsIcon from '@/components/icons/SupplementsIcon';
+import HomeIcon from '@/components/icons/HomeIcon';
 
-const categoryIcons: Record<string, any> = {
-    software: Monitor,
-    'hair-care': Sparkles,
-    'skin-care': Droplet,
-    fashion: Shirt,
-    accessories: Gem,
-    electronics: Smartphone,
-    supplements: Pill,
-    home: Home,
+// ✅ Category icons - Custom SVG icons for ALL categories
+const categoryIcons = {
+    software: <SoftwareIcon className="w-6 h-6 text-indigo-500" />,
+    'hair-care': <HairCareIcon className="w-6 h-6 text-pink-500" />,
+    'skin-care': <SkinCareIcon className="w-6 h-6 text-amber-500" />,
+    fashion: <PerfumeIcon className="w-6 h-6 text-rose-500" />,
+    perfumes: <PerfumeIcon className="w-6 h-6 text-rose-500" />,
+    accessories: <AccessoriesIcon className="w-6 h-6 text-yellow-500" />,
+    electronics: <ElectronicsIcon className="w-6 h-6 text-blue-500" />,
+    supplements: <SupplementsIcon className="w-6 h-6 text-green-500" />,
+    home: <HomeIcon className="w-6 h-6 text-gray-500" />,
 };
 
-const categoryColors: Record<string, string> = {
+// ✅ Category colors
+const categoryColors = {
     software: 'bg-indigo-50 text-indigo-600',
     'hair-care': 'bg-pink-50 text-pink-600',
     'skin-care': 'bg-amber-50 text-amber-600',
     fashion: 'bg-rose-50 text-rose-600',
+    perfumes: 'bg-rose-50 text-rose-600',
     accessories: 'bg-yellow-50 text-yellow-600',
     electronics: 'bg-blue-50 text-blue-600',
     supplements: 'bg-green-50 text-green-600',
     home: 'bg-gray-50 text-gray-600',
 };
 
-const normalizeCategory = (cat: string): string => cat.toLowerCase().replace(/\s+/g, '-');
+// ✅ Category mapping - English
+const categoryNameMap = {
+    software: 'Software',
+    'hair-care': 'Hair Care',
+    'skin-care': 'Skin Care',
+    fashion: 'Perfumes',
+    perfumes: 'Perfumes',
+    accessories: 'Accessories',
+    electronics: 'Electronics',
+    supplements: 'Supplements',
+    home: 'Home',
+};
 
-const getCategoryDisplayName = (cat: string, t: (key: string) => string): string => {
-    const key = `categories.${normalizeCategory(cat)}`;
-    const translated = t(key);
-    return translated === key ? cat : translated;
+// ✅ Category mapping - Arabic
+const categoryNameMapAr = {
+    software: 'برامج',
+    'hair-care': 'العناية بالشعر',
+    'skin-care': 'العناية بالبشرة',
+    fashion: 'عطور',
+    perfumes: 'عطور',
+    accessories: 'إكسسوارات',
+    electronics: 'إلكترونيات',
+    supplements: 'مكملات غذائية',
+    home: 'المنزل',
+};
+
+const normalizeCategory = (cat) => {
+    if (cat === 'Fashion' || cat === 'fashion' || cat === 'Perfumes' || cat === 'perfumes') {
+        return 'perfumes';
+    }
+    return cat.toLowerCase().replace(/\s+/g, '-');
+};
+
+const getCategoryDisplayName = (cat, lang) => {
+    const key = normalizeCategory(cat);
+    if (lang === 'ar') {
+        return categoryNameMapAr[key] || cat;
+    }
+    return categoryNameMap[key] || cat;
 };
 
 export default function CategoryGrid() {
-    const { t } = useTranslation('common');
-    const [categories, setCategories] = useState<string[]>([]);
+    const { t, i18n } = useTranslation('common');
+    const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
+    const lang = i18n.language || 'en';
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -8921,7 +9304,7 @@ export default function CategoryGrid() {
         fetchCategories();
     }, []);
 
-    const handleCategoryClick = (category: string) => {
+    const handleCategoryClick = (category) => {
         const slug = normalizeCategory(category);
         window.location.href = `/${slug}`;
     };
@@ -8951,18 +9334,19 @@ export default function CategoryGrid() {
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4">
                 {categories.map((cat) => {
                     const key = normalizeCategory(cat);
-                    const Icon = categoryIcons[key] || Home;
+                    const icon = categoryIcons[key] || '📂';
                     const colorClass = categoryColors[key] || 'bg-gray-50 text-gray-600';
-                    const displayName = getCategoryDisplayName(cat, t);
+                    const displayName = getCategoryDisplayName(cat, lang);
 
                     return (
                         <button
                             key={cat}
                             onClick={() => handleCategoryClick(cat)}
                             className="bg-card-bg rounded-2xl shadow-soft hover:shadow-card-hover transition p-4 md:p-5 text-center hover:-translate-y-1 duration-300 border border-border/50 cursor-pointer w-full group"
+                            type="button"
                         >
                             <div className={`w-12 h-12 md:w-14 md:h-14 rounded-full ${colorClass} flex items-center justify-center mx-auto mb-2 md:mb-3 group-hover:scale-110 transition-transform duration-300`}>
-                                <Icon className="w-6 h-6 md:w-7 md:h-7" />
+                                {icon}
                             </div>
                             <h3 className="font-semibold text-text text-xs md:text-sm">{displayName}</h3>
                         </button>
@@ -8974,6 +9358,7 @@ export default function CategoryGrid() {
 }
 
 // ===== CategoryPage.tsx =====
+// @ts-nocheck
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -8984,59 +9369,89 @@ import { Product, PagedResult } from '@/types';
 import ProductCard from '@/components/ProductCard';
 import FilterSidebar from '@/components/Filters/FilterSidebar';
 import { Sparkles } from 'lucide-react';
+import PerfumeIcon from '@/components/icons/PerfumeIcon';
 
-// Category mapping – SLUG → DATABASE NAME
-const categoryNameMap: Record<string, string> = {
+// ✅ Category mapping - maps URL slug to database category name
+const categoryNameMap = {
     software: 'Software',
     'hair-care': 'Hair Care',
     'skin-care': 'Skin Care',
-    fashion: 'Fashion',
+    fashion: 'Perfumes',
+    perfumes: 'Perfumes',
     accessories: 'Accessories',
     electronics: 'Electronics',
     supplements: 'Supplements',
     home: 'Home',
 };
 
-const categoryEmojis: Record<string, string> = {
+// ✅ Category mapping - Arabic display names
+const categoryNameMapAr = {
+    software: 'برامج',
+    'hair-care': 'العناية بالشعر',
+    'skin-care': 'العناية بالبشرة',
+    fashion: 'عطور',
+    perfumes: 'عطور',
+    accessories: 'إكسسوارات',
+    electronics: 'إلكترونيات',
+    supplements: 'مكملات غذائية',
+    home: 'المنزل',
+};
+
+// ✅ Category icons - PRETTY versions
+const categoryIcons = {
     software: '💻',
     'hair-care': '💇',
     'skin-care': '🧴',
-    fashion: '👗',
+    fashion: <PerfumeIcon className="w-16 h-16 text-primary" />,
+    perfumes: <PerfumeIcon className="w-16 h-16 text-primary" />,
     accessories: '💎',
     electronics: '📱',
     supplements: '💊',
     home: '🏠',
 };
 
-const getCategoryDisplayName = (slug: string, t: (key: string) => string): string => {
-    const key = `categories.${slug}`;
-    const translated = t(key);
-    return translated === key ? slug.replace(/-/g, ' ') : translated;
+// ✅ Category emojis - fallback
+const categoryEmojis = {
+    software: '💻',
+    'hair-care': '💇',
+    'skin-care': '🧴',
+    fashion: '🌸',
+    perfumes: '🌸',
+    accessories: '💎',
+    electronics: '📱',
+    supplements: '💊',
+    home: '🏠',
 };
 
-interface CategoryPageProps {
-    category: string;
-}
+const getCategoryDisplayName = (slug, lang) => {
+    if (lang === 'ar') {
+        return categoryNameMapAr[slug] || slug.replace(/-/g, ' ');
+    }
+    return categoryNameMap[slug] || slug.replace(/-/g, ' ');
+};
 
-export default function CategoryPage({ category }: CategoryPageProps) {
-    const { t } = useTranslation('common');
+const getCategoryNameForApi = (slug) => {
+    if (slug === 'fashion' || slug === 'perfumes') {
+        return 'Perfumes';
+    }
+    return categoryNameMap[slug] || slug;
+};
+
+export default function CategoryPage({ category }) {
+    const { t, i18n } = useTranslation('common');
     const router = useRouter();
-    const [products, setProducts] = useState<Product[]>([]);
+    const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    const [filters, setFilters] = useState<{
-        minPrice?: number;
-        maxPrice?: number;
-        inStock?: boolean;
-        rating?: number;
-    }>({});
+    const [error, setError] = useState(null);
+    const [filters, setFilters] = useState({});
 
     const normalizedCategory = category.toLowerCase();
-    const dbCategory = categoryNameMap[normalizedCategory];
-    const displayName = getCategoryDisplayName(normalizedCategory, t);
-    const emoji = categoryEmojis[normalizedCategory] || '📂';
+    const lang = i18n.language || 'en';
+    const displayName = getCategoryDisplayName(normalizedCategory, lang);
+    const icon = categoryIcons[normalizedCategory] || '📂';
+    const apiCategoryName = getCategoryNameForApi(normalizedCategory);
 
-    const fetchProducts = async (filterOverrides?: typeof filters) => {
+    const fetchProducts = async (filterOverrides) => {
         setLoading(true);
         setError(null);
         try {
@@ -9051,11 +9466,10 @@ export default function CategoryPage({ category }: CategoryPageProps) {
                 if (finalFilters.rating !== undefined) params.append('rating', finalFilters.rating.toString());
                 url = `/api/Products/filter?${params.toString()}&page=1&pageSize=100`;
             } else {
-                const categoryName = dbCategory || normalizedCategory;
-                url = `/api/Products/category/${encodeURIComponent(categoryName)}?page=1&pageSize=100`;
+                url = `/api/Products/category/${encodeURIComponent(apiCategoryName)}?page=1&pageSize=100`;
             }
 
-            const response = await api.get<PagedResult<Product>>(url);
+            const response = await api.get(url);
             setProducts(response.data.items || []);
         } catch (err) {
             console.error('❌ Failed to fetch products:', err);
@@ -9071,7 +9485,7 @@ export default function CategoryPage({ category }: CategoryPageProps) {
         }
     }, [category]);
 
-    const handleApplyFilters = (newFilters: typeof filters) => {
+    const handleApplyFilters = (newFilters) => {
         setFilters(newFilters);
         fetchProducts(newFilters);
     };
@@ -9081,7 +9495,8 @@ export default function CategoryPage({ category }: CategoryPageProps) {
         fetchProducts({});
     };
 
-    if (!dbCategory) {
+    const isValidCategory = categoryNameMap[normalizedCategory] || categoryNameMapAr[normalizedCategory];
+    if (!isValidCategory) {
         return (
             <div className="container mx-auto px-4 py-20 text-center">
                 <h1 className="text-3xl font-bold text-text mb-4">⚠️ القسم غير موجود</h1>
@@ -9101,10 +9516,14 @@ export default function CategoryPage({ category }: CategoryPageProps) {
             {/* Category Hero */}
             <section className="bg-gradient-to-br from-primary-bg to-background py-12 md:py-16">
                 <div className="container mx-auto px-4 text-center">
-                    <div className="text-5xl md:text-6xl mb-4">{emoji}</div>
+                    <div className="text-6xl md:text-7xl mb-4 flex justify-center">
+                        {icon}
+                    </div>
                     <h1 className="text-3xl md:text-5xl font-bold text-text">{displayName}</h1>
                     <p className="text-text-muted mt-3 text-lg">
-                        {t('categories.discover', { category: displayName })}
+                        {lang === 'ar'
+                            ? `اكتشف أفضل منتجات ${displayName} من بائعين موثوقين`
+                            : `Discover the best ${displayName} products from trusted vendors`}
                     </p>
                 </div>
             </section>
@@ -9176,84 +9595,95 @@ export default function CategoryPage({ category }: CategoryPageProps) {
     );
 }
 
+// ===== ClientAuthWrapper.tsx =====
+'use client';
+
+import { ReactNode } from 'react';
+import { AuthProvider } from '@/context/AuthContext';
+
+export default function ClientAuthWrapper({ children }: { children: ReactNode }) {
+    return <AuthProvider>{children}</AuthProvider>;
+}
+
 // ===== Footer.tsx =====
+// @ts-nocheck
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Heart, Mail, Phone, MapPin, Apple, Smartphone, ShoppingBag } from 'lucide-react';
+import { Heart, Mail, Phone, MapPin, ShoppingBag } from 'lucide-react';
 import api from '@/lib/api';
+import { getStoreSettings } from '@/lib/storeApi';
 
 export default function Footer() {
-    const { t } = useTranslation('common');
+    const { t, i18n } = useTranslation('common');
     const [email, setEmail] = useState('');
     const [loading, setLoading] = useState(false);
-    const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+    const [message, setMessage] = useState(null);
+    const [settings, setSettings] = useState(null);
+    const lang = i18n.language || 'ar';
 
-    const handleSubscribe = async (e: React.FormEvent) => {
+    // Fetch store settings + dynamic footer pages (from admin Pages)
+    const [footerPages, setFooterPages] = useState([]);
+
+    useEffect(() => {
+        getStoreSettings().then(setSettings).catch(() => { });
+        api.get('/api/Pages/navigation')
+            .then(res => setFooterPages(res.data.footerPages || []))
+            .catch(() => { });
+    }, []);
+
+    const handleSubscribe = async (e) => {
         e.preventDefault();
         if (!email) {
-            setMessage({ type: 'error', text: 'يرجى إدخال بريدك الإلكتروني.' });
+            setMessage({ type: 'error', text: lang === 'ar' ? 'يرجى إدخال بريدك الإلكتروني.' : 'Please enter your email.' });
             return;
         }
-
         setLoading(true);
         setMessage(null);
-
         try {
             await api.post('/api/Newsletter/subscribe', { email });
-            setMessage({ type: 'success', text: '✅ تم الاشتراك بنجاح!' });
+            setMessage({ type: 'success', text: lang === 'ar' ? '✅ تم الاشتراك بنجاح!' : '✅ Subscribed successfully!' });
             setEmail('');
-        } catch (err: any) {
-            setMessage({ type: 'error', text: err.response?.data?.message || 'حدث خطأ، حاول مرة أخرى.' });
+        } catch (err) {
+            setMessage({ type: 'error', text: err.response?.data?.message || (lang === 'ar' ? 'حدث خطأ، حاول مرة أخرى.' : 'Something went wrong.') });
         } finally {
             setLoading(false);
             setTimeout(() => setMessage(null), 5000);
         }
     };
 
+    // Extract contact info safely
+    const whatsapp = settings?.whatsapp || '';
+    const landline = settings?.landline || '';
+    const emailContact = settings?.emails?.[0] || '';
+    const address = settings?.address || '';
+    const location = settings?.location || '';
+
     return (
-        <footer className="bg-footer-bg text-footer-text mt-12 py-12">
+        <footer className="bg-footer-bg text-footer-text mt-12 pt-12 pb-6">
             <div className="container mx-auto px-4">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
-                    <div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+
+                    {/* 1. Brand + Newsletter */}
+                    <div className="md:col-span-2">
                         <h4 className="font-bold text-footer-heading text-lg mb-4 flex items-center gap-2">
                             <ShoppingBag className="w-5 h-5" />
-                            Prime
+                            {settings?.storeName || 'Prime'}
                         </h4>
-                        <p className="text-footer-text text-sm leading-relaxed mb-4">
-                            منصة تسوق فاخرة تقدم أفضل المنتجات من برامج، تجميل، أزياء، وإكسسوارات.
+                        <p className="text-footer-text text-sm leading-relaxed mb-6 max-w-lg">
+                            {lang === 'ar'
+                                ? 'منصة تسوق فاخرة تقدم أفضل المنتجات من برامج، تجميل، أزياء، وإكسسوارات.'
+                                : 'A premium marketplace offering the best products in software, beauty, fashion, and accessories.'}
                         </p>
-                        <div className="flex gap-2">
-                            <Link href="#" className="inline-flex items-center gap-2 bg-white/10 px-4 py-2 rounded-lg hover:bg-white/20 transition text-sm text-footer-text hover:text-white">
-                                <Apple className="w-4 h-4" /> App Store
-                            </Link>
-                            <Link href="#" className="inline-flex items-center gap-2 bg-white/10 px-4 py-2 rounded-lg hover:bg-white/20 transition text-sm text-footer-text hover:text-white">
-                                <Smartphone className="w-4 h-4" /> Google Play
-                            </Link>
-                        </div>
-                    </div>
 
-                    <div>
-                        <h4 className="font-bold text-footer-heading text-lg mb-4">{t('footer.quickLinks')}</h4>
-                        <Link href="/" className="block py-1.5 text-footer-text hover:text-white transition">{t('footer.home')}</Link>
-                        <Link href="/products" className="block py-1.5 text-footer-text hover:text-white transition">{t('footer.products')}</Link>
-                        <Link href="/stores" className="block py-1.5 text-footer-text hover:text-white transition">{t('footer.stores')}</Link>
-                        <Link href="/offers" className="block py-1.5 text-footer-text hover:text-white transition">{t('footer.offers')}</Link>
-                    </div>
-
-                    <div>
-                        <h4 className="font-bold text-footer-heading text-lg mb-4">{t('footer.customerService')}</h4>
-                        <Link href="/contact" className="block py-1.5 text-footer-text hover:text-white transition">{t('footer.contact')}</Link>
-                        <Link href="/faq" className="block py-1.5 text-footer-text hover:text-white transition">{t('footer.faq')}</Link>
-                        <Link href="/returns" className="block py-1.5 text-footer-text hover:text-white transition">{t('footer.returns')}</Link>
-                        <Link href="/shipping" className="block py-1.5 text-footer-text hover:text-white transition">{t('footer.shipping')}</Link>
-                    </div>
-
-                    <div>
-                        <h4 className="font-bold text-footer-heading text-lg mb-4">{t('footer.newsletter')}</h4>
-                        <p className="text-footer-text text-sm mb-3">{t('footer.newsletterDescription')}</p>
+                        <h4 className="font-bold text-footer-heading text-base mb-3">
+                            {lang === 'ar' ? '📬 اشترك في النشرة البريدية' : '📬 Join our newsletter'}
+                        </h4>
+                        <p className="text-footer-text text-sm mb-3">
+                            {lang === 'ar' ? 'اشترك لتحصل على أحدث العروض والمنتجات.' : 'Get the latest offers and products in your inbox.'}
+                        </p>
 
                         {message && (
                             <div className={`mb-3 p-2 rounded text-sm ${message.type === 'success' ? 'bg-green-500/20 text-green-300' : 'bg-red-500/20 text-red-300'}`}>
@@ -9261,31 +9691,89 @@ export default function Footer() {
                             </div>
                         )}
 
-                        <form onSubmit={handleSubscribe} className="flex rounded-lg overflow-hidden border border-white/20">
+                        <form onSubmit={handleSubscribe} className="flex rounded-lg overflow-hidden border border-white/20 max-w-md">
                             <input
                                 type="email"
-                                placeholder={t('footer.emailPlaceholder')}
+                                placeholder={lang === 'ar' ? 'بريدك الإلكتروني' : 'Your email'}
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
-                                className="flex-1 px-4 py-2 bg-transparent text-footer-text placeholder:text-footer-text/50 outline-none"
+                                className="flex-1 px-4 py-2.5 bg-transparent text-footer-text placeholder:text-footer-text/50 outline-none"
                             />
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="px-4 py-2 bg-secondary text-white font-medium hover:bg-secondary-dark transition disabled:opacity-50"
+                                className="px-5 py-2.5 bg-secondary text-white font-medium hover:bg-secondary-dark transition disabled:opacity-50"
                             >
-                                {loading ? '...' : t('footer.subscribe')}
+                                {loading ? '...' : (lang === 'ar' ? 'اشتراك' : 'Subscribe')}
                             </button>
                         </form>
                     </div>
+
+                    {/* 2. Contact + Dynamic footer pages (from Admin Pages) */}
+                    <div>
+                        <h4 className="font-bold text-footer-heading text-base mb-4">
+                            {lang === 'ar' ? 'تواصل معنا' : 'Contact Us'}
+                        </h4>
+
+                        <ul className="space-y-3 text-sm">
+                            {landline && (
+                                <li className="flex items-start gap-2">
+                                    <Phone className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                                    <span className="font-mono" dir="ltr">{landline}</span>
+                                </li>
+                            )}
+                            {whatsapp && (
+                                <li className="flex items-start gap-2">
+                                    <Phone className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                                    <span className="font-mono" dir="ltr">WhatsApp: {whatsapp}</span>
+                                </li>
+                            )}
+                            {emailContact && (
+                                <li className="flex items-start gap-2">
+                                    <Mail className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                                    <span>{emailContact}</span>
+                                </li>
+                            )}
+                            {(address || location) && (
+                                <li className="flex items-start gap-2">
+                                    <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                                    <span>{address}{address && location ? ' — ' : ''}{location}</span>
+                                </li>
+                            )}
+                        </ul>
+
+                        {/* Dynamic footer pages from admin Pages manager */}
+                        {footerPages.length > 0 && (
+                            <div className="mt-6">
+                                <h4 className="font-bold text-footer-heading text-base mb-3">
+                                    {lang === 'ar' ? 'روابط' : 'Links'}
+                                </h4>
+                                <ul className="space-y-2 text-sm">
+                                    {footerPages.map(p => (
+                                        <li key={p.id}>
+                                            <Link href={`/${p.slug}`} className="text-footer-text hover:text-white transition">
+                                                {p.title}
+                                            </Link>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+                    </div>
                 </div>
 
-                <div className="border-t border-white/10 mt-8 pt-6 text-center text-footer-text text-sm">
-                    {t('footer.copyright')}
-                    <span className="flex items-center justify-center gap-1 mt-1">
-                        {t('footer.madeWith')} <Heart className="w-3 h-3 text-red-500 fill-red-500 animate-pulse" /> by Prime Team
-                    </span>
+                {/* Copyright */}
+                <div className="border-t border-white/10 mt-10 pt-5 text-center text-footer-text text-sm">
+                    <p>
+                        © {new Date().getFullYear()} {settings?.storeName || 'Prime'}.{' '}
+                        {lang === 'ar' ? 'جميع الحقوق محفوظة.' : 'All rights reserved.'}
+                    </p>
+                    <p className="flex items-center justify-center gap-1 mt-1 text-xs opacity-70">
+                        {lang === 'ar' ? 'صُنع بـ' : 'Made with'}{' '}
+                        <Heart className="w-3 h-3 text-red-500 fill-red-500 animate-pulse" />{' '}
+                        {lang === 'ar' ? 'فريق برايم' : 'by Prime Team'}
+                    </p>
                 </div>
             </div>
         </footer>
@@ -9299,68 +9787,59 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ArrowRight, ShoppingBag, Shield, Truck, Headphones, Clock } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ShoppingBag } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 export default function HeroBanner() {
-    const { t } = useTranslation('common');
+    const { t, i18n } = useTranslation('common');
     const [current, setCurrent] = useState(0);
     const [direction, setDirection] = useState(0);
 
     const PLACEHOLDER_IMAGE = 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1200&h=400&fit=crop';
+    const lang = i18n.language || 'ar';
 
+    // Slides with translation keys – text will be loaded from i18n
     const slides = [
         {
             id: 1,
-            badge: '🛍️ وجهة التسوق الأولى',
-            title: 'اكتشف متعة التسوق في برايم',
-            subtitle: 'وجهتك الأولى للمنتجات الأصلية',
-            description:
-                'من البرامج والتقنية إلى التجميل، الأزياء، والإلكترونيات. كل ما تحتاجه في مكان واحد، بأسعار تنافسية وشحن سريع لجميع المحافظات.',
-            cta: 'تسوق الآن',
+            badgeKey: 'hero.slide1.badge',
+            titleKey: 'hero.slide1.title',
+            subtitleKey: 'hero.slide1.subtitle',
+            descriptionKey: 'hero.slide1.description',
+            ctaKey: 'hero.slide1.cta',
             link: '/products',
             image: '/images/hero/slide1.jpg',
         },
         {
             id: 2,
-            badge: '💻 تقنية متطورة',
-            title: 'أحدث البرامج والتطبيقات التقنية',
-            subtitle: 'إصدارات 2025 بأسعار خاصة',
-            description:
-                'احصل على أدوات التطوير، برامج التصميم الجرافيكي، حلول الأمن السيبراني، والذكاء الاصطناعي. تراخيص أصلية ودعم فني متواصل.',
-            cta: 'استكشف البرامج',
+            badgeKey: 'hero.slide2.badge',
+            titleKey: 'hero.slide2.title',
+            subtitleKey: 'hero.slide2.subtitle',
+            descriptionKey: 'hero.slide2.description',
+            ctaKey: 'hero.slide2.cta',
             link: '/software',
             image: '/images/hero/slide2.jpg',
         },
         {
             id: 3,
-            badge: '✨ عناية فائقة',
-            title: 'الجمال والعناية الفاخرة',
-            subtitle: 'منتجات طبيعية لبشرتك وشعرك',
-            description:
-                'شامبو عضوي، كريمات مرطبة للبشرة الحساسة، زيوت مغربية أصلية. منتجات معتمدة من أفضل الماركات العالمية، مناسبة لجميع أنواع البشرة.',
-            cta: 'تسوق التجميل',
+            badgeKey: 'hero.slide3.badge',
+            titleKey: 'hero.slide3.title',
+            subtitleKey: 'hero.slide3.subtitle',
+            descriptionKey: 'hero.slide3.description',
+            ctaKey: 'hero.slide3.cta',
             link: '/hair-care',
             image: '/images/hero/slide3.jpg',
         },
         {
             id: 4,
-            badge: '👗 ستايل عصري',
-            title: 'أحدث صيحات الموضة والأزياء',
-            subtitle: 'أزياء وإكسسوارات لكل الأذواق',
-            description:
-                'تشكيلة مميزة من الملابس القطنية، الأحذية الرياضية، الساعات الكلاسيكية، والمجوهرات. نناسب جميع المناسبات بأفضل جودة وأسعار لا تقبل المنافسة.',
-            cta: 'تسوق الأزياء',
+            badgeKey: 'hero.slide4.badge',
+            titleKey: 'hero.slide4.title',
+            subtitleKey: 'hero.slide4.subtitle',
+            descriptionKey: 'hero.slide4.description',
+            ctaKey: 'hero.slide4.cta',
             link: '/fashion',
             image: '/images/hero/slide4.jpg',
         },
-    ];
-
-    const trustBadges = [
-        { icon: Truck, label: 'شحن سريع', sub: 'توصيل خلال 2-5 أيام' },
-        { icon: Shield, label: 'ضمان الجودة', sub: 'منتجات أصلية 100%' },
-        { icon: Headphones, label: 'دعم 24/7', sub: 'خدمة عملاء على مدار الساعة' },
-        { icon: Clock, label: 'إرجاع مجاني', sub: '30 يوم لإرجاع المنتج' },
     ];
 
     useEffect(() => {
@@ -9394,111 +9873,93 @@ export default function HeroBanner() {
     };
 
     return (
-        <>
-            {/* Hero Banner */}
-            <div className="relative bg-gradient-to-br from-[#E8F4F7] to-[#F8F8F8] rounded-2xl p-4 md:p-8 lg:p-12 my-4 md:my-6 overflow-hidden min-h-[280px] md:min-h-[320px] shadow-soft">
-                <AnimatePresence mode="wait" custom={direction}>
-                    {slides.map((slide, index) => (
-                        index === current && (
-                            <motion.div
-                                key={slide.id}
-                                custom={direction}
-                                variants={slideVariants}
-                                initial="enter"
-                                animate="center"
-                                exit="exit"
-                                transition={{ duration: 0.6, ease: 'easeInOut' }}
-                                className="flex flex-col md:flex-row items-center gap-4 md:gap-8"
-                            >
-                                {/* Text content */}
-                                <div className="flex-1 text-right z-10 w-full md:w-1/2">
-                                    <span className="inline-block bg-secondary text-white text-xs font-semibold px-3 py-1 rounded-pill mb-2 md:mb-3">
-                                        {slide.badge}
-                                    </span>
-                                    <h1 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-text mb-1 md:mb-2">
-                                        {slide.title}
-                                    </h1>
-                                    <p className="text-lg md:text-xl text-text-secondary mb-2">{slide.subtitle}</p>
-                                    <p className="text-sm md:text-base text-text-muted max-w-lg leading-relaxed mb-3 md:mb-5">
-                                        {slide.description}
-                                    </p>
-                                    <Link
-                                        href={slide.link}
-                                        className="inline-flex items-center gap-2 bg-button-secondary-bg hover:bg-button-secondary-hover text-button-secondary-text px-4 md:px-6 py-2 md:py-3 rounded-pill font-semibold transition hover:shadow-lg hover:-translate-y-1 text-sm md:text-base"
-                                    >
-                                        <ShoppingBag className="w-4 h-4 md:w-5 md:h-5" />
-                                        {slide.cta}
-                                    </Link>
-                                </div>
-
-                                {/* Image */}
-                                <div className="hidden md:flex md:w-1/2 justify-center z-10">
-                                    <Image
-                                        src={slide.image}
-                                        alt={slide.title}
-                                        width={400}
-                                        height={400}
-                                        className="max-w-[200px] lg:max-w-[320px] h-auto object-contain"
-                                        priority
-                                        onError={(e) => {
-                                            (e.target as HTMLImageElement).src = PLACEHOLDER_IMAGE;
-                                        }}
-                                    />
-                                </div>
-                            </motion.div>
-                        )
-                    ))}
-                </AnimatePresence>
-
-                {/* Navigation buttons */}
-                <button
-                    onClick={handlePrev}
-                    className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-20 p-2 md:p-3 bg-white/80 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition hover:scale-110"
-                >
-                    <ArrowLeft className="w-4 h-4 md:w-5 md:h-5 text-text" />
-                </button>
-                <button
-                    onClick={handleNext}
-                    className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-20 p-2 md:p-3 bg-white/80 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition hover:scale-110"
-                >
-                    <ArrowRight className="w-4 h-4 md:w-5 md:h-5 text-text" />
-                </button>
-
-                {/* Dots */}
-                <div className="absolute bottom-2 md:bottom-4 left-1/2 -translate-x-1/2 flex gap-1 md:gap-2 z-20">
-                    {slides.map((_, index) => (
-                        <button
-                            key={index}
-                            onClick={() => {
-                                setDirection(index > current ? 1 : -1);
-                                setCurrent(index);
-                            }}
-                            className={`transition-all duration-300 rounded-full ${current === index
-                                    ? 'w-6 md:w-8 h-1.5 md:h-2.5 bg-primary'
-                                    : 'w-1.5 md:w-2.5 h-1.5 md:h-2.5 bg-gray-300 hover:bg-primary/50'
-                                }`}
-                        />
-                    ))}
-                </div>
-            </div>
-
-            {/* Trust Badges */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 -mt-2 md:-mt-4 mb-6 md:mb-8 px-2">
-                {trustBadges.map((badge, index) => {
-                    const Icon = badge.icon;
-                    return (
-                        <div
-                            key={index}
-                            className="bg-white rounded-xl shadow-soft p-3 md:p-4 text-center border border-gray-50 transition hover:shadow-card-hover hover:-translate-y-1 duration-300"
+        <div className="relative bg-gradient-to-br from-[#E8F4F7] to-[#F8F8F8] rounded-2xl p-4 md:p-8 lg:p-12 my-4 md:my-6 overflow-hidden min-h-[280px] md:min-h-[320px] shadow-soft">
+            <AnimatePresence mode="wait" custom={direction}>
+                {slides.map((slide, index) => (
+                    index === current && (
+                        <motion.div
+                            key={slide.id}
+                            custom={direction}
+                            variants={slideVariants}
+                            initial="enter"
+                            animate="center"
+                            exit="exit"
+                            transition={{ duration: 0.6, ease: 'easeInOut' }}
+                            className="flex flex-col md:flex-row items-center gap-4 md:gap-8"
                         >
-                            <Icon className="w-5 h-5 md:w-6 md:h-6 text-primary mx-auto mb-1 md:mb-2" />
-                            <p className="text-xs md:text-sm font-semibold text-text">{badge.label}</p>
-                            <p className="text-[10px] md:text-xs text-text-muted">{badge.sub}</p>
-                        </div>
-                    );
-                })}
+                            {/* Text content – using translated values */}
+                            <div className="flex-1 text-right z-10 w-full md:w-1/2">
+                                <span className="inline-block bg-secondary text-white text-xs font-semibold px-3 py-1 rounded-pill mb-2 md:mb-3">
+                                    {t(slide.badgeKey)}
+                                </span>
+                                <h1 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-text mb-1 md:mb-2">
+                                    {t(slide.titleKey)}
+                                </h1>
+                                <p className="text-lg md:text-xl text-text-secondary mb-2">
+                                    {t(slide.subtitleKey)}
+                                </p>
+                                <p className="text-sm md:text-base text-text-muted max-w-lg leading-relaxed mb-3 md:mb-5">
+                                    {t(slide.descriptionKey)}
+                                </p>
+                                <Link
+                                    href={slide.link}
+                                    className="inline-flex items-center gap-2 bg-button-secondary-bg hover:bg-button-secondary-hover text-button-secondary-text px-4 md:px-6 py-2 md:py-3 rounded-pill font-semibold transition hover:shadow-lg hover:-translate-y-1 text-sm md:text-base"
+                                >
+                                    <ShoppingBag className="w-4 h-4 md:w-5 md:h-5" />
+                                    {t(slide.ctaKey)}
+                                </Link>
+                            </div>
+
+                            {/* Image */}
+                            <div className="hidden md:flex md:w-1/2 justify-center z-10">
+                                <Image
+                                    src={slide.image}
+                                    alt={t(slide.titleKey)}
+                                    width={400}
+                                    height={400}
+                                    className="max-w-[200px] lg:max-w-[320px] h-auto object-contain"
+                                    priority
+                                    onError={(e) => {
+                                        (e.target as HTMLImageElement).src = PLACEHOLDER_IMAGE;
+                                    }}
+                                />
+                            </div>
+                        </motion.div>
+                    )
+                ))}
+            </AnimatePresence>
+
+            {/* Navigation buttons */}
+            <button
+                onClick={handlePrev}
+                className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-20 p-2 md:p-3 bg-white/80 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition hover:scale-110"
+            >
+                <ArrowLeft className="w-4 h-4 md:w-5 md:h-5 text-text" />
+            </button>
+            <button
+                onClick={handleNext}
+                className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-20 p-2 md:p-3 bg-white/80 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition hover:scale-110"
+            >
+                <ArrowRight className="w-4 h-4 md:w-5 md:h-5 text-text" />
+            </button>
+
+            {/* Dots */}
+            <div className="absolute bottom-2 md:bottom-4 left-1/2 -translate-x-1/2 flex gap-1 md:gap-2 z-20">
+                {slides.map((_, index) => (
+                    <button
+                        key={index}
+                        onClick={() => {
+                            setDirection(index > current ? 1 : -1);
+                            setCurrent(index);
+                        }}
+                        className={`transition-all duration-300 rounded-full ${current === index
+                            ? 'w-6 md:w-8 h-1.5 md:h-2.5 bg-primary'
+                            : 'w-1.5 md:w-2.5 h-1.5 md:h-2.5 bg-gray-300 hover:bg-primary/50'
+                        }`}
+                    />
+                ))}
             </div>
-        </>
+        </div>
     );
 }
 
@@ -9530,16 +9991,16 @@ export default function LanguageSwitcher() {
 }
 
 // ===== Logo.tsx =====
-// marketplace-frontend/components/Logo.tsx
-
-'use client';
-
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 
-export default function Logo() {
+interface LogoProps {
+    className?: string;
+}
+
+export default function Logo({ className = '' }: LogoProps) {
     return (
-        <Link href="/" className="flex items-center gap-2.5 group">
+        <Link href="/" className={`flex items-center gap-2.5 group ${className}`}>
             <motion.div whileHover={{ rotate: -5, scale: 1.05 }} className="relative">
                 <div className="w-10 h-10 bg-[#4E8C9E] rounded-xl flex items-center justify-center shadow-md group-hover:shadow-lg transition-all duration-300">
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -9550,7 +10011,7 @@ export default function Logo() {
                     </svg>
                 </div>
             </motion.div>
-            <motion.span whileHover={{ scale: 1.02 }} className="text-2xl font-bold text-[#2F5A6B] tracking-tight">
+            <motion.span whileHover={{ scale: 1.02 }} className="text-2xl font-bold text-black tracking-tight">
                 Prime
             </motion.span>
         </Link>
@@ -9558,331 +10019,275 @@ export default function Logo() {
 }
 
 // ===== Navbar.tsx =====
+// @ts-nocheck
 'use client';
 
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
 import { useTranslation } from 'react-i18next';
 import { useCartIconRef } from '@/context/CartIconRefContext';
 import Logo from './Logo';
-import LanguageSwitcher from './LanguageSwitcher';
+import UnifiedMenu from './UnifiedMenu';
 import {
     ShoppingCartIcon,
     UserIcon,
     HeartIcon,
-    MagnifyingGlassIcon,
     CurrencyDollarIcon,
     Bars3Icon,
     ChevronDownIcon,
+    GlobeAltIcon,
+    LifebuoyIcon,
+    TruckIcon,
+    X,
 } from '@heroicons/react/24/outline';
-import { AuthResponse } from '@/types';
-import { motion, AnimatePresence } from 'framer-motion';
-import api from '@/lib/api';
 
-// ============================================================
-// TOP BAR
-// ============================================================
-const TopBar = () => {
-    const { t } = useTranslation('common');
-    return (
-        <div className="bg-primary-dark text-white text-xs py-1.5 relative z-50">
-            <div className="container mx-auto px-4 flex justify-between items-center">
-                <div className="flex items-center gap-4">
-                    <span>🚚 {t('freeShipping')}</span>
-                    <span className="text-white/30">|</span>
-                    <Link href="/tracking" className="hover:opacity-70 transition">
-                        {t('trackOrder')}
-                    </Link>
-                </div>
-                <div className="flex items-center gap-3">
-                    <LanguageSwitcher />
-                    <span className="text-white/30">|</span>
-                    <button className="hover:opacity-70 transition">
-                        <CurrencyDollarIcon className="w-4 h-4 inline" /> {t('currency')}
-                    </button>
-                    <span className="text-white/30">|</span>
-                    <button className="hover:opacity-70 transition">{t('support')}</button>
-                </div>
-            </div>
-        </div>
-    );
-};
-
-// ============================================================
-// MAIN HEADER
-// ============================================================
-const MainHeader = ({ user }: { user: AuthResponse | null }) => {
-    const { t } = useTranslation('common');
-    const [searchTerm, setSearchTerm] = useState('');
-    const [isScrolled, setIsScrolled] = useState(false);
+const Navbar = () => {
+    const { t, i18n } = useTranslation('common');
+    const { user, isLoading, logout } = useAuth();
     const { totalItems } = useCart();
     const { totalFavorites } = useWishlist();
     const { cartIconRef } = useCartIconRef();
-    const [leftMenuOpen, setLeftMenuOpen] = useState(false);
-    const [rightMenuOpen, setRightMenuOpen] = useState(false);
-    const { logout } = useAuth();
-    const [categories, setCategories] = useState<string[]>([]);
-    const [loadingCategories, setLoadingCategories] = useState(true);
 
-    // Fetch categories for the left menu
+    const [menuOpen, setMenuOpen] = useState(false);
+    const [userOpen, setUserOpen] = useState(false);
+    const userRef = useRef(null);
+
     useEffect(() => {
-        const fetchCategories = async () => {
-            try {
-                const response = await api.get('/api/Categories');
-                setCategories(response.data);
-            } catch (error) {
-                console.error('Failed to fetch categories:', error);
-            } finally {
-                setLoadingCategories(false);
-            }
+        const handler = (e) => {
+            if (userRef.current && !userRef.current.contains(e.target)) setUserOpen(false);
         };
-        fetchCategories();
+        document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
     }, []);
 
-    useEffect(() => {
-        const handleScroll = () => setIsScrolled(window.scrollY > 20);
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
-
-    const handleSearch = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (searchTerm.trim()) {
-            window.location.href = `/?q=${encodeURIComponent(searchTerm.trim())}`;
-        }
+    const toggleLanguage = () => {
+        i18n.changeLanguage((i18n.language || '').startsWith('ar') ? 'en' : 'ar');
     };
 
-    // Close menus on outside click
-    useEffect(() => {
-        const closeMenus = () => { setLeftMenuOpen(false); setRightMenuOpen(false); };
-        window.addEventListener('click', closeMenus);
-        return () => window.removeEventListener('click', closeMenus);
-    }, []);
+    const closeUser = () => setUserOpen(false);
+    const isAr = (i18n.language || '').startsWith('ar');
 
-    // Check if RTL
-    const isRTL = typeof document !== 'undefined' && document.documentElement.dir === 'rtl';
+    const topLinkClass = "flex items-center gap-2 px-3 py-2 rounded-lg font-bold text-[15px] text-white hover:text-[#D4A54A] hover:bg-white/15 transition whitespace-nowrap drop-shadow-sm";
 
-    const getCategorySlug = (cat: string) => cat.toLowerCase().replace(/\s+/g, '-');
-
-    return (
-        <div className={`bg-navbar-bg border-b border-navbar-border sticky top-0 z-50 ${isScrolled ? 'shadow-md' : ''}`}>
-            <div className="container mx-auto px-4 flex items-center gap-4 py-2">
-                {/* Left hamburger menu - SOLID BACKGROUND */}
-                <div className="relative" onClick={(e) => e.stopPropagation()}>
-                    <button
-                        onClick={() => setLeftMenuOpen(!leftMenuOpen)}
-                        className="p-2 rounded-md hover:bg-primary-dark/10 transition text-navbar-text"
-                        aria-label="Main menu"
-                    >
-                        <Bars3Icon className="w-6 h-6" />
-                    </button>
-                    <AnimatePresence>
-                        {leftMenuOpen && (
-                            <motion.div
-                                initial={{ opacity: 0, y: -10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -10 }}
-                                className={`absolute ${isRTL ? 'right-0' : 'left-0'} top-full mt-2 w-64 max-w-[calc(100vw-2rem)] max-h-[80vh] overflow-y-auto bg-white rounded-xl shadow-strong border border-border py-2 z-[999]`}
-                            >
-                                <Link href="/" className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition" onClick={() => setLeftMenuOpen(false)}>
-                                    {t('home')}
-                                </Link>
-
-                                {/* Categories */}
-                                {loadingCategories ? (
-                                    <span className="block px-4 py-2 text-text-muted text-sm">جاري التحميل...</span>
-                                ) : (
-                                    categories.map((cat) => {
-                                        const slug = getCategorySlug(cat);
-                                        return (
-                                            <Link
-                                                key={cat}
-                                                href={`/${slug}`}
-                                                className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition"
-                                                onClick={() => setLeftMenuOpen(false)}
-                                            >
-                                                {cat}
-                                            </Link>
-                                        );
-                                    })
-                                )}
-
-                                <Link href="/stores" className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition" onClick={() => setLeftMenuOpen(false)}>
-                                    {t('stores')}
-                                </Link>
-                                <Link href="/offers" className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition" onClick={() => setLeftMenuOpen(false)}>
-                                    🔥 {t('offers')}
-                                </Link>
-                                <Link href="/contact" className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition" onClick={() => setLeftMenuOpen(false)}>
-                                    {t('contact')}
-                                </Link>
-                                <Link href="/help" className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition" onClick={() => setLeftMenuOpen(false)}>
-                                    📘 {t('help')}
-                                </Link>
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
-                </div>
-
-                <Logo />
-
-                <form onSubmit={handleSearch} className="flex-1 flex items-center bg-background border border-border rounded-pill h-11 px-1 max-w-[600px] focus-within:border-primary focus-within:shadow-[0_0_0_3px_rgba(78,140,158,0.15)] transition">
-                    <input
-                        type="text"
-                        placeholder={t('searchPlaceholder')}
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="flex-1 border-none outline-none px-4 text-text bg-transparent placeholder-text-muted text-sm"
-                    />
-                    <button type="submit" className="bg-button-primary-bg hover:bg-button-primary-hover text-button-primary-text border-none rounded-pill px-6 h-9 font-semibold transition flex items-center gap-2 text-sm">
-                        <MagnifyingGlassIcon className="w-4 h-4" />
-                        <span>{t('search')}</span>
-                    </button>
-                </form>
-
-                <div className="flex items-center gap-3 flex-shrink-0">
-                    <motion.button whileHover={{ scale: 1.1 }} className="text-navbar-text hover:text-navbar-hover transition relative hidden sm:block">
-                        <HeartIcon className="w-6 h-6" />
-                        <span className="absolute -top-1.5 -right-1.5 bg-secondary text-white text-[10px] font-bold w-[18px] h-[18px] rounded-full flex items-center justify-center">
-                            {totalFavorites}
-                        </span>
-                    </motion.button>
-
-                    <Link href="/cart" ref={(el) => { cartIconRef.current = el as HTMLElement; }} className="text-navbar-text hover:text-navbar-hover transition relative">
-                        <ShoppingCartIcon className="w-6 h-6" />
-                        <motion.span animate={{ scale: totalItems > 0 ? 1.2 : 1 }} className="absolute -top-1.5 -right-1.5 bg-secondary text-white text-[10px] font-bold w-[18px] h-[18px] rounded-full flex items-center justify-center">
-                            {totalItems}
-                        </motion.span>
-                    </Link>
-
-                    {/* Right user menu - SOLID BACKGROUND */}
-                    <div className="relative" onClick={(e) => e.stopPropagation()}>
-                        <button
-                            onClick={() => setRightMenuOpen(!rightMenuOpen)}
-                            className="flex items-center gap-1 p-2 rounded-md hover:bg-primary-dark/10 transition text-navbar-text"
-                            aria-label="User menu"
-                        >
-                            {user ? (
-                                <>
-                                    <span className="hidden sm:inline text-sm font-medium">{user.username}</span>
-                                    <UserIcon className="w-6 h-6" />
-                                </>
-                            ) : (
-                                <UserIcon className="w-6 h-6" />
-                            )}
-                            <ChevronDownIcon className="w-4 h-4" />
-                        </button>
-
-                        <AnimatePresence>
-                            {rightMenuOpen && (
-                                <motion.div
-                                    initial={{ opacity: 0, y: -10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -10 }}
-                                    className={`absolute ${isRTL ? 'left-0' : 'right-0'} top-full mt-2 w-56 max-w-[calc(100vw-2rem)] max-h-[80vh] overflow-y-auto bg-white rounded-xl shadow-strong border border-border py-2 z-[999]`}
-                                >
-                                    {!user ? (
-                                        <>
-                                            <Link href="/auth/login" className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition" onClick={() => setRightMenuOpen(false)}>
-                                                {t('loginTitle')}
-                                            </Link>
-                                            <Link href="/auth/register" className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition" onClick={() => setRightMenuOpen(false)}>
-                                                {t('registerTitle')}
-                                            </Link>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Link href="/cart" className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition" onClick={() => setRightMenuOpen(false)}>
-                                                🛒 {t('cart')}
-                                            </Link>
-                                            <Link href="/orders" className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition" onClick={() => setRightMenuOpen(false)}>
-                                                📋 {t('orders')}
-                                            </Link>
-                                            <Link href="/suggest" className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition" onClick={() => setRightMenuOpen(false)}>
-                                                💡 Suggest
-                                            </Link>
-                                            {(user.role === 'Vendor' || user.role === 'Admin') && (
-                                                <Link href="/vendor/dashboard" className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition" onClick={() => setRightMenuOpen(false)}>
-                                                    📊 {t('dashboard')}
-                                                </Link>
-                                            )}
-                                            {(user.role === 'Vendor' || user.role === 'Admin' || user.role === 'Employee') && (
-                                                <Link href="/admin/orders" className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition" onClick={() => setRightMenuOpen(false)}>
-                                                    📦 Manage Orders
-                                                </Link>
-                                            )}
-                                            {user.role === 'Admin' && (
-                                                <>
-                                                    <Link href="/admin/users" className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition" onClick={() => setRightMenuOpen(false)}>
-                                                        👥 {t('users')}
-                                                    </Link>
-                                                    <Link href="/admin" className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition" onClick={() => setRightMenuOpen(false)}>
-                                                        ⚙️ {t('admin')}
-                                                    </Link>
-                                                    <Link href="/admin/golden-links" className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition" onClick={() => setRightMenuOpen(false)}>
-                                                        🔗 Golden Links
-                                                    </Link>
-                                                </>
-                                            )}
-                                            <Link href="/chat" className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition" onClick={() => setRightMenuOpen(false)}>
-                                                💬 Chat
-                                            </Link>
-                                            <Link href="/profile" className="block px-4 py-2.5 text-text hover:bg-primary-dark/10 transition" onClick={() => setRightMenuOpen(false)}>
-                                                👤 {t('profile')}
-                                            </Link>
-                                            <hr className="my-2 border-border" />
-                                            <button
-                                                onClick={() => { logout(); setRightMenuOpen(false); }}
-                                                className="block w-full text-right px-4 py-2.5 text-red-600 hover:bg-red-50 transition"
-                                            >
-                                                {t('logout')}
-                                            </button>
-                                        </>
-                                    )}
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-};
-
-// ============================================================
-// MAIN EXPORT
-// ============================================================
-export default function Navbar() {
-    const { user, isLoading } = useAuth();
-
-    if (isLoading) {
+    if (typeof window === 'undefined' || isLoading) {
         return <div className="bg-surface shadow-md py-4 text-center text-text-muted animate-pulse">Loading...</div>;
     }
 
-    return (
-        <header className="sticky top-0 z-[100]">
-            <TopBar />
-            <MainHeader user={user} />
-        </header>
+    const userLinks = (
+        <>
+            {!user ? (
+                <>
+                    <Link href="/auth/login" className="block px-5 py-3 hover:bg-[#0F5C45]/10 text-sm font-medium" onClick={closeUser}>
+                        🔑 {isAr ? 'تسجيل الدخول' : 'Sign In'}
+                    </Link>
+                    <Link href="/auth/register" className="block px-5 py-3 hover:bg-[#0F5C45]/10 text-sm font-medium border-t border-gray-100" onClick={closeUser}>
+                        ✨ {isAr ? 'إنشاء حساب جديد' : 'Create New Account'}
+                    </Link>
+                </>
+            ) : (
+                <>
+                    <Link href="/cart" className="block px-5 py-3 hover:bg-[#0F5C45]/10 text-sm" onClick={closeUser}>🛒 {t('cart')}</Link>
+                    <Link href="/orders" className="block px-5 py-3 hover:bg-[#0F5C45]/10 text-sm" onClick={closeUser}>📋 {t('orders')}</Link>
+                    <Link href="/suggest" className="block px-5 py-3 hover:bg-[#0F5C45]/10 text-sm" onClick={closeUser}>💡 {isAr ? 'اقترح منتج' : 'Suggest Product'}</Link>
+                    <Link href="/chat" className="block px-5 py-3 hover:bg-[#0F5C45]/10 text-sm" onClick={closeUser}>💬 {isAr ? 'المحادثة' : 'Chat'}</Link>
+                    <Link href="/profile" className="block px-5 py-3 hover:bg-[#0F5C45]/10 text-sm" onClick={closeUser}>👤 {t('profile')}</Link>
+
+                    {(user.role === 'Vendor' || user.role === 'Admin') && (
+                        <Link href="/vendor/dashboard" className="block px-5 py-3 hover:bg-[#0F5C45]/10 text-sm" onClick={closeUser}>📊 {t('dashboard')}</Link>
+                    )}
+                    {(user.role === 'Vendor' || user.role === 'Admin' || user.role === 'Employee') && (
+                        <Link href="/admin/orders" className="block px-5 py-3 hover:bg-[#0F5C45]/10 text-sm" onClick={closeUser}>📦 {isAr ? 'إدارة الطلبات' : 'Manage Orders'}</Link>
+                    )}
+                    {user.role === 'Admin' && (
+                        <>
+                            <div className="border-t border-gray-100 my-1" />
+                            <Link href="/admin" className="block px-5 py-3 hover:bg-red-50 text-sm font-bold text-red-600" onClick={closeUser}>⚙️ {isAr ? 'لوحة التحكم' : 'Admin Panel'}</Link>
+                            <Link href="/admin/users" className="block px-5 py-3 hover:bg-[#0F5C45]/10 text-sm" onClick={closeUser}>👥 {t('users')}</Link>
+                            <Link href="/admin/products" className="block px-5 py-3 hover:bg-[#0F5C45]/10 text-sm" onClick={closeUser}>📦 {isAr ? 'المنتجات' : 'Products'}</Link>
+                            <Link href="/admin/pages" className="block px-5 py-3 hover:bg-[#0F5C45]/10 text-sm" onClick={closeUser}>📄 {isAr ? 'الصفحات' : 'Pages'}</Link>
+                            <Link href="/admin/stores" className="block px-5 py-3 hover:bg-[#0F5C45]/10 text-sm" onClick={closeUser}>🏪 {isAr ? 'المتاجر' : 'Stores'}</Link>
+                            <Link href="/admin/golden-links" className="block px-5 py-3 hover:bg-[#0F5C45]/10 text-sm" onClick={closeUser}>🔗 Golden Links</Link>
+                        </>
+                    )}
+
+                    <div className="border-t border-gray-100 my-1" />
+                    <button onClick={() => { closeUser(); logout(); }}
+                        className="block w-full text-right px-5 py-3 text-red-600 hover:bg-red-50 text-sm font-semibold">
+                        🚪 {t('logout')}
+                    </button>
+                </>
+            )}
+        </>
     );
-}
+
+    return (
+        <>
+            <header className="fixed top-0 left-0 right-0 z-[1000] bg-white shadow-md">
+                <div className="navbar border-b border-border bg-[#0F5C45]">
+                    <div className="container mx-auto px-3 sm:px-4 flex items-center justify-between gap-2 py-2.5">
+
+                        {/* LEFT — hamburger + logo + username */}
+                        <div className="flex items-center gap-3 flex-shrink-0">
+                            <button onClick={() => setMenuOpen(true)}
+                                className="p-2 rounded-lg hover:bg-white/15 transition text-white" aria-label="Open menu">
+                                <Bars3Icon className="w-7 h-7 sm:w-8 sm:h-8" />
+                            </button>
+                            <Logo />
+
+                            {/* ✅ Username shown right after the logo */}
+                            {user && (
+                                <span className="hidden sm:inline-flex items-center gap-1 text-white text-sm font-semibold px-2 py-1 rounded-lg bg-white/10 border border-white/20">
+                                    <UserIcon className="w-4 h-4" />
+                                    {user.username}
+                                </span>
+                            )}
+                        </div>
+
+                        {/* RIGHT */}
+                        <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+
+                            {/* Language (desktop) */}
+                            <button onClick={toggleLanguage} className={`${topLinkClass} hidden md:flex`}>
+                                <GlobeAltIcon className="w-5 h-5" />
+                                <span>{isAr ? 'English' : 'العربية'}</span>
+                            </button>
+
+                            {/* Support (desktop) */}
+                            <Link href="/help" className={`${topLinkClass} hidden md:flex`}>
+                                <LifebuoyIcon className="w-5 h-5" />
+                                <span>{t('support')}</span>
+                            </Link>
+
+                            {/* Currency (desktop) */}
+                            <span className={`${topLinkClass} hidden md:flex`}>
+                                <CurrencyDollarIcon className="w-5 h-5" />
+                                <span>{t('currency')}</span>
+                            </span>
+
+                            {/* Track (desktop) */}
+                            <Link href="/tracking" className={`${topLinkClass} hidden lg:flex`}>
+                                <TruckIcon className="w-5 h-5" />
+                                <span>{t('trackOrder')}</span>
+                            </Link>
+
+                            {/* Wishlist */}
+                            <button className="text-white hover:text-[#D4A54A] transition relative p-2">
+                                <HeartIcon className="w-6 h-6" />
+                                <span className="absolute top-1 right-1 bg-[#D4A54A] text-[#0F5C45] text-[10px] font-bold w-[18px] h-[18px] rounded-full flex items-center justify-center">
+                                    {totalFavorites}
+                                </span>
+                            </button>
+
+                            {/* Cart */}
+                            <span ref={cartIconRef} className="relative inline-flex p-2">
+                                <Link href="/cart" className="text-white hover:text-[#D4A54A] transition">
+                                    <ShoppingCartIcon className="w-6 h-6" />
+                                    <span className="absolute -top-1 -right-1 bg-[#D4A54A] text-[#0F5C45] text-[10px] font-bold w-[18px] h-[18px] rounded-full flex items-center justify-center">
+                                        {totalItems}
+                                    </span>
+                                </Link>
+                            </span>
+
+                            {/* User icon — opens user panel */}
+                            <div className="relative" ref={userRef}>
+                                <button
+                                    onClick={() => setUserOpen(!userOpen)}
+                                    className="flex items-center gap-1 p-2 rounded-lg hover:bg-white/15 transition text-white"
+                                >
+                                    <UserIcon className="w-6 h-6" />
+                                    <ChevronDownIcon className={`w-4 h-4 transition-transform ${userOpen ? 'rotate-180' : ''}`} />
+                                </button>
+
+                                {userOpen && (
+                                    <>
+                                        {/* Mobile backdrop */}
+                                        <div
+                                            className="fixed inset-0 bg-black/50 z-[9998] md:hidden"
+                                            onClick={closeUser}
+                                        />
+                                        {/* Panel — bottom sheet on mobile, dropdown on desktop */}
+                                        <div
+                                            className={[
+                                                'fixed bottom-0 left-0 right-0 z-[9999]',
+                                                'md:absolute md:top-full md:mt-1 md:bottom-auto',
+                                                isAr ? 'md:left-0' : 'md:right-0',
+                                                'bg-white rounded-t-2xl md:rounded-lg shadow-2xl',
+                                                'max-h-[80vh] overflow-y-auto',
+                                                'md:min-w-[240px]',
+                                            ].join(' ')}
+                                        >
+                                            {/* Mobile header */}
+                                            <div className="md:hidden flex items-center justify-between px-5 py-4 border-b border-gray-100 sticky top-0 bg-white rounded-t-2xl">
+                                                <div>
+                                                    <p className="text-xs text-gray-500">
+                                                        {user ? (isAr ? 'مرحباً بعودتك' : 'Welcome back') : (isAr ? 'مرحباً بك' : 'Welcome')}
+                                                    </p>
+                                                    <h3 className="text-lg font-bold text-gray-900">
+                                                        {user?.username || (isAr ? 'تسجيل الدخول / حساب جديد' : 'Sign in / Register')}
+                                                    </h3>
+                                                </div>
+                                                <button onClick={closeUser} className="p-1 hover:bg-gray-100 rounded-lg">
+                                                    <X className="w-5 h-5" />
+                                                </button>
+                                            </div>
+
+                                            <div>{userLinks}</div>
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Mobile strip */}
+                    <div className="md:hidden border-t border-white/10 bg-[#0F5C45]">
+                        <div className="grid grid-cols-4 divide-x divide-white/10">
+                            <button onClick={toggleLanguage}
+                                className="flex items-center justify-center gap-1 px-1 py-2 text-[11px] font-bold text-white hover:bg-white/15">
+                                <GlobeAltIcon className="w-4 h-4" />
+                                <span className="truncate">{isAr ? 'EN' : 'عربي'}</span>
+                            </button>
+                            <Link href="/help"
+                                className="flex items-center justify-center gap-1 px-1 py-2 text-[11px] font-bold text-white hover:bg-white/15">
+                                <LifebuoyIcon className="w-4 h-4" />
+                                <span className="truncate">{t('support')}</span>
+                            </Link>
+                            <span className="flex items-center justify-center gap-1 px-1 py-2 text-[11px] font-bold text-white">
+                                <CurrencyDollarIcon className="w-4 h-4" />
+                                <span className="truncate">{t('currency')}</span>
+                            </span>
+                            <Link href="/tracking"
+                                className="flex items-center justify-center gap-1 px-1 py-2 text-[11px] font-bold text-white hover:bg-white/15">
+                                <TruckIcon className="w-4 h-4" />
+                                <span className="truncate">{t('trackOrder')}</span>
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <UnifiedMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
+        </>
+    );
+};
+
+export default Navbar;
 
 // ===== ProductCard.tsx =====
 'use client';
 
-import { usePathname } from 'next/navigation';
 import Image from 'next/image';
-import { Heart, ShoppingBag, Star } from 'lucide-react';
+import { Heart, Plus, Minus } from 'lucide-react';
+import { ShoppingCartIcon } from '@heroicons/react/24/outline';
 import { useState, useRef, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import { useWishlist } from '@/context/WishlistContext';
 import { useCart } from '@/context/CartContext';
 import { useCartIconRef } from '@/context/CartIconRefContext';
-import { useTheme } from '@/context/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import { getImageUrl } from '@/lib/getImageUrl';
 import { getProductImage } from '@/lib/productImages';
@@ -9911,9 +10316,7 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product, onCardClick }: ProductCardProps) {
-    const { template = 'standard' } = useTheme();
     const { i18n } = useTranslation();
-    const pathname = usePathname();
     const [isAdding, setIsAdding] = useState(false);
     const [quantity, setQuantity] = useState(1);
 
@@ -9933,8 +10336,8 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
     const { cartIconRef } = useCartIconRef();
 
     const isWishlist = isFavorite(product.id);
-    const discountPrice = product.discount ? product.price * (1 - product.discount / 100) : null;
-    const hasDiscount = product.discount && product.discount > 0;
+    const hasDiscount = product.discount !== undefined && product.discount > 0;
+    const discountPrice = hasDiscount ? product.price * (1 - (product.discount ?? 0) / 100) : null;
 
     const handleImageError = useCallback(() => {
         setImgSrc('/images/placeholder.jpg');
@@ -9946,7 +10349,7 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
         toggleFavorite(product.id);
     };
 
-    const handleAddToCart = async (e: React.MouseEvent, qty: number) => {
+    const handleAddToCart = async (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
 
@@ -9958,11 +10361,16 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
         const cardRect = cardRef.current?.getBoundingClientRect();
         const cartRect = cartIconRef.current?.getBoundingClientRect();
 
-        if (cardRect && cartRect) {
+        let endX = window.innerWidth - 80;
+        let endY = 60;
+        if (cartRect) {
+            endX = cartRect.left + cartRect.width / 2;
+            endY = cartRect.top + cartRect.height / 2;
+        }
+
+        if (cardRect) {
             const startX = cardRect.left + cardRect.width / 2;
             const startY = cardRect.top + cardRect.height / 2;
-            const endX = cartRect.left + cartRect.width / 2;
-            const endY = cartRect.top + cartRect.height / 2;
 
             setFlyStart({ x: startX, y: startY });
             setFlyEnd({ x: endX, y: endY });
@@ -9971,11 +10379,11 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
             setTimeout(() => {
                 setFly(false);
                 setIsAdding(true);
-                addToCart(product.id, qty).finally(() => setIsAdding(false));
+                addToCart(product.id, quantity).finally(() => setIsAdding(false));
             }, 800);
         } else {
             setIsAdding(true);
-            await addToCart(product.id, qty);
+            await addToCart(product.id, quantity);
             setIsAdding(false);
         }
     };
@@ -9998,13 +10406,9 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
 
     const handleCardClick = (e: React.MouseEvent) => {
         e.preventDefault();
-        console.log('🖱️ ProductCard clicked, productId:', product.id);
-        if (onCardClick) {
-            onCardClick(product.id);
-        }
+        if (onCardClick) onCardClick(product.id);
     };
 
-    // 🌐 Language-aware display
     const lang = i18n.language || 'en';
     const displayName = lang === 'en'
         ? (product.nameEn || product.name || product.nameAr || `Product #${product.id}`)
@@ -10022,138 +10426,143 @@ export default function ProductCard({ product, onCardClick }: ProductCardProps) 
             whileHover={{ y: -6 }}
             onHoverStart={() => setIsHovered(true)}
             onHoverEnd={() => setIsHovered(false)}
-            className="product-card bg-white rounded-xl border border-gray-100 p-4 hover:shadow-lg transition-all duration-300 cursor-pointer"
+            className="cursor-pointer p-1 sm:p-2"
             onClick={handleCardClick}
         >
-            {/* ============================================================
-                BLOCK 1: IMAGE + WISHLIST + DISCOUNT BADGE
-                ============================================================ */}
-            <div className="relative">
-                <motion.button
-                    whileHover={{ scale: 1.2 }}
-                    whileTap={{ scale: 0.8 }}
-                    onClick={handleWishlistToggle}
-                    className="absolute top-2 left-2 z-10 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-md hover:shadow-lg transition"
-                >
-                    <Heart
-                        className={`w-4 h-4 transition ${isWishlist ? 'fill-red-500 text-red-500' : 'text-gray-400'}`}
-                    />
-                </motion.button>
+            {/* Transparent outer card */}
+            <div className="border border-gray-200 rounded-2xl overflow-hidden bg-transparent shadow-sm hover:shadow-xl transition-all duration-300">
 
-                {hasDiscount && (
-                    <span className="absolute top-2 right-2 z-10 bg-[#D27736] text-white text-xs font-bold px-2.5 py-1 rounded-full">
-                        -{product.discount}%
-                    </span>
-                )}
+                {/* BLOCK 1 – Picture + Name + Description (white background) */}
+                <div className="bg-white p-3 sm:p-4">
+                    <div className="relative bg-gray-50/80 rounded-xl p-2 sm:p-4">
+                        {/* Wishlist heart */}
+                        <motion.button
+                            whileHover={{ scale: 1.2 }}
+                            whileTap={{ scale: 0.8 }}
+                            onClick={handleWishlistToggle}
+                            className="absolute top-1 sm:top-2 right-1 sm:right-2 z-10 bg-white/90 backdrop-blur-sm rounded-full p-1.5 sm:p-2 shadow-sm hover:shadow-md transition"
+                        >
+                            <Heart
+                                className={`w-4 h-4 transition ${isWishlist ? 'fill-red-500 text-red-500' : 'text-gray-400'}`}
+                            />
+                        </motion.button>
 
-                <div className="relative w-full h-52 bg-gray-50 rounded-lg overflow-hidden">
-                    <Image
-                        src={imgSrc}
-                        alt={displayName}
-                        fill
-                        className={`object-contain p-3 transition-transform duration-500 ${isHovered ? 'scale-105' : 'scale-100'}`}
-                        sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-                        priority={false}
-                        onError={handleImageError}
-                    />
+                        {hasDiscount && (
+                            <span className="absolute top-1 sm:top-2 left-1 sm:left-2 z-10 bg-red-500 text-white text-[10px] sm:text-xs font-bold px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full">
+                                -{product.discount}%
+                            </span>
+                        )}
+
+                        <div className="relative w-full aspect-square max-h-[140px] sm:max-h-[200px] mx-auto">
+                            <Image
+                                src={imgSrc}
+                                alt={displayName}
+                                fill
+                                className={`object-contain p-2 transition-transform duration-500 ${isHovered ? 'scale-105' : 'scale-100'}`}
+                                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                                priority={false}
+                                onError={handleImageError}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="mt-2 sm:mt-3 space-y-1 text-center">
+                        {product.category && (
+                            <span className="inline-block text-[10px] font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+                                {product.category}
+                            </span>
+                        )}
+                        <h3 className="font-semibold text-gray-800 text-sm sm:text-base line-clamp-1">
+                            {displayName}
+                        </h3>
+                        {displayDescription && (
+                            <p className="text-gray-500 text-xs sm:text-sm line-clamp-2 leading-relaxed">
+                                {displayDescription}
+                            </p>
+                        )}
+                        <div className="flex items-center justify-center gap-2 pt-1">
+                            <span className="text-lg sm:text-xl font-bold text-gray-900">
+                                {CURRENCY}{(discountPrice || product.price).toFixed(2)}
+                            </span>
+                            {hasDiscount && (
+                                <span className="text-sm text-gray-400 line-through">
+                                    {CURRENCY}{product.price.toFixed(2)}
+                                </span>
+                            )}
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-            {/* ============================================================
-                BLOCK 2: PRODUCT INFO (Title, Description, Price)
-                ============================================================ */}
-            <div className="mt-3 space-y-1.5">
-                <h3 className="font-semibold text-gray-800 text-base line-clamp-1">
-                    {displayName}
-                </h3>
-                {displayDescription && (
-                    <p className="text-gray-500 text-sm line-clamp-2 leading-relaxed">
-                        {displayDescription}
-                    </p>
-                )}
-
-                {/* Price Row */}
-                <div className="flex items-center gap-3 pt-1">
-                    <span className="text-xl font-bold text-[#2F5A6B]">
-                        {CURRENCY}{(discountPrice || product.price).toFixed(2)}
-                    </span>
-                    {hasDiscount && (
-                        <span className="text-sm text-gray-400 line-through">
-                            {CURRENCY}{product.price.toFixed(2)}
-                        </span>
-                    )}
-                </div>
-            </div>
-
-            {/* ============================================================
-                DIVIDER – Subtle line between info and controls
-                ============================================================ */}
-            <div className="border-t border-gray-100 my-3"></div>
-
-            {/* ============================================================
-                BLOCK 3: QUANTITY CONTROLS + ADD TO CART BUTTON
-                ============================================================ */}
-            <div className="flex items-center gap-3" onClick={(e) => e.stopPropagation()}>
-                {/* Quantity Controls – Always Visible */}
-                <div className="flex items-center gap-1 bg-gray-50 rounded-full p-1 border border-gray-200 flex-shrink-0">
+                {/* BLOCK 2 – Controls as "Chocolate Bar" with header cart icon */}
+                <div className="bg-[#4E8C9E] p-1.5 sm:p-2 flex items-stretch" onClick={(e) => e.stopPropagation()}>
                     <button
                         onClick={decrement}
                         disabled={quantity <= 1}
-                        className="w-8 h-8 rounded-full flex items-center justify-center text-gray-600 hover:bg-white hover:shadow-sm transition disabled:opacity-30 disabled:cursor-not-allowed text-lg font-bold"
+                        className="flex-1 py-2 sm:py-3 text-white hover:bg-white/20 transition disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center border-r border-white/20"
                     >
-                        −
+                        <Minus className="w-4 h-4 sm:w-5 sm:h-5" />
                     </button>
-                    <span className="w-8 text-center text-sm font-medium text-gray-800">
+
+                    <div className="flex-1 py-2 sm:py-3 text-white font-semibold text-center border-r border-white/20 flex items-center justify-center text-sm sm:text-base">
                         {quantity}
-                    </span>
+                    </div>
+
                     <button
                         onClick={increment}
                         disabled={quantity >= product.stockQuantity}
-                        className="w-8 h-8 rounded-full flex items-center justify-center text-gray-600 hover:bg-white hover:shadow-sm transition disabled:opacity-30 disabled:cursor-not-allowed text-lg font-bold"
+                        className="flex-1 py-2 sm:py-3 text-white hover:bg-white/20 transition disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center border-r border-white/20"
                     >
-                        +
+                        <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
+                    </button>
+
+                    {/* Add to Cart – uses SAME icon as header */}
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            handleAddToCart(e);
+                        }}
+                        disabled={isAdding || product.stockQuantity === 0}
+                        className="flex-[2] py-2 sm:py-3 bg-white text-[#4E8C9E] hover:bg-white/90 transition disabled:opacity-50 flex items-center justify-center rounded-r-lg"
+                    >
+                        {isAdding ? (
+                            <div className="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-2 border-[#4E8C9E] border-t-transparent" />
+                        ) : product.stockQuantity === 0 ? (
+                            <span className="text-xs sm:text-sm">غير متوفر</span>
+                        ) : (
+                            <ShoppingCartIcon className="w-4 h-4 sm:w-5 sm:h-5" />
+                        )}
                     </button>
                 </div>
 
-                {/* Add to Cart Button */}
-                <button
-                    onClick={(e) => handleAddToCart(e, quantity)}
-                    disabled={isAdding || product.stockQuantity === 0}
-                    className={`flex-1 py-2.5 rounded-full font-medium text-sm transition-all duration-300 flex items-center justify-center gap-2 ${product.stockQuantity === 0
-                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                            : isAdding
-                                ? 'bg-[#4E8C9E]/70 text-white cursor-wait'
-                                : 'bg-[#4E8C9E] text-white hover:bg-[#2F5A6B] hover:shadow-md'
-                        }`}
-                >
-                    <ShoppingBag className="w-4 h-4" />
-                    {isAdding
-                        ? 'جاري الإضافة...'
-                        : product.stockQuantity === 0
-                            ? 'غير متوفر'
-                            : `إضافة (${quantity})`}
-                </button>
+                {product.stockQuantity > 0 && product.stockQuantity <= 5 && (
+                    <p className="text-[10px] sm:text-xs text-amber-600 text-center py-1 bg-white/80">
+                        ⚠️ متبقي {product.stockQuantity} فقط
+                    </p>
+                )}
             </div>
 
-            {/* Optional: Stock indicator (small text) */}
-            {product.stockQuantity > 0 && product.stockQuantity <= 5 && (
-                <p className="text-xs text-[#D27736] mt-2 text-center">
-                    ⚠️ متبقي {product.stockQuantity} فقط
-                </p>
-            )}
-
-            {/* Fly animation (hidden) */}
+            {/* Fly animation */}
             {fly && (
                 <div
-                    className="fixed pointer-events-none z-50 w-8 h-8 bg-[#4E8C9E] rounded-full shadow-lg flex items-center justify-center"
+                    className="fixed pointer-events-none z-50 w-10 h-10 sm:w-14 sm:h-14 bg-primary rounded-full shadow-lg flex items-center justify-center"
                     style={{
                         left: flyStart.x,
                         top: flyStart.y,
-                        transform: 'translate(-50%, -50%)',
-                        animation: 'flyToCart 0.8s ease-in-out forwards',
+                        transition: 'left 0.8s cubic-bezier(0.2, 0.8, 0.4, 1), top 0.8s cubic-bezier(0.2, 0.8, 0.4, 1), transform 0.8s cubic-bezier(0.2, 0.8, 0.4, 1), opacity 0.8s cubic-bezier(0.2, 0.8, 0.4, 1)',
+                        transform: 'translate(-50%, -50%) scale(1)',
+                        opacity: 1,
+                    }}
+                    ref={(el) => {
+                        if (el) {
+                            void el.offsetHeight;
+                            el.style.left = flyEnd.x + 'px';
+                            el.style.top = flyEnd.y + 'px';
+                            el.style.transform = 'translate(-50%, -50%) scale(0.3)';
+                            el.style.opacity = '0';
+                        }
                     }}
                 >
-                    <ShoppingBag className="w-4 h-4 text-white" />
+                    <ShoppingCartIcon className="w-5 h-5 sm:w-7 sm:h-7 text-white" />
                 </div>
             )}
         </motion.div>
@@ -10471,6 +10880,259 @@ export default function ProductDetailModal({ productId, isOpen, onClose }: Produ
     );
 }
 
+// ===== UnifiedMenu.tsx =====
+// @ts-nocheck
+'use client';
+
+import Link from 'next/link';
+import { X, ChevronLeft } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
+import { useEffect, useState } from 'react';
+import api from '@/lib/api';
+
+// Custom icons
+import PerfumeIcon from '@/components/icons/PerfumeIcon';
+import SoftwareIcon from '@/components/icons/SoftwareIcon';
+import HairCareIcon from '@/components/icons/HairCareIcon';
+import SkinCareIcon from '@/components/icons/SkinCareIcon';
+import AccessoriesIcon from '@/components/icons/AccessoriesIcon';
+import ElectronicsIcon from '@/components/icons/ElectronicsIcon';
+import SupplementsIcon from '@/components/icons/SupplementsIcon';
+import HomeIcon from '@/components/icons/HomeIcon';
+
+const categoryIcons = {
+    software: <SoftwareIcon className="w-5 h-5 text-indigo-500" />,
+    'hair-care': <HairCareIcon className="w-5 h-5 text-pink-500" />,
+    'skin-care': <SkinCareIcon className="w-5 h-5 text-amber-500" />,
+    fashion: <PerfumeIcon className="w-5 h-5 text-rose-500" />,
+    perfumes: <PerfumeIcon className="w-5 h-5 text-rose-500" />,
+    accessories: <AccessoriesIcon className="w-5 h-5 text-yellow-500" />,
+    electronics: <ElectronicsIcon className="w-5 h-5 text-blue-500" />,
+    supplements: <SupplementsIcon className="w-5 h-5 text-green-500" />,
+    home: <HomeIcon className="w-5 h-5 text-gray-500" />,
+};
+
+const categoryNameMap = {
+    software: 'Software',
+    'hair-care': 'Hair Care',
+    'skin-care': 'Skin Care',
+    fashion: 'Perfumes',
+    perfumes: 'Perfumes',
+    accessories: 'Accessories',
+    electronics: 'Electronics',
+    supplements: 'Supplements',
+    home: 'Home',
+};
+
+const categoryNameMapAr = {
+    software: 'برامج',
+    'hair-care': 'العناية بالشعر',
+    'skin-care': 'العناية بالبشرة',
+    fashion: 'عطور',
+    perfumes: 'عطور',
+    accessories: 'إكسسوارات',
+    electronics: 'إلكترونيات',
+    supplements: 'مكملات غذائية',
+    home: 'المنزل',
+};
+
+const normalizeCategory = (cat) => {
+    if (['Fashion', 'fashion', 'Perfumes', 'perfumes'].includes(cat)) return 'perfumes';
+    return cat.toLowerCase().replace(/\s+/g, '-');
+};
+
+export default function UnifiedMenu({ isOpen, onClose }) {
+    const { i18n } = useTranslation('common');
+    const [categories, setCategories] = useState([]);
+    const [navPages, setNavPages] = useState([]);
+    const [stores, setStores] = useState([]);
+
+    // ✅ ROBUST language + RTL detection
+    const lang = (i18n.language || 'ar').startsWith('ar') ? 'ar' : 'en';
+    const [isRTL, setIsRTL] = useState(true);
+
+    useEffect(() => {
+        if (typeof document !== 'undefined') {
+            setIsRTL(document.documentElement.dir === 'rtl');
+        }
+    }, [isOpen, i18n.language]);
+
+    useEffect(() => {
+        if (!isOpen) return;
+        api.get('/api/Categories').then(r => setCategories(r.data)).catch(() => { });
+        api.get('/api/Pages/navigation').then(r => setNavPages(r.data.navbarPages || [])).catch(() => { });
+        api.get('/api/Stores?page=1&pageSize=20').then(r => setStores(r.data.items || [])).catch(() => { });
+    }, [isOpen]);
+
+    // Lock body scroll
+    useEffect(() => {
+        if (isOpen) document.body.style.overflow = 'hidden';
+        else document.body.style.overflow = '';
+        return () => { document.body.style.overflow = ''; };
+    }, [isOpen]);
+
+    // Close on Escape
+    useEffect(() => {
+        const handler = (e) => { if (e.key === 'Escape' && isOpen) onClose(); };
+        window.addEventListener('keydown', handler);
+        return () => window.removeEventListener('keydown', handler);
+    }, [isOpen, onClose]);
+
+    const getCategoryName = (cat) => {
+        const key = normalizeCategory(cat);
+        return lang === 'ar' ? (categoryNameMapAr[key] || cat) : (categoryNameMap[key] || cat);
+    };
+
+    // ✅ RTL → panel slides from RIGHT. LTR → from LEFT.
+    const panelPositionClass = isRTL ? 'right-0' : 'left-0';
+    const slideOffscreen = isRTL ? '100%' : '-100%';
+
+    return (
+        <AnimatePresence>
+            {isOpen && (
+                <>
+                    {/* Backdrop */}
+                    <motion.div
+                        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="fixed inset-0 bg-black/60 z-[2000] backdrop-blur-sm"
+                        onClick={onClose}
+                    />
+
+                    {/* Slide-in panel */}
+                    <motion.aside
+                        initial={{ x: slideOffscreen }}
+                        animate={{ x: 0 }}
+                        exit={{ x: slideOffscreen }}
+                        transition={{ type: 'spring', damping: 28, stiffness: 220 }}
+                        className={`fixed top-0 bottom-0 w-full sm:w-[440px] max-w-[92vw] bg-white z-[2001] overflow-y-auto shadow-2xl ${panelPositionClass}`}
+                    >
+                        {/* Header */}
+                        <div className="sticky top-0 bg-[#0F5C45] text-white px-5 py-4 flex items-center justify-between z-10 shadow-md">
+                            <h2 className="text-xl font-bold">
+                                {lang === 'ar' ? 'القائمة الرئيسية' : 'Main Menu'}
+                            </h2>
+                            <button
+                                onClick={onClose}
+                                className="p-2 hover:bg-white/10 rounded-lg transition"
+                                aria-label="Close"
+                            >
+                                <X className="w-6 h-6" />
+                            </button>
+                        </div>
+
+                        <div className="p-5 space-y-7">
+
+                            {/* 1. Popular */}
+                            <Section title={lang === 'ar' ? 'الأكثر شيوعاً' : 'Most Popular'}>
+                                <MenuLink href="/products" onClick={onClose} isRTL={isRTL}>
+                                    {lang === 'ar' ? 'المنتجات الأكثر مبيعاً' : 'Best Sellers'}
+                                </MenuLink>
+                                <MenuLink href="/products?filter=new" onClick={onClose} isRTL={isRTL}>
+                                    {lang === 'ar' ? 'الإصدارات الحديثة' : 'New Arrivals'}
+                                </MenuLink>
+                                <MenuLink href="/offers" onClick={onClose} isRTL={isRTL}>
+                                    {lang === 'ar' ? 'العروض' : 'Offers'}
+                                </MenuLink>
+                            </Section>
+
+                            {/* 2. Categories */}
+                            <Section title={lang === 'ar' ? 'تسوق حسب القسم' : 'Shop by Category'}>
+                                {categories.map(cat => {
+                                    const key = normalizeCategory(cat);
+                                    return (
+                                        <MenuLink key={cat} href={`/${key}`} onClick={onClose} isRTL={isRTL}>
+                                            <span className="flex items-center gap-3">
+                                                <span className="w-7 h-7 flex items-center justify-center">
+                                                    {categoryIcons[key] || '📦'}
+                                                </span>
+                                                <span>{getCategoryName(cat)}</span>
+                                            </span>
+                                        </MenuLink>
+                                    );
+                                })}
+                            </Section>
+
+                            {/* 3. Stores */}
+                            {stores.length > 0 && (
+                                <Section title={lang === 'ar' ? 'المتاجر' : 'Stores'}>
+                                    {stores.map(s => (
+                                        <MenuLink key={s.id} href={`/stores/${s.id}`} onClick={onClose} isRTL={isRTL}>
+                                            {s.name}
+                                        </MenuLink>
+                                    ))}
+                                </Section>
+                            )}
+
+                            {/* 4. Dynamic Pages */}
+                            {navPages.length > 0 && (
+                                <Section title={lang === 'ar' ? 'صفحات' : 'Pages'}>
+                                    {navPages.map(p => (
+                                        <MenuLink key={p.id} href={`/${p.slug}`} onClick={onClose} isRTL={isRTL}>
+                                            {p.title}
+                                        </MenuLink>
+                                    ))}
+                                </Section>
+                            )}
+
+                            {/* 5. Support */}
+                            <Section title={lang === 'ar' ? 'الدعم' : 'Support'}>
+                                <MenuLink href="/help" onClick={onClose} isRTL={isRTL}>
+                                    {lang === 'ar' ? 'دليل المستخدم' : 'Help Center'}
+                                </MenuLink>
+                                <MenuLink href="/contact" onClick={onClose} isRTL={isRTL}>
+                                    {lang === 'ar' ? 'اتصل بنا' : 'Contact Us'}
+                                </MenuLink>
+                                <MenuLink href="/tracking" onClick={onClose} isRTL={isRTL}>
+                                    {lang === 'ar' ? 'تتبع الطلب' : 'Track Order'}
+                                </MenuLink>
+                            </Section>
+
+                            {/* 6. Account */}
+                            <Section title={lang === 'ar' ? 'حسابي' : 'My Account'}>
+                                <MenuLink href="/profile" onClick={onClose} isRTL={isRTL}>
+                                    {lang === 'ar' ? 'الملف الشخصي' : 'Profile'}
+                                </MenuLink>
+                                <MenuLink href="/orders" onClick={onClose} isRTL={isRTL}>
+                                    {lang === 'ar' ? 'طلباتي' : 'My Orders'}
+                                </MenuLink>
+                                <MenuLink href="/cart" onClick={onClose} isRTL={isRTL}>
+                                    {lang === 'ar' ? 'السلة' : 'Cart'}
+                                </MenuLink>
+                            </Section>
+                        </div>
+                    </motion.aside>
+                </>
+            )}
+        </AnimatePresence>
+    );
+}
+
+function Section({ title, children }) {
+    return (
+        <div>
+            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 px-2">
+                {title}
+            </h3>
+            <div className="space-y-0.5">{children}</div>
+        </div>
+    );
+}
+
+function MenuLink({ href, onClick, children, isRTL }) {
+    return (
+        <Link
+            href={href}
+            onClick={onClick}
+            className="flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-[#0F5C45]/10 text-gray-800 hover:text-[#0F5C45] transition"
+        >
+            <span className="font-medium text-sm">{children}</span>
+            <ChevronLeft className={`w-4 h-4 opacity-40 ${isRTL ? '' : 'rotate-180'}`} />
+        </Link>
+    );
+}
+
 // ===== VendorCard.tsx =====
 'use client';
 
@@ -10587,7 +11249,7 @@ export default function AdminSidebar({ onLinkClick }: AdminSidebarProps) {
                 </div>
             </div>
 
-            <nav className="flex-1 space-y-1 overflow-y-auto">
+            <nav className="flex-1 space-y-1 overflow-y-auto pb-4">
                 {navItems.map((item) => {
                     const isActive = pathname === item.href || pathname?.startsWith(item.href + '/');
                     return (
@@ -10608,7 +11270,7 @@ export default function AdminSidebar({ onLinkClick }: AdminSidebarProps) {
                 })}
             </nav>
 
-            {/* ✅ Fixed Logout – uses function, not Link */}
+            {/* Fixed logout at bottom */}
             <div className="border-t border-gray-700 pt-4 mt-4">
                 <button
                     onClick={handleLogout}
@@ -10997,9 +11659,8 @@ export default function FilterSidebar({
     const [rating, setRating] = useState<number | undefined>(undefined);
     const [isMobileOpen, setIsMobileOpen] = useState(false);
 
-    const [openSections, setOpenSections] = useState<Set<string>>(
-        new Set(['نطاق السعر', 'التقييم', 'التوفر'])
-    );
+    // ✅ Start with ALL sections collapsed
+    const [openSections, setOpenSections] = useState<Set<string>>(new Set());
 
     const toggleSection = (title: string) => {
         const newSet = new Set(openSections);
@@ -11195,6 +11856,166 @@ export default function FilterSidebar({
         </>
     );
 }
+
+// ===== AccessoriesIcon.tsx =====
+// @ts-nocheck
+const AccessoriesIcon = ({ className = "w-6 h-6" }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        {/* Diamond shape */}
+        <path d="M12 2L2 12L12 22L22 12L12 2Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+        {/* Diamond facets */}
+        <line x1="12" y1="2" x2="12" y2="22" stroke="currentColor" strokeWidth="0.8" opacity="0.3" />
+        <line x1="2" y1="12" x2="22" y2="12" stroke="currentColor" strokeWidth="0.8" opacity="0.3" />
+        {/* Sparkle */}
+        <circle cx="12" cy="12" r="1.5" fill="currentColor" opacity="0.5" />
+        <circle cx="7" cy="7" r="0.5" fill="currentColor" opacity="0.3" />
+        <circle cx="17" cy="17" r="0.5" fill="currentColor" opacity="0.3" />
+    </svg>
+);
+
+export default AccessoriesIcon;
+
+// ===== ElectronicsIcon.tsx =====
+// @ts-nocheck
+const ElectronicsIcon = ({ className = "w-6 h-6" }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        {/* Smartphone body */}
+        <rect x="6" y="3" width="12" height="18" rx="2" stroke="currentColor" strokeWidth="1.5" />
+        {/* Screen */}
+        <rect x="8" y="6" width="8" height="11" rx="1" fill="currentColor" opacity="0.15" />
+        {/* Screen content */}
+        <line x1="10" y1="9" x2="14" y2="9" stroke="currentColor" strokeWidth="0.8" opacity="0.4" />
+        <line x1="10" y1="11" x2="13" y2="11" stroke="currentColor" strokeWidth="0.8" opacity="0.4" />
+        <line x1="10" y1="13" x2="15" y2="13" stroke="currentColor" strokeWidth="0.8" opacity="0.4" />
+        {/* Home button */}
+        <circle cx="12" cy="19.5" r="1" fill="currentColor" opacity="0.3" />
+        {/* Camera */}
+        <circle cx="12" cy="4.5" r="0.8" fill="currentColor" opacity="0.4" />
+    </svg>
+);
+
+export default ElectronicsIcon;
+
+// ===== HairCareIcon.tsx =====
+// @ts-nocheck
+const HairCareIcon = ({ className = "w-6 h-6" }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        {/* Hair waves */}
+        <path d="M4 10C4 10 6 6 8 8C10 10 12 6 14 8C16 10 18 6 20 8"
+            stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M4 14C4 14 6 10 8 12C10 14 12 10 14 12C16 14 18 10 20 12"
+            stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M4 18C4 18 6 14 8 16C10 18 12 14 14 16C16 18 18 14 20 16"
+            stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        {/* Sparkle accent */}
+        <circle cx="12" cy="5" r="1" fill="currentColor" opacity="0.6" />
+        <circle cx="8" cy="7" r="0.6" fill="currentColor" opacity="0.4" />
+        <circle cx="16" cy="7" r="0.6" fill="currentColor" opacity="0.4" />
+    </svg>
+);
+
+export default HairCareIcon;
+
+// ===== HomeIcon.tsx =====
+// @ts-nocheck
+const HomeIcon = ({ className = "w-6 h-6" }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        {/* House roof */}
+        <path d="M2 10L12 3L22 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        {/* House body */}
+        <rect x="5" y="10" width="14" height="11" rx="1" stroke="currentColor" strokeWidth="1.5" />
+        {/* Door */}
+        <rect x="9" y="14" width="6" height="7" rx="0.5" stroke="currentColor" strokeWidth="1.2" />
+        {/* Door handle */}
+        <circle cx="13.5" cy="17.5" r="0.5" fill="currentColor" opacity="0.5" />
+        {/* Window */}
+        <circle cx="8" cy="12" r="1" fill="currentColor" opacity="0.3" />
+        <circle cx="16" cy="12" r="1" fill="currentColor" opacity="0.3" />
+        {/* Chimney */}
+        <rect x="16" y="4" width="3" height="5" fill="currentColor" opacity="0.2" />
+    </svg>
+);
+
+export default HomeIcon;
+
+// ===== PerfumeIcon.tsx =====
+// @ts-nocheck
+const PerfumeIcon = ({ className = "w-6 h-6" }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        {/* Diamond cap */}
+        <path d="M11 2L12 0L13 2L12 4L11 2Z" fill="#D4A54A" stroke="#D4A54A" strokeWidth="0.5" />
+        {/* Bottle neck */}
+        <rect x="10" y="4" width="4" height="3" rx="0.5" fill="#E8D5C4" stroke="#D4A54A" strokeWidth="0.5" />
+        {/* Bottle body */}
+        <path d="M7 7C7 7 6.5 12 7 15C7.5 18 10 19 12 19C14 19 16.5 18 17 15C17.5 12 17 7 17 7H7Z"
+            fill="#F5E6D3" stroke="#D4A54A" strokeWidth="0.8" />
+        {/* Golden liquid */}
+        <path d="M8.5 10C8.5 10 8.5 14 10 15.5C11 16.5 13 16.5 14 15.5C15.5 14 15.5 10 15.5 10H8.5Z"
+            fill="#D4A54A" opacity="0.6" />
+        {/* Decorative lines */}
+        <line x1="9" y1="8" x2="15" y2="8" stroke="#D4A54A" strokeWidth="0.5" opacity="0.4" />
+        <line x1="9.5" y1="12" x2="14.5" y2="12" stroke="#D4A54A" strokeWidth="0.5" opacity="0.4" />
+        {/* Sparkle accents */}
+        <circle cx="12" cy="8" r="0.8" fill="#FFFFFF" opacity="0.8" />
+        <circle cx="10.5" cy="10" r="0.5" fill="#FFFFFF" opacity="0.5" />
+        <circle cx="13.5" cy="10" r="0.5" fill="#FFFFFF" opacity="0.5" />
+    </svg>
+);
+
+export default PerfumeIcon;
+
+// ===== SkinCareIcon.tsx =====
+// @ts-nocheck
+const SkinCareIcon = ({ className = "w-6 h-6" }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        {/* Droplet shape */}
+        <path d="M12 2C12 2 6 10 6 15C6 18.5 9 21 12 21C15 21 18 18.5 18 15C18 10 12 2 12 2Z"
+            stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+        {/* Droplet shine */}
+        <circle cx="10" cy="12" r="1" fill="currentColor" opacity="0.6" />
+        <circle cx="13" cy="8" r="0.6" fill="currentColor" opacity="0.4" />
+        {/* Leaf accent */}
+        <path d="M18 15L21 13L19 16L21 19L18 17" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+);
+
+export default SkinCareIcon;
+
+// ===== SoftwareIcon.tsx =====
+// @ts-nocheck
+const SoftwareIcon = ({ className = "w-6 h-6" }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        {/* Laptop screen */}
+        <rect x="3" y="4" width="18" height="12" rx="1" stroke="currentColor" strokeWidth="1.5" />
+        {/* Screen content - code lines */}
+        <line x1="6" y1="8" x2="10" y2="8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <line x1="6" y1="11" x2="14" y2="11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <line x1="6" y1="14" x2="12" y2="14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        {/* Laptop base */}
+        <path d="M4 16H20L18 20H6L4 16Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+        <circle cx="12" cy="18" r="1.5" fill="currentColor" opacity="0.2" />
+    </svg>
+);
+
+export default SoftwareIcon;
+
+// ===== SupplementsIcon.tsx =====
+// @ts-nocheck
+const SupplementsIcon = ({ className = "w-6 h-6" }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        {/* Pill/capsule shape */}
+        <rect x="8" y="8" width="8" height="12" rx="4" stroke="currentColor" strokeWidth="1.5" />
+        {/* Capsule split */}
+        <line x1="8" y1="14" x2="16" y2="14" stroke="currentColor" strokeWidth="0.8" opacity="0.3" />
+        {/* Second pill */}
+        <rect x="13" y="3" width="6" height="9" rx="3" stroke="currentColor" strokeWidth="1.2" opacity="0.5" />
+        {/* Heart accent */}
+        <path d="M15 18C15 18 14 17 13 18C12 19 15 21 15 21C15 21 18 19 17 18C16 17 15 18 15 18Z"
+            fill="currentColor" opacity="0.4" />
+    </svg>
+);
+
+export default SupplementsIcon;
 
 // ===== marketplace.ts =====
 export const MARKETPLACE = {

@@ -30,624 +30,6 @@ public class Class1
 
 </Project>
 
-// ===== migrate.sql =====
-CREATE TABLE IF NOT EXISTS "__EFMigrationsHistory" (
-    "MigrationId" character varying(150) NOT NULL,
-    "ProductVersion" character varying(32) NOT NULL,
-    CONSTRAINT "PK___EFMigrationsHistory" PRIMARY KEY ("MigrationId")
-);
-
-START TRANSACTION;
-
-CREATE TABLE "NewsletterSubscriptions" (
-    "Id" INTEGER NOT NULL,
-    "Email" TEXT NOT NULL,
-    "SubscribedAt" TEXT NOT NULL,
-    "IsActive" INTEGER NOT NULL,
-    CONSTRAINT "PK_NewsletterSubscriptions" PRIMARY KEY ("Id")
-);
-
-CREATE TABLE "Orders" (
-    "Id" INTEGER NOT NULL,
-    "UserId" INTEGER NOT NULL,
-    "OrderDate" TEXT NOT NULL,
-    "TotalAmount" TEXT NOT NULL,
-    "Status" TEXT NOT NULL,
-    "ShippingAddress" TEXT,
-    "PaymentMethod" TEXT,
-    "TrackingNumber" TEXT,
-    "ShippingCarrier" TEXT,
-    "ShippedAt" TEXT,
-    "DeliveredAt" TEXT,
-    "CurrentStatus" TEXT NOT NULL,
-    "PaymentTransactionId" TEXT,
-    "CardLastFour" TEXT,
-    "PhoneNumber" TEXT,
-    "PayPalEmail" TEXT,
-    "DeliveryInstructions" TEXT,
-    "IsPaymentConfirmed" INTEGER NOT NULL,
-    "PaymentConfirmedAt" TEXT,
-    CONSTRAINT "PK_Orders" PRIMARY KEY ("Id")
-);
-
-CREATE TABLE "Products" (
-    "Id" INTEGER NOT NULL,
-    "NameAr" TEXT NOT NULL,
-    "NameEn" TEXT NOT NULL,
-    "DescriptionAr" TEXT NOT NULL,
-    "DescriptionEn" TEXT NOT NULL,
-    "Name" TEXT NOT NULL,
-    "Description" TEXT NOT NULL,
-    "Price" TEXT NOT NULL,
-    "CostPrice" TEXT NOT NULL,
-    "StockQuantity" INTEGER NOT NULL,
-    "VendorId" INTEGER NOT NULL,
-    "ImageUrl" TEXT,
-    "CreatedAt" TEXT NOT NULL,
-    "IsActive" INTEGER NOT NULL,
-    "Rating" REAL,
-    "Category" TEXT,
-    CONSTRAINT "PK_Products" PRIMARY KEY ("Id")
-);
-
-CREATE TABLE "StoreSettings" (
-    "Id" INTEGER NOT NULL,
-    "StoreName" TEXT NOT NULL,
-    "Address" TEXT NOT NULL,
-    "Location" TEXT NOT NULL,
-    "OwnersJson" TEXT NOT NULL,
-    "MobileNumbersJson" TEXT NOT NULL,
-    "EmailsJson" TEXT NOT NULL,
-    "Landline" TEXT NOT NULL,
-    "WhatsApp" TEXT NOT NULL,
-    "Template" TEXT NOT NULL,
-    "PrimaryColor" TEXT,
-    "PrimaryLight" TEXT,
-    "PrimaryDark" TEXT,
-    "SecondaryColor" TEXT,
-    "SecondaryLight" TEXT,
-    "BackgroundColor" TEXT,
-    "SurfaceColor" TEXT,
-    "TextColor" TEXT,
-    "TextMuted" TEXT,
-    "NavbarBg" TEXT,
-    "NavbarText" TEXT,
-    "NavbarHover" TEXT,
-    "FooterBg" TEXT,
-    "FooterText" TEXT,
-    "ButtonPrimaryBg" TEXT,
-    "ButtonPrimaryHover" TEXT,
-    "ButtonPrimaryText" TEXT,
-    "ButtonSecondaryBg" TEXT,
-    "ButtonSecondaryHover" TEXT,
-    "ButtonSecondaryText" TEXT,
-    "CardBg" TEXT,
-    "CardBorder" TEXT,
-    "CardShadow" TEXT,
-    "CardHoverShadow" TEXT,
-    "CardBorderRadius" TEXT,
-    "FontFamily" TEXT,
-    "HeadingFont" TEXT,
-    "BodyFont" TEXT,
-    "SiteEmoji" TEXT,
-    "FaviconEmoji" TEXT,
-    "CustomCss" TEXT,
-    "CustomHeaderHtml" TEXT,
-    "CustomFooterHtml" TEXT,
-    CONSTRAINT "PK_StoreSettings" PRIMARY KEY ("Id")
-);
-
-CREATE TABLE "Users" (
-    "Id" INTEGER NOT NULL,
-    "Username" TEXT NOT NULL,
-    "Email" TEXT NOT NULL,
-    "PasswordHash" TEXT NOT NULL,
-    "Role" TEXT NOT NULL,
-    "CreatedAt" TEXT NOT NULL,
-    CONSTRAINT "PK_Users" PRIMARY KEY ("Id")
-);
-
-CREATE TABLE "OrderItems" (
-    "Id" INTEGER NOT NULL,
-    "OrderId" INTEGER NOT NULL,
-    "ProductId" INTEGER NOT NULL,
-    "ProductName" TEXT NOT NULL,
-    "UnitPrice" TEXT NOT NULL,
-    "Quantity" INTEGER NOT NULL,
-    CONSTRAINT "PK_OrderItems" PRIMARY KEY ("Id"),
-    CONSTRAINT "FK_OrderItems_Orders_OrderId" FOREIGN KEY ("OrderId") REFERENCES "Orders" ("Id") ON DELETE CASCADE
-);
-
-CREATE TABLE "CartItems" (
-    "Id" INTEGER NOT NULL,
-    "UserId" INTEGER NOT NULL,
-    "ProductId" INTEGER NOT NULL,
-    "Quantity" INTEGER NOT NULL,
-    "AddedAt" TEXT NOT NULL,
-    CONSTRAINT "PK_CartItems" PRIMARY KEY ("Id"),
-    CONSTRAINT "FK_CartItems_Products_ProductId" FOREIGN KEY ("ProductId") REFERENCES "Products" ("Id") ON DELETE RESTRICT
-);
-
-CREATE TABLE "Conversations" (
-    "Id" INTEGER NOT NULL,
-    "UserId1" INTEGER NOT NULL,
-    "UserId2" INTEGER NOT NULL,
-    "CreatedAt" TEXT NOT NULL,
-    "LastMessageAt" TEXT,
-    CONSTRAINT "PK_Conversations" PRIMARY KEY ("Id"),
-    CONSTRAINT "FK_Conversations_Users_UserId1" FOREIGN KEY ("UserId1") REFERENCES "Users" ("Id") ON DELETE RESTRICT,
-    CONSTRAINT "FK_Conversations_Users_UserId2" FOREIGN KEY ("UserId2") REFERENCES "Users" ("Id") ON DELETE RESTRICT
-);
-
-CREATE TABLE "ProductSuggestions" (
-    "Id" INTEGER NOT NULL,
-    "Name" TEXT NOT NULL,
-    "Description" TEXT,
-    "Category" TEXT,
-    "VendorId" INTEGER,
-    "SuggestedPrice" TEXT,
-    "EstimatedCostPrice" TEXT,
-    "SuggestedStockQuantity" INTEGER,
-    "ImageData" TEXT,
-    "SuggestedByUserId" INTEGER NOT NULL,
-    "CreatedAt" TEXT NOT NULL,
-    "Status" TEXT NOT NULL,
-    "AdminNote" TEXT,
-    "ReviewedAt" TEXT,
-    "ReviewedByUserId" INTEGER,
-    CONSTRAINT "PK_ProductSuggestions" PRIMARY KEY ("Id"),
-    CONSTRAINT "FK_ProductSuggestions_Users_ReviewedByUserId" FOREIGN KEY ("ReviewedByUserId") REFERENCES "Users" ("Id") ON DELETE RESTRICT,
-    CONSTRAINT "FK_ProductSuggestions_Users_SuggestedByUserId" FOREIGN KEY ("SuggestedByUserId") REFERENCES "Users" ("Id") ON DELETE RESTRICT
-);
-
-CREATE TABLE "ShipmentStatusLogs" (
-    "Id" INTEGER NOT NULL,
-    "OrderId" INTEGER NOT NULL,
-    "Status" TEXT NOT NULL,
-    "Note" TEXT,
-    "CreatedAt" TEXT NOT NULL,
-    "UpdatedByUserId" INTEGER NOT NULL,
-    CONSTRAINT "PK_ShipmentStatusLogs" PRIMARY KEY ("Id"),
-    CONSTRAINT "FK_ShipmentStatusLogs_Orders_OrderId" FOREIGN KEY ("OrderId") REFERENCES "Orders" ("Id") ON DELETE CASCADE,
-    CONSTRAINT "FK_ShipmentStatusLogs_Users_UpdatedByUserId" FOREIGN KEY ("UpdatedByUserId") REFERENCES "Users" ("Id") ON DELETE RESTRICT
-);
-
-CREATE TABLE "Stores" (
-    "Id" INTEGER NOT NULL,
-    "Name" TEXT NOT NULL,
-    "LogoUrl" TEXT,
-    "Description" TEXT,
-    "VendorId" INTEGER NOT NULL,
-    "IsActive" INTEGER NOT NULL,
-    "CreatedAt" TEXT NOT NULL,
-    CONSTRAINT "PK_Stores" PRIMARY KEY ("Id"),
-    CONSTRAINT "FK_Stores_Users_VendorId" FOREIGN KEY ("VendorId") REFERENCES "Users" ("Id") ON DELETE RESTRICT
-);
-
-CREATE TABLE "WishlistItems" (
-    "Id" INTEGER NOT NULL,
-    "UserId" INTEGER NOT NULL,
-    "ProductId" INTEGER NOT NULL,
-    CONSTRAINT "PK_WishlistItems" PRIMARY KEY ("Id"),
-    CONSTRAINT "FK_WishlistItems_Products_ProductId" FOREIGN KEY ("ProductId") REFERENCES "Products" ("Id") ON DELETE RESTRICT,
-    CONSTRAINT "FK_WishlistItems_Users_UserId" FOREIGN KEY ("UserId") REFERENCES "Users" ("Id") ON DELETE CASCADE
-);
-
-CREATE TABLE "Messages" (
-    "Id" INTEGER NOT NULL,
-    "ConversationId" INTEGER NOT NULL,
-    "SenderId" INTEGER NOT NULL,
-    "Content" TEXT NOT NULL,
-    "SentAt" TEXT NOT NULL,
-    "IsRead" INTEGER NOT NULL,
-    CONSTRAINT "PK_Messages" PRIMARY KEY ("Id"),
-    CONSTRAINT "FK_Messages_Conversations_ConversationId" FOREIGN KEY ("ConversationId") REFERENCES "Conversations" ("Id") ON DELETE CASCADE,
-    CONSTRAINT "FK_Messages_Users_SenderId" FOREIGN KEY ("SenderId") REFERENCES "Users" ("Id") ON DELETE RESTRICT
-);
-
-CREATE INDEX "IX_CartItems_ProductId" ON "CartItems" ("ProductId");
-
-CREATE INDEX "IX_CartItems_UserId" ON "CartItems" ("UserId");
-
-CREATE UNIQUE INDEX "IX_Conversations_UserId1_UserId2" ON "Conversations" ("UserId1", "UserId2");
-
-CREATE INDEX "IX_Conversations_UserId2" ON "Conversations" ("UserId2");
-
-CREATE INDEX "IX_Messages_ConversationId" ON "Messages" ("ConversationId");
-
-CREATE INDEX "IX_Messages_SenderId" ON "Messages" ("SenderId");
-
-CREATE UNIQUE INDEX "IX_NewsletterSubscriptions_Email" ON "NewsletterSubscriptions" ("Email");
-
-CREATE INDEX "IX_OrderItems_OrderId" ON "OrderItems" ("OrderId");
-
-CREATE INDEX "IX_Orders_UserId" ON "Orders" ("UserId");
-
-CREATE INDEX "IX_Products_Category" ON "Products" ("Category");
-
-CREATE INDEX "IX_Products_IsActive" ON "Products" ("IsActive");
-
-CREATE INDEX "IX_Products_VendorId" ON "Products" ("VendorId");
-
-CREATE INDEX "IX_ProductSuggestions_ReviewedByUserId" ON "ProductSuggestions" ("ReviewedByUserId");
-
-CREATE INDEX "IX_ProductSuggestions_Status" ON "ProductSuggestions" ("Status");
-
-CREATE INDEX "IX_ProductSuggestions_SuggestedByUserId" ON "ProductSuggestions" ("SuggestedByUserId");
-
-CREATE INDEX "IX_ShipmentStatusLogs_OrderId" ON "ShipmentStatusLogs" ("OrderId");
-
-CREATE INDEX "IX_ShipmentStatusLogs_UpdatedByUserId" ON "ShipmentStatusLogs" ("UpdatedByUserId");
-
-CREATE UNIQUE INDEX "IX_Stores_VendorId" ON "Stores" ("VendorId");
-
-CREATE UNIQUE INDEX "IX_Users_Email" ON "Users" ("Email");
-
-CREATE INDEX "IX_WishlistItems_ProductId" ON "WishlistItems" ("ProductId");
-
-CREATE UNIQUE INDEX "IX_WishlistItems_UserId_ProductId" ON "WishlistItems" ("UserId", "ProductId");
-
-INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
-VALUES ('20260806130823_InitialCreate', '8.0.0');
-
-COMMIT;
-
-START TRANSACTION;
-
-ALTER TABLE "WishlistItems" ALTER COLUMN "UserId" TYPE integer;
-
-ALTER TABLE "WishlistItems" ALTER COLUMN "ProductId" TYPE integer;
-
-ALTER TABLE "WishlistItems" ALTER COLUMN "Id" TYPE integer;
-ALTER TABLE "WishlistItems" ALTER COLUMN "Id" DROP DEFAULT;
-ALTER TABLE "WishlistItems" ALTER COLUMN "Id" ADD GENERATED BY DEFAULT AS IDENTITY;
-
-ALTER TABLE "Users" ALTER COLUMN "Username" TYPE text;
-
-ALTER TABLE "Users" ALTER COLUMN "Role" TYPE text;
-
-ALTER TABLE "Users" ALTER COLUMN "PasswordHash" TYPE text;
-
-ALTER TABLE "Users" ALTER COLUMN "Email" TYPE text;
-
-ALTER TABLE "Users" ALTER COLUMN "CreatedAt" TYPE timestamp with time zone;
-
-ALTER TABLE "Users" ALTER COLUMN "Id" TYPE integer;
-ALTER TABLE "Users" ALTER COLUMN "Id" DROP DEFAULT;
-ALTER TABLE "Users" ALTER COLUMN "Id" ADD GENERATED BY DEFAULT AS IDENTITY;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "WhatsApp" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "TextMuted" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "TextColor" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "Template" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "SurfaceColor" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "StoreName" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "SiteEmoji" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "SecondaryLight" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "SecondaryColor" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "PrimaryLight" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "PrimaryDark" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "PrimaryColor" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "OwnersJson" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "NavbarText" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "NavbarHover" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "NavbarBg" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "MobileNumbersJson" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "Location" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "Landline" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "HeadingFont" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "FooterText" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "FooterBg" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "FontFamily" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "FaviconEmoji" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "EmailsJson" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "CustomHeaderHtml" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "CustomFooterHtml" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "CustomCss" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "CardShadow" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "CardHoverShadow" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "CardBorderRadius" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "CardBorder" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "CardBg" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "ButtonSecondaryText" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "ButtonSecondaryHover" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "ButtonSecondaryBg" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "ButtonPrimaryText" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "ButtonPrimaryHover" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "ButtonPrimaryBg" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "BodyFont" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "BackgroundColor" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "Address" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "Id" TYPE integer;
-ALTER TABLE "StoreSettings" ALTER COLUMN "Id" DROP DEFAULT;
-ALTER TABLE "StoreSettings" ALTER COLUMN "Id" ADD GENERATED BY DEFAULT AS IDENTITY;
-
-ALTER TABLE "Stores" ALTER COLUMN "VendorId" TYPE integer;
-
-ALTER TABLE "Stores" ALTER COLUMN "Name" TYPE character varying(100);
-
-ALTER TABLE "Stores" ALTER COLUMN "LogoUrl" TYPE text;
-
-ALTER TABLE "Stores" ALTER COLUMN "IsActive" TYPE boolean;
-
-ALTER TABLE "Stores" ALTER COLUMN "Description" TYPE text;
-
-ALTER TABLE "Stores" ALTER COLUMN "CreatedAt" TYPE timestamp with time zone;
-
-ALTER TABLE "Stores" ALTER COLUMN "Id" TYPE integer;
-ALTER TABLE "Stores" ALTER COLUMN "Id" DROP DEFAULT;
-ALTER TABLE "Stores" ALTER COLUMN "Id" ADD GENERATED BY DEFAULT AS IDENTITY;
-
-ALTER TABLE "ShipmentStatusLogs" ALTER COLUMN "UpdatedByUserId" TYPE integer;
-
-ALTER TABLE "ShipmentStatusLogs" ALTER COLUMN "Status" TYPE text;
-
-ALTER TABLE "ShipmentStatusLogs" ALTER COLUMN "OrderId" TYPE integer;
-
-ALTER TABLE "ShipmentStatusLogs" ALTER COLUMN "Note" TYPE text;
-
-ALTER TABLE "ShipmentStatusLogs" ALTER COLUMN "CreatedAt" TYPE timestamp with time zone;
-
-ALTER TABLE "ShipmentStatusLogs" ALTER COLUMN "Id" TYPE integer;
-ALTER TABLE "ShipmentStatusLogs" ALTER COLUMN "Id" DROP DEFAULT;
-ALTER TABLE "ShipmentStatusLogs" ALTER COLUMN "Id" ADD GENERATED BY DEFAULT AS IDENTITY;
-
-ALTER TABLE "ProductSuggestions" ALTER COLUMN "VendorId" TYPE integer;
-
-ALTER TABLE "ProductSuggestions" ALTER COLUMN "SuggestedStockQuantity" TYPE integer;
-
-ALTER TABLE "ProductSuggestions" ALTER COLUMN "SuggestedPrice" TYPE numeric;
-
-ALTER TABLE "ProductSuggestions" ALTER COLUMN "SuggestedByUserId" TYPE integer;
-
-ALTER TABLE "ProductSuggestions" ALTER COLUMN "Status" TYPE character varying(20);
-
-ALTER TABLE "ProductSuggestions" ALTER COLUMN "ReviewedByUserId" TYPE integer;
-
-ALTER TABLE "ProductSuggestions" ALTER COLUMN "ReviewedAt" TYPE timestamp with time zone;
-
-ALTER TABLE "ProductSuggestions" ALTER COLUMN "Name" TYPE text;
-
-ALTER TABLE "ProductSuggestions" ALTER COLUMN "ImageData" TYPE text;
-
-ALTER TABLE "ProductSuggestions" ALTER COLUMN "EstimatedCostPrice" TYPE numeric;
-
-ALTER TABLE "ProductSuggestions" ALTER COLUMN "Description" TYPE text;
-
-ALTER TABLE "ProductSuggestions" ALTER COLUMN "CreatedAt" TYPE timestamp with time zone;
-
-ALTER TABLE "ProductSuggestions" ALTER COLUMN "Category" TYPE text;
-
-ALTER TABLE "ProductSuggestions" ALTER COLUMN "AdminNote" TYPE text;
-
-ALTER TABLE "ProductSuggestions" ALTER COLUMN "Id" TYPE integer;
-ALTER TABLE "ProductSuggestions" ALTER COLUMN "Id" DROP DEFAULT;
-ALTER TABLE "ProductSuggestions" ALTER COLUMN "Id" ADD GENERATED BY DEFAULT AS IDENTITY;
-
-ALTER TABLE "Products" ALTER COLUMN "VendorId" TYPE integer;
-
-ALTER TABLE "Products" ALTER COLUMN "StockQuantity" TYPE integer;
-
-ALTER TABLE "Products" ALTER COLUMN "Rating" TYPE double precision;
-
-ALTER TABLE "Products" ALTER COLUMN "Price" TYPE numeric(18,2);
-
-ALTER TABLE "Products" ALTER COLUMN "NameEn" TYPE text;
-
-ALTER TABLE "Products" ALTER COLUMN "NameAr" TYPE text;
-
-ALTER TABLE "Products" ALTER COLUMN "Name" TYPE text;
-
-ALTER TABLE "Products" ALTER COLUMN "IsActive" TYPE boolean;
-
-ALTER TABLE "Products" ALTER COLUMN "ImageUrl" TYPE text;
-
-ALTER TABLE "Products" ALTER COLUMN "DescriptionEn" TYPE text;
-
-ALTER TABLE "Products" ALTER COLUMN "DescriptionAr" TYPE text;
-
-ALTER TABLE "Products" ALTER COLUMN "Description" TYPE text;
-
-ALTER TABLE "Products" ALTER COLUMN "CreatedAt" TYPE timestamp with time zone;
-
-ALTER TABLE "Products" ALTER COLUMN "CostPrice" TYPE numeric;
-
-ALTER TABLE "Products" ALTER COLUMN "Category" TYPE text;
-
-ALTER TABLE "Products" ALTER COLUMN "Id" TYPE integer;
-ALTER TABLE "Products" ALTER COLUMN "Id" DROP DEFAULT;
-ALTER TABLE "Products" ALTER COLUMN "Id" ADD GENERATED BY DEFAULT AS IDENTITY;
-
-ALTER TABLE "Orders" ALTER COLUMN "UserId" TYPE integer;
-
-ALTER TABLE "Orders" ALTER COLUMN "TrackingNumber" TYPE text;
-
-ALTER TABLE "Orders" ALTER COLUMN "TotalAmount" TYPE numeric(18,2);
-
-ALTER TABLE "Orders" ALTER COLUMN "Status" TYPE text;
-
-ALTER TABLE "Orders" ALTER COLUMN "ShippingCarrier" TYPE text;
-
-ALTER TABLE "Orders" ALTER COLUMN "ShippingAddress" TYPE text;
-
-ALTER TABLE "Orders" ALTER COLUMN "ShippedAt" TYPE timestamp with time zone;
-
-ALTER TABLE "Orders" ALTER COLUMN "PhoneNumber" TYPE text;
-
-ALTER TABLE "Orders" ALTER COLUMN "PaymentTransactionId" TYPE text;
-
-ALTER TABLE "Orders" ALTER COLUMN "PaymentMethod" TYPE text;
-
-ALTER TABLE "Orders" ALTER COLUMN "PaymentConfirmedAt" TYPE timestamp with time zone;
-
-ALTER TABLE "Orders" ALTER COLUMN "PayPalEmail" TYPE text;
-
-ALTER TABLE "Orders" ALTER COLUMN "OrderDate" TYPE timestamp with time zone;
-
-ALTER TABLE "Orders" ALTER COLUMN "IsPaymentConfirmed" TYPE boolean;
-
-ALTER TABLE "Orders" ALTER COLUMN "DeliveryInstructions" TYPE text;
-
-ALTER TABLE "Orders" ALTER COLUMN "DeliveredAt" TYPE timestamp with time zone;
-
-ALTER TABLE "Orders" ALTER COLUMN "CurrentStatus" TYPE text;
-
-ALTER TABLE "Orders" ALTER COLUMN "CardLastFour" TYPE text;
-
-ALTER TABLE "Orders" ALTER COLUMN "Id" TYPE integer;
-ALTER TABLE "Orders" ALTER COLUMN "Id" DROP DEFAULT;
-ALTER TABLE "Orders" ALTER COLUMN "Id" ADD GENERATED BY DEFAULT AS IDENTITY;
-
-ALTER TABLE "OrderItems" ALTER COLUMN "UnitPrice" TYPE numeric(18,2);
-
-ALTER TABLE "OrderItems" ALTER COLUMN "Quantity" TYPE integer;
-
-ALTER TABLE "OrderItems" ALTER COLUMN "ProductName" TYPE text;
-
-ALTER TABLE "OrderItems" ALTER COLUMN "ProductId" TYPE integer;
-
-ALTER TABLE "OrderItems" ALTER COLUMN "OrderId" TYPE integer;
-
-ALTER TABLE "OrderItems" ALTER COLUMN "Id" TYPE integer;
-ALTER TABLE "OrderItems" ALTER COLUMN "Id" DROP DEFAULT;
-ALTER TABLE "OrderItems" ALTER COLUMN "Id" ADD GENERATED BY DEFAULT AS IDENTITY;
-
-ALTER TABLE "NewsletterSubscriptions" ALTER COLUMN "SubscribedAt" TYPE timestamp with time zone;
-
-ALTER TABLE "NewsletterSubscriptions" ALTER COLUMN "IsActive" TYPE boolean;
-
-ALTER TABLE "NewsletterSubscriptions" ALTER COLUMN "Email" TYPE text;
-
-ALTER TABLE "NewsletterSubscriptions" ALTER COLUMN "Id" TYPE integer;
-ALTER TABLE "NewsletterSubscriptions" ALTER COLUMN "Id" DROP DEFAULT;
-ALTER TABLE "NewsletterSubscriptions" ALTER COLUMN "Id" ADD GENERATED BY DEFAULT AS IDENTITY;
-
-ALTER TABLE "Messages" ALTER COLUMN "SentAt" TYPE timestamp with time zone;
-
-ALTER TABLE "Messages" ALTER COLUMN "SenderId" TYPE integer;
-
-ALTER TABLE "Messages" ALTER COLUMN "IsRead" TYPE boolean;
-
-ALTER TABLE "Messages" ALTER COLUMN "ConversationId" TYPE integer;
-
-ALTER TABLE "Messages" ALTER COLUMN "Content" TYPE text;
-
-ALTER TABLE "Messages" ALTER COLUMN "Id" TYPE integer;
-ALTER TABLE "Messages" ALTER COLUMN "Id" DROP DEFAULT;
-ALTER TABLE "Messages" ALTER COLUMN "Id" ADD GENERATED BY DEFAULT AS IDENTITY;
-
-ALTER TABLE "Conversations" ALTER COLUMN "UserId2" TYPE integer;
-
-ALTER TABLE "Conversations" ALTER COLUMN "UserId1" TYPE integer;
-
-ALTER TABLE "Conversations" ALTER COLUMN "LastMessageAt" TYPE timestamp with time zone;
-
-ALTER TABLE "Conversations" ALTER COLUMN "CreatedAt" TYPE timestamp with time zone;
-
-ALTER TABLE "Conversations" ALTER COLUMN "Id" TYPE integer;
-ALTER TABLE "Conversations" ALTER COLUMN "Id" DROP DEFAULT;
-ALTER TABLE "Conversations" ALTER COLUMN "Id" ADD GENERATED BY DEFAULT AS IDENTITY;
-
-ALTER TABLE "CartItems" ALTER COLUMN "UserId" TYPE integer;
-
-ALTER TABLE "CartItems" ALTER COLUMN "Quantity" TYPE integer;
-
-ALTER TABLE "CartItems" ALTER COLUMN "ProductId" TYPE integer;
-
-ALTER TABLE "CartItems" ALTER COLUMN "AddedAt" TYPE timestamp with time zone;
-
-ALTER TABLE "CartItems" ALTER COLUMN "Id" TYPE integer;
-ALTER TABLE "CartItems" ALTER COLUMN "Id" DROP DEFAULT;
-ALTER TABLE "CartItems" ALTER COLUMN "Id" ADD GENERATED BY DEFAULT AS IDENTITY;
-
-INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
-VALUES ('20260806151242_AddMissingColumns', '8.0.0');
-
-COMMIT;
-
-START TRANSACTION;
-
-CREATE TABLE "GoldenLinks" (
-    "Id" integer GENERATED BY DEFAULT AS IDENTITY,
-    "Token" character varying(64) NOT NULL,
-    "UserId" integer NOT NULL,
-    "CreatedAt" timestamp with time zone NOT NULL,
-    "ExpiresAt" timestamp with time zone NOT NULL,
-    "IsUsed" boolean NOT NULL,
-    "CreatedBy" text,
-    CONSTRAINT "PK_GoldenLinks" PRIMARY KEY ("Id"),
-    CONSTRAINT "FK_GoldenLinks_Users_UserId" FOREIGN KEY ("UserId") REFERENCES "Users" ("Id") ON DELETE RESTRICT
-);
-
-CREATE TABLE "ProductReviews" (
-    "Id" integer GENERATED BY DEFAULT AS IDENTITY,
-    "ProductId" integer NOT NULL,
-    "UserId" integer NOT NULL,
-    "Rating" integer NOT NULL,
-    "Review" text,
-    "CreatedAt" timestamp with time zone NOT NULL,
-    CONSTRAINT "PK_ProductReviews" PRIMARY KEY ("Id"),
-    CONSTRAINT "FK_ProductReviews_Products_ProductId" FOREIGN KEY ("ProductId") REFERENCES "Products" ("Id") ON DELETE CASCADE,
-    CONSTRAINT "FK_ProductReviews_Users_UserId" FOREIGN KEY ("UserId") REFERENCES "Users" ("Id") ON DELETE RESTRICT
-);
-
-CREATE UNIQUE INDEX "IX_GoldenLinks_Token" ON "GoldenLinks" ("Token");
-
-CREATE INDEX "IX_GoldenLinks_UserId" ON "GoldenLinks" ("UserId");
-
-CREATE UNIQUE INDEX "IX_ProductReviews_ProductId_UserId" ON "ProductReviews" ("ProductId", "UserId");
-
-CREATE INDEX "IX_ProductReviews_UserId" ON "ProductReviews" ("UserId");
-
-INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
-VALUES ('20260810132249_AddGoldenLinks', '8.0.0');
-
-COMMIT;
-
-
-
 // ===== Marketplace.Infrastructure.deps.json =====
 {
   "runtimeTarget": {
@@ -2410,7 +1792,7 @@ public class AppDbContext : DbContext
         if (!optionsBuilder.IsConfigured)
         {
             optionsBuilder.UseNpgsql(
-                "Host=db.rgnanibivkruuryndplle.supabase.co;Database=postgres;Username=postgres;Password=MyMarketplaceDB#2026!Secure;Port=5432;SslMode=Require;Trust Server Certificate=true;"
+                "Host=44.216.29.125;Database=postgres;Username=postgres.rgnanbivkruuryndplle;Password=MyMarketplaceDB%232026%21Secure;Port=5432;SslMode=Require;Trust Server Certificate=true;"
             );
         }
     }
@@ -2430,6 +1812,9 @@ public class AppDbContext : DbContext
     public DbSet<Store> Stores { get; set; }
     public DbSet<ProductReview> ProductReviews { get; set; }
     public DbSet<GoldenLink> GoldenLinks { get; set; }
+
+    // ✅ NEW: Pages DbSet
+    public DbSet<Page> Pages { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -2454,7 +1839,7 @@ public class AppDbContext : DbContext
         // ---- CartItem configurations ----
         modelBuilder.Entity<CartItem>()
             .Property(e => e.Id)
-            .ValueGeneratedOnAdd();   // ✅ This tells EF Core the database generates the Id
+            .ValueGeneratedOnAdd();
 
         modelBuilder.Entity<CartItem>()
             .HasIndex(ci => ci.UserId);
@@ -2464,6 +1849,7 @@ public class AppDbContext : DbContext
             .WithMany()
             .HasForeignKey(ci => ci.ProductId)
             .OnDelete(DeleteBehavior.Restrict);
+
         // ---- Order configurations ----
         modelBuilder.Entity<Order>()
             .Property(o => o.TotalAmount)
@@ -2590,6 +1976,31 @@ public class AppDbContext : DbContext
                   .WithMany()
                   .HasForeignKey(e => e.UserId)
                   .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // ---- Page configurations ----
+        modelBuilder.Entity<Page>(entity =>
+        {
+            entity.HasKey(p => p.Id);
+            entity.HasIndex(p => p.Slug).IsUnique();
+            entity.HasIndex(p => p.IsPublished);
+            entity.HasIndex(p => p.DisplayOrder);
+
+            entity.Property(p => p.Title).IsRequired().HasMaxLength(255);
+            entity.Property(p => p.Slug).IsRequired().HasMaxLength(255);
+            entity.Property(p => p.Content).HasColumnType("text");
+            entity.Property(p => p.MetaDescription).HasMaxLength(500);
+            entity.Property(p => p.MetaKeywords).HasMaxLength(500);
+
+            entity.HasOne(p => p.CreatedBy)
+                .WithMany()
+                .HasForeignKey(p => p.CreatedByUserId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasOne(p => p.UpdatedBy)
+                .WithMany()
+                .HasForeignKey(p => p.UpdatedByUserId)
+                .OnDelete(DeleteBehavior.SetNull);
         });
     }
 }
@@ -8177,12 +7588,123 @@ namespace Marketplace.Infrastructure.Migrations
 }
 
 
-// ===== AppDbContextModelSnapshot.cs =====
+// ===== 20260910080752_AddPagesTable.cs =====
+using System;
+using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
+
+#nullable disable
+
+namespace Marketplace.Infrastructure.Migrations
+{
+    /// <inheritdoc />
+    public partial class AddPagesTable : Migration
+    {
+        /// <inheritdoc />
+        protected override void Up(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.AddColumn<bool>(
+                name: "IsPublic",
+                table: "Stores",
+                type: "boolean",
+                nullable: false,
+                defaultValue: false);
+
+            migrationBuilder.AddColumn<string>(
+                name: "RedirectPath",
+                table: "GoldenLinks",
+                type: "text",
+                nullable: true);
+
+            migrationBuilder.CreateTable(
+                name: "Pages",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Title = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Slug = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Content = table.Column<string>(type: "text", nullable: true),
+                    MetaDescription = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
+                    MetaKeywords = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
+                    IsPublished = table.Column<bool>(type: "boolean", nullable: false),
+                    ShowInFooter = table.Column<bool>(type: "boolean", nullable: false),
+                    ShowInNavbar = table.Column<bool>(type: "boolean", nullable: false),
+                    DisplayOrder = table.Column<int>(type: "integer", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedByUserId = table.Column<int>(type: "integer", nullable: true),
+                    UpdatedByUserId = table.Column<int>(type: "integer", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Pages", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Pages_Users_CreatedByUserId",
+                        column: x => x.CreatedByUserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "FK_Pages_Users_UpdatedByUserId",
+                        column: x => x.UpdatedByUserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Pages_CreatedByUserId",
+                table: "Pages",
+                column: "CreatedByUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Pages_DisplayOrder",
+                table: "Pages",
+                column: "DisplayOrder");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Pages_IsPublished",
+                table: "Pages",
+                column: "IsPublished");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Pages_Slug",
+                table: "Pages",
+                column: "Slug",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Pages_UpdatedByUserId",
+                table: "Pages",
+                column: "UpdatedByUserId");
+        }
+
+        /// <inheritdoc />
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.DropTable(
+                name: "Pages");
+
+            migrationBuilder.DropColumn(
+                name: "IsPublic",
+                table: "Stores");
+
+            migrationBuilder.DropColumn(
+                name: "RedirectPath",
+                table: "GoldenLinks");
+        }
+    }
+}
+
+
+// ===== 20260910080752_AddPagesTable.Designer.cs =====
 // <auto-generated />
 using System;
 using Marketplace.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -8191,9 +7713,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Marketplace.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260910080752_AddPagesTable")]
+    partial class AddPagesTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -8280,6 +7804,9 @@ namespace Marketplace.Infrastructure.Migrations
 
                     b.Property<bool>("IsUsed")
                         .HasColumnType("boolean");
+
+                    b.Property<string>("RedirectPath")
+                        .HasColumnType("text");
 
                     b.Property<string>("Token")
                         .IsRequired()
@@ -8460,6 +7987,75 @@ namespace Marketplace.Infrastructure.Migrations
                     b.HasIndex("OrderId");
 
                     b.ToTable("OrderItems");
+                });
+
+            modelBuilder.Entity("Marketplace.Domain.Entities.Page", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Content")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("CreatedByUserId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("DisplayOrder")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsPublished")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("MetaDescription")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("MetaKeywords")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<bool>("ShowInFooter")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("ShowInNavbar")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("UpdatedByUserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedByUserId");
+
+                    b.HasIndex("DisplayOrder");
+
+                    b.HasIndex("IsPublished");
+
+                    b.HasIndex("Slug")
+                        .IsUnique();
+
+                    b.HasIndex("UpdatedByUserId");
+
+                    b.ToTable("Pages");
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.Product", b =>
@@ -8678,6 +8274,9 @@ namespace Marketplace.Infrastructure.Migrations
                         .HasColumnType("text");
 
                     b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsPublic")
                         .HasColumnType("boolean");
 
                     b.Property<string>("LogoUrl")
@@ -8975,6 +8574,1018 @@ namespace Marketplace.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Order");
+                });
+
+            modelBuilder.Entity("Marketplace.Domain.Entities.Page", b =>
+                {
+                    b.HasOne("Marketplace.Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("Marketplace.Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedByUserId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Marketplace.Domain.Entities.ProductReview", b =>
+                {
+                    b.HasOne("Marketplace.Domain.Entities.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Marketplace.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Marketplace.Domain.Entities.ProductSuggestion", b =>
+                {
+                    b.HasOne("Marketplace.Domain.Entities.User", "ReviewedByUser")
+                        .WithMany()
+                        .HasForeignKey("ReviewedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Marketplace.Domain.Entities.User", "SuggestedByUser")
+                        .WithMany()
+                        .HasForeignKey("SuggestedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("ReviewedByUser");
+
+                    b.Navigation("SuggestedByUser");
+                });
+
+            modelBuilder.Entity("Marketplace.Domain.Entities.ShipmentStatusLog", b =>
+                {
+                    b.HasOne("Marketplace.Domain.Entities.Order", "Order")
+                        .WithMany("StatusLogs")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Marketplace.Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Marketplace.Domain.Entities.Store", b =>
+                {
+                    b.HasOne("Marketplace.Domain.Entities.User", "Vendor")
+                        .WithMany()
+                        .HasForeignKey("VendorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Vendor");
+                });
+
+            modelBuilder.Entity("Marketplace.Domain.Entities.WishlistItem", b =>
+                {
+                    b.HasOne("Marketplace.Domain.Entities.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Marketplace.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Marketplace.Domain.Entities.Conversation", b =>
+                {
+                    b.Navigation("Messages");
+                });
+
+            modelBuilder.Entity("Marketplace.Domain.Entities.Order", b =>
+                {
+                    b.Navigation("OrderItems");
+
+                    b.Navigation("StatusLogs");
+                });
+#pragma warning restore 612, 618
+        }
+    }
+}
+
+
+// ===== AppDbContextModelSnapshot.cs =====
+// <auto-generated />
+using System;
+using Marketplace.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
+
+#nullable disable
+
+namespace Marketplace.Infrastructure.Migrations
+{
+    [DbContext(typeof(AppDbContext))]
+    partial class AppDbContextModelSnapshot : ModelSnapshot
+    {
+        protected override void BuildModel(ModelBuilder modelBuilder)
+        {
+#pragma warning disable 612, 618
+            modelBuilder
+                .HasAnnotation("ProductVersion", "8.0.0")
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
+
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("Marketplace.Domain.Entities.CartItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("AddedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("CartItems");
+                });
+
+            modelBuilder.Entity("Marketplace.Domain.Entities.Conversation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("LastMessageAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("UserId1")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("UserId2")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId2");
+
+                    b.HasIndex("UserId1", "UserId2")
+                        .IsUnique();
+
+                    b.ToTable("Conversations");
+                });
+
+            modelBuilder.Entity("Marketplace.Domain.Entities.GoldenLink", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("RedirectPath")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Token")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("GoldenLinks");
+                });
+
+            modelBuilder.Entity("Marketplace.Domain.Entities.Message", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("ConversationId")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("SenderId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("SentAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ConversationId");
+
+                    b.HasIndex("SenderId");
+
+                    b.ToTable("Messages");
+                });
+
+            modelBuilder.Entity("Marketplace.Domain.Entities.NewsletterSubscription", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("SubscribedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.ToTable("NewsletterSubscriptions");
+                });
+
+            modelBuilder.Entity("Marketplace.Domain.Entities.Order", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CardLastFour")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CurrentStatus")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("DeliveredAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DeliveryInstructions")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsPaymentConfirmed")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("OrderDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("PayPalEmail")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("PaymentConfirmedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("PaymentMethod")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PaymentTransactionId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("ShippedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ShippingAddress")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ShippingCarrier")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("TotalAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<string>("TrackingNumber")
+                        .HasColumnType("text");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Orders");
+                });
+
+            modelBuilder.Entity("Marketplace.Domain.Entities.OrderItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ProductName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("UnitPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderId");
+
+                    b.ToTable("OrderItems");
+                });
+
+            modelBuilder.Entity("Marketplace.Domain.Entities.Page", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Content")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("CreatedByUserId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("DisplayOrder")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsPublished")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("MetaDescription")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("MetaKeywords")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<bool>("ShowInFooter")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("ShowInNavbar")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("UpdatedByUserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedByUserId");
+
+                    b.HasIndex("DisplayOrder");
+
+                    b.HasIndex("IsPublished");
+
+                    b.HasIndex("Slug")
+                        .IsUnique();
+
+                    b.HasIndex("UpdatedByUserId");
+
+                    b.ToTable("Pages");
+                });
+
+            modelBuilder.Entity("Marketplace.Domain.Entities.Product", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Category")
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("CostPrice")
+                        .HasColumnType("numeric");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("DescriptionAr")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("DescriptionEn")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("NameAr")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("NameEn")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("Price")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<double?>("Rating")
+                        .HasColumnType("double precision");
+
+                    b.Property<int>("StockQuantity")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("VendorId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Category");
+
+                    b.HasIndex("IsActive");
+
+                    b.HasIndex("VendorId");
+
+                    b.ToTable("Products");
+                });
+
+            modelBuilder.Entity("Marketplace.Domain.Entities.ProductReview", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Review")
+                        .HasColumnType("text");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("ProductId", "UserId")
+                        .IsUnique();
+
+                    b.ToTable("ProductReviews");
+                });
+
+            modelBuilder.Entity("Marketplace.Domain.Entities.ProductSuggestion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AdminNote")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Category")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<decimal?>("EstimatedCostPrice")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("ImageData")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("ReviewedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("ReviewedByUserId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<int>("SuggestedByUserId")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal?>("SuggestedPrice")
+                        .HasColumnType("numeric");
+
+                    b.Property<int?>("SuggestedStockQuantity")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("VendorId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReviewedByUserId");
+
+                    b.HasIndex("Status");
+
+                    b.HasIndex("SuggestedByUserId");
+
+                    b.ToTable("ProductSuggestions");
+                });
+
+            modelBuilder.Entity("Marketplace.Domain.Entities.ShipmentStatusLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Note")
+                        .HasColumnType("text");
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("UpdatedByUserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderId");
+
+                    b.HasIndex("UpdatedByUserId");
+
+                    b.ToTable("ShipmentStatusLogs");
+                });
+
+            modelBuilder.Entity("Marketplace.Domain.Entities.Store", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsPublic")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("LogoUrl")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<int>("VendorId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("VendorId")
+                        .IsUnique();
+
+                    b.ToTable("Stores");
+                });
+
+            modelBuilder.Entity("Marketplace.Domain.Entities.StoreSetting", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("BackgroundColor")
+                        .HasColumnType("text");
+
+                    b.Property<string>("BodyFont")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ButtonPrimaryBg")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ButtonPrimaryHover")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ButtonPrimaryText")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ButtonSecondaryBg")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ButtonSecondaryHover")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ButtonSecondaryText")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CardBg")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CardBorder")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CardBorderRadius")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CardHoverShadow")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CardShadow")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CustomCss")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CustomFooterHtml")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CustomHeaderHtml")
+                        .HasColumnType("text");
+
+                    b.Property<string>("EmailsJson")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("FaviconEmoji")
+                        .HasColumnType("text");
+
+                    b.Property<string>("FontFamily")
+                        .HasColumnType("text");
+
+                    b.Property<string>("FooterBg")
+                        .HasColumnType("text");
+
+                    b.Property<string>("FooterText")
+                        .HasColumnType("text");
+
+                    b.Property<string>("HeadingFont")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Landline")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Location")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("MobileNumbersJson")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("NavbarBg")
+                        .HasColumnType("text");
+
+                    b.Property<string>("NavbarHover")
+                        .HasColumnType("text");
+
+                    b.Property<string>("NavbarText")
+                        .HasColumnType("text");
+
+                    b.Property<string>("OwnersJson")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("PrimaryColor")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PrimaryDark")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PrimaryLight")
+                        .HasColumnType("text");
+
+                    b.Property<string>("SecondaryColor")
+                        .HasColumnType("text");
+
+                    b.Property<string>("SecondaryLight")
+                        .HasColumnType("text");
+
+                    b.Property<string>("SiteEmoji")
+                        .HasColumnType("text");
+
+                    b.Property<string>("StoreName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("SurfaceColor")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Template")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("TextColor")
+                        .HasColumnType("text");
+
+                    b.Property<string>("TextMuted")
+                        .HasColumnType("text");
+
+                    b.Property<string>("WhatsApp")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("StoreSettings");
+                });
+
+            modelBuilder.Entity("Marketplace.Domain.Entities.User", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("Marketplace.Domain.Entities.WishlistItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("UserId", "ProductId")
+                        .IsUnique();
+
+                    b.ToTable("WishlistItems");
+                });
+
+            modelBuilder.Entity("Marketplace.Domain.Entities.CartItem", b =>
+                {
+                    b.HasOne("Marketplace.Domain.Entities.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("Marketplace.Domain.Entities.Conversation", b =>
+                {
+                    b.HasOne("Marketplace.Domain.Entities.User", "User1")
+                        .WithMany()
+                        .HasForeignKey("UserId1")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Marketplace.Domain.Entities.User", "User2")
+                        .WithMany()
+                        .HasForeignKey("UserId2")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User1");
+
+                    b.Navigation("User2");
+                });
+
+            modelBuilder.Entity("Marketplace.Domain.Entities.GoldenLink", b =>
+                {
+                    b.HasOne("Marketplace.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Marketplace.Domain.Entities.Message", b =>
+                {
+                    b.HasOne("Marketplace.Domain.Entities.Conversation", "Conversation")
+                        .WithMany("Messages")
+                        .HasForeignKey("ConversationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Marketplace.Domain.Entities.User", "Sender")
+                        .WithMany()
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Conversation");
+
+                    b.Navigation("Sender");
+                });
+
+            modelBuilder.Entity("Marketplace.Domain.Entities.OrderItem", b =>
+                {
+                    b.HasOne("Marketplace.Domain.Entities.Order", "Order")
+                        .WithMany("OrderItems")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+                });
+
+            modelBuilder.Entity("Marketplace.Domain.Entities.Page", b =>
+                {
+                    b.HasOne("Marketplace.Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("Marketplace.Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedByUserId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("UpdatedBy");
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.ProductReview", b =>
@@ -13787,7 +14398,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Marketplace.Infrastructure")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+97824d445e7bee2ee6ee3c45da1081142448f254")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a13e8c262c2e01fe55e78357867528f6c8de9050")]
 [assembly: System.Reflection.AssemblyProductAttribute("Marketplace.Infrastructure")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Marketplace.Infrastructure")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
@@ -13836,7 +14447,7 @@ E:\prime-marketplace\Marketplace.Infrastructure\obj\Debug\net8.0\ref\Marketplace
 
 
 // ===== Marketplace.Infrastructure.sourcelink.json =====
-{"documents":{"E:\\prime-marketplace\\*":"https://raw.githubusercontent.com/WaelMohdAlshafey/prime-marketplace/97824d445e7bee2ee6ee3c45da1081142448f254/*"}}
+{"documents":{"E:\\prime-marketplace\\*":"https://raw.githubusercontent.com/WaelMohdAlshafey/prime-marketplace/a13e8c262c2e01fe55e78357867528f6c8de9050/*"}}
 
 // ===== .NETCoreApp,Version=v8.0.AssemblyAttributes.cs =====
 // <autogenerated />

@@ -1,582 +1,3 @@
-// ===== add_missing.sql =====
-CREATE TABLE IF NOT EXISTS "__EFMigrationsHistory" (
-    "MigrationId" character varying(150) NOT NULL,
-    "ProductVersion" character varying(32) NOT NULL,
-    CONSTRAINT "PK___EFMigrationsHistory" PRIMARY KEY ("MigrationId")
-);
-
-START TRANSACTION;
-
-CREATE TABLE "NewsletterSubscriptions" (
-    "Id" INTEGER NOT NULL,
-    "Email" TEXT NOT NULL,
-    "SubscribedAt" TEXT NOT NULL,
-    "IsActive" INTEGER NOT NULL,
-    CONSTRAINT "PK_NewsletterSubscriptions" PRIMARY KEY ("Id")
-);
-
-CREATE TABLE "Orders" (
-    "Id" INTEGER NOT NULL,
-    "UserId" INTEGER NOT NULL,
-    "OrderDate" TEXT NOT NULL,
-    "TotalAmount" TEXT NOT NULL,
-    "Status" TEXT NOT NULL,
-    "ShippingAddress" TEXT,
-    "PaymentMethod" TEXT,
-    "TrackingNumber" TEXT,
-    "ShippingCarrier" TEXT,
-    "ShippedAt" TEXT,
-    "DeliveredAt" TEXT,
-    "CurrentStatus" TEXT NOT NULL,
-    "PaymentTransactionId" TEXT,
-    "CardLastFour" TEXT,
-    "PhoneNumber" TEXT,
-    "PayPalEmail" TEXT,
-    "DeliveryInstructions" TEXT,
-    "IsPaymentConfirmed" INTEGER NOT NULL,
-    "PaymentConfirmedAt" TEXT,
-    CONSTRAINT "PK_Orders" PRIMARY KEY ("Id")
-);
-
-CREATE TABLE "Products" (
-    "Id" INTEGER NOT NULL,
-    "NameAr" TEXT NOT NULL,
-    "NameEn" TEXT NOT NULL,
-    "DescriptionAr" TEXT NOT NULL,
-    "DescriptionEn" TEXT NOT NULL,
-    "Name" TEXT NOT NULL,
-    "Description" TEXT NOT NULL,
-    "Price" TEXT NOT NULL,
-    "CostPrice" TEXT NOT NULL,
-    "StockQuantity" INTEGER NOT NULL,
-    "VendorId" INTEGER NOT NULL,
-    "ImageUrl" TEXT,
-    "CreatedAt" TEXT NOT NULL,
-    "IsActive" INTEGER NOT NULL,
-    "Rating" REAL,
-    "Category" TEXT,
-    CONSTRAINT "PK_Products" PRIMARY KEY ("Id")
-);
-
-CREATE TABLE "StoreSettings" (
-    "Id" INTEGER NOT NULL,
-    "StoreName" TEXT NOT NULL,
-    "Address" TEXT NOT NULL,
-    "Location" TEXT NOT NULL,
-    "OwnersJson" TEXT NOT NULL,
-    "MobileNumbersJson" TEXT NOT NULL,
-    "EmailsJson" TEXT NOT NULL,
-    "Landline" TEXT NOT NULL,
-    "WhatsApp" TEXT NOT NULL,
-    "Template" TEXT NOT NULL,
-    "PrimaryColor" TEXT,
-    "PrimaryLight" TEXT,
-    "PrimaryDark" TEXT,
-    "SecondaryColor" TEXT,
-    "SecondaryLight" TEXT,
-    "BackgroundColor" TEXT,
-    "SurfaceColor" TEXT,
-    "TextColor" TEXT,
-    "TextMuted" TEXT,
-    "NavbarBg" TEXT,
-    "NavbarText" TEXT,
-    "NavbarHover" TEXT,
-    "FooterBg" TEXT,
-    "FooterText" TEXT,
-    "ButtonPrimaryBg" TEXT,
-    "ButtonPrimaryHover" TEXT,
-    "ButtonPrimaryText" TEXT,
-    "ButtonSecondaryBg" TEXT,
-    "ButtonSecondaryHover" TEXT,
-    "ButtonSecondaryText" TEXT,
-    "CardBg" TEXT,
-    "CardBorder" TEXT,
-    "CardShadow" TEXT,
-    "CardHoverShadow" TEXT,
-    "CardBorderRadius" TEXT,
-    "FontFamily" TEXT,
-    "HeadingFont" TEXT,
-    "BodyFont" TEXT,
-    "SiteEmoji" TEXT,
-    "FaviconEmoji" TEXT,
-    "CustomCss" TEXT,
-    "CustomHeaderHtml" TEXT,
-    "CustomFooterHtml" TEXT,
-    CONSTRAINT "PK_StoreSettings" PRIMARY KEY ("Id")
-);
-
-CREATE TABLE "Users" (
-    "Id" INTEGER NOT NULL,
-    "Username" TEXT NOT NULL,
-    "Email" TEXT NOT NULL,
-    "PasswordHash" TEXT NOT NULL,
-    "Role" TEXT NOT NULL,
-    "CreatedAt" TEXT NOT NULL,
-    CONSTRAINT "PK_Users" PRIMARY KEY ("Id")
-);
-
-CREATE TABLE "OrderItems" (
-    "Id" INTEGER NOT NULL,
-    "OrderId" INTEGER NOT NULL,
-    "ProductId" INTEGER NOT NULL,
-    "ProductName" TEXT NOT NULL,
-    "UnitPrice" TEXT NOT NULL,
-    "Quantity" INTEGER NOT NULL,
-    CONSTRAINT "PK_OrderItems" PRIMARY KEY ("Id"),
-    CONSTRAINT "FK_OrderItems_Orders_OrderId" FOREIGN KEY ("OrderId") REFERENCES "Orders" ("Id") ON DELETE CASCADE
-);
-
-CREATE TABLE "CartItems" (
-    "Id" INTEGER NOT NULL,
-    "UserId" INTEGER NOT NULL,
-    "ProductId" INTEGER NOT NULL,
-    "Quantity" INTEGER NOT NULL,
-    "AddedAt" TEXT NOT NULL,
-    CONSTRAINT "PK_CartItems" PRIMARY KEY ("Id"),
-    CONSTRAINT "FK_CartItems_Products_ProductId" FOREIGN KEY ("ProductId") REFERENCES "Products" ("Id") ON DELETE RESTRICT
-);
-
-CREATE TABLE "Conversations" (
-    "Id" INTEGER NOT NULL,
-    "UserId1" INTEGER NOT NULL,
-    "UserId2" INTEGER NOT NULL,
-    "CreatedAt" TEXT NOT NULL,
-    "LastMessageAt" TEXT,
-    CONSTRAINT "PK_Conversations" PRIMARY KEY ("Id"),
-    CONSTRAINT "FK_Conversations_Users_UserId1" FOREIGN KEY ("UserId1") REFERENCES "Users" ("Id") ON DELETE RESTRICT,
-    CONSTRAINT "FK_Conversations_Users_UserId2" FOREIGN KEY ("UserId2") REFERENCES "Users" ("Id") ON DELETE RESTRICT
-);
-
-CREATE TABLE "ProductSuggestions" (
-    "Id" INTEGER NOT NULL,
-    "Name" TEXT NOT NULL,
-    "Description" TEXT,
-    "Category" TEXT,
-    "VendorId" INTEGER,
-    "SuggestedPrice" TEXT,
-    "EstimatedCostPrice" TEXT,
-    "SuggestedStockQuantity" INTEGER,
-    "ImageData" TEXT,
-    "SuggestedByUserId" INTEGER NOT NULL,
-    "CreatedAt" TEXT NOT NULL,
-    "Status" TEXT NOT NULL,
-    "AdminNote" TEXT,
-    "ReviewedAt" TEXT,
-    "ReviewedByUserId" INTEGER,
-    CONSTRAINT "PK_ProductSuggestions" PRIMARY KEY ("Id"),
-    CONSTRAINT "FK_ProductSuggestions_Users_ReviewedByUserId" FOREIGN KEY ("ReviewedByUserId") REFERENCES "Users" ("Id") ON DELETE RESTRICT,
-    CONSTRAINT "FK_ProductSuggestions_Users_SuggestedByUserId" FOREIGN KEY ("SuggestedByUserId") REFERENCES "Users" ("Id") ON DELETE RESTRICT
-);
-
-CREATE TABLE "ShipmentStatusLogs" (
-    "Id" INTEGER NOT NULL,
-    "OrderId" INTEGER NOT NULL,
-    "Status" TEXT NOT NULL,
-    "Note" TEXT,
-    "CreatedAt" TEXT NOT NULL,
-    "UpdatedByUserId" INTEGER NOT NULL,
-    CONSTRAINT "PK_ShipmentStatusLogs" PRIMARY KEY ("Id"),
-    CONSTRAINT "FK_ShipmentStatusLogs_Orders_OrderId" FOREIGN KEY ("OrderId") REFERENCES "Orders" ("Id") ON DELETE CASCADE,
-    CONSTRAINT "FK_ShipmentStatusLogs_Users_UpdatedByUserId" FOREIGN KEY ("UpdatedByUserId") REFERENCES "Users" ("Id") ON DELETE RESTRICT
-);
-
-CREATE TABLE "Stores" (
-    "Id" INTEGER NOT NULL,
-    "Name" TEXT NOT NULL,
-    "LogoUrl" TEXT,
-    "Description" TEXT,
-    "VendorId" INTEGER NOT NULL,
-    "IsActive" INTEGER NOT NULL,
-    "CreatedAt" TEXT NOT NULL,
-    CONSTRAINT "PK_Stores" PRIMARY KEY ("Id"),
-    CONSTRAINT "FK_Stores_Users_VendorId" FOREIGN KEY ("VendorId") REFERENCES "Users" ("Id") ON DELETE RESTRICT
-);
-
-CREATE TABLE "WishlistItems" (
-    "Id" INTEGER NOT NULL,
-    "UserId" INTEGER NOT NULL,
-    "ProductId" INTEGER NOT NULL,
-    CONSTRAINT "PK_WishlistItems" PRIMARY KEY ("Id"),
-    CONSTRAINT "FK_WishlistItems_Products_ProductId" FOREIGN KEY ("ProductId") REFERENCES "Products" ("Id") ON DELETE RESTRICT,
-    CONSTRAINT "FK_WishlistItems_Users_UserId" FOREIGN KEY ("UserId") REFERENCES "Users" ("Id") ON DELETE CASCADE
-);
-
-CREATE TABLE "Messages" (
-    "Id" INTEGER NOT NULL,
-    "ConversationId" INTEGER NOT NULL,
-    "SenderId" INTEGER NOT NULL,
-    "Content" TEXT NOT NULL,
-    "SentAt" TEXT NOT NULL,
-    "IsRead" INTEGER NOT NULL,
-    CONSTRAINT "PK_Messages" PRIMARY KEY ("Id"),
-    CONSTRAINT "FK_Messages_Conversations_ConversationId" FOREIGN KEY ("ConversationId") REFERENCES "Conversations" ("Id") ON DELETE CASCADE,
-    CONSTRAINT "FK_Messages_Users_SenderId" FOREIGN KEY ("SenderId") REFERENCES "Users" ("Id") ON DELETE RESTRICT
-);
-
-CREATE INDEX "IX_CartItems_ProductId" ON "CartItems" ("ProductId");
-
-CREATE INDEX "IX_CartItems_UserId" ON "CartItems" ("UserId");
-
-CREATE UNIQUE INDEX "IX_Conversations_UserId1_UserId2" ON "Conversations" ("UserId1", "UserId2");
-
-CREATE INDEX "IX_Conversations_UserId2" ON "Conversations" ("UserId2");
-
-CREATE INDEX "IX_Messages_ConversationId" ON "Messages" ("ConversationId");
-
-CREATE INDEX "IX_Messages_SenderId" ON "Messages" ("SenderId");
-
-CREATE UNIQUE INDEX "IX_NewsletterSubscriptions_Email" ON "NewsletterSubscriptions" ("Email");
-
-CREATE INDEX "IX_OrderItems_OrderId" ON "OrderItems" ("OrderId");
-
-CREATE INDEX "IX_Orders_UserId" ON "Orders" ("UserId");
-
-CREATE INDEX "IX_Products_Category" ON "Products" ("Category");
-
-CREATE INDEX "IX_Products_IsActive" ON "Products" ("IsActive");
-
-CREATE INDEX "IX_Products_VendorId" ON "Products" ("VendorId");
-
-CREATE INDEX "IX_ProductSuggestions_ReviewedByUserId" ON "ProductSuggestions" ("ReviewedByUserId");
-
-CREATE INDEX "IX_ProductSuggestions_Status" ON "ProductSuggestions" ("Status");
-
-CREATE INDEX "IX_ProductSuggestions_SuggestedByUserId" ON "ProductSuggestions" ("SuggestedByUserId");
-
-CREATE INDEX "IX_ShipmentStatusLogs_OrderId" ON "ShipmentStatusLogs" ("OrderId");
-
-CREATE INDEX "IX_ShipmentStatusLogs_UpdatedByUserId" ON "ShipmentStatusLogs" ("UpdatedByUserId");
-
-CREATE UNIQUE INDEX "IX_Stores_VendorId" ON "Stores" ("VendorId");
-
-CREATE UNIQUE INDEX "IX_Users_Email" ON "Users" ("Email");
-
-CREATE INDEX "IX_WishlistItems_ProductId" ON "WishlistItems" ("ProductId");
-
-CREATE UNIQUE INDEX "IX_WishlistItems_UserId_ProductId" ON "WishlistItems" ("UserId", "ProductId");
-
-INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
-VALUES ('20260806130823_InitialCreate', '8.0.0');
-
-COMMIT;
-
-START TRANSACTION;
-
-ALTER TABLE "WishlistItems" ALTER COLUMN "UserId" TYPE integer;
-
-ALTER TABLE "WishlistItems" ALTER COLUMN "ProductId" TYPE integer;
-
-ALTER TABLE "WishlistItems" ALTER COLUMN "Id" TYPE integer;
-ALTER TABLE "WishlistItems" ALTER COLUMN "Id" DROP DEFAULT;
-ALTER TABLE "WishlistItems" ALTER COLUMN "Id" ADD GENERATED BY DEFAULT AS IDENTITY;
-
-ALTER TABLE "Users" ALTER COLUMN "Username" TYPE text;
-
-ALTER TABLE "Users" ALTER COLUMN "Role" TYPE text;
-
-ALTER TABLE "Users" ALTER COLUMN "PasswordHash" TYPE text;
-
-ALTER TABLE "Users" ALTER COLUMN "Email" TYPE text;
-
-ALTER TABLE "Users" ALTER COLUMN "CreatedAt" TYPE timestamp with time zone;
-
-ALTER TABLE "Users" ALTER COLUMN "Id" TYPE integer;
-ALTER TABLE "Users" ALTER COLUMN "Id" DROP DEFAULT;
-ALTER TABLE "Users" ALTER COLUMN "Id" ADD GENERATED BY DEFAULT AS IDENTITY;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "WhatsApp" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "TextMuted" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "TextColor" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "Template" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "SurfaceColor" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "StoreName" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "SiteEmoji" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "SecondaryLight" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "SecondaryColor" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "PrimaryLight" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "PrimaryDark" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "PrimaryColor" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "OwnersJson" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "NavbarText" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "NavbarHover" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "NavbarBg" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "MobileNumbersJson" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "Location" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "Landline" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "HeadingFont" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "FooterText" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "FooterBg" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "FontFamily" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "FaviconEmoji" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "EmailsJson" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "CustomHeaderHtml" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "CustomFooterHtml" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "CustomCss" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "CardShadow" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "CardHoverShadow" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "CardBorderRadius" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "CardBorder" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "CardBg" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "ButtonSecondaryText" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "ButtonSecondaryHover" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "ButtonSecondaryBg" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "ButtonPrimaryText" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "ButtonPrimaryHover" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "ButtonPrimaryBg" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "BodyFont" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "BackgroundColor" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "Address" TYPE text;
-
-ALTER TABLE "StoreSettings" ALTER COLUMN "Id" TYPE integer;
-ALTER TABLE "StoreSettings" ALTER COLUMN "Id" DROP DEFAULT;
-ALTER TABLE "StoreSettings" ALTER COLUMN "Id" ADD GENERATED BY DEFAULT AS IDENTITY;
-
-ALTER TABLE "Stores" ALTER COLUMN "VendorId" TYPE integer;
-
-ALTER TABLE "Stores" ALTER COLUMN "Name" TYPE character varying(100);
-
-ALTER TABLE "Stores" ALTER COLUMN "LogoUrl" TYPE text;
-
-ALTER TABLE "Stores" ALTER COLUMN "IsActive" TYPE boolean;
-
-ALTER TABLE "Stores" ALTER COLUMN "Description" TYPE text;
-
-ALTER TABLE "Stores" ALTER COLUMN "CreatedAt" TYPE timestamp with time zone;
-
-ALTER TABLE "Stores" ALTER COLUMN "Id" TYPE integer;
-ALTER TABLE "Stores" ALTER COLUMN "Id" DROP DEFAULT;
-ALTER TABLE "Stores" ALTER COLUMN "Id" ADD GENERATED BY DEFAULT AS IDENTITY;
-
-ALTER TABLE "ShipmentStatusLogs" ALTER COLUMN "UpdatedByUserId" TYPE integer;
-
-ALTER TABLE "ShipmentStatusLogs" ALTER COLUMN "Status" TYPE text;
-
-ALTER TABLE "ShipmentStatusLogs" ALTER COLUMN "OrderId" TYPE integer;
-
-ALTER TABLE "ShipmentStatusLogs" ALTER COLUMN "Note" TYPE text;
-
-ALTER TABLE "ShipmentStatusLogs" ALTER COLUMN "CreatedAt" TYPE timestamp with time zone;
-
-ALTER TABLE "ShipmentStatusLogs" ALTER COLUMN "Id" TYPE integer;
-ALTER TABLE "ShipmentStatusLogs" ALTER COLUMN "Id" DROP DEFAULT;
-ALTER TABLE "ShipmentStatusLogs" ALTER COLUMN "Id" ADD GENERATED BY DEFAULT AS IDENTITY;
-
-ALTER TABLE "ProductSuggestions" ALTER COLUMN "VendorId" TYPE integer;
-
-ALTER TABLE "ProductSuggestions" ALTER COLUMN "SuggestedStockQuantity" TYPE integer;
-
-ALTER TABLE "ProductSuggestions" ALTER COLUMN "SuggestedPrice" TYPE numeric;
-
-ALTER TABLE "ProductSuggestions" ALTER COLUMN "SuggestedByUserId" TYPE integer;
-
-ALTER TABLE "ProductSuggestions" ALTER COLUMN "Status" TYPE character varying(20);
-
-ALTER TABLE "ProductSuggestions" ALTER COLUMN "ReviewedByUserId" TYPE integer;
-
-ALTER TABLE "ProductSuggestions" ALTER COLUMN "ReviewedAt" TYPE timestamp with time zone;
-
-ALTER TABLE "ProductSuggestions" ALTER COLUMN "Name" TYPE text;
-
-ALTER TABLE "ProductSuggestions" ALTER COLUMN "ImageData" TYPE text;
-
-ALTER TABLE "ProductSuggestions" ALTER COLUMN "EstimatedCostPrice" TYPE numeric;
-
-ALTER TABLE "ProductSuggestions" ALTER COLUMN "Description" TYPE text;
-
-ALTER TABLE "ProductSuggestions" ALTER COLUMN "CreatedAt" TYPE timestamp with time zone;
-
-ALTER TABLE "ProductSuggestions" ALTER COLUMN "Category" TYPE text;
-
-ALTER TABLE "ProductSuggestions" ALTER COLUMN "AdminNote" TYPE text;
-
-ALTER TABLE "ProductSuggestions" ALTER COLUMN "Id" TYPE integer;
-ALTER TABLE "ProductSuggestions" ALTER COLUMN "Id" DROP DEFAULT;
-ALTER TABLE "ProductSuggestions" ALTER COLUMN "Id" ADD GENERATED BY DEFAULT AS IDENTITY;
-
-ALTER TABLE "Products" ALTER COLUMN "VendorId" TYPE integer;
-
-ALTER TABLE "Products" ALTER COLUMN "StockQuantity" TYPE integer;
-
-ALTER TABLE "Products" ALTER COLUMN "Rating" TYPE double precision;
-
-ALTER TABLE "Products" ALTER COLUMN "Price" TYPE numeric(18,2);
-
-ALTER TABLE "Products" ALTER COLUMN "NameEn" TYPE text;
-
-ALTER TABLE "Products" ALTER COLUMN "NameAr" TYPE text;
-
-ALTER TABLE "Products" ALTER COLUMN "Name" TYPE text;
-
-ALTER TABLE "Products" ALTER COLUMN "IsActive" TYPE boolean;
-
-ALTER TABLE "Products" ALTER COLUMN "ImageUrl" TYPE text;
-
-ALTER TABLE "Products" ALTER COLUMN "DescriptionEn" TYPE text;
-
-ALTER TABLE "Products" ALTER COLUMN "DescriptionAr" TYPE text;
-
-ALTER TABLE "Products" ALTER COLUMN "Description" TYPE text;
-
-ALTER TABLE "Products" ALTER COLUMN "CreatedAt" TYPE timestamp with time zone;
-
-ALTER TABLE "Products" ALTER COLUMN "CostPrice" TYPE numeric;
-
-ALTER TABLE "Products" ALTER COLUMN "Category" TYPE text;
-
-ALTER TABLE "Products" ALTER COLUMN "Id" TYPE integer;
-ALTER TABLE "Products" ALTER COLUMN "Id" DROP DEFAULT;
-ALTER TABLE "Products" ALTER COLUMN "Id" ADD GENERATED BY DEFAULT AS IDENTITY;
-
-ALTER TABLE "Orders" ALTER COLUMN "UserId" TYPE integer;
-
-ALTER TABLE "Orders" ALTER COLUMN "TrackingNumber" TYPE text;
-
-ALTER TABLE "Orders" ALTER COLUMN "TotalAmount" TYPE numeric(18,2);
-
-ALTER TABLE "Orders" ALTER COLUMN "Status" TYPE text;
-
-ALTER TABLE "Orders" ALTER COLUMN "ShippingCarrier" TYPE text;
-
-ALTER TABLE "Orders" ALTER COLUMN "ShippingAddress" TYPE text;
-
-ALTER TABLE "Orders" ALTER COLUMN "ShippedAt" TYPE timestamp with time zone;
-
-ALTER TABLE "Orders" ALTER COLUMN "PhoneNumber" TYPE text;
-
-ALTER TABLE "Orders" ALTER COLUMN "PaymentTransactionId" TYPE text;
-
-ALTER TABLE "Orders" ALTER COLUMN "PaymentMethod" TYPE text;
-
-ALTER TABLE "Orders" ALTER COLUMN "PaymentConfirmedAt" TYPE timestamp with time zone;
-
-ALTER TABLE "Orders" ALTER COLUMN "PayPalEmail" TYPE text;
-
-ALTER TABLE "Orders" ALTER COLUMN "OrderDate" TYPE timestamp with time zone;
-
-ALTER TABLE "Orders" ALTER COLUMN "IsPaymentConfirmed" TYPE boolean;
-
-ALTER TABLE "Orders" ALTER COLUMN "DeliveryInstructions" TYPE text;
-
-ALTER TABLE "Orders" ALTER COLUMN "DeliveredAt" TYPE timestamp with time zone;
-
-ALTER TABLE "Orders" ALTER COLUMN "CurrentStatus" TYPE text;
-
-ALTER TABLE "Orders" ALTER COLUMN "CardLastFour" TYPE text;
-
-ALTER TABLE "Orders" ALTER COLUMN "Id" TYPE integer;
-ALTER TABLE "Orders" ALTER COLUMN "Id" DROP DEFAULT;
-ALTER TABLE "Orders" ALTER COLUMN "Id" ADD GENERATED BY DEFAULT AS IDENTITY;
-
-ALTER TABLE "OrderItems" ALTER COLUMN "UnitPrice" TYPE numeric(18,2);
-
-ALTER TABLE "OrderItems" ALTER COLUMN "Quantity" TYPE integer;
-
-ALTER TABLE "OrderItems" ALTER COLUMN "ProductName" TYPE text;
-
-ALTER TABLE "OrderItems" ALTER COLUMN "ProductId" TYPE integer;
-
-ALTER TABLE "OrderItems" ALTER COLUMN "OrderId" TYPE integer;
-
-ALTER TABLE "OrderItems" ALTER COLUMN "Id" TYPE integer;
-ALTER TABLE "OrderItems" ALTER COLUMN "Id" DROP DEFAULT;
-ALTER TABLE "OrderItems" ALTER COLUMN "Id" ADD GENERATED BY DEFAULT AS IDENTITY;
-
-ALTER TABLE "NewsletterSubscriptions" ALTER COLUMN "SubscribedAt" TYPE timestamp with time zone;
-
-ALTER TABLE "NewsletterSubscriptions" ALTER COLUMN "IsActive" TYPE boolean;
-
-ALTER TABLE "NewsletterSubscriptions" ALTER COLUMN "Email" TYPE text;
-
-ALTER TABLE "NewsletterSubscriptions" ALTER COLUMN "Id" TYPE integer;
-ALTER TABLE "NewsletterSubscriptions" ALTER COLUMN "Id" DROP DEFAULT;
-ALTER TABLE "NewsletterSubscriptions" ALTER COLUMN "Id" ADD GENERATED BY DEFAULT AS IDENTITY;
-
-ALTER TABLE "Messages" ALTER COLUMN "SentAt" TYPE timestamp with time zone;
-
-ALTER TABLE "Messages" ALTER COLUMN "SenderId" TYPE integer;
-
-ALTER TABLE "Messages" ALTER COLUMN "IsRead" TYPE boolean;
-
-ALTER TABLE "Messages" ALTER COLUMN "ConversationId" TYPE integer;
-
-ALTER TABLE "Messages" ALTER COLUMN "Content" TYPE text;
-
-ALTER TABLE "Messages" ALTER COLUMN "Id" TYPE integer;
-ALTER TABLE "Messages" ALTER COLUMN "Id" DROP DEFAULT;
-ALTER TABLE "Messages" ALTER COLUMN "Id" ADD GENERATED BY DEFAULT AS IDENTITY;
-
-ALTER TABLE "Conversations" ALTER COLUMN "UserId2" TYPE integer;
-
-ALTER TABLE "Conversations" ALTER COLUMN "UserId1" TYPE integer;
-
-ALTER TABLE "Conversations" ALTER COLUMN "LastMessageAt" TYPE timestamp with time zone;
-
-ALTER TABLE "Conversations" ALTER COLUMN "CreatedAt" TYPE timestamp with time zone;
-
-ALTER TABLE "Conversations" ALTER COLUMN "Id" TYPE integer;
-ALTER TABLE "Conversations" ALTER COLUMN "Id" DROP DEFAULT;
-ALTER TABLE "Conversations" ALTER COLUMN "Id" ADD GENERATED BY DEFAULT AS IDENTITY;
-
-ALTER TABLE "CartItems" ALTER COLUMN "UserId" TYPE integer;
-
-ALTER TABLE "CartItems" ALTER COLUMN "Quantity" TYPE integer;
-
-ALTER TABLE "CartItems" ALTER COLUMN "ProductId" TYPE integer;
-
-ALTER TABLE "CartItems" ALTER COLUMN "AddedAt" TYPE timestamp with time zone;
-
-ALTER TABLE "CartItems" ALTER COLUMN "Id" TYPE integer;
-ALTER TABLE "CartItems" ALTER COLUMN "Id" DROP DEFAULT;
-ALTER TABLE "CartItems" ALTER COLUMN "Id" ADD GENERATED BY DEFAULT AS IDENTITY;
-
-INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
-VALUES ('20260806151242_AddMissingColumns', '8.0.0');
-
-COMMIT;
-
-
-
 // ===== appsettings.Development.json =====
 {
   "Logging": {
@@ -750,8 +171,18 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 // ============================================================
-// 2. (No need for CORS policy – we'll use custom middleware)
+// 2. Add CORS Policy (official)
 // ============================================================
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        policy =>
+        {
+            policy.AllowAnyOrigin()
+                  .AllowAnyMethod()
+                  .AllowAnyHeader();
+        });
+});
 
 // ============================================================
 // 3. Add Memory Cache
@@ -870,17 +301,26 @@ if (app.Environment.IsDevelopment())
 }
 
 // ============================================================
-// 11. CUSTOM CORS MIDDLEWARE – Handles ALL requests and OPTIONS
+// 11. 🔥🔥🔥 MANUAL OPTIONS HANDLER – MUST BE FIRST 🔥🔥🔥
+//     This runs BEFORE any routing, authentication, etc.
 // ============================================================
 app.Use(async (context, next) =>
 {
-    context.Response.Headers["Access-Control-Allow-Origin"] = "*";
-    context.Response.Headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS";
-    context.Response.Headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With";
+    // Log every request for debugging
+    Console.WriteLine($"🌐 {context.Request.Method} {context.Request.Path}");
 
+    // Always set these headers for ALL responses
+    context.Response.Headers["Access-Control-Allow-Origin"] = "*";
+    context.Response.Headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH";
+    context.Response.Headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With, Accept, Origin";
+    context.Response.Headers["Access-Control-Max-Age"] = "86400";
+
+    // Handle preflight (OPTIONS) immediately
     if (context.Request.Method == "OPTIONS")
     {
+        Console.WriteLine("✅ Preflight OPTIONS request handled");
         context.Response.StatusCode = 204;
+        await context.Response.CompleteAsync();
         return;
     }
 
@@ -888,7 +328,17 @@ app.Use(async (context, next) =>
 });
 
 // ============================================================
-// 12. Request Logging Middleware (helps debug)
+// 12. UseRouting – REQUIRED before UseCors and UseAuthorization
+// ============================================================
+app.UseRouting();
+
+// ============================================================
+// 13. UseCors (official) – as an extra safety layer
+// ============================================================
+app.UseCors("AllowAll");
+
+// ============================================================
+// 14. Request Logging Middleware (helps debug)
 // ============================================================
 app.Use(async (context, next) =>
 {
@@ -898,23 +348,23 @@ app.Use(async (context, next) =>
 });
 
 // ============================================================
-// 13. Serve static files (product images, etc.)
+// 15. Serve static files (product images, etc.)
 // ============================================================
 app.UseStaticFiles();
 
 // ============================================================
-// 14. Authentication & Authorization
+// 16. Authentication & Authorization
 // ============================================================
 app.UseAuthentication();
 app.UseAuthorization();
 
 // ============================================================
-// 15. Map Controllers
+// 17. Map Controllers
 // ============================================================
 app.MapControllers();
 
 // ============================================================
-// 16. Additional Endpoints
+// 18. Additional Endpoints
 // ============================================================
 app.MapGet("/db-test", async (AppDbContext dbContext) =>
 {
@@ -933,7 +383,7 @@ app.MapGet("/", () => "Prime Marketplace API is running!");
 app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = DateTime.UtcNow }));
 
 // ============================================================
-// 17. Database Migration – Apply pending migrations
+// 19. Database Migration – Apply pending migrations
 // ============================================================
 using (var scope = app.Services.CreateScope())
 {
@@ -951,7 +401,7 @@ using (var scope = app.Services.CreateScope())
 }
 
 // ============================================================
-// 18. Run the App
+// 20. Run the App
 // ============================================================
 app.Run();
 
@@ -2829,10 +2279,10 @@ app.Run();
 }
 
 // ===== Marketplace.API.staticwebassets.endpoints.json =====
-{"Version":1,"ManifestType":"Build","Endpoints":[{"Route":"images/products/book.jpg","AssetFile":"images/products/book.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="}]},{"Route":"images/products/book.sz8s44gqpy.jpg","AssetFile":"images/products/book.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"}],"EndpointProperties":[{"Name":"fingerprint","Value":"sz8s44gqpy"},{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="},{"Name":"label","Value":"images/products/book.jpg"}]},{"Route":"images/products/c5272b11-84a7-409a-89fa-c5ef5be9036c_خدماتي2.jpg","AssetFile":"images/products/c5272b11-84a7-409a-89fa-c5ef5be9036c_خدماتي2.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="}]},{"Route":"images/products/c5272b11-84a7-409a-89fa-c5ef5be9036c_خدماتي2.sz8s44gqpy.jpg","AssetFile":"images/products/c5272b11-84a7-409a-89fa-c5ef5be9036c_خدماتي2.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"}],"EndpointProperties":[{"Name":"fingerprint","Value":"sz8s44gqpy"},{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="},{"Name":"label","Value":"images/products/c5272b11-84a7-409a-89fa-c5ef5be9036c_خدماتي2.jpg"}]},{"Route":"images/products/haircare.jpg","AssetFile":"images/products/haircare.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="}]},{"Route":"images/products/haircare.sz8s44gqpy.jpg","AssetFile":"images/products/haircare.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"}],"EndpointProperties":[{"Name":"fingerprint","Value":"sz8s44gqpy"},{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="},{"Name":"label","Value":"images/products/haircare.jpg"}]},{"Route":"images/products/headphones.jpg","AssetFile":"images/products/headphones.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="}]},{"Route":"images/products/headphones.sz8s44gqpy.jpg","AssetFile":"images/products/headphones.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"}],"EndpointProperties":[{"Name":"fingerprint","Value":"sz8s44gqpy"},{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="},{"Name":"label","Value":"images/products/headphones.jpg"}]},{"Route":"images/products/home.jpg","AssetFile":"images/products/home.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="}]},{"Route":"images/products/home.sz8s44gqpy.jpg","AssetFile":"images/products/home.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"}],"EndpointProperties":[{"Name":"fingerprint","Value":"sz8s44gqpy"},{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="},{"Name":"label","Value":"images/products/home.jpg"}]},{"Route":"images/products/laptop.jpg","AssetFile":"images/products/laptop.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="}]},{"Route":"images/products/laptop.sz8s44gqpy.jpg","AssetFile":"images/products/laptop.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"}],"EndpointProperties":[{"Name":"fingerprint","Value":"sz8s44gqpy"},{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="},{"Name":"label","Value":"images/products/laptop.jpg"}]},{"Route":"images/products/shoes.jpg","AssetFile":"images/products/shoes.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="}]},{"Route":"images/products/shoes.sz8s44gqpy.jpg","AssetFile":"images/products/shoes.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"}],"EndpointProperties":[{"Name":"fingerprint","Value":"sz8s44gqpy"},{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="},{"Name":"label","Value":"images/products/shoes.jpg"}]},{"Route":"images/products/skincare.jpg","AssetFile":"images/products/skincare.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="}]},{"Route":"images/products/skincare.sz8s44gqpy.jpg","AssetFile":"images/products/skincare.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"}],"EndpointProperties":[{"Name":"fingerprint","Value":"sz8s44gqpy"},{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="},{"Name":"label","Value":"images/products/skincare.jpg"}]},{"Route":"images/products/supplements.jpg","AssetFile":"images/products/supplements.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="}]},{"Route":"images/products/supplements.sz8s44gqpy.jpg","AssetFile":"images/products/supplements.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"}],"EndpointProperties":[{"Name":"fingerprint","Value":"sz8s44gqpy"},{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="},{"Name":"label","Value":"images/products/supplements.jpg"}]},{"Route":"images/products/tshirt.jpg","AssetFile":"images/products/tshirt.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="}]},{"Route":"images/products/tshirt.sz8s44gqpy.jpg","AssetFile":"images/products/tshirt.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"}],"EndpointProperties":[{"Name":"fingerprint","Value":"sz8s44gqpy"},{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="},{"Name":"label","Value":"images/products/tshirt.jpg"}]},{"Route":"images/products/watch.jpg","AssetFile":"images/products/watch.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="}]},{"Route":"images/products/watch.sz8s44gqpy.jpg","AssetFile":"images/products/watch.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"}],"EndpointProperties":[{"Name":"fingerprint","Value":"sz8s44gqpy"},{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="},{"Name":"label","Value":"images/products/watch.jpg"}]}]}
+{"Version":1,"ManifestType":"Build","Endpoints":[{"Route":"images/products/book.jpg","AssetFile":"images/products/book.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"15694"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"Cy9aaTMUFFhVuiXtseyqq+nam5M/I1692qGaNQEN/lo=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-Cy9aaTMUFFhVuiXtseyqq+nam5M/I1692qGaNQEN/lo="}]},{"Route":"images/products/book.vvh6j3zyr0.jpg","AssetFile":"images/products/book.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"15694"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"Cy9aaTMUFFhVuiXtseyqq+nam5M/I1692qGaNQEN/lo=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"}],"EndpointProperties":[{"Name":"fingerprint","Value":"vvh6j3zyr0"},{"Name":"integrity","Value":"sha256-Cy9aaTMUFFhVuiXtseyqq+nam5M/I1692qGaNQEN/lo="},{"Name":"label","Value":"images/products/book.jpg"}]},{"Route":"images/products/haircare.81t2ihvx9a.jpg","AssetFile":"images/products/haircare.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"33656"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"fGUOUgzQA7ALrJZYa2GPKkFn74n/fnOlci4docuZ0IY=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"}],"EndpointProperties":[{"Name":"fingerprint","Value":"81t2ihvx9a"},{"Name":"integrity","Value":"sha256-fGUOUgzQA7ALrJZYa2GPKkFn74n/fnOlci4docuZ0IY="},{"Name":"label","Value":"images/products/haircare.jpg"}]},{"Route":"images/products/haircare.jpg","AssetFile":"images/products/haircare.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"33656"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"fGUOUgzQA7ALrJZYa2GPKkFn74n/fnOlci4docuZ0IY=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-fGUOUgzQA7ALrJZYa2GPKkFn74n/fnOlci4docuZ0IY="}]},{"Route":"images/products/headphones.jpg","AssetFile":"images/products/headphones.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"16748"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"IE7mFu3dP3YM0TNAWY0Crb3zrX91VQKlkkPA90aEfvM=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-IE7mFu3dP3YM0TNAWY0Crb3zrX91VQKlkkPA90aEfvM="}]},{"Route":"images/products/headphones.w4fanf1ba7.jpg","AssetFile":"images/products/headphones.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"16748"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"IE7mFu3dP3YM0TNAWY0Crb3zrX91VQKlkkPA90aEfvM=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"}],"EndpointProperties":[{"Name":"fingerprint","Value":"w4fanf1ba7"},{"Name":"integrity","Value":"sha256-IE7mFu3dP3YM0TNAWY0Crb3zrX91VQKlkkPA90aEfvM="},{"Name":"label","Value":"images/products/headphones.jpg"}]},{"Route":"images/products/home.66jk4c5e0l.jpg","AssetFile":"images/products/home.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"19385"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"8l1ESJlho2vXeAVwrKUbgoTeU1alwR+ZHdKZf5x1cyw=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"}],"EndpointProperties":[{"Name":"fingerprint","Value":"66jk4c5e0l"},{"Name":"integrity","Value":"sha256-8l1ESJlho2vXeAVwrKUbgoTeU1alwR+ZHdKZf5x1cyw="},{"Name":"label","Value":"images/products/home.jpg"}]},{"Route":"images/products/home.jpg","AssetFile":"images/products/home.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"19385"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"8l1ESJlho2vXeAVwrKUbgoTeU1alwR+ZHdKZf5x1cyw=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-8l1ESJlho2vXeAVwrKUbgoTeU1alwR+ZHdKZf5x1cyw="}]},{"Route":"images/products/laptop.0wj356j2bf.jpg","AssetFile":"images/products/laptop.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"14838"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"cDTEpMH4xCAo8oIwmR6No753hzrBG1h5Kz43TLyLqU4=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"}],"EndpointProperties":[{"Name":"fingerprint","Value":"0wj356j2bf"},{"Name":"integrity","Value":"sha256-cDTEpMH4xCAo8oIwmR6No753hzrBG1h5Kz43TLyLqU4="},{"Name":"label","Value":"images/products/laptop.jpg"}]},{"Route":"images/products/laptop.jpg","AssetFile":"images/products/laptop.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"14838"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"cDTEpMH4xCAo8oIwmR6No753hzrBG1h5Kz43TLyLqU4=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-cDTEpMH4xCAo8oIwmR6No753hzrBG1h5Kz43TLyLqU4="}]},{"Route":"images/products/mens-perfume.hl9uomk4no.jpg","AssetFile":"images/products/mens-perfume.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"30380"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"6wOcP4qZwYOgSg7v4WoX8EU6gVu/BYr1gflwGy9z4gY=\""},{"Name":"Last-Modified","Value":"Tue, 08 Sep 2026 14:17:12 GMT"}],"EndpointProperties":[{"Name":"fingerprint","Value":"hl9uomk4no"},{"Name":"integrity","Value":"sha256-6wOcP4qZwYOgSg7v4WoX8EU6gVu/BYr1gflwGy9z4gY="},{"Name":"label","Value":"images/products/mens-perfume.jpg"}]},{"Route":"images/products/mens-perfume.jpg","AssetFile":"images/products/mens-perfume.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"30380"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"6wOcP4qZwYOgSg7v4WoX8EU6gVu/BYr1gflwGy9z4gY=\""},{"Name":"Last-Modified","Value":"Tue, 08 Sep 2026 14:17:12 GMT"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-6wOcP4qZwYOgSg7v4WoX8EU6gVu/BYr1gflwGy9z4gY="}]},{"Route":"images/products/services.jpg","AssetFile":"images/products/services.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"24655"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"7wWjLm2gKRVeEYzbWyaynoqzgs+K9mI/GGWdVvDhOak=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-7wWjLm2gKRVeEYzbWyaynoqzgs+K9mI/GGWdVvDhOak="}]},{"Route":"images/products/services.nan8uch1qp.jpg","AssetFile":"images/products/services.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"24655"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"7wWjLm2gKRVeEYzbWyaynoqzgs+K9mI/GGWdVvDhOak=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"}],"EndpointProperties":[{"Name":"fingerprint","Value":"nan8uch1qp"},{"Name":"integrity","Value":"sha256-7wWjLm2gKRVeEYzbWyaynoqzgs+K9mI/GGWdVvDhOak="},{"Name":"label","Value":"images/products/services.jpg"}]},{"Route":"images/products/shoes.e0uwb30arr.jpg","AssetFile":"images/products/shoes.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"21397"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"EknJkAK+oDGSAq50rPs0tvrIPPKRC1LKJzL9y85YXXs=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"}],"EndpointProperties":[{"Name":"fingerprint","Value":"e0uwb30arr"},{"Name":"integrity","Value":"sha256-EknJkAK+oDGSAq50rPs0tvrIPPKRC1LKJzL9y85YXXs="},{"Name":"label","Value":"images/products/shoes.jpg"}]},{"Route":"images/products/shoes.jpg","AssetFile":"images/products/shoes.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"21397"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"EknJkAK+oDGSAq50rPs0tvrIPPKRC1LKJzL9y85YXXs=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-EknJkAK+oDGSAq50rPs0tvrIPPKRC1LKJzL9y85YXXs="}]},{"Route":"images/products/skincare.4v1uf5bx3n.jpg","AssetFile":"images/products/skincare.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"30915"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"EAgqN049ihTyVpgHgWVYaUIgCDVMuzqsCAkkaIWf/Uc=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"}],"EndpointProperties":[{"Name":"fingerprint","Value":"4v1uf5bx3n"},{"Name":"integrity","Value":"sha256-EAgqN049ihTyVpgHgWVYaUIgCDVMuzqsCAkkaIWf/Uc="},{"Name":"label","Value":"images/products/skincare.jpg"}]},{"Route":"images/products/skincare.jpg","AssetFile":"images/products/skincare.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"30915"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"EAgqN049ihTyVpgHgWVYaUIgCDVMuzqsCAkkaIWf/Uc=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-EAgqN049ihTyVpgHgWVYaUIgCDVMuzqsCAkkaIWf/Uc="}]},{"Route":"images/products/supplements.jpg","AssetFile":"images/products/supplements.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"41713"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"UcHZWpevE/pdstnFkMIX1H/sxdVE69YQ0h7UsfibkKc=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-UcHZWpevE/pdstnFkMIX1H/sxdVE69YQ0h7UsfibkKc="}]},{"Route":"images/products/supplements.lf63myi77w.jpg","AssetFile":"images/products/supplements.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"41713"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"UcHZWpevE/pdstnFkMIX1H/sxdVE69YQ0h7UsfibkKc=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"}],"EndpointProperties":[{"Name":"fingerprint","Value":"lf63myi77w"},{"Name":"integrity","Value":"sha256-UcHZWpevE/pdstnFkMIX1H/sxdVE69YQ0h7UsfibkKc="},{"Name":"label","Value":"images/products/supplements.jpg"}]},{"Route":"images/products/tshirt.54s2xa8pjt.jpg","AssetFile":"images/products/tshirt.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"16607"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"KxwCM/QfMHLjt7cL0U+mbFTFeTa1EuzI5pjJUJJX2J8=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"}],"EndpointProperties":[{"Name":"fingerprint","Value":"54s2xa8pjt"},{"Name":"integrity","Value":"sha256-KxwCM/QfMHLjt7cL0U+mbFTFeTa1EuzI5pjJUJJX2J8="},{"Name":"label","Value":"images/products/tshirt.jpg"}]},{"Route":"images/products/tshirt.jpg","AssetFile":"images/products/tshirt.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"16607"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"KxwCM/QfMHLjt7cL0U+mbFTFeTa1EuzI5pjJUJJX2J8=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-KxwCM/QfMHLjt7cL0U+mbFTFeTa1EuzI5pjJUJJX2J8="}]},{"Route":"images/products/unisex-perfume.hl9uomk4no.jpg","AssetFile":"images/products/unisex-perfume.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"30380"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"6wOcP4qZwYOgSg7v4WoX8EU6gVu/BYr1gflwGy9z4gY=\""},{"Name":"Last-Modified","Value":"Tue, 08 Sep 2026 14:17:12 GMT"}],"EndpointProperties":[{"Name":"fingerprint","Value":"hl9uomk4no"},{"Name":"integrity","Value":"sha256-6wOcP4qZwYOgSg7v4WoX8EU6gVu/BYr1gflwGy9z4gY="},{"Name":"label","Value":"images/products/unisex-perfume.jpg"}]},{"Route":"images/products/unisex-perfume.jpg","AssetFile":"images/products/unisex-perfume.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"30380"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"6wOcP4qZwYOgSg7v4WoX8EU6gVu/BYr1gflwGy9z4gY=\""},{"Name":"Last-Modified","Value":"Tue, 08 Sep 2026 14:17:12 GMT"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-6wOcP4qZwYOgSg7v4WoX8EU6gVu/BYr1gflwGy9z4gY="}]},{"Route":"images/products/watch.bqq5br5uzv.jpg","AssetFile":"images/products/watch.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"9900"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"beJM6N4rjyODsx/GAaAAoLlwthp/Kt8jNzpj2yHb5g4=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"}],"EndpointProperties":[{"Name":"fingerprint","Value":"bqq5br5uzv"},{"Name":"integrity","Value":"sha256-beJM6N4rjyODsx/GAaAAoLlwthp/Kt8jNzpj2yHb5g4="},{"Name":"label","Value":"images/products/watch.jpg"}]},{"Route":"images/products/watch.jpg","AssetFile":"images/products/watch.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"9900"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"beJM6N4rjyODsx/GAaAAoLlwthp/Kt8jNzpj2yHb5g4=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-beJM6N4rjyODsx/GAaAAoLlwthp/Kt8jNzpj2yHb5g4="}]},{"Route":"images/products/womens-perfume.0h79ofsh5r.jpg","AssetFile":"images/products/womens-perfume.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"21528"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"FEJ23ddPwNoykvZYb0SeozdNJF09yVmsSh9JG5SVhkI=\""},{"Name":"Last-Modified","Value":"Tue, 08 Sep 2026 14:17:12 GMT"}],"EndpointProperties":[{"Name":"fingerprint","Value":"0h79ofsh5r"},{"Name":"integrity","Value":"sha256-FEJ23ddPwNoykvZYb0SeozdNJF09yVmsSh9JG5SVhkI="},{"Name":"label","Value":"images/products/womens-perfume.jpg"}]},{"Route":"images/products/womens-perfume.jpg","AssetFile":"images/products/womens-perfume.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"21528"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"FEJ23ddPwNoykvZYb0SeozdNJF09yVmsSh9JG5SVhkI=\""},{"Name":"Last-Modified","Value":"Tue, 08 Sep 2026 14:17:12 GMT"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-FEJ23ddPwNoykvZYb0SeozdNJF09yVmsSh9JG5SVhkI="}]}]}
 
 // ===== Marketplace.API.staticwebassets.runtime.json =====
-{"ContentRoots":["E:\\prime-marketplace\\Marketplace.API\\wwwroot\\"],"Root":{"Children":{"images":{"Children":{"products":{"Children":{"book.jpg":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"images/products/book.jpg"},"Patterns":null},"c5272b11-84a7-409a-89fa-c5ef5be9036c_خدماتي2.jpg":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"images/products/c5272b11-84a7-409a-89fa-c5ef5be9036c_خدماتي2.jpg"},"Patterns":null},"haircare.jpg":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"images/products/haircare.jpg"},"Patterns":null},"headphones.jpg":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"images/products/headphones.jpg"},"Patterns":null},"home.jpg":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"images/products/home.jpg"},"Patterns":null},"laptop.jpg":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"images/products/laptop.jpg"},"Patterns":null},"shoes.jpg":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"images/products/shoes.jpg"},"Patterns":null},"skincare.jpg":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"images/products/skincare.jpg"},"Patterns":null},"supplements.jpg":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"images/products/supplements.jpg"},"Patterns":null},"tshirt.jpg":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"images/products/tshirt.jpg"},"Patterns":null},"watch.jpg":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"images/products/watch.jpg"},"Patterns":null}},"Asset":null,"Patterns":null}},"Asset":null,"Patterns":null}},"Asset":null,"Patterns":[{"ContentRootIndex":0,"Pattern":"**","Depth":0}]}}
+{"ContentRoots":["E:\\prime-marketplace\\Marketplace.API\\wwwroot\\"],"Root":{"Children":{"images":{"Children":{"products":{"Children":{"book.jpg":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"images/products/book.jpg"},"Patterns":null},"haircare.jpg":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"images/products/haircare.jpg"},"Patterns":null},"headphones.jpg":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"images/products/headphones.jpg"},"Patterns":null},"home.jpg":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"images/products/home.jpg"},"Patterns":null},"laptop.jpg":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"images/products/laptop.jpg"},"Patterns":null},"mens-perfume.jpg":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"images/products/mens-perfume.jpg"},"Patterns":null},"services.jpg":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"images/products/services.jpg"},"Patterns":null},"shoes.jpg":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"images/products/shoes.jpg"},"Patterns":null},"skincare.jpg":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"images/products/skincare.jpg"},"Patterns":null},"supplements.jpg":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"images/products/supplements.jpg"},"Patterns":null},"tshirt.jpg":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"images/products/tshirt.jpg"},"Patterns":null},"unisex-perfume.jpg":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"images/products/unisex-perfume.jpg"},"Patterns":null},"watch.jpg":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"images/products/watch.jpg"},"Patterns":null},"womens-perfume.jpg":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"images/products/womens-perfume.jpg"},"Patterns":null}},"Asset":null,"Patterns":null}},"Asset":null,"Patterns":null}},"Asset":null,"Patterns":[{"ContentRootIndex":0,"Pattern":"**","Depth":0}]}}
 
 // ===== AdminController.cs =====
 using Microsoft.AspNetCore.Authorization;
@@ -3804,6 +3254,238 @@ public class RevertPaymentDto
     public string? Note { get; set; }
 }
 
+// ===== PagesController.cs =====
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
+using Marketplace.Domain.Entities;
+using Marketplace.Infrastructure.Data;
+
+namespace Marketplace.API.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+public class PagesController : ControllerBase
+{
+    private readonly AppDbContext _context;
+
+    public PagesController(AppDbContext context)
+    {
+        _context = context;
+    }
+
+    private int GetUserId()
+    {
+        var claim = User.FindFirst("VendorId") ?? User.FindFirst(ClaimTypes.NameIdentifier);
+        return claim != null ? int.Parse(claim.Value) : 0;
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetPages()
+    {
+        var pages = await _context.Pages
+            .Where(p => p.IsPublished)
+            .OrderBy(p => p.DisplayOrder ?? 999)
+            .ThenBy(p => p.Title)
+            .Select(p => new
+            {
+                p.Id,
+                p.Title,
+                p.Slug,
+                p.Content,
+                p.MetaDescription,
+                p.MetaKeywords,
+                p.IsPublished,
+                p.ShowInFooter,
+                p.ShowInNavbar,
+                p.DisplayOrder,
+                p.CreatedAt,
+                p.UpdatedAt
+            })
+            .ToListAsync();
+        return Ok(pages);
+    }
+
+    [HttpGet("slug/{slug}")]
+    public async Task<IActionResult> GetPageBySlug(string slug)
+    {
+        var page = await _context.Pages
+            .FirstOrDefaultAsync(p => p.Slug == slug && p.IsPublished);
+
+        if (page == null)
+            return NotFound(new { message = "Page not found." });
+
+        return Ok(new
+        {
+            page.Id,
+            page.Title,
+            page.Slug,
+            page.Content,
+            page.MetaDescription,
+            page.MetaKeywords,
+            page.IsPublished,
+            page.ShowInFooter,
+            page.ShowInNavbar,
+            page.DisplayOrder,
+            page.CreatedAt,
+            page.UpdatedAt
+        });
+    }
+
+    [HttpGet("navigation")]
+    public async Task<IActionResult> GetNavigation()
+    {
+        var navbarPages = await _context.Pages
+            .Where(p => p.IsPublished && p.ShowInNavbar)
+            .OrderBy(p => p.DisplayOrder ?? 999)
+            .Select(p => new { p.Id, p.Title, p.Slug })
+            .ToListAsync();
+
+        var footerPages = await _context.Pages
+            .Where(p => p.IsPublished && p.ShowInFooter)
+            .OrderBy(p => p.DisplayOrder ?? 999)
+            .Select(p => new { p.Id, p.Title, p.Slug })
+            .ToListAsync();
+
+        return Ok(new { navbarPages, footerPages });
+    }
+
+    [HttpGet("admin/all")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> GetAllAdmin()
+    {
+        var pages = await _context.Pages
+            .OrderBy(p => p.DisplayOrder ?? 999)
+            .ThenBy(p => p.Title)
+            .Select(p => new
+            {
+                p.Id,
+                p.Title,
+                p.Slug,
+                p.Content,
+                p.MetaDescription,
+                p.MetaKeywords,
+                p.IsPublished,
+                p.ShowInFooter,
+                p.ShowInNavbar,
+                p.DisplayOrder,
+                p.CreatedAt,
+                p.UpdatedAt
+            })
+            .ToListAsync();
+        return Ok(pages);
+    }
+
+    [HttpGet("admin/{id}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> GetById(int id)
+    {
+        var page = await _context.Pages.FindAsync(id);
+        if (page == null) return NotFound(new { message = "Page not found." });
+        return Ok(page);
+    }
+
+    [HttpPost]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> Create([FromBody] CreatePageDto dto)
+    {
+        if (!ModelState.IsValid) return BadRequest(ModelState);
+
+        if (await _context.Pages.AnyAsync(p => p.Slug == dto.Slug))
+            return BadRequest(new { message = "A page with this slug already exists." });
+
+        var userId = GetUserId();
+
+        var page = new Page
+        {
+            Title = dto.Title,
+            Slug = dto.Slug,
+            Content = dto.Content,
+            MetaDescription = dto.MetaDescription,
+            MetaKeywords = dto.MetaKeywords,
+            IsPublished = dto.IsPublished,
+            ShowInFooter = dto.ShowInFooter,
+            ShowInNavbar = dto.ShowInNavbar,
+            DisplayOrder = dto.DisplayOrder,
+            CreatedAt = DateTime.UtcNow,
+            CreatedByUserId = userId > 0 ? userId : null
+        };
+
+        _context.Pages.Add(page);
+        await _context.SaveChangesAsync();
+        return Ok(page);
+    }
+
+    [HttpPut("{id}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> Update(int id, [FromBody] UpdatePageDto dto)
+    {
+        if (!ModelState.IsValid) return BadRequest(ModelState);
+
+        var page = await _context.Pages.FindAsync(id);
+        if (page == null) return NotFound(new { message = "Page not found." });
+
+        if (await _context.Pages.AnyAsync(p => p.Slug == dto.Slug && p.Id != id))
+            return BadRequest(new { message = "A page with this slug already exists." });
+
+        var userId = GetUserId();
+
+        page.Title = dto.Title;
+        page.Slug = dto.Slug;
+        page.Content = dto.Content;
+        page.MetaDescription = dto.MetaDescription;
+        page.MetaKeywords = dto.MetaKeywords;
+        page.IsPublished = dto.IsPublished;
+        page.ShowInFooter = dto.ShowInFooter;
+        page.ShowInNavbar = dto.ShowInNavbar;
+        page.DisplayOrder = dto.DisplayOrder;
+        page.UpdatedAt = DateTime.UtcNow;
+        page.UpdatedByUserId = userId > 0 ? userId : null;
+
+        await _context.SaveChangesAsync();
+        return Ok(page);
+    }
+
+    [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var page = await _context.Pages.FindAsync(id);
+        if (page == null) return NotFound(new { message = "Page not found." });
+
+        _context.Pages.Remove(page);
+        await _context.SaveChangesAsync();
+        return NoContent();
+    }
+}
+
+public class CreatePageDto
+{
+    public string Title { get; set; } = string.Empty;
+    public string Slug { get; set; } = string.Empty;
+    public string? Content { get; set; }
+    public string? MetaDescription { get; set; }
+    public string? MetaKeywords { get; set; }
+    public bool IsPublished { get; set; } = true;
+    public bool ShowInFooter { get; set; }
+    public bool ShowInNavbar { get; set; }
+    public int? DisplayOrder { get; set; }
+}
+
+public class UpdatePageDto
+{
+    public string Title { get; set; } = string.Empty;
+    public string Slug { get; set; } = string.Empty;
+    public string? Content { get; set; }
+    public string? MetaDescription { get; set; }
+    public string? MetaKeywords { get; set; }
+    public bool IsPublished { get; set; } = true;
+    public bool ShowInFooter { get; set; }
+    public bool ShowInNavbar { get; set; }
+    public int? DisplayOrder { get; set; }
+}
+
 // ===== ProductsController.cs =====
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -4313,6 +3995,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Security.Claims;
 using Marketplace.Application.DTOs;
 using Marketplace.Application.Interfaces;
 using Marketplace.Infrastructure.Data;
@@ -4333,17 +4016,33 @@ namespace Marketplace.API.Controllers
             _context = context;
         }
 
+        private bool IsClientRole()
+        {
+            var role = User.FindFirst(ClaimTypes.Role)?.Value;
+            return role == "Client" || role == "Customer";
+        }
+
         // ============================================================
-        // PUBLIC – Get all stores (active only)
+        // GET: api/stores
+        // Clients see ONLY public stores (Pharmacy & Library)
+        // Admin/Vendor/Employee see ALL stores
         // ============================================================
         [HttpGet]
         public async Task<IActionResult> GetStores([FromQuery] int page = 1, [FromQuery] int pageSize = 20)
         {
             try
             {
+                var isClient = IsClientRole();
+
                 var query = _context.Stores
-                    .Where(s => s.IsActive)
-                    .OrderBy(s => s.Name);
+                    .Where(s => s.IsActive);
+
+                if (isClient)
+                {
+                    query = query.Where(s => s.IsPublic == true);
+                }
+
+                query = query.OrderBy(s => s.Name);
 
                 var totalCount = await query.CountAsync();
 
@@ -4357,10 +4056,14 @@ namespace Marketplace.API.Controllers
                         LogoUrl = s.LogoUrl,
                         Description = s.Description,
                         VendorId = s.VendorId,
-                        VendorUsername = "Unknown",
+                        VendorUsername = _context.Users
+                            .Where(u => u.Id == s.VendorId)
+                            .Select(u => u.Username)
+                            .FirstOrDefault() ?? "Unknown",
                         IsActive = s.IsActive,
                         CreatedAt = s.CreatedAt,
-                        ProductCount = _context.Products.Count(p => p.VendorId == s.VendorId && p.IsActive)
+                        ProductCount = _context.Products.Count(p => p.VendorId == s.VendorId && p.IsActive),
+                        IsPublic = s.IsPublic
                     })
                     .ToListAsync();
 
@@ -4377,21 +4080,29 @@ namespace Marketplace.API.Controllers
             catch (Exception ex)
             {
                 Console.WriteLine($"❌ GetStores ERROR: {ex.Message}");
-                Console.WriteLine(ex.StackTrace);
-                return StatusCode(500, new { message = ex.Message, stackTrace = ex.StackTrace });
+                return StatusCode(500, new { message = ex.Message });
             }
         }
 
         // ============================================================
-        // PUBLIC – Get a single store by ID
+        // GET: api/stores/{id}
         // ============================================================
         [HttpGet("{id}")]
         public async Task<IActionResult> GetStore(int id)
         {
             try
             {
-                var store = await _context.Stores
-                    .Where(s => s.Id == id && s.IsActive)
+                var isClient = IsClientRole();
+
+                var query = _context.Stores
+                    .Where(s => s.Id == id && s.IsActive);
+
+                if (isClient)
+                {
+                    query = query.Where(s => s.IsPublic == true);
+                }
+
+                var store = await query
                     .Select(s => new StoreResponseDto
                     {
                         Id = s.Id,
@@ -4399,10 +4110,14 @@ namespace Marketplace.API.Controllers
                         LogoUrl = s.LogoUrl,
                         Description = s.Description,
                         VendorId = s.VendorId,
-                        VendorUsername = "Unknown",
+                        VendorUsername = _context.Users
+                            .Where(u => u.Id == s.VendorId)
+                            .Select(u => u.Username)
+                            .FirstOrDefault() ?? "Unknown",
                         IsActive = s.IsActive,
                         CreatedAt = s.CreatedAt,
-                        ProductCount = _context.Products.Count(p => p.VendorId == s.VendorId && p.IsActive)
+                        ProductCount = _context.Products.Count(p => p.VendorId == s.VendorId && p.IsActive),
+                        IsPublic = s.IsPublic
                     })
                     .FirstOrDefaultAsync();
 
@@ -4419,14 +4134,25 @@ namespace Marketplace.API.Controllers
         }
 
         // ============================================================
-        // PUBLIC – Get products of a store
+        // GET: api/stores/{id}/products
         // ============================================================
         [HttpGet("{id}/products")]
         public async Task<IActionResult> GetStoreProducts(int id, [FromQuery] int page = 1, [FromQuery] int pageSize = 20)
         {
             try
             {
-                var store = await _context.Stores.FindAsync(id);
+                var isClient = IsClientRole();
+
+                var storeQuery = _context.Stores
+                    .Where(s => s.Id == id && s.IsActive);
+
+                if (isClient)
+                {
+                    storeQuery = storeQuery.Where(s => s.IsPublic == true);
+                }
+
+                var store = await storeQuery.FirstOrDefaultAsync();
+
                 if (store == null)
                     return NotFound(new { message = "Store not found." });
 
@@ -4441,7 +4167,8 @@ namespace Marketplace.API.Controllers
         }
 
         // ============================================================
-        // ADMIN ONLY – Create a store (with logo upload)
+        // POST: api/stores - Admin only
+        // ✅ Admin can set IsPublic checkbox
         // ============================================================
         [HttpPost]
         [Authorize(Roles = "Admin")]
@@ -4479,7 +4206,8 @@ namespace Marketplace.API.Controllers
         }
 
         // ============================================================
-        // ADMIN ONLY – Update a store (with logo upload)
+        // PUT: api/stores/{id} - Admin only
+        // ✅ Admin can update IsPublic checkbox
         // ============================================================
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
@@ -4517,7 +4245,7 @@ namespace Marketplace.API.Controllers
         }
 
         // ============================================================
-        // ADMIN ONLY – Delete a store (soft delete)
+        // DELETE: api/stores/{id} - Admin only
         // ============================================================
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
@@ -4763,53 +4491,67 @@ public class CreateUserDto
 }
 
 // ===== WishlistController.cs =====
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using Marketplace.Application.Interfaces;
 
-namespace Marketplace.API.Controllers;
-
-[ApiController]
-[Route("api/[controller]")]
-[Authorize]
-public class WishlistController : ControllerBase
+namespace Marketplace.API.Controllers
 {
-    private readonly IWishlistService _wishlistService;
-
-    public WishlistController(IWishlistService wishlistService)
+    [ApiController]
+    [Route("api/[controller]")]
+    [EnableCors("AllowAll")]   // ← This ensures CORS headers are sent for all actions
+    [Authorize]                // ← All endpoints require authentication
+    public class WishlistController : ControllerBase
     {
-        _wishlistService = wishlistService;
-    }
+        private readonly IWishlistService _wishlistService;
 
-    private int GetUserId()
-    {
-        var claim = User.FindFirst("VendorId") ?? User.FindFirst(ClaimTypes.NameIdentifier);
-        return int.Parse(claim!.Value);
-    }
+        public WishlistController(IWishlistService wishlistService)
+        {
+            _wishlistService = wishlistService;
+        }
 
-    [HttpGet]
-    public async Task<IActionResult> GetWishlist()
-    {
-        var userId = GetUserId();
-        var ids = await _wishlistService.GetUserWishlistIdsAsync(userId);
-        return Ok(ids);
-    }
+        // Helper to get current user ID from JWT claims
+        private int GetUserId()
+        {
+            var claim = User.FindFirst("VendorId") ?? User.FindFirst(ClaimTypes.NameIdentifier);
+            return int.Parse(claim!.Value);
+        }
 
-    [HttpPost("{productId}")]
-    public async Task<IActionResult> AddToWishlist(int productId)
-    {
-        var userId = GetUserId();
-        await _wishlistService.AddToWishlistAsync(userId, productId);
-        return Ok();
-    }
+        // ============================================================
+        // GET /api/Wishlist – returns list of product IDs in the user's wishlist
+        // ============================================================
+        [HttpGet]
+        public async Task<IActionResult> GetWishlist()
+        {
+            var userId = GetUserId();
+            var ids = await _wishlistService.GetUserWishlistIdsAsync(userId);
+            return Ok(ids);   // returns e.g., [1, 5, 12]
+        }
 
-    [HttpDelete("{productId}")]
-    public async Task<IActionResult> RemoveFromWishlist(int productId)
-    {
-        var userId = GetUserId();
-        await _wishlistService.RemoveFromWishlistAsync(userId, productId);
-        return Ok();
+        // ============================================================
+        // POST /api/Wishlist/{productId} – adds product to wishlist
+        // ============================================================
+        [HttpPost("{productId}")]
+        public async Task<IActionResult> AddToWishlist(int productId)
+        {
+            var userId = GetUserId();
+            await _wishlistService.AddToWishlistAsync(userId, productId);
+            return Ok(new { message = "Product added to wishlist." });
+        }
+
+        // ============================================================
+        // DELETE /api/Wishlist/{productId} – removes product from wishlist
+        // ============================================================
+        [HttpDelete("{productId}")]
+        public async Task<IActionResult> RemoveFromWishlist(int productId)
+        {
+            var userId = GetUserId();
+            await _wishlistService.RemoveFromWishlistAsync(userId, productId);
+            return Ok(new { message = "Product removed from wishlist." });
+        }
     }
 }
 
@@ -10110,7 +9852,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Marketplace.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+aabf06953732a6a65215e49e9bcc2dd8d6586f14")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+75b338228de79c9c39d5cba710ab5e23ce2d1e5b")]
 [assembly: System.Reflection.AssemblyProductAttribute("Marketplace.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Marketplace.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
@@ -10499,28 +10241,28 @@ using System.Reflection;
 
 
 // ===== Marketplace.API.sourcelink.json =====
-{"documents":{"E:\\prime-marketplace\\*":"https://raw.githubusercontent.com/WaelMohdAlshafey/prime-marketplace/97824d445e7bee2ee6ee3c45da1081142448f254/*"}}
+{"documents":{"E:\\prime-marketplace\\*":"https://raw.githubusercontent.com/WaelMohdAlshafey/prime-marketplace/a13e8c262c2e01fe55e78357867528f6c8de9050/*"}}
 
 // ===== rjimswa.dswa.cache.json =====
-{"GlobalPropertiesHash":"xFPRRkHZHtaMGs2NI/cH9d7AIQGiQI8/IXRJo6HF8VM=","FingerprintPatternsHash":"8ZRc1sGeVrPBx4lD717BgRaQekyh78QKV9SKsdt638U=","PropertyOverridesHash":"R7Rea/YQmcweqCbKffD9oUelggfpJQX85r65aYZsas0=","InputHashes":["GFUiGIItOVu6aQd\u002BjOPtSYNAba0cz7r13zzMgD\u002BfeYs=","Z2gI71BHpAa7\u002Bw3fgBkWEdctdWIq0JJK1Ckdy4evfBA=","XZR6pbYzcI2iLS5krnEVhbuCTpEJM2s\u002BdpZxP85SD6c=","PvUkVVp9eZ8R/9yc9Hy78s6C98d0RUwP3TvhVD5gn70=","8bRVGcobswXQCZQzPnqPVXUImXOz8ymzE6i\u002BqGpORxQ=","iyIBubfNUKHY3Nt/AZ3XU\u002Bawr6UIuURKQw6R\u002BHSGY38=","YKRu3e0QdsOWyWC5RBNAgtqT7Ku2\u002Bwy9WFjFuYc9htk=","f9TDnIVw6d9r3lFqLJjDHwgNo8qmvsfMQ1lGK10hzo4=","ZlAAD0Tz5ahpAHi3UaoT9RoCSYw9ItxP5JvmceA9wkU=","bfJxT7lcGRcTUwJBIKsI0eiQpsqxcrP2zTxOi9wlIq8=","5aQv0scHxDrBp0h/8R4858QH1/5nelUPVQ12MWEu7Os="],"CachedAssets":{},"CachedCopyCandidates":{}}
+{"GlobalPropertiesHash":"xFPRRkHZHtaMGs2NI/cH9d7AIQGiQI8/IXRJo6HF8VM=","FingerprintPatternsHash":"8ZRc1sGeVrPBx4lD717BgRaQekyh78QKV9SKsdt638U=","PropertyOverridesHash":"R7Rea/YQmcweqCbKffD9oUelggfpJQX85r65aYZsas0=","InputHashes":["YyBQCq20Kj7jeZSH7JjhQ1NSRGuhZRrrt9PDUdO62Zo=","sYhuCgYFJtZ51KCI8ZKnAYqYUZwIegM/l4n9fv0nYuo=","bEx8j6sxBOxtdhumN18WCsgbbHY\u002BIIoJ7\u002BivVRoxGzk=","haN6hdeAzT7DzIpQskfqlwAzGenddyvd3/SDDgudCXQ=","gsKfs28rm5\u002BQjM2WzD4gq/RvqBUzK2oUeELHy9GfBS8=","RNm9snPNKr1fJGCgW2UpTYwexDzuebiUYBodVLO20ww=","0YfwwodSRIiVL2Bhn\u002B1qEXoCKrbsM0K7BKCr5AkndAQ=","g/LpHVsegy3TpOnqURyTIpNXNxSEaaYA1qMfQrI3KQs=","xvYbQEtxbvwBhpeepAn4qWdG1o56q1T5euMwDc6ucbI=","igshSwawGntTBCb\u002BpNAf4TWP9c3NnktwBEqwpLKiXis=","UJSSihMSc71EeRq3O/hns46Iddp743P3UhnFe0JNnJo=","c7pbgmKsbG/9SOmWQESCi3LdP5I2s3XkiSkWoCzRlUs=","mimQFDbdLsKUW8wsUc8Dvl4za9eADFXdTuthbp8DXTY=","iakWtcgU3wEY3jdWDKfWbCqrjl3P/2kaNQ3o5MxnlqM="],"CachedAssets":{},"CachedCopyCandidates":{}}
 
 // ===== rjsmcshtml.dswa.cache.json =====
-{"GlobalPropertiesHash":"edTNt9MYE0O6QQbm3GHeAb2NTi4LzUvtul7Ibw7UDWk=","FingerprintPatternsHash":"8ZRc1sGeVrPBx4lD717BgRaQekyh78QKV9SKsdt638U=","PropertyOverridesHash":"8ZRc1sGeVrPBx4lD717BgRaQekyh78QKV9SKsdt638U=","InputHashes":["qq00EjSRsMPX/BGpiJB\u002BnM0VZt0ngb3TX3CwKTAlQFo=","iNjrFu7kAmrsm53XcmIh/ZeJGMX/sf6ccOCbi1EjJ/I=","LSyra8UfeoKq6JyvqdOPwmri42GpoJOtLHHjePREkKk=","oT1RxX7oS4wBGcNIQGM20IFmGMuYwpWa7XgJt\u002B4cu60=","5e\u002BZvMdZyTMvS8HvPT1pFHyy2IZr9dRXEnkQTktTPWg=","LmyLGT7WbenfJKBp3mu7WTrbQ/zi2/ztiUquCk0kKUI=","sjYer0XoV02H1yP3mFXehqRrD9nU/KQ8/nrMp/nPS3Y=","71/P8kHI7M3/lCGDhGbHmBrGwNAqAGJw9gDg\u002BOHW3Og=","aOX6BRv4nhmD1dmb4KpcYnIt0dwe4mI91GGzbH4\u002BxaI=","qEzKBpATHsjZnOpofAWPXdQMv3mkibMj\u002BncBHIJguGo=","ksClJ45a004Cxwk5AwjQhVc5chpo5hAxFn\u002Bgr4dsQ90=","YCUpkCmJKPqznScMIVXHnrY/leQ8ptLY23qwI4BUIsM=","M38eHFL6LEGSC9j8sT8ncyuBrmpnmPmXAjziC3\u002B9Tdc=","PQBGJYx9TxCTGPApN\u002BNsJnJf09iDHd74ygiwvd2Rau4=","s1SlN1ZLrCdU2Jv2Yk5RZanGMhxOp39vNNqCpsM5k94=","6HCwCWfEkn94V0GCawfT2GpINT3zPr0QpqjPlS/wQKM=","XPgmRXh2Sd1EMfgBEUYz8G0f0lBKY/W/sIHpWb/SSgU=","nCZe1G0fBUHJ8rz8DEgL6xB63PODbMBmXy2aW0zT9O0=","rw\u002BPkhGWjrulJzajDLa2uMlHzWhkJDXIfYbjSUfgc4M=","DoRv2ySltnbKBb8TQhPhA5xo/oIlMOSQXWohXDm1dpA=","w12GGox0ai6bxwYJ/qbgP\u002BfKBPemoqBYE\u002Bnpta0MRVs="],"CachedAssets":{},"CachedCopyCandidates":{}}
+{"GlobalPropertiesHash":"edTNt9MYE0O6QQbm3GHeAb2NTi4LzUvtul7Ibw7UDWk=","FingerprintPatternsHash":"8ZRc1sGeVrPBx4lD717BgRaQekyh78QKV9SKsdt638U=","PropertyOverridesHash":"8ZRc1sGeVrPBx4lD717BgRaQekyh78QKV9SKsdt638U=","InputHashes":["xi1ns\u002BW7ptYQVOrk4EoUq/9uatL/KKY0A5mRKjJOCNo=","bhLpar8FPyRS3LZKd\u002BTUSkHllxIBUMID4H859YOeqeQ=","XlQp4sfypzAV6YiKPk\u002B/0S0l6ft6GA6aA/bO1E/t9zk=","xGiQ0Y/ih\u002B7EbgPCG8H\u002B9wMjqTdvCodm3DtDZkW\u002BOgM=","VlN5\u002BXHgnme2HwR98HzhZ4u9KbXXWGekO\u002B8F3ejao8Q=","xNV8wTyvTOTUaiRQHWLKtSmS03kzYe3ntc\u002BclNs6aio=","nXaNCxYqruI83AL/1wAG9l/yTCNPzXKcFgH\u002BsKxWJAM=","M4QxlZ3C1eG/YJEIqrpqsWHo/2VJULLLvHZ96iM0vFA=","C0CI9L04smCnpIepUiESgeF26tUPP9hGAKb1IV4vOZw=","Ew9fySympsE5xYVuFpmKifoCHAFxDjpR4RW7eqWyzGc=","0YM626IBm1eaG903ggkaLbA5v6i8nlNz\u002Bnh/h/eoMKc=","RWdzhL08V7KCRLmivNjc4b\u002BWc3SfgnjqqDlYtVSmMHI=","vxULAS4f\u002BLJA84b4h/d7f5Py/ueSLrnCwVYOcx09kxA=","tf4fug5rmmnn9mHrC8ytPiGSYw\u002BDZ8j1jK\u002Bq5gr1bHA=","no6zwwcr2hPFbFS0tgnkFppErK\u002BScmGpjfcPKhCTYB8=","3I7ARIRBkFzWhrDlczmpCnqpKes9U5OJtUa/7Y2wPek=","j9vb6zx5zg7CLnhTDYVACsm7mfK9CCuedXdp/9FvmEI=","mnNGwMOCT1yYO2p8YFqxWmBDW9uUqfaf\u002BmTVOI9II6k=","7ohzeb0b0l3k1u03\u002BLly\u002BN7MZzBnjrn0n7gndppSgfc=","zWR/yVa9LHbMD5unOAk9skXS8YVH3sI3skezT/5rBFA=","XfQ/4bkW0DrWVc9HDREk6p2tFhMu/whu5xLMkkpUPgA=","KhDNJ4xoGnFx8ebtcEfFvlmhJwPf87NURHxPdOFvmGQ=","aEKQ8boB4MPIYmiMkVqPpbdgQCqFg\u002BiR\u002B4lQA830Tf8=","QndC6qUGOOylO6yCOktLc5vC1i1hNobz9YaUdpwX6YQ="],"CachedAssets":{},"CachedCopyCandidates":{}}
 
 // ===== rjsmrazor.dswa.cache.json =====
-{"GlobalPropertiesHash":"vTNrwmw7GS6UciIH7PnRw6OEIRppKc5JukRrVA8QZrg=","FingerprintPatternsHash":"8ZRc1sGeVrPBx4lD717BgRaQekyh78QKV9SKsdt638U=","PropertyOverridesHash":"8ZRc1sGeVrPBx4lD717BgRaQekyh78QKV9SKsdt638U=","InputHashes":["qq00EjSRsMPX/BGpiJB\u002BnM0VZt0ngb3TX3CwKTAlQFo=","iNjrFu7kAmrsm53XcmIh/ZeJGMX/sf6ccOCbi1EjJ/I=","LSyra8UfeoKq6JyvqdOPwmri42GpoJOtLHHjePREkKk=","oT1RxX7oS4wBGcNIQGM20IFmGMuYwpWa7XgJt\u002B4cu60=","5e\u002BZvMdZyTMvS8HvPT1pFHyy2IZr9dRXEnkQTktTPWg=","LmyLGT7WbenfJKBp3mu7WTrbQ/zi2/ztiUquCk0kKUI=","sjYer0XoV02H1yP3mFXehqRrD9nU/KQ8/nrMp/nPS3Y=","71/P8kHI7M3/lCGDhGbHmBrGwNAqAGJw9gDg\u002BOHW3Og=","aOX6BRv4nhmD1dmb4KpcYnIt0dwe4mI91GGzbH4\u002BxaI=","qEzKBpATHsjZnOpofAWPXdQMv3mkibMj\u002BncBHIJguGo=","ksClJ45a004Cxwk5AwjQhVc5chpo5hAxFn\u002Bgr4dsQ90=","YCUpkCmJKPqznScMIVXHnrY/leQ8ptLY23qwI4BUIsM=","M38eHFL6LEGSC9j8sT8ncyuBrmpnmPmXAjziC3\u002B9Tdc=","PQBGJYx9TxCTGPApN\u002BNsJnJf09iDHd74ygiwvd2Rau4=","s1SlN1ZLrCdU2Jv2Yk5RZanGMhxOp39vNNqCpsM5k94=","6HCwCWfEkn94V0GCawfT2GpINT3zPr0QpqjPlS/wQKM=","XPgmRXh2Sd1EMfgBEUYz8G0f0lBKY/W/sIHpWb/SSgU=","nCZe1G0fBUHJ8rz8DEgL6xB63PODbMBmXy2aW0zT9O0=","rw\u002BPkhGWjrulJzajDLa2uMlHzWhkJDXIfYbjSUfgc4M=","DoRv2ySltnbKBb8TQhPhA5xo/oIlMOSQXWohXDm1dpA=","w12GGox0ai6bxwYJ/qbgP\u002BfKBPemoqBYE\u002Bnpta0MRVs="],"CachedAssets":{},"CachedCopyCandidates":{}}
+{"GlobalPropertiesHash":"vTNrwmw7GS6UciIH7PnRw6OEIRppKc5JukRrVA8QZrg=","FingerprintPatternsHash":"8ZRc1sGeVrPBx4lD717BgRaQekyh78QKV9SKsdt638U=","PropertyOverridesHash":"8ZRc1sGeVrPBx4lD717BgRaQekyh78QKV9SKsdt638U=","InputHashes":["xi1ns\u002BW7ptYQVOrk4EoUq/9uatL/KKY0A5mRKjJOCNo=","bhLpar8FPyRS3LZKd\u002BTUSkHllxIBUMID4H859YOeqeQ=","XlQp4sfypzAV6YiKPk\u002B/0S0l6ft6GA6aA/bO1E/t9zk=","xGiQ0Y/ih\u002B7EbgPCG8H\u002B9wMjqTdvCodm3DtDZkW\u002BOgM=","VlN5\u002BXHgnme2HwR98HzhZ4u9KbXXWGekO\u002B8F3ejao8Q=","xNV8wTyvTOTUaiRQHWLKtSmS03kzYe3ntc\u002BclNs6aio=","nXaNCxYqruI83AL/1wAG9l/yTCNPzXKcFgH\u002BsKxWJAM=","M4QxlZ3C1eG/YJEIqrpqsWHo/2VJULLLvHZ96iM0vFA=","C0CI9L04smCnpIepUiESgeF26tUPP9hGAKb1IV4vOZw=","Ew9fySympsE5xYVuFpmKifoCHAFxDjpR4RW7eqWyzGc=","0YM626IBm1eaG903ggkaLbA5v6i8nlNz\u002Bnh/h/eoMKc=","RWdzhL08V7KCRLmivNjc4b\u002BWc3SfgnjqqDlYtVSmMHI=","vxULAS4f\u002BLJA84b4h/d7f5Py/ueSLrnCwVYOcx09kxA=","tf4fug5rmmnn9mHrC8ytPiGSYw\u002BDZ8j1jK\u002Bq5gr1bHA=","no6zwwcr2hPFbFS0tgnkFppErK\u002BScmGpjfcPKhCTYB8=","3I7ARIRBkFzWhrDlczmpCnqpKes9U5OJtUa/7Y2wPek=","j9vb6zx5zg7CLnhTDYVACsm7mfK9CCuedXdp/9FvmEI=","mnNGwMOCT1yYO2p8YFqxWmBDW9uUqfaf\u002BmTVOI9II6k=","7ohzeb0b0l3k1u03\u002BLly\u002BN7MZzBnjrn0n7gndppSgfc=","zWR/yVa9LHbMD5unOAk9skXS8YVH3sI3skezT/5rBFA=","XfQ/4bkW0DrWVc9HDREk6p2tFhMu/whu5xLMkkpUPgA=","KhDNJ4xoGnFx8ebtcEfFvlmhJwPf87NURHxPdOFvmGQ=","aEKQ8boB4MPIYmiMkVqPpbdgQCqFg\u002BiR\u002B4lQA830Tf8=","QndC6qUGOOylO6yCOktLc5vC1i1hNobz9YaUdpwX6YQ="],"CachedAssets":{},"CachedCopyCandidates":{}}
 
 // ===== rpswa.dswa.cache.json =====
-{"GlobalPropertiesHash":"VGDdCbm1rZu+G0EcbbxACl+k9IlJ81e4BAGYlTmH+oU=","FingerprintPatternsHash":"gq3WsqcKBUGTSNle7RKKyXRIwh7M8ccEqOqYvIzoM04=","PropertyOverridesHash":"8ZRc1sGeVrPBx4lD717BgRaQekyh78QKV9SKsdt638U=","InputHashes":["qq00EjSRsMPX/BGpiJB\u002BnM0VZt0ngb3TX3CwKTAlQFo=","iNjrFu7kAmrsm53XcmIh/ZeJGMX/sf6ccOCbi1EjJ/I=","LSyra8UfeoKq6JyvqdOPwmri42GpoJOtLHHjePREkKk=","oT1RxX7oS4wBGcNIQGM20IFmGMuYwpWa7XgJt\u002B4cu60=","5e\u002BZvMdZyTMvS8HvPT1pFHyy2IZr9dRXEnkQTktTPWg=","LmyLGT7WbenfJKBp3mu7WTrbQ/zi2/ztiUquCk0kKUI=","sjYer0XoV02H1yP3mFXehqRrD9nU/KQ8/nrMp/nPS3Y=","71/P8kHI7M3/lCGDhGbHmBrGwNAqAGJw9gDg\u002BOHW3Og=","aOX6BRv4nhmD1dmb4KpcYnIt0dwe4mI91GGzbH4\u002BxaI=","qEzKBpATHsjZnOpofAWPXdQMv3mkibMj\u002BncBHIJguGo=","ksClJ45a004Cxwk5AwjQhVc5chpo5hAxFn\u002Bgr4dsQ90=","YCUpkCmJKPqznScMIVXHnrY/leQ8ptLY23qwI4BUIsM=","M38eHFL6LEGSC9j8sT8ncyuBrmpnmPmXAjziC3\u002B9Tdc="],"CachedAssets":{"qq00EjSRsMPX/BGpiJB\u002BnM0VZt0ngb3TX3CwKTAlQFo=":{"Identity":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\book.jpg","SourceId":"Marketplace.API","SourceType":"Discovered","ContentRoot":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\","BasePath":"_content/Marketplace.API","RelativePath":"images/products/book#[.{fingerprint}]?.jpg","AssetKind":"All","AssetMode":"All","AssetRole":"Primary","AssetMergeBehavior":null,"AssetMergeSource":"","RelatedAsset":null,"AssetTraitName":null,"AssetTraitValue":null,"Fingerprint":"sz8s44gqpy","Integrity":"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=","CopyToOutputDirectory":"Never","CopyToPublishDirectory":"PreserveNewest","OriginalItemSpec":"wwwroot\\images\\products\\book.jpg","FileLength":354169,"LastWriteTime":"2026-08-06T13:06:21.5626789+00:00"},"iNjrFu7kAmrsm53XcmIh/ZeJGMX/sf6ccOCbi1EjJ/I=":{"Identity":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\c5272b11-84a7-409a-89fa-c5ef5be9036c_\u062E\u062F\u0645\u0627\u062A\u064A2.jpg","SourceId":"Marketplace.API","SourceType":"Discovered","ContentRoot":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\","BasePath":"_content/Marketplace.API","RelativePath":"images/products/c5272b11-84a7-409a-89fa-c5ef5be9036c_\u062E\u062F\u0645\u0627\u062A\u064A2#[.{fingerprint}]?.jpg","AssetKind":"All","AssetMode":"All","AssetRole":"Primary","AssetMergeBehavior":null,"AssetMergeSource":"","RelatedAsset":null,"AssetTraitName":null,"AssetTraitValue":null,"Fingerprint":"sz8s44gqpy","Integrity":"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=","CopyToOutputDirectory":"Never","CopyToPublishDirectory":"PreserveNewest","OriginalItemSpec":"wwwroot\\images\\products\\c5272b11-84a7-409a-89fa-c5ef5be9036c_\u062E\u062F\u0645\u0627\u062A\u064A2.jpg","FileLength":354169,"LastWriteTime":"2026-08-06T13:06:21.5626789+00:00"},"LSyra8UfeoKq6JyvqdOPwmri42GpoJOtLHHjePREkKk=":{"Identity":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\haircare.jpg","SourceId":"Marketplace.API","SourceType":"Discovered","ContentRoot":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\","BasePath":"_content/Marketplace.API","RelativePath":"images/products/haircare#[.{fingerprint}]?.jpg","AssetKind":"All","AssetMode":"All","AssetRole":"Primary","AssetMergeBehavior":null,"AssetMergeSource":"","RelatedAsset":null,"AssetTraitName":null,"AssetTraitValue":null,"Fingerprint":"sz8s44gqpy","Integrity":"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=","CopyToOutputDirectory":"Never","CopyToPublishDirectory":"PreserveNewest","OriginalItemSpec":"wwwroot\\images\\products\\haircare.jpg","FileLength":354169,"LastWriteTime":"2026-08-06T13:06:21.5783001+00:00"},"oT1RxX7oS4wBGcNIQGM20IFmGMuYwpWa7XgJt\u002B4cu60=":{"Identity":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\headphones.jpg","SourceId":"Marketplace.API","SourceType":"Discovered","ContentRoot":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\","BasePath":"_content/Marketplace.API","RelativePath":"images/products/headphones#[.{fingerprint}]?.jpg","AssetKind":"All","AssetMode":"All","AssetRole":"Primary","AssetMergeBehavior":null,"AssetMergeSource":"","RelatedAsset":null,"AssetTraitName":null,"AssetTraitValue":null,"Fingerprint":"sz8s44gqpy","Integrity":"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=","CopyToOutputDirectory":"Never","CopyToPublishDirectory":"PreserveNewest","OriginalItemSpec":"wwwroot\\images\\products\\headphones.jpg","FileLength":354169,"LastWriteTime":"2026-08-06T13:06:21.5783001+00:00"},"5e\u002BZvMdZyTMvS8HvPT1pFHyy2IZr9dRXEnkQTktTPWg=":{"Identity":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\home.jpg","SourceId":"Marketplace.API","SourceType":"Discovered","ContentRoot":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\","BasePath":"_content/Marketplace.API","RelativePath":"images/products/home#[.{fingerprint}]?.jpg","AssetKind":"All","AssetMode":"All","AssetRole":"Primary","AssetMergeBehavior":null,"AssetMergeSource":"","RelatedAsset":null,"AssetTraitName":null,"AssetTraitValue":null,"Fingerprint":"sz8s44gqpy","Integrity":"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=","CopyToOutputDirectory":"Never","CopyToPublishDirectory":"PreserveNewest","OriginalItemSpec":"wwwroot\\images\\products\\home.jpg","FileLength":354169,"LastWriteTime":"2026-08-06T13:06:21.5783001+00:00"},"LmyLGT7WbenfJKBp3mu7WTrbQ/zi2/ztiUquCk0kKUI=":{"Identity":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\laptop.jpg","SourceId":"Marketplace.API","SourceType":"Discovered","ContentRoot":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\","BasePath":"_content/Marketplace.API","RelativePath":"images/products/laptop#[.{fingerprint}]?.jpg","AssetKind":"All","AssetMode":"All","AssetRole":"Primary","AssetMergeBehavior":null,"AssetMergeSource":"","RelatedAsset":null,"AssetTraitName":null,"AssetTraitValue":null,"Fingerprint":"sz8s44gqpy","Integrity":"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=","CopyToOutputDirectory":"Never","CopyToPublishDirectory":"PreserveNewest","OriginalItemSpec":"wwwroot\\images\\products\\laptop.jpg","FileLength":354169,"LastWriteTime":"2026-08-06T13:06:21.5783001+00:00"},"sjYer0XoV02H1yP3mFXehqRrD9nU/KQ8/nrMp/nPS3Y=":{"Identity":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\shoes.jpg","SourceId":"Marketplace.API","SourceType":"Discovered","ContentRoot":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\","BasePath":"_content/Marketplace.API","RelativePath":"images/products/shoes#[.{fingerprint}]?.jpg","AssetKind":"All","AssetMode":"All","AssetRole":"Primary","AssetMergeBehavior":null,"AssetMergeSource":"","RelatedAsset":null,"AssetTraitName":null,"AssetTraitValue":null,"Fingerprint":"sz8s44gqpy","Integrity":"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=","CopyToOutputDirectory":"Never","CopyToPublishDirectory":"PreserveNewest","OriginalItemSpec":"wwwroot\\images\\products\\shoes.jpg","FileLength":354169,"LastWriteTime":"2026-08-06T13:06:21.5783001+00:00"},"71/P8kHI7M3/lCGDhGbHmBrGwNAqAGJw9gDg\u002BOHW3Og=":{"Identity":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\skincare.jpg","SourceId":"Marketplace.API","SourceType":"Discovered","ContentRoot":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\","BasePath":"_content/Marketplace.API","RelativePath":"images/products/skincare#[.{fingerprint}]?.jpg","AssetKind":"All","AssetMode":"All","AssetRole":"Primary","AssetMergeBehavior":null,"AssetMergeSource":"","RelatedAsset":null,"AssetTraitName":null,"AssetTraitValue":null,"Fingerprint":"sz8s44gqpy","Integrity":"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=","CopyToOutputDirectory":"Never","CopyToPublishDirectory":"PreserveNewest","OriginalItemSpec":"wwwroot\\images\\products\\skincare.jpg","FileLength":354169,"LastWriteTime":"2026-08-06T13:06:21.5939247+00:00"},"aOX6BRv4nhmD1dmb4KpcYnIt0dwe4mI91GGzbH4\u002BxaI=":{"Identity":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\supplements.jpg","SourceId":"Marketplace.API","SourceType":"Discovered","ContentRoot":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\","BasePath":"_content/Marketplace.API","RelativePath":"images/products/supplements#[.{fingerprint}]?.jpg","AssetKind":"All","AssetMode":"All","AssetRole":"Primary","AssetMergeBehavior":null,"AssetMergeSource":"","RelatedAsset":null,"AssetTraitName":null,"AssetTraitValue":null,"Fingerprint":"sz8s44gqpy","Integrity":"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=","CopyToOutputDirectory":"Never","CopyToPublishDirectory":"PreserveNewest","OriginalItemSpec":"wwwroot\\images\\products\\supplements.jpg","FileLength":354169,"LastWriteTime":"2026-08-06T13:06:21.5939247+00:00"},"qEzKBpATHsjZnOpofAWPXdQMv3mkibMj\u002BncBHIJguGo=":{"Identity":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\tshirt.jpg","SourceId":"Marketplace.API","SourceType":"Discovered","ContentRoot":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\","BasePath":"_content/Marketplace.API","RelativePath":"images/products/tshirt#[.{fingerprint}]?.jpg","AssetKind":"All","AssetMode":"All","AssetRole":"Primary","AssetMergeBehavior":null,"AssetMergeSource":"","RelatedAsset":null,"AssetTraitName":null,"AssetTraitValue":null,"Fingerprint":"sz8s44gqpy","Integrity":"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=","CopyToOutputDirectory":"Never","CopyToPublishDirectory":"PreserveNewest","OriginalItemSpec":"wwwroot\\images\\products\\tshirt.jpg","FileLength":354169,"LastWriteTime":"2026-08-06T13:06:21.5939247+00:00"},"ksClJ45a004Cxwk5AwjQhVc5chpo5hAxFn\u002Bgr4dsQ90=":{"Identity":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\watch.jpg","SourceId":"Marketplace.API","SourceType":"Discovered","ContentRoot":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\","BasePath":"_content/Marketplace.API","RelativePath":"images/products/watch#[.{fingerprint}]?.jpg","AssetKind":"All","AssetMode":"All","AssetRole":"Primary","AssetMergeBehavior":null,"AssetMergeSource":"","RelatedAsset":null,"AssetTraitName":null,"AssetTraitValue":null,"Fingerprint":"sz8s44gqpy","Integrity":"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=","CopyToOutputDirectory":"Never","CopyToPublishDirectory":"PreserveNewest","OriginalItemSpec":"wwwroot\\images\\products\\watch.jpg","FileLength":354169,"LastWriteTime":"2026-08-06T13:06:21.5939247+00:00"}},"CachedCopyCandidates":{}}
+{"GlobalPropertiesHash":"VGDdCbm1rZu+G0EcbbxACl+k9IlJ81e4BAGYlTmH+oU=","FingerprintPatternsHash":"gq3WsqcKBUGTSNle7RKKyXRIwh7M8ccEqOqYvIzoM04=","PropertyOverridesHash":"8ZRc1sGeVrPBx4lD717BgRaQekyh78QKV9SKsdt638U=","InputHashes":["xi1ns\u002BW7ptYQVOrk4EoUq/9uatL/KKY0A5mRKjJOCNo=","bhLpar8FPyRS3LZKd\u002BTUSkHllxIBUMID4H859YOeqeQ=","XlQp4sfypzAV6YiKPk\u002B/0S0l6ft6GA6aA/bO1E/t9zk=","xGiQ0Y/ih\u002B7EbgPCG8H\u002B9wMjqTdvCodm3DtDZkW\u002BOgM=","VlN5\u002BXHgnme2HwR98HzhZ4u9KbXXWGekO\u002B8F3ejao8Q=","xNV8wTyvTOTUaiRQHWLKtSmS03kzYe3ntc\u002BclNs6aio=","nXaNCxYqruI83AL/1wAG9l/yTCNPzXKcFgH\u002BsKxWJAM=","M4QxlZ3C1eG/YJEIqrpqsWHo/2VJULLLvHZ96iM0vFA=","C0CI9L04smCnpIepUiESgeF26tUPP9hGAKb1IV4vOZw=","Ew9fySympsE5xYVuFpmKifoCHAFxDjpR4RW7eqWyzGc=","0YM626IBm1eaG903ggkaLbA5v6i8nlNz\u002Bnh/h/eoMKc=","RWdzhL08V7KCRLmivNjc4b\u002BWc3SfgnjqqDlYtVSmMHI=","vxULAS4f\u002BLJA84b4h/d7f5Py/ueSLrnCwVYOcx09kxA=","tf4fug5rmmnn9mHrC8ytPiGSYw\u002BDZ8j1jK\u002Bq5gr1bHA=","no6zwwcr2hPFbFS0tgnkFppErK\u002BScmGpjfcPKhCTYB8=","3I7ARIRBkFzWhrDlczmpCnqpKes9U5OJtUa/7Y2wPek="],"CachedAssets":{"xi1ns\u002BW7ptYQVOrk4EoUq/9uatL/KKY0A5mRKjJOCNo=":{"Identity":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\book.jpg","SourceId":"Marketplace.API","SourceType":"Discovered","ContentRoot":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\","BasePath":"_content/Marketplace.API","RelativePath":"images/products/book#[.{fingerprint}]?.jpg","AssetKind":"All","AssetMode":"All","AssetRole":"Primary","AssetMergeBehavior":null,"AssetMergeSource":"","RelatedAsset":null,"AssetTraitName":null,"AssetTraitValue":null,"Fingerprint":"vvh6j3zyr0","Integrity":"Cy9aaTMUFFhVuiXtseyqq\u002Bnam5M/I1692qGaNQEN/lo=","CopyToOutputDirectory":"Never","CopyToPublishDirectory":"PreserveNewest","OriginalItemSpec":"wwwroot\\images\\products\\book.jpg","FileLength":15694,"LastWriteTime":"2026-09-07T14:58:41.4378002+00:00"},"bhLpar8FPyRS3LZKd\u002BTUSkHllxIBUMID4H859YOeqeQ=":{"Identity":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\haircare.jpg","SourceId":"Marketplace.API","SourceType":"Discovered","ContentRoot":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\","BasePath":"_content/Marketplace.API","RelativePath":"images/products/haircare#[.{fingerprint}]?.jpg","AssetKind":"All","AssetMode":"All","AssetRole":"Primary","AssetMergeBehavior":null,"AssetMergeSource":"","RelatedAsset":null,"AssetTraitName":null,"AssetTraitValue":null,"Fingerprint":"81t2ihvx9a","Integrity":"fGUOUgzQA7ALrJZYa2GPKkFn74n/fnOlci4docuZ0IY=","CopyToOutputDirectory":"Never","CopyToPublishDirectory":"PreserveNewest","OriginalItemSpec":"wwwroot\\images\\products\\haircare.jpg","FileLength":33656,"LastWriteTime":"2026-09-07T14:58:41.4378002+00:00"},"XlQp4sfypzAV6YiKPk\u002B/0S0l6ft6GA6aA/bO1E/t9zk=":{"Identity":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\headphones.jpg","SourceId":"Marketplace.API","SourceType":"Discovered","ContentRoot":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\","BasePath":"_content/Marketplace.API","RelativePath":"images/products/headphones#[.{fingerprint}]?.jpg","AssetKind":"All","AssetMode":"All","AssetRole":"Primary","AssetMergeBehavior":null,"AssetMergeSource":"","RelatedAsset":null,"AssetTraitName":null,"AssetTraitValue":null,"Fingerprint":"w4fanf1ba7","Integrity":"IE7mFu3dP3YM0TNAWY0Crb3zrX91VQKlkkPA90aEfvM=","CopyToOutputDirectory":"Never","CopyToPublishDirectory":"PreserveNewest","OriginalItemSpec":"wwwroot\\images\\products\\headphones.jpg","FileLength":16748,"LastWriteTime":"2026-09-07T14:58:41.4378002+00:00"},"xGiQ0Y/ih\u002B7EbgPCG8H\u002B9wMjqTdvCodm3DtDZkW\u002BOgM=":{"Identity":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\home.jpg","SourceId":"Marketplace.API","SourceType":"Discovered","ContentRoot":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\","BasePath":"_content/Marketplace.API","RelativePath":"images/products/home#[.{fingerprint}]?.jpg","AssetKind":"All","AssetMode":"All","AssetRole":"Primary","AssetMergeBehavior":null,"AssetMergeSource":"","RelatedAsset":null,"AssetTraitName":null,"AssetTraitValue":null,"Fingerprint":"66jk4c5e0l","Integrity":"8l1ESJlho2vXeAVwrKUbgoTeU1alwR\u002BZHdKZf5x1cyw=","CopyToOutputDirectory":"Never","CopyToPublishDirectory":"PreserveNewest","OriginalItemSpec":"wwwroot\\images\\products\\home.jpg","FileLength":19385,"LastWriteTime":"2026-09-07T14:58:41.4534234+00:00"},"VlN5\u002BXHgnme2HwR98HzhZ4u9KbXXWGekO\u002B8F3ejao8Q=":{"Identity":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\laptop.jpg","SourceId":"Marketplace.API","SourceType":"Discovered","ContentRoot":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\","BasePath":"_content/Marketplace.API","RelativePath":"images/products/laptop#[.{fingerprint}]?.jpg","AssetKind":"All","AssetMode":"All","AssetRole":"Primary","AssetMergeBehavior":null,"AssetMergeSource":"","RelatedAsset":null,"AssetTraitName":null,"AssetTraitValue":null,"Fingerprint":"0wj356j2bf","Integrity":"cDTEpMH4xCAo8oIwmR6No753hzrBG1h5Kz43TLyLqU4=","CopyToOutputDirectory":"Never","CopyToPublishDirectory":"PreserveNewest","OriginalItemSpec":"wwwroot\\images\\products\\laptop.jpg","FileLength":14838,"LastWriteTime":"2026-09-07T14:58:41.4534234+00:00"},"nXaNCxYqruI83AL/1wAG9l/yTCNPzXKcFgH\u002BsKxWJAM=":{"Identity":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\services.jpg","SourceId":"Marketplace.API","SourceType":"Discovered","ContentRoot":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\","BasePath":"_content/Marketplace.API","RelativePath":"images/products/services#[.{fingerprint}]?.jpg","AssetKind":"All","AssetMode":"All","AssetRole":"Primary","AssetMergeBehavior":null,"AssetMergeSource":"","RelatedAsset":null,"AssetTraitName":null,"AssetTraitValue":null,"Fingerprint":"nan8uch1qp","Integrity":"7wWjLm2gKRVeEYzbWyaynoqzgs\u002BK9mI/GGWdVvDhOak=","CopyToOutputDirectory":"Never","CopyToPublishDirectory":"PreserveNewest","OriginalItemSpec":"wwwroot\\images\\products\\services.jpg","FileLength":24655,"LastWriteTime":"2026-09-07T14:58:41.4534234+00:00"},"M4QxlZ3C1eG/YJEIqrpqsWHo/2VJULLLvHZ96iM0vFA=":{"Identity":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\shoes.jpg","SourceId":"Marketplace.API","SourceType":"Discovered","ContentRoot":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\","BasePath":"_content/Marketplace.API","RelativePath":"images/products/shoes#[.{fingerprint}]?.jpg","AssetKind":"All","AssetMode":"All","AssetRole":"Primary","AssetMergeBehavior":null,"AssetMergeSource":"","RelatedAsset":null,"AssetTraitName":null,"AssetTraitValue":null,"Fingerprint":"e0uwb30arr","Integrity":"EknJkAK\u002BoDGSAq50rPs0tvrIPPKRC1LKJzL9y85YXXs=","CopyToOutputDirectory":"Never","CopyToPublishDirectory":"PreserveNewest","OriginalItemSpec":"wwwroot\\images\\products\\shoes.jpg","FileLength":21397,"LastWriteTime":"2026-09-07T14:58:41.4534234+00:00"},"C0CI9L04smCnpIepUiESgeF26tUPP9hGAKb1IV4vOZw=":{"Identity":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\skincare.jpg","SourceId":"Marketplace.API","SourceType":"Discovered","ContentRoot":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\","BasePath":"_content/Marketplace.API","RelativePath":"images/products/skincare#[.{fingerprint}]?.jpg","AssetKind":"All","AssetMode":"All","AssetRole":"Primary","AssetMergeBehavior":null,"AssetMergeSource":"","RelatedAsset":null,"AssetTraitName":null,"AssetTraitValue":null,"Fingerprint":"4v1uf5bx3n","Integrity":"EAgqN049ihTyVpgHgWVYaUIgCDVMuzqsCAkkaIWf/Uc=","CopyToOutputDirectory":"Never","CopyToPublishDirectory":"PreserveNewest","OriginalItemSpec":"wwwroot\\images\\products\\skincare.jpg","FileLength":30915,"LastWriteTime":"2026-09-07T14:58:41.4534234+00:00"},"Ew9fySympsE5xYVuFpmKifoCHAFxDjpR4RW7eqWyzGc=":{"Identity":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\supplements.jpg","SourceId":"Marketplace.API","SourceType":"Discovered","ContentRoot":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\","BasePath":"_content/Marketplace.API","RelativePath":"images/products/supplements#[.{fingerprint}]?.jpg","AssetKind":"All","AssetMode":"All","AssetRole":"Primary","AssetMergeBehavior":null,"AssetMergeSource":"","RelatedAsset":null,"AssetTraitName":null,"AssetTraitValue":null,"Fingerprint":"lf63myi77w","Integrity":"UcHZWpevE/pdstnFkMIX1H/sxdVE69YQ0h7UsfibkKc=","CopyToOutputDirectory":"Never","CopyToPublishDirectory":"PreserveNewest","OriginalItemSpec":"wwwroot\\images\\products\\supplements.jpg","FileLength":41713,"LastWriteTime":"2026-09-07T14:58:41.4534234+00:00"},"0YM626IBm1eaG903ggkaLbA5v6i8nlNz\u002Bnh/h/eoMKc=":{"Identity":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\tshirt.jpg","SourceId":"Marketplace.API","SourceType":"Discovered","ContentRoot":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\","BasePath":"_content/Marketplace.API","RelativePath":"images/products/tshirt#[.{fingerprint}]?.jpg","AssetKind":"All","AssetMode":"All","AssetRole":"Primary","AssetMergeBehavior":null,"AssetMergeSource":"","RelatedAsset":null,"AssetTraitName":null,"AssetTraitValue":null,"Fingerprint":"54s2xa8pjt","Integrity":"KxwCM/QfMHLjt7cL0U\u002BmbFTFeTa1EuzI5pjJUJJX2J8=","CopyToOutputDirectory":"Never","CopyToPublishDirectory":"PreserveNewest","OriginalItemSpec":"wwwroot\\images\\products\\tshirt.jpg","FileLength":16607,"LastWriteTime":"2026-09-07T14:58:41.4534234+00:00"},"vxULAS4f\u002BLJA84b4h/d7f5Py/ueSLrnCwVYOcx09kxA=":{"Identity":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\watch.jpg","SourceId":"Marketplace.API","SourceType":"Discovered","ContentRoot":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\","BasePath":"_content/Marketplace.API","RelativePath":"images/products/watch#[.{fingerprint}]?.jpg","AssetKind":"All","AssetMode":"All","AssetRole":"Primary","AssetMergeBehavior":null,"AssetMergeSource":"","RelatedAsset":null,"AssetTraitName":null,"AssetTraitValue":null,"Fingerprint":"bqq5br5uzv","Integrity":"beJM6N4rjyODsx/GAaAAoLlwthp/Kt8jNzpj2yHb5g4=","CopyToOutputDirectory":"Never","CopyToPublishDirectory":"PreserveNewest","OriginalItemSpec":"wwwroot\\images\\products\\watch.jpg","FileLength":9900,"LastWriteTime":"2026-09-07T14:58:41.4534234+00:00"},"xNV8wTyvTOTUaiRQHWLKtSmS03kzYe3ntc\u002BclNs6aio=":{"Identity":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\mens-perfume.jpg","SourceId":"Marketplace.API","SourceType":"Discovered","ContentRoot":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\","BasePath":"_content/Marketplace.API","RelativePath":"images/products/mens-perfume#[.{fingerprint}]?.jpg","AssetKind":"All","AssetMode":"All","AssetRole":"Primary","AssetMergeBehavior":null,"AssetMergeSource":"","RelatedAsset":null,"AssetTraitName":null,"AssetTraitValue":null,"Fingerprint":"hl9uomk4no","Integrity":"6wOcP4qZwYOgSg7v4WoX8EU6gVu/BYr1gflwGy9z4gY=","CopyToOutputDirectory":"Never","CopyToPublishDirectory":"PreserveNewest","OriginalItemSpec":"wwwroot\\images\\products\\mens-perfume.jpg","FileLength":30380,"LastWriteTime":"2026-09-08T14:17:12.8190658+00:00"},"RWdzhL08V7KCRLmivNjc4b\u002BWc3SfgnjqqDlYtVSmMHI=":{"Identity":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\unisex-perfume.jpg","SourceId":"Marketplace.API","SourceType":"Discovered","ContentRoot":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\","BasePath":"_content/Marketplace.API","RelativePath":"images/products/unisex-perfume#[.{fingerprint}]?.jpg","AssetKind":"All","AssetMode":"All","AssetRole":"Primary","AssetMergeBehavior":null,"AssetMergeSource":"","RelatedAsset":null,"AssetTraitName":null,"AssetTraitValue":null,"Fingerprint":"hl9uomk4no","Integrity":"6wOcP4qZwYOgSg7v4WoX8EU6gVu/BYr1gflwGy9z4gY=","CopyToOutputDirectory":"Never","CopyToPublishDirectory":"PreserveNewest","OriginalItemSpec":"wwwroot\\images\\products\\unisex-perfume.jpg","FileLength":30380,"LastWriteTime":"2026-09-08T14:17:12.8190658+00:00"},"tf4fug5rmmnn9mHrC8ytPiGSYw\u002BDZ8j1jK\u002Bq5gr1bHA=":{"Identity":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\womens-perfume.jpg","SourceId":"Marketplace.API","SourceType":"Discovered","ContentRoot":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\","BasePath":"_content/Marketplace.API","RelativePath":"images/products/womens-perfume#[.{fingerprint}]?.jpg","AssetKind":"All","AssetMode":"All","AssetRole":"Primary","AssetMergeBehavior":null,"AssetMergeSource":"","RelatedAsset":null,"AssetTraitName":null,"AssetTraitValue":null,"Fingerprint":"0h79ofsh5r","Integrity":"FEJ23ddPwNoykvZYb0SeozdNJF09yVmsSh9JG5SVhkI=","CopyToOutputDirectory":"Never","CopyToPublishDirectory":"PreserveNewest","OriginalItemSpec":"wwwroot\\images\\products\\womens-perfume.jpg","FileLength":21528,"LastWriteTime":"2026-09-08T14:17:12.9909356+00:00"}},"CachedCopyCandidates":{}}
 
 // ===== staticwebassets.build.endpoints.json =====
-{"Version":1,"ManifestType":"Build","Endpoints":[{"Route":"images/products/book.jpg","AssetFile":"images/products/book.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="}]},{"Route":"images/products/book.sz8s44gqpy.jpg","AssetFile":"images/products/book.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"}],"EndpointProperties":[{"Name":"fingerprint","Value":"sz8s44gqpy"},{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="},{"Name":"label","Value":"images/products/book.jpg"}]},{"Route":"images/products/c5272b11-84a7-409a-89fa-c5ef5be9036c_خدماتي2.jpg","AssetFile":"images/products/c5272b11-84a7-409a-89fa-c5ef5be9036c_خدماتي2.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="}]},{"Route":"images/products/c5272b11-84a7-409a-89fa-c5ef5be9036c_خدماتي2.sz8s44gqpy.jpg","AssetFile":"images/products/c5272b11-84a7-409a-89fa-c5ef5be9036c_خدماتي2.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"}],"EndpointProperties":[{"Name":"fingerprint","Value":"sz8s44gqpy"},{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="},{"Name":"label","Value":"images/products/c5272b11-84a7-409a-89fa-c5ef5be9036c_خدماتي2.jpg"}]},{"Route":"images/products/haircare.jpg","AssetFile":"images/products/haircare.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="}]},{"Route":"images/products/haircare.sz8s44gqpy.jpg","AssetFile":"images/products/haircare.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"}],"EndpointProperties":[{"Name":"fingerprint","Value":"sz8s44gqpy"},{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="},{"Name":"label","Value":"images/products/haircare.jpg"}]},{"Route":"images/products/headphones.jpg","AssetFile":"images/products/headphones.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="}]},{"Route":"images/products/headphones.sz8s44gqpy.jpg","AssetFile":"images/products/headphones.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"}],"EndpointProperties":[{"Name":"fingerprint","Value":"sz8s44gqpy"},{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="},{"Name":"label","Value":"images/products/headphones.jpg"}]},{"Route":"images/products/home.jpg","AssetFile":"images/products/home.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="}]},{"Route":"images/products/home.sz8s44gqpy.jpg","AssetFile":"images/products/home.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"}],"EndpointProperties":[{"Name":"fingerprint","Value":"sz8s44gqpy"},{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="},{"Name":"label","Value":"images/products/home.jpg"}]},{"Route":"images/products/laptop.jpg","AssetFile":"images/products/laptop.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="}]},{"Route":"images/products/laptop.sz8s44gqpy.jpg","AssetFile":"images/products/laptop.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"}],"EndpointProperties":[{"Name":"fingerprint","Value":"sz8s44gqpy"},{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="},{"Name":"label","Value":"images/products/laptop.jpg"}]},{"Route":"images/products/shoes.jpg","AssetFile":"images/products/shoes.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="}]},{"Route":"images/products/shoes.sz8s44gqpy.jpg","AssetFile":"images/products/shoes.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"}],"EndpointProperties":[{"Name":"fingerprint","Value":"sz8s44gqpy"},{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="},{"Name":"label","Value":"images/products/shoes.jpg"}]},{"Route":"images/products/skincare.jpg","AssetFile":"images/products/skincare.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="}]},{"Route":"images/products/skincare.sz8s44gqpy.jpg","AssetFile":"images/products/skincare.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"}],"EndpointProperties":[{"Name":"fingerprint","Value":"sz8s44gqpy"},{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="},{"Name":"label","Value":"images/products/skincare.jpg"}]},{"Route":"images/products/supplements.jpg","AssetFile":"images/products/supplements.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="}]},{"Route":"images/products/supplements.sz8s44gqpy.jpg","AssetFile":"images/products/supplements.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"}],"EndpointProperties":[{"Name":"fingerprint","Value":"sz8s44gqpy"},{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="},{"Name":"label","Value":"images/products/supplements.jpg"}]},{"Route":"images/products/tshirt.jpg","AssetFile":"images/products/tshirt.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="}]},{"Route":"images/products/tshirt.sz8s44gqpy.jpg","AssetFile":"images/products/tshirt.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"}],"EndpointProperties":[{"Name":"fingerprint","Value":"sz8s44gqpy"},{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="},{"Name":"label","Value":"images/products/tshirt.jpg"}]},{"Route":"images/products/watch.jpg","AssetFile":"images/products/watch.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="}]},{"Route":"images/products/watch.sz8s44gqpy.jpg","AssetFile":"images/products/watch.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"}],"EndpointProperties":[{"Name":"fingerprint","Value":"sz8s44gqpy"},{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="},{"Name":"label","Value":"images/products/watch.jpg"}]}]}
+{"Version":1,"ManifestType":"Build","Endpoints":[{"Route":"images/products/book.jpg","AssetFile":"images/products/book.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"15694"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"Cy9aaTMUFFhVuiXtseyqq+nam5M/I1692qGaNQEN/lo=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-Cy9aaTMUFFhVuiXtseyqq+nam5M/I1692qGaNQEN/lo="}]},{"Route":"images/products/book.vvh6j3zyr0.jpg","AssetFile":"images/products/book.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"15694"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"Cy9aaTMUFFhVuiXtseyqq+nam5M/I1692qGaNQEN/lo=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"}],"EndpointProperties":[{"Name":"fingerprint","Value":"vvh6j3zyr0"},{"Name":"integrity","Value":"sha256-Cy9aaTMUFFhVuiXtseyqq+nam5M/I1692qGaNQEN/lo="},{"Name":"label","Value":"images/products/book.jpg"}]},{"Route":"images/products/haircare.81t2ihvx9a.jpg","AssetFile":"images/products/haircare.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"33656"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"fGUOUgzQA7ALrJZYa2GPKkFn74n/fnOlci4docuZ0IY=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"}],"EndpointProperties":[{"Name":"fingerprint","Value":"81t2ihvx9a"},{"Name":"integrity","Value":"sha256-fGUOUgzQA7ALrJZYa2GPKkFn74n/fnOlci4docuZ0IY="},{"Name":"label","Value":"images/products/haircare.jpg"}]},{"Route":"images/products/haircare.jpg","AssetFile":"images/products/haircare.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"33656"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"fGUOUgzQA7ALrJZYa2GPKkFn74n/fnOlci4docuZ0IY=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-fGUOUgzQA7ALrJZYa2GPKkFn74n/fnOlci4docuZ0IY="}]},{"Route":"images/products/headphones.jpg","AssetFile":"images/products/headphones.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"16748"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"IE7mFu3dP3YM0TNAWY0Crb3zrX91VQKlkkPA90aEfvM=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-IE7mFu3dP3YM0TNAWY0Crb3zrX91VQKlkkPA90aEfvM="}]},{"Route":"images/products/headphones.w4fanf1ba7.jpg","AssetFile":"images/products/headphones.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"16748"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"IE7mFu3dP3YM0TNAWY0Crb3zrX91VQKlkkPA90aEfvM=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"}],"EndpointProperties":[{"Name":"fingerprint","Value":"w4fanf1ba7"},{"Name":"integrity","Value":"sha256-IE7mFu3dP3YM0TNAWY0Crb3zrX91VQKlkkPA90aEfvM="},{"Name":"label","Value":"images/products/headphones.jpg"}]},{"Route":"images/products/home.66jk4c5e0l.jpg","AssetFile":"images/products/home.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"19385"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"8l1ESJlho2vXeAVwrKUbgoTeU1alwR+ZHdKZf5x1cyw=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"}],"EndpointProperties":[{"Name":"fingerprint","Value":"66jk4c5e0l"},{"Name":"integrity","Value":"sha256-8l1ESJlho2vXeAVwrKUbgoTeU1alwR+ZHdKZf5x1cyw="},{"Name":"label","Value":"images/products/home.jpg"}]},{"Route":"images/products/home.jpg","AssetFile":"images/products/home.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"19385"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"8l1ESJlho2vXeAVwrKUbgoTeU1alwR+ZHdKZf5x1cyw=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-8l1ESJlho2vXeAVwrKUbgoTeU1alwR+ZHdKZf5x1cyw="}]},{"Route":"images/products/laptop.0wj356j2bf.jpg","AssetFile":"images/products/laptop.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"14838"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"cDTEpMH4xCAo8oIwmR6No753hzrBG1h5Kz43TLyLqU4=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"}],"EndpointProperties":[{"Name":"fingerprint","Value":"0wj356j2bf"},{"Name":"integrity","Value":"sha256-cDTEpMH4xCAo8oIwmR6No753hzrBG1h5Kz43TLyLqU4="},{"Name":"label","Value":"images/products/laptop.jpg"}]},{"Route":"images/products/laptop.jpg","AssetFile":"images/products/laptop.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"14838"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"cDTEpMH4xCAo8oIwmR6No753hzrBG1h5Kz43TLyLqU4=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-cDTEpMH4xCAo8oIwmR6No753hzrBG1h5Kz43TLyLqU4="}]},{"Route":"images/products/mens-perfume.hl9uomk4no.jpg","AssetFile":"images/products/mens-perfume.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"30380"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"6wOcP4qZwYOgSg7v4WoX8EU6gVu/BYr1gflwGy9z4gY=\""},{"Name":"Last-Modified","Value":"Tue, 08 Sep 2026 14:17:12 GMT"}],"EndpointProperties":[{"Name":"fingerprint","Value":"hl9uomk4no"},{"Name":"integrity","Value":"sha256-6wOcP4qZwYOgSg7v4WoX8EU6gVu/BYr1gflwGy9z4gY="},{"Name":"label","Value":"images/products/mens-perfume.jpg"}]},{"Route":"images/products/mens-perfume.jpg","AssetFile":"images/products/mens-perfume.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"30380"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"6wOcP4qZwYOgSg7v4WoX8EU6gVu/BYr1gflwGy9z4gY=\""},{"Name":"Last-Modified","Value":"Tue, 08 Sep 2026 14:17:12 GMT"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-6wOcP4qZwYOgSg7v4WoX8EU6gVu/BYr1gflwGy9z4gY="}]},{"Route":"images/products/services.jpg","AssetFile":"images/products/services.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"24655"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"7wWjLm2gKRVeEYzbWyaynoqzgs+K9mI/GGWdVvDhOak=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-7wWjLm2gKRVeEYzbWyaynoqzgs+K9mI/GGWdVvDhOak="}]},{"Route":"images/products/services.nan8uch1qp.jpg","AssetFile":"images/products/services.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"24655"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"7wWjLm2gKRVeEYzbWyaynoqzgs+K9mI/GGWdVvDhOak=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"}],"EndpointProperties":[{"Name":"fingerprint","Value":"nan8uch1qp"},{"Name":"integrity","Value":"sha256-7wWjLm2gKRVeEYzbWyaynoqzgs+K9mI/GGWdVvDhOak="},{"Name":"label","Value":"images/products/services.jpg"}]},{"Route":"images/products/shoes.e0uwb30arr.jpg","AssetFile":"images/products/shoes.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"21397"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"EknJkAK+oDGSAq50rPs0tvrIPPKRC1LKJzL9y85YXXs=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"}],"EndpointProperties":[{"Name":"fingerprint","Value":"e0uwb30arr"},{"Name":"integrity","Value":"sha256-EknJkAK+oDGSAq50rPs0tvrIPPKRC1LKJzL9y85YXXs="},{"Name":"label","Value":"images/products/shoes.jpg"}]},{"Route":"images/products/shoes.jpg","AssetFile":"images/products/shoes.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"21397"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"EknJkAK+oDGSAq50rPs0tvrIPPKRC1LKJzL9y85YXXs=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-EknJkAK+oDGSAq50rPs0tvrIPPKRC1LKJzL9y85YXXs="}]},{"Route":"images/products/skincare.4v1uf5bx3n.jpg","AssetFile":"images/products/skincare.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"30915"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"EAgqN049ihTyVpgHgWVYaUIgCDVMuzqsCAkkaIWf/Uc=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"}],"EndpointProperties":[{"Name":"fingerprint","Value":"4v1uf5bx3n"},{"Name":"integrity","Value":"sha256-EAgqN049ihTyVpgHgWVYaUIgCDVMuzqsCAkkaIWf/Uc="},{"Name":"label","Value":"images/products/skincare.jpg"}]},{"Route":"images/products/skincare.jpg","AssetFile":"images/products/skincare.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"30915"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"EAgqN049ihTyVpgHgWVYaUIgCDVMuzqsCAkkaIWf/Uc=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-EAgqN049ihTyVpgHgWVYaUIgCDVMuzqsCAkkaIWf/Uc="}]},{"Route":"images/products/supplements.jpg","AssetFile":"images/products/supplements.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"41713"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"UcHZWpevE/pdstnFkMIX1H/sxdVE69YQ0h7UsfibkKc=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-UcHZWpevE/pdstnFkMIX1H/sxdVE69YQ0h7UsfibkKc="}]},{"Route":"images/products/supplements.lf63myi77w.jpg","AssetFile":"images/products/supplements.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"41713"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"UcHZWpevE/pdstnFkMIX1H/sxdVE69YQ0h7UsfibkKc=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"}],"EndpointProperties":[{"Name":"fingerprint","Value":"lf63myi77w"},{"Name":"integrity","Value":"sha256-UcHZWpevE/pdstnFkMIX1H/sxdVE69YQ0h7UsfibkKc="},{"Name":"label","Value":"images/products/supplements.jpg"}]},{"Route":"images/products/tshirt.54s2xa8pjt.jpg","AssetFile":"images/products/tshirt.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"16607"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"KxwCM/QfMHLjt7cL0U+mbFTFeTa1EuzI5pjJUJJX2J8=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"}],"EndpointProperties":[{"Name":"fingerprint","Value":"54s2xa8pjt"},{"Name":"integrity","Value":"sha256-KxwCM/QfMHLjt7cL0U+mbFTFeTa1EuzI5pjJUJJX2J8="},{"Name":"label","Value":"images/products/tshirt.jpg"}]},{"Route":"images/products/tshirt.jpg","AssetFile":"images/products/tshirt.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"16607"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"KxwCM/QfMHLjt7cL0U+mbFTFeTa1EuzI5pjJUJJX2J8=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-KxwCM/QfMHLjt7cL0U+mbFTFeTa1EuzI5pjJUJJX2J8="}]},{"Route":"images/products/unisex-perfume.hl9uomk4no.jpg","AssetFile":"images/products/unisex-perfume.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"30380"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"6wOcP4qZwYOgSg7v4WoX8EU6gVu/BYr1gflwGy9z4gY=\""},{"Name":"Last-Modified","Value":"Tue, 08 Sep 2026 14:17:12 GMT"}],"EndpointProperties":[{"Name":"fingerprint","Value":"hl9uomk4no"},{"Name":"integrity","Value":"sha256-6wOcP4qZwYOgSg7v4WoX8EU6gVu/BYr1gflwGy9z4gY="},{"Name":"label","Value":"images/products/unisex-perfume.jpg"}]},{"Route":"images/products/unisex-perfume.jpg","AssetFile":"images/products/unisex-perfume.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"30380"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"6wOcP4qZwYOgSg7v4WoX8EU6gVu/BYr1gflwGy9z4gY=\""},{"Name":"Last-Modified","Value":"Tue, 08 Sep 2026 14:17:12 GMT"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-6wOcP4qZwYOgSg7v4WoX8EU6gVu/BYr1gflwGy9z4gY="}]},{"Route":"images/products/watch.bqq5br5uzv.jpg","AssetFile":"images/products/watch.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"9900"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"beJM6N4rjyODsx/GAaAAoLlwthp/Kt8jNzpj2yHb5g4=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"}],"EndpointProperties":[{"Name":"fingerprint","Value":"bqq5br5uzv"},{"Name":"integrity","Value":"sha256-beJM6N4rjyODsx/GAaAAoLlwthp/Kt8jNzpj2yHb5g4="},{"Name":"label","Value":"images/products/watch.jpg"}]},{"Route":"images/products/watch.jpg","AssetFile":"images/products/watch.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"9900"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"beJM6N4rjyODsx/GAaAAoLlwthp/Kt8jNzpj2yHb5g4=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-beJM6N4rjyODsx/GAaAAoLlwthp/Kt8jNzpj2yHb5g4="}]},{"Route":"images/products/womens-perfume.0h79ofsh5r.jpg","AssetFile":"images/products/womens-perfume.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"21528"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"FEJ23ddPwNoykvZYb0SeozdNJF09yVmsSh9JG5SVhkI=\""},{"Name":"Last-Modified","Value":"Tue, 08 Sep 2026 14:17:12 GMT"}],"EndpointProperties":[{"Name":"fingerprint","Value":"0h79ofsh5r"},{"Name":"integrity","Value":"sha256-FEJ23ddPwNoykvZYb0SeozdNJF09yVmsSh9JG5SVhkI="},{"Name":"label","Value":"images/products/womens-perfume.jpg"}]},{"Route":"images/products/womens-perfume.jpg","AssetFile":"images/products/womens-perfume.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"21528"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"FEJ23ddPwNoykvZYb0SeozdNJF09yVmsSh9JG5SVhkI=\""},{"Name":"Last-Modified","Value":"Tue, 08 Sep 2026 14:17:12 GMT"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-FEJ23ddPwNoykvZYb0SeozdNJF09yVmsSh9JG5SVhkI="}]}]}
 
 // ===== staticwebassets.build.json =====
-{"Version":1,"Hash":"bW6LOiYEOnJlldkEgv87s/jJJCTAQRvabAKC+GBJSPE=","Source":"Marketplace.API","BasePath":"_content/Marketplace.API","Mode":"Default","ManifestType":"Build","ReferencedProjectsConfiguration":[],"DiscoveryPatterns":[{"Name":"Marketplace.API\\wwwroot","Source":"Marketplace.API","ContentRoot":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\","BasePath":"_content/Marketplace.API","Pattern":"**"}],"Assets":[{"Identity":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\book.jpg","SourceId":"Marketplace.API","SourceType":"Discovered","ContentRoot":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\","BasePath":"_content/Marketplace.API","RelativePath":"images/products/book#[.{fingerprint}]?.jpg","AssetKind":"All","AssetMode":"All","AssetRole":"Primary","AssetMergeBehavior":"","AssetMergeSource":"","RelatedAsset":"","AssetTraitName":"","AssetTraitValue":"","Fingerprint":"sz8s44gqpy","Integrity":"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=","CopyToOutputDirectory":"Never","CopyToPublishDirectory":"PreserveNewest","OriginalItemSpec":"wwwroot\\images\\products\\book.jpg","FileLength":354169,"LastWriteTime":"2026-08-06T13:06:21+00:00"},{"Identity":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\c5272b11-84a7-409a-89fa-c5ef5be9036c_خدماتي2.jpg","SourceId":"Marketplace.API","SourceType":"Discovered","ContentRoot":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\","BasePath":"_content/Marketplace.API","RelativePath":"images/products/c5272b11-84a7-409a-89fa-c5ef5be9036c_خدماتي2#[.{fingerprint}]?.jpg","AssetKind":"All","AssetMode":"All","AssetRole":"Primary","AssetMergeBehavior":"","AssetMergeSource":"","RelatedAsset":"","AssetTraitName":"","AssetTraitValue":"","Fingerprint":"sz8s44gqpy","Integrity":"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=","CopyToOutputDirectory":"Never","CopyToPublishDirectory":"PreserveNewest","OriginalItemSpec":"wwwroot\\images\\products\\c5272b11-84a7-409a-89fa-c5ef5be9036c_خدماتي2.jpg","FileLength":354169,"LastWriteTime":"2026-08-06T13:06:21+00:00"},{"Identity":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\haircare.jpg","SourceId":"Marketplace.API","SourceType":"Discovered","ContentRoot":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\","BasePath":"_content/Marketplace.API","RelativePath":"images/products/haircare#[.{fingerprint}]?.jpg","AssetKind":"All","AssetMode":"All","AssetRole":"Primary","AssetMergeBehavior":"","AssetMergeSource":"","RelatedAsset":"","AssetTraitName":"","AssetTraitValue":"","Fingerprint":"sz8s44gqpy","Integrity":"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=","CopyToOutputDirectory":"Never","CopyToPublishDirectory":"PreserveNewest","OriginalItemSpec":"wwwroot\\images\\products\\haircare.jpg","FileLength":354169,"LastWriteTime":"2026-08-06T13:06:21+00:00"},{"Identity":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\headphones.jpg","SourceId":"Marketplace.API","SourceType":"Discovered","ContentRoot":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\","BasePath":"_content/Marketplace.API","RelativePath":"images/products/headphones#[.{fingerprint}]?.jpg","AssetKind":"All","AssetMode":"All","AssetRole":"Primary","AssetMergeBehavior":"","AssetMergeSource":"","RelatedAsset":"","AssetTraitName":"","AssetTraitValue":"","Fingerprint":"sz8s44gqpy","Integrity":"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=","CopyToOutputDirectory":"Never","CopyToPublishDirectory":"PreserveNewest","OriginalItemSpec":"wwwroot\\images\\products\\headphones.jpg","FileLength":354169,"LastWriteTime":"2026-08-06T13:06:21+00:00"},{"Identity":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\home.jpg","SourceId":"Marketplace.API","SourceType":"Discovered","ContentRoot":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\","BasePath":"_content/Marketplace.API","RelativePath":"images/products/home#[.{fingerprint}]?.jpg","AssetKind":"All","AssetMode":"All","AssetRole":"Primary","AssetMergeBehavior":"","AssetMergeSource":"","RelatedAsset":"","AssetTraitName":"","AssetTraitValue":"","Fingerprint":"sz8s44gqpy","Integrity":"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=","CopyToOutputDirectory":"Never","CopyToPublishDirectory":"PreserveNewest","OriginalItemSpec":"wwwroot\\images\\products\\home.jpg","FileLength":354169,"LastWriteTime":"2026-08-06T13:06:21+00:00"},{"Identity":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\laptop.jpg","SourceId":"Marketplace.API","SourceType":"Discovered","ContentRoot":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\","BasePath":"_content/Marketplace.API","RelativePath":"images/products/laptop#[.{fingerprint}]?.jpg","AssetKind":"All","AssetMode":"All","AssetRole":"Primary","AssetMergeBehavior":"","AssetMergeSource":"","RelatedAsset":"","AssetTraitName":"","AssetTraitValue":"","Fingerprint":"sz8s44gqpy","Integrity":"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=","CopyToOutputDirectory":"Never","CopyToPublishDirectory":"PreserveNewest","OriginalItemSpec":"wwwroot\\images\\products\\laptop.jpg","FileLength":354169,"LastWriteTime":"2026-08-06T13:06:21+00:00"},{"Identity":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\shoes.jpg","SourceId":"Marketplace.API","SourceType":"Discovered","ContentRoot":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\","BasePath":"_content/Marketplace.API","RelativePath":"images/products/shoes#[.{fingerprint}]?.jpg","AssetKind":"All","AssetMode":"All","AssetRole":"Primary","AssetMergeBehavior":"","AssetMergeSource":"","RelatedAsset":"","AssetTraitName":"","AssetTraitValue":"","Fingerprint":"sz8s44gqpy","Integrity":"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=","CopyToOutputDirectory":"Never","CopyToPublishDirectory":"PreserveNewest","OriginalItemSpec":"wwwroot\\images\\products\\shoes.jpg","FileLength":354169,"LastWriteTime":"2026-08-06T13:06:21+00:00"},{"Identity":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\skincare.jpg","SourceId":"Marketplace.API","SourceType":"Discovered","ContentRoot":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\","BasePath":"_content/Marketplace.API","RelativePath":"images/products/skincare#[.{fingerprint}]?.jpg","AssetKind":"All","AssetMode":"All","AssetRole":"Primary","AssetMergeBehavior":"","AssetMergeSource":"","RelatedAsset":"","AssetTraitName":"","AssetTraitValue":"","Fingerprint":"sz8s44gqpy","Integrity":"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=","CopyToOutputDirectory":"Never","CopyToPublishDirectory":"PreserveNewest","OriginalItemSpec":"wwwroot\\images\\products\\skincare.jpg","FileLength":354169,"LastWriteTime":"2026-08-06T13:06:21+00:00"},{"Identity":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\supplements.jpg","SourceId":"Marketplace.API","SourceType":"Discovered","ContentRoot":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\","BasePath":"_content/Marketplace.API","RelativePath":"images/products/supplements#[.{fingerprint}]?.jpg","AssetKind":"All","AssetMode":"All","AssetRole":"Primary","AssetMergeBehavior":"","AssetMergeSource":"","RelatedAsset":"","AssetTraitName":"","AssetTraitValue":"","Fingerprint":"sz8s44gqpy","Integrity":"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=","CopyToOutputDirectory":"Never","CopyToPublishDirectory":"PreserveNewest","OriginalItemSpec":"wwwroot\\images\\products\\supplements.jpg","FileLength":354169,"LastWriteTime":"2026-08-06T13:06:21+00:00"},{"Identity":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\tshirt.jpg","SourceId":"Marketplace.API","SourceType":"Discovered","ContentRoot":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\","BasePath":"_content/Marketplace.API","RelativePath":"images/products/tshirt#[.{fingerprint}]?.jpg","AssetKind":"All","AssetMode":"All","AssetRole":"Primary","AssetMergeBehavior":"","AssetMergeSource":"","RelatedAsset":"","AssetTraitName":"","AssetTraitValue":"","Fingerprint":"sz8s44gqpy","Integrity":"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=","CopyToOutputDirectory":"Never","CopyToPublishDirectory":"PreserveNewest","OriginalItemSpec":"wwwroot\\images\\products\\tshirt.jpg","FileLength":354169,"LastWriteTime":"2026-08-06T13:06:21+00:00"},{"Identity":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\watch.jpg","SourceId":"Marketplace.API","SourceType":"Discovered","ContentRoot":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\","BasePath":"_content/Marketplace.API","RelativePath":"images/products/watch#[.{fingerprint}]?.jpg","AssetKind":"All","AssetMode":"All","AssetRole":"Primary","AssetMergeBehavior":"","AssetMergeSource":"","RelatedAsset":"","AssetTraitName":"","AssetTraitValue":"","Fingerprint":"sz8s44gqpy","Integrity":"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=","CopyToOutputDirectory":"Never","CopyToPublishDirectory":"PreserveNewest","OriginalItemSpec":"wwwroot\\images\\products\\watch.jpg","FileLength":354169,"LastWriteTime":"2026-08-06T13:06:21+00:00"}],"Endpoints":[{"Route":"images/products/book.jpg","AssetFile":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\book.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"},{"Name":"Cache-Control","Value":"no-cache"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="}]},{"Route":"images/products/book.sz8s44gqpy.jpg","AssetFile":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\book.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"}],"EndpointProperties":[{"Name":"fingerprint","Value":"sz8s44gqpy"},{"Name":"label","Value":"images/products/book.jpg"},{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="}]},{"Route":"images/products/c5272b11-84a7-409a-89fa-c5ef5be9036c_خدماتي2.jpg","AssetFile":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\c5272b11-84a7-409a-89fa-c5ef5be9036c_خدماتي2.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"},{"Name":"Cache-Control","Value":"no-cache"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="}]},{"Route":"images/products/c5272b11-84a7-409a-89fa-c5ef5be9036c_خدماتي2.sz8s44gqpy.jpg","AssetFile":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\c5272b11-84a7-409a-89fa-c5ef5be9036c_خدماتي2.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"}],"EndpointProperties":[{"Name":"fingerprint","Value":"sz8s44gqpy"},{"Name":"label","Value":"images/products/c5272b11-84a7-409a-89fa-c5ef5be9036c_خدماتي2.jpg"},{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="}]},{"Route":"images/products/haircare.jpg","AssetFile":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\haircare.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"},{"Name":"Cache-Control","Value":"no-cache"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="}]},{"Route":"images/products/haircare.sz8s44gqpy.jpg","AssetFile":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\haircare.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"}],"EndpointProperties":[{"Name":"fingerprint","Value":"sz8s44gqpy"},{"Name":"label","Value":"images/products/haircare.jpg"},{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="}]},{"Route":"images/products/headphones.jpg","AssetFile":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\headphones.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"},{"Name":"Cache-Control","Value":"no-cache"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="}]},{"Route":"images/products/headphones.sz8s44gqpy.jpg","AssetFile":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\headphones.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"}],"EndpointProperties":[{"Name":"fingerprint","Value":"sz8s44gqpy"},{"Name":"label","Value":"images/products/headphones.jpg"},{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="}]},{"Route":"images/products/home.jpg","AssetFile":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\home.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"},{"Name":"Cache-Control","Value":"no-cache"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="}]},{"Route":"images/products/home.sz8s44gqpy.jpg","AssetFile":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\home.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"}],"EndpointProperties":[{"Name":"fingerprint","Value":"sz8s44gqpy"},{"Name":"label","Value":"images/products/home.jpg"},{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="}]},{"Route":"images/products/laptop.jpg","AssetFile":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\laptop.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"},{"Name":"Cache-Control","Value":"no-cache"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="}]},{"Route":"images/products/laptop.sz8s44gqpy.jpg","AssetFile":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\laptop.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"}],"EndpointProperties":[{"Name":"fingerprint","Value":"sz8s44gqpy"},{"Name":"label","Value":"images/products/laptop.jpg"},{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="}]},{"Route":"images/products/shoes.jpg","AssetFile":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\shoes.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"},{"Name":"Cache-Control","Value":"no-cache"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="}]},{"Route":"images/products/shoes.sz8s44gqpy.jpg","AssetFile":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\shoes.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"}],"EndpointProperties":[{"Name":"fingerprint","Value":"sz8s44gqpy"},{"Name":"label","Value":"images/products/shoes.jpg"},{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="}]},{"Route":"images/products/skincare.jpg","AssetFile":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\skincare.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"},{"Name":"Cache-Control","Value":"no-cache"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="}]},{"Route":"images/products/skincare.sz8s44gqpy.jpg","AssetFile":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\skincare.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"}],"EndpointProperties":[{"Name":"fingerprint","Value":"sz8s44gqpy"},{"Name":"label","Value":"images/products/skincare.jpg"},{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="}]},{"Route":"images/products/supplements.jpg","AssetFile":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\supplements.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"},{"Name":"Cache-Control","Value":"no-cache"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="}]},{"Route":"images/products/supplements.sz8s44gqpy.jpg","AssetFile":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\supplements.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"}],"EndpointProperties":[{"Name":"fingerprint","Value":"sz8s44gqpy"},{"Name":"label","Value":"images/products/supplements.jpg"},{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="}]},{"Route":"images/products/tshirt.jpg","AssetFile":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\tshirt.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"},{"Name":"Cache-Control","Value":"no-cache"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="}]},{"Route":"images/products/tshirt.sz8s44gqpy.jpg","AssetFile":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\tshirt.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"}],"EndpointProperties":[{"Name":"fingerprint","Value":"sz8s44gqpy"},{"Name":"label","Value":"images/products/tshirt.jpg"},{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="}]},{"Route":"images/products/watch.jpg","AssetFile":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\watch.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"},{"Name":"Cache-Control","Value":"no-cache"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="}]},{"Route":"images/products/watch.sz8s44gqpy.jpg","AssetFile":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\watch.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Content-Length","Value":"354169"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU=\""},{"Name":"Last-Modified","Value":"Thu, 06 Aug 2026 13:06:21 GMT"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"}],"EndpointProperties":[{"Name":"fingerprint","Value":"sz8s44gqpy"},{"Name":"label","Value":"images/products/watch.jpg"},{"Name":"integrity","Value":"sha256-iLDJKddE0/ZOk8vZr1wVbL5cLfXvTggF1Re0mmsE7oU="}]}]}
+{"Version":1,"Hash":"tYomh0hFSL+JLW9y2wLpTGS+XQRGtff9FnuoF2vt9Rs=","Source":"Marketplace.API","BasePath":"_content/Marketplace.API","Mode":"Default","ManifestType":"Build","ReferencedProjectsConfiguration":[],"DiscoveryPatterns":[{"Name":"Marketplace.API\\wwwroot","Source":"Marketplace.API","ContentRoot":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\","BasePath":"_content/Marketplace.API","Pattern":"**"}],"Assets":[{"Identity":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\book.jpg","SourceId":"Marketplace.API","SourceType":"Discovered","ContentRoot":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\","BasePath":"_content/Marketplace.API","RelativePath":"images/products/book#[.{fingerprint}]?.jpg","AssetKind":"All","AssetMode":"All","AssetRole":"Primary","AssetMergeBehavior":"","AssetMergeSource":"","RelatedAsset":"","AssetTraitName":"","AssetTraitValue":"","Fingerprint":"vvh6j3zyr0","Integrity":"Cy9aaTMUFFhVuiXtseyqq+nam5M/I1692qGaNQEN/lo=","CopyToOutputDirectory":"Never","CopyToPublishDirectory":"PreserveNewest","OriginalItemSpec":"wwwroot\\images\\products\\book.jpg","FileLength":15694,"LastWriteTime":"2026-09-07T14:58:41+00:00"},{"Identity":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\haircare.jpg","SourceId":"Marketplace.API","SourceType":"Discovered","ContentRoot":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\","BasePath":"_content/Marketplace.API","RelativePath":"images/products/haircare#[.{fingerprint}]?.jpg","AssetKind":"All","AssetMode":"All","AssetRole":"Primary","AssetMergeBehavior":"","AssetMergeSource":"","RelatedAsset":"","AssetTraitName":"","AssetTraitValue":"","Fingerprint":"81t2ihvx9a","Integrity":"fGUOUgzQA7ALrJZYa2GPKkFn74n/fnOlci4docuZ0IY=","CopyToOutputDirectory":"Never","CopyToPublishDirectory":"PreserveNewest","OriginalItemSpec":"wwwroot\\images\\products\\haircare.jpg","FileLength":33656,"LastWriteTime":"2026-09-07T14:58:41+00:00"},{"Identity":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\headphones.jpg","SourceId":"Marketplace.API","SourceType":"Discovered","ContentRoot":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\","BasePath":"_content/Marketplace.API","RelativePath":"images/products/headphones#[.{fingerprint}]?.jpg","AssetKind":"All","AssetMode":"All","AssetRole":"Primary","AssetMergeBehavior":"","AssetMergeSource":"","RelatedAsset":"","AssetTraitName":"","AssetTraitValue":"","Fingerprint":"w4fanf1ba7","Integrity":"IE7mFu3dP3YM0TNAWY0Crb3zrX91VQKlkkPA90aEfvM=","CopyToOutputDirectory":"Never","CopyToPublishDirectory":"PreserveNewest","OriginalItemSpec":"wwwroot\\images\\products\\headphones.jpg","FileLength":16748,"LastWriteTime":"2026-09-07T14:58:41+00:00"},{"Identity":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\home.jpg","SourceId":"Marketplace.API","SourceType":"Discovered","ContentRoot":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\","BasePath":"_content/Marketplace.API","RelativePath":"images/products/home#[.{fingerprint}]?.jpg","AssetKind":"All","AssetMode":"All","AssetRole":"Primary","AssetMergeBehavior":"","AssetMergeSource":"","RelatedAsset":"","AssetTraitName":"","AssetTraitValue":"","Fingerprint":"66jk4c5e0l","Integrity":"8l1ESJlho2vXeAVwrKUbgoTeU1alwR+ZHdKZf5x1cyw=","CopyToOutputDirectory":"Never","CopyToPublishDirectory":"PreserveNewest","OriginalItemSpec":"wwwroot\\images\\products\\home.jpg","FileLength":19385,"LastWriteTime":"2026-09-07T14:58:41+00:00"},{"Identity":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\laptop.jpg","SourceId":"Marketplace.API","SourceType":"Discovered","ContentRoot":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\","BasePath":"_content/Marketplace.API","RelativePath":"images/products/laptop#[.{fingerprint}]?.jpg","AssetKind":"All","AssetMode":"All","AssetRole":"Primary","AssetMergeBehavior":"","AssetMergeSource":"","RelatedAsset":"","AssetTraitName":"","AssetTraitValue":"","Fingerprint":"0wj356j2bf","Integrity":"cDTEpMH4xCAo8oIwmR6No753hzrBG1h5Kz43TLyLqU4=","CopyToOutputDirectory":"Never","CopyToPublishDirectory":"PreserveNewest","OriginalItemSpec":"wwwroot\\images\\products\\laptop.jpg","FileLength":14838,"LastWriteTime":"2026-09-07T14:58:41+00:00"},{"Identity":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\mens-perfume.jpg","SourceId":"Marketplace.API","SourceType":"Discovered","ContentRoot":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\","BasePath":"_content/Marketplace.API","RelativePath":"images/products/mens-perfume#[.{fingerprint}]?.jpg","AssetKind":"All","AssetMode":"All","AssetRole":"Primary","AssetMergeBehavior":"","AssetMergeSource":"","RelatedAsset":"","AssetTraitName":"","AssetTraitValue":"","Fingerprint":"hl9uomk4no","Integrity":"6wOcP4qZwYOgSg7v4WoX8EU6gVu/BYr1gflwGy9z4gY=","CopyToOutputDirectory":"Never","CopyToPublishDirectory":"PreserveNewest","OriginalItemSpec":"wwwroot\\images\\products\\mens-perfume.jpg","FileLength":30380,"LastWriteTime":"2026-09-08T14:17:12+00:00"},{"Identity":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\services.jpg","SourceId":"Marketplace.API","SourceType":"Discovered","ContentRoot":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\","BasePath":"_content/Marketplace.API","RelativePath":"images/products/services#[.{fingerprint}]?.jpg","AssetKind":"All","AssetMode":"All","AssetRole":"Primary","AssetMergeBehavior":"","AssetMergeSource":"","RelatedAsset":"","AssetTraitName":"","AssetTraitValue":"","Fingerprint":"nan8uch1qp","Integrity":"7wWjLm2gKRVeEYzbWyaynoqzgs+K9mI/GGWdVvDhOak=","CopyToOutputDirectory":"Never","CopyToPublishDirectory":"PreserveNewest","OriginalItemSpec":"wwwroot\\images\\products\\services.jpg","FileLength":24655,"LastWriteTime":"2026-09-07T14:58:41+00:00"},{"Identity":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\shoes.jpg","SourceId":"Marketplace.API","SourceType":"Discovered","ContentRoot":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\","BasePath":"_content/Marketplace.API","RelativePath":"images/products/shoes#[.{fingerprint}]?.jpg","AssetKind":"All","AssetMode":"All","AssetRole":"Primary","AssetMergeBehavior":"","AssetMergeSource":"","RelatedAsset":"","AssetTraitName":"","AssetTraitValue":"","Fingerprint":"e0uwb30arr","Integrity":"EknJkAK+oDGSAq50rPs0tvrIPPKRC1LKJzL9y85YXXs=","CopyToOutputDirectory":"Never","CopyToPublishDirectory":"PreserveNewest","OriginalItemSpec":"wwwroot\\images\\products\\shoes.jpg","FileLength":21397,"LastWriteTime":"2026-09-07T14:58:41+00:00"},{"Identity":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\skincare.jpg","SourceId":"Marketplace.API","SourceType":"Discovered","ContentRoot":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\","BasePath":"_content/Marketplace.API","RelativePath":"images/products/skincare#[.{fingerprint}]?.jpg","AssetKind":"All","AssetMode":"All","AssetRole":"Primary","AssetMergeBehavior":"","AssetMergeSource":"","RelatedAsset":"","AssetTraitName":"","AssetTraitValue":"","Fingerprint":"4v1uf5bx3n","Integrity":"EAgqN049ihTyVpgHgWVYaUIgCDVMuzqsCAkkaIWf/Uc=","CopyToOutputDirectory":"Never","CopyToPublishDirectory":"PreserveNewest","OriginalItemSpec":"wwwroot\\images\\products\\skincare.jpg","FileLength":30915,"LastWriteTime":"2026-09-07T14:58:41+00:00"},{"Identity":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\supplements.jpg","SourceId":"Marketplace.API","SourceType":"Discovered","ContentRoot":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\","BasePath":"_content/Marketplace.API","RelativePath":"images/products/supplements#[.{fingerprint}]?.jpg","AssetKind":"All","AssetMode":"All","AssetRole":"Primary","AssetMergeBehavior":"","AssetMergeSource":"","RelatedAsset":"","AssetTraitName":"","AssetTraitValue":"","Fingerprint":"lf63myi77w","Integrity":"UcHZWpevE/pdstnFkMIX1H/sxdVE69YQ0h7UsfibkKc=","CopyToOutputDirectory":"Never","CopyToPublishDirectory":"PreserveNewest","OriginalItemSpec":"wwwroot\\images\\products\\supplements.jpg","FileLength":41713,"LastWriteTime":"2026-09-07T14:58:41+00:00"},{"Identity":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\tshirt.jpg","SourceId":"Marketplace.API","SourceType":"Discovered","ContentRoot":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\","BasePath":"_content/Marketplace.API","RelativePath":"images/products/tshirt#[.{fingerprint}]?.jpg","AssetKind":"All","AssetMode":"All","AssetRole":"Primary","AssetMergeBehavior":"","AssetMergeSource":"","RelatedAsset":"","AssetTraitName":"","AssetTraitValue":"","Fingerprint":"54s2xa8pjt","Integrity":"KxwCM/QfMHLjt7cL0U+mbFTFeTa1EuzI5pjJUJJX2J8=","CopyToOutputDirectory":"Never","CopyToPublishDirectory":"PreserveNewest","OriginalItemSpec":"wwwroot\\images\\products\\tshirt.jpg","FileLength":16607,"LastWriteTime":"2026-09-07T14:58:41+00:00"},{"Identity":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\unisex-perfume.jpg","SourceId":"Marketplace.API","SourceType":"Discovered","ContentRoot":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\","BasePath":"_content/Marketplace.API","RelativePath":"images/products/unisex-perfume#[.{fingerprint}]?.jpg","AssetKind":"All","AssetMode":"All","AssetRole":"Primary","AssetMergeBehavior":"","AssetMergeSource":"","RelatedAsset":"","AssetTraitName":"","AssetTraitValue":"","Fingerprint":"hl9uomk4no","Integrity":"6wOcP4qZwYOgSg7v4WoX8EU6gVu/BYr1gflwGy9z4gY=","CopyToOutputDirectory":"Never","CopyToPublishDirectory":"PreserveNewest","OriginalItemSpec":"wwwroot\\images\\products\\unisex-perfume.jpg","FileLength":30380,"LastWriteTime":"2026-09-08T14:17:12+00:00"},{"Identity":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\watch.jpg","SourceId":"Marketplace.API","SourceType":"Discovered","ContentRoot":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\","BasePath":"_content/Marketplace.API","RelativePath":"images/products/watch#[.{fingerprint}]?.jpg","AssetKind":"All","AssetMode":"All","AssetRole":"Primary","AssetMergeBehavior":"","AssetMergeSource":"","RelatedAsset":"","AssetTraitName":"","AssetTraitValue":"","Fingerprint":"bqq5br5uzv","Integrity":"beJM6N4rjyODsx/GAaAAoLlwthp/Kt8jNzpj2yHb5g4=","CopyToOutputDirectory":"Never","CopyToPublishDirectory":"PreserveNewest","OriginalItemSpec":"wwwroot\\images\\products\\watch.jpg","FileLength":9900,"LastWriteTime":"2026-09-07T14:58:41+00:00"},{"Identity":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\womens-perfume.jpg","SourceId":"Marketplace.API","SourceType":"Discovered","ContentRoot":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\","BasePath":"_content/Marketplace.API","RelativePath":"images/products/womens-perfume#[.{fingerprint}]?.jpg","AssetKind":"All","AssetMode":"All","AssetRole":"Primary","AssetMergeBehavior":"","AssetMergeSource":"","RelatedAsset":"","AssetTraitName":"","AssetTraitValue":"","Fingerprint":"0h79ofsh5r","Integrity":"FEJ23ddPwNoykvZYb0SeozdNJF09yVmsSh9JG5SVhkI=","CopyToOutputDirectory":"Never","CopyToPublishDirectory":"PreserveNewest","OriginalItemSpec":"wwwroot\\images\\products\\womens-perfume.jpg","FileLength":21528,"LastWriteTime":"2026-09-08T14:17:12+00:00"}],"Endpoints":[{"Route":"images/products/book.jpg","AssetFile":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\book.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Content-Length","Value":"15694"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"Cy9aaTMUFFhVuiXtseyqq+nam5M/I1692qGaNQEN/lo=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"},{"Name":"Cache-Control","Value":"no-cache"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-Cy9aaTMUFFhVuiXtseyqq+nam5M/I1692qGaNQEN/lo="}]},{"Route":"images/products/book.vvh6j3zyr0.jpg","AssetFile":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\book.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Content-Length","Value":"15694"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"Cy9aaTMUFFhVuiXtseyqq+nam5M/I1692qGaNQEN/lo=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"}],"EndpointProperties":[{"Name":"fingerprint","Value":"vvh6j3zyr0"},{"Name":"label","Value":"images/products/book.jpg"},{"Name":"integrity","Value":"sha256-Cy9aaTMUFFhVuiXtseyqq+nam5M/I1692qGaNQEN/lo="}]},{"Route":"images/products/haircare.81t2ihvx9a.jpg","AssetFile":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\haircare.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Content-Length","Value":"33656"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"fGUOUgzQA7ALrJZYa2GPKkFn74n/fnOlci4docuZ0IY=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"}],"EndpointProperties":[{"Name":"fingerprint","Value":"81t2ihvx9a"},{"Name":"label","Value":"images/products/haircare.jpg"},{"Name":"integrity","Value":"sha256-fGUOUgzQA7ALrJZYa2GPKkFn74n/fnOlci4docuZ0IY="}]},{"Route":"images/products/haircare.jpg","AssetFile":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\haircare.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Content-Length","Value":"33656"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"fGUOUgzQA7ALrJZYa2GPKkFn74n/fnOlci4docuZ0IY=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"},{"Name":"Cache-Control","Value":"no-cache"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-fGUOUgzQA7ALrJZYa2GPKkFn74n/fnOlci4docuZ0IY="}]},{"Route":"images/products/headphones.jpg","AssetFile":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\headphones.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Content-Length","Value":"16748"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"IE7mFu3dP3YM0TNAWY0Crb3zrX91VQKlkkPA90aEfvM=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"},{"Name":"Cache-Control","Value":"no-cache"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-IE7mFu3dP3YM0TNAWY0Crb3zrX91VQKlkkPA90aEfvM="}]},{"Route":"images/products/headphones.w4fanf1ba7.jpg","AssetFile":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\headphones.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Content-Length","Value":"16748"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"IE7mFu3dP3YM0TNAWY0Crb3zrX91VQKlkkPA90aEfvM=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"}],"EndpointProperties":[{"Name":"fingerprint","Value":"w4fanf1ba7"},{"Name":"label","Value":"images/products/headphones.jpg"},{"Name":"integrity","Value":"sha256-IE7mFu3dP3YM0TNAWY0Crb3zrX91VQKlkkPA90aEfvM="}]},{"Route":"images/products/home.66jk4c5e0l.jpg","AssetFile":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\home.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Content-Length","Value":"19385"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"8l1ESJlho2vXeAVwrKUbgoTeU1alwR+ZHdKZf5x1cyw=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"}],"EndpointProperties":[{"Name":"fingerprint","Value":"66jk4c5e0l"},{"Name":"label","Value":"images/products/home.jpg"},{"Name":"integrity","Value":"sha256-8l1ESJlho2vXeAVwrKUbgoTeU1alwR+ZHdKZf5x1cyw="}]},{"Route":"images/products/home.jpg","AssetFile":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\home.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Content-Length","Value":"19385"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"8l1ESJlho2vXeAVwrKUbgoTeU1alwR+ZHdKZf5x1cyw=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"},{"Name":"Cache-Control","Value":"no-cache"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-8l1ESJlho2vXeAVwrKUbgoTeU1alwR+ZHdKZf5x1cyw="}]},{"Route":"images/products/laptop.0wj356j2bf.jpg","AssetFile":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\laptop.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Content-Length","Value":"14838"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"cDTEpMH4xCAo8oIwmR6No753hzrBG1h5Kz43TLyLqU4=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"}],"EndpointProperties":[{"Name":"fingerprint","Value":"0wj356j2bf"},{"Name":"label","Value":"images/products/laptop.jpg"},{"Name":"integrity","Value":"sha256-cDTEpMH4xCAo8oIwmR6No753hzrBG1h5Kz43TLyLqU4="}]},{"Route":"images/products/laptop.jpg","AssetFile":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\laptop.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Content-Length","Value":"14838"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"cDTEpMH4xCAo8oIwmR6No753hzrBG1h5Kz43TLyLqU4=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"},{"Name":"Cache-Control","Value":"no-cache"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-cDTEpMH4xCAo8oIwmR6No753hzrBG1h5Kz43TLyLqU4="}]},{"Route":"images/products/mens-perfume.hl9uomk4no.jpg","AssetFile":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\mens-perfume.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Content-Length","Value":"30380"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"6wOcP4qZwYOgSg7v4WoX8EU6gVu/BYr1gflwGy9z4gY=\""},{"Name":"Last-Modified","Value":"Tue, 08 Sep 2026 14:17:12 GMT"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"}],"EndpointProperties":[{"Name":"fingerprint","Value":"hl9uomk4no"},{"Name":"label","Value":"images/products/mens-perfume.jpg"},{"Name":"integrity","Value":"sha256-6wOcP4qZwYOgSg7v4WoX8EU6gVu/BYr1gflwGy9z4gY="}]},{"Route":"images/products/mens-perfume.jpg","AssetFile":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\mens-perfume.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Content-Length","Value":"30380"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"6wOcP4qZwYOgSg7v4WoX8EU6gVu/BYr1gflwGy9z4gY=\""},{"Name":"Last-Modified","Value":"Tue, 08 Sep 2026 14:17:12 GMT"},{"Name":"Cache-Control","Value":"no-cache"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-6wOcP4qZwYOgSg7v4WoX8EU6gVu/BYr1gflwGy9z4gY="}]},{"Route":"images/products/services.jpg","AssetFile":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\services.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Content-Length","Value":"24655"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"7wWjLm2gKRVeEYzbWyaynoqzgs+K9mI/GGWdVvDhOak=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"},{"Name":"Cache-Control","Value":"no-cache"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-7wWjLm2gKRVeEYzbWyaynoqzgs+K9mI/GGWdVvDhOak="}]},{"Route":"images/products/services.nan8uch1qp.jpg","AssetFile":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\services.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Content-Length","Value":"24655"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"7wWjLm2gKRVeEYzbWyaynoqzgs+K9mI/GGWdVvDhOak=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"}],"EndpointProperties":[{"Name":"fingerprint","Value":"nan8uch1qp"},{"Name":"label","Value":"images/products/services.jpg"},{"Name":"integrity","Value":"sha256-7wWjLm2gKRVeEYzbWyaynoqzgs+K9mI/GGWdVvDhOak="}]},{"Route":"images/products/shoes.e0uwb30arr.jpg","AssetFile":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\shoes.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Content-Length","Value":"21397"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"EknJkAK+oDGSAq50rPs0tvrIPPKRC1LKJzL9y85YXXs=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"}],"EndpointProperties":[{"Name":"fingerprint","Value":"e0uwb30arr"},{"Name":"label","Value":"images/products/shoes.jpg"},{"Name":"integrity","Value":"sha256-EknJkAK+oDGSAq50rPs0tvrIPPKRC1LKJzL9y85YXXs="}]},{"Route":"images/products/shoes.jpg","AssetFile":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\shoes.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Content-Length","Value":"21397"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"EknJkAK+oDGSAq50rPs0tvrIPPKRC1LKJzL9y85YXXs=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"},{"Name":"Cache-Control","Value":"no-cache"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-EknJkAK+oDGSAq50rPs0tvrIPPKRC1LKJzL9y85YXXs="}]},{"Route":"images/products/skincare.4v1uf5bx3n.jpg","AssetFile":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\skincare.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Content-Length","Value":"30915"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"EAgqN049ihTyVpgHgWVYaUIgCDVMuzqsCAkkaIWf/Uc=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"}],"EndpointProperties":[{"Name":"fingerprint","Value":"4v1uf5bx3n"},{"Name":"label","Value":"images/products/skincare.jpg"},{"Name":"integrity","Value":"sha256-EAgqN049ihTyVpgHgWVYaUIgCDVMuzqsCAkkaIWf/Uc="}]},{"Route":"images/products/skincare.jpg","AssetFile":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\skincare.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Content-Length","Value":"30915"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"EAgqN049ihTyVpgHgWVYaUIgCDVMuzqsCAkkaIWf/Uc=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"},{"Name":"Cache-Control","Value":"no-cache"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-EAgqN049ihTyVpgHgWVYaUIgCDVMuzqsCAkkaIWf/Uc="}]},{"Route":"images/products/supplements.jpg","AssetFile":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\supplements.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Content-Length","Value":"41713"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"UcHZWpevE/pdstnFkMIX1H/sxdVE69YQ0h7UsfibkKc=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"},{"Name":"Cache-Control","Value":"no-cache"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-UcHZWpevE/pdstnFkMIX1H/sxdVE69YQ0h7UsfibkKc="}]},{"Route":"images/products/supplements.lf63myi77w.jpg","AssetFile":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\supplements.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Content-Length","Value":"41713"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"UcHZWpevE/pdstnFkMIX1H/sxdVE69YQ0h7UsfibkKc=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"}],"EndpointProperties":[{"Name":"fingerprint","Value":"lf63myi77w"},{"Name":"label","Value":"images/products/supplements.jpg"},{"Name":"integrity","Value":"sha256-UcHZWpevE/pdstnFkMIX1H/sxdVE69YQ0h7UsfibkKc="}]},{"Route":"images/products/tshirt.54s2xa8pjt.jpg","AssetFile":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\tshirt.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Content-Length","Value":"16607"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"KxwCM/QfMHLjt7cL0U+mbFTFeTa1EuzI5pjJUJJX2J8=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"}],"EndpointProperties":[{"Name":"fingerprint","Value":"54s2xa8pjt"},{"Name":"label","Value":"images/products/tshirt.jpg"},{"Name":"integrity","Value":"sha256-KxwCM/QfMHLjt7cL0U+mbFTFeTa1EuzI5pjJUJJX2J8="}]},{"Route":"images/products/tshirt.jpg","AssetFile":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\tshirt.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Content-Length","Value":"16607"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"KxwCM/QfMHLjt7cL0U+mbFTFeTa1EuzI5pjJUJJX2J8=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"},{"Name":"Cache-Control","Value":"no-cache"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-KxwCM/QfMHLjt7cL0U+mbFTFeTa1EuzI5pjJUJJX2J8="}]},{"Route":"images/products/unisex-perfume.hl9uomk4no.jpg","AssetFile":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\unisex-perfume.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Content-Length","Value":"30380"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"6wOcP4qZwYOgSg7v4WoX8EU6gVu/BYr1gflwGy9z4gY=\""},{"Name":"Last-Modified","Value":"Tue, 08 Sep 2026 14:17:12 GMT"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"}],"EndpointProperties":[{"Name":"fingerprint","Value":"hl9uomk4no"},{"Name":"label","Value":"images/products/unisex-perfume.jpg"},{"Name":"integrity","Value":"sha256-6wOcP4qZwYOgSg7v4WoX8EU6gVu/BYr1gflwGy9z4gY="}]},{"Route":"images/products/unisex-perfume.jpg","AssetFile":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\unisex-perfume.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Content-Length","Value":"30380"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"6wOcP4qZwYOgSg7v4WoX8EU6gVu/BYr1gflwGy9z4gY=\""},{"Name":"Last-Modified","Value":"Tue, 08 Sep 2026 14:17:12 GMT"},{"Name":"Cache-Control","Value":"no-cache"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-6wOcP4qZwYOgSg7v4WoX8EU6gVu/BYr1gflwGy9z4gY="}]},{"Route":"images/products/watch.bqq5br5uzv.jpg","AssetFile":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\watch.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Content-Length","Value":"9900"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"beJM6N4rjyODsx/GAaAAoLlwthp/Kt8jNzpj2yHb5g4=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"}],"EndpointProperties":[{"Name":"fingerprint","Value":"bqq5br5uzv"},{"Name":"label","Value":"images/products/watch.jpg"},{"Name":"integrity","Value":"sha256-beJM6N4rjyODsx/GAaAAoLlwthp/Kt8jNzpj2yHb5g4="}]},{"Route":"images/products/watch.jpg","AssetFile":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\watch.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Content-Length","Value":"9900"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"beJM6N4rjyODsx/GAaAAoLlwthp/Kt8jNzpj2yHb5g4=\""},{"Name":"Last-Modified","Value":"Mon, 07 Sep 2026 14:58:41 GMT"},{"Name":"Cache-Control","Value":"no-cache"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-beJM6N4rjyODsx/GAaAAoLlwthp/Kt8jNzpj2yHb5g4="}]},{"Route":"images/products/womens-perfume.0h79ofsh5r.jpg","AssetFile":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\womens-perfume.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Content-Length","Value":"21528"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"FEJ23ddPwNoykvZYb0SeozdNJF09yVmsSh9JG5SVhkI=\""},{"Name":"Last-Modified","Value":"Tue, 08 Sep 2026 14:17:12 GMT"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"}],"EndpointProperties":[{"Name":"fingerprint","Value":"0h79ofsh5r"},{"Name":"label","Value":"images/products/womens-perfume.jpg"},{"Name":"integrity","Value":"sha256-FEJ23ddPwNoykvZYb0SeozdNJF09yVmsSh9JG5SVhkI="}]},{"Route":"images/products/womens-perfume.jpg","AssetFile":"E:\\prime-marketplace\\Marketplace.API\\wwwroot\\images\\products\\womens-perfume.jpg","Selectors":[],"ResponseHeaders":[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Content-Length","Value":"21528"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\"FEJ23ddPwNoykvZYb0SeozdNJF09yVmsSh9JG5SVhkI=\""},{"Name":"Last-Modified","Value":"Tue, 08 Sep 2026 14:17:12 GMT"},{"Name":"Cache-Control","Value":"no-cache"}],"EndpointProperties":[{"Name":"integrity","Value":"sha256-FEJ23ddPwNoykvZYb0SeozdNJF09yVmsSh9JG5SVhkI="}]}]}
 
 // ===== staticwebassets.development.json =====
-{"ContentRoots":["E:\\prime-marketplace\\Marketplace.API\\wwwroot\\"],"Root":{"Children":{"images":{"Children":{"products":{"Children":{"book.jpg":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"images/products/book.jpg"},"Patterns":null},"c5272b11-84a7-409a-89fa-c5ef5be9036c_خدماتي2.jpg":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"images/products/c5272b11-84a7-409a-89fa-c5ef5be9036c_خدماتي2.jpg"},"Patterns":null},"haircare.jpg":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"images/products/haircare.jpg"},"Patterns":null},"headphones.jpg":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"images/products/headphones.jpg"},"Patterns":null},"home.jpg":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"images/products/home.jpg"},"Patterns":null},"laptop.jpg":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"images/products/laptop.jpg"},"Patterns":null},"shoes.jpg":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"images/products/shoes.jpg"},"Patterns":null},"skincare.jpg":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"images/products/skincare.jpg"},"Patterns":null},"supplements.jpg":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"images/products/supplements.jpg"},"Patterns":null},"tshirt.jpg":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"images/products/tshirt.jpg"},"Patterns":null},"watch.jpg":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"images/products/watch.jpg"},"Patterns":null}},"Asset":null,"Patterns":null}},"Asset":null,"Patterns":null}},"Asset":null,"Patterns":[{"ContentRootIndex":0,"Pattern":"**","Depth":0}]}}
+{"ContentRoots":["E:\\prime-marketplace\\Marketplace.API\\wwwroot\\"],"Root":{"Children":{"images":{"Children":{"products":{"Children":{"book.jpg":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"images/products/book.jpg"},"Patterns":null},"haircare.jpg":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"images/products/haircare.jpg"},"Patterns":null},"headphones.jpg":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"images/products/headphones.jpg"},"Patterns":null},"home.jpg":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"images/products/home.jpg"},"Patterns":null},"laptop.jpg":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"images/products/laptop.jpg"},"Patterns":null},"mens-perfume.jpg":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"images/products/mens-perfume.jpg"},"Patterns":null},"services.jpg":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"images/products/services.jpg"},"Patterns":null},"shoes.jpg":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"images/products/shoes.jpg"},"Patterns":null},"skincare.jpg":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"images/products/skincare.jpg"},"Patterns":null},"supplements.jpg":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"images/products/supplements.jpg"},"Patterns":null},"tshirt.jpg":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"images/products/tshirt.jpg"},"Patterns":null},"unisex-perfume.jpg":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"images/products/unisex-perfume.jpg"},"Patterns":null},"watch.jpg":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"images/products/watch.jpg"},"Patterns":null},"womens-perfume.jpg":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"images/products/womens-perfume.jpg"},"Patterns":null}},"Asset":null,"Patterns":null}},"Asset":null,"Patterns":null}},"Asset":null,"Patterns":[{"ContentRootIndex":0,"Pattern":"**","Depth":0}]}}
 
 // ===== .NETCoreApp,Version=v8.0.AssemblyAttributes.cs =====
 // <autogenerated />
@@ -10546,7 +10288,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Marketplace.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+aabf06953732a6a65215e49e9bcc2dd8d6586f14")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+75b338228de79c9c39d5cba710ab5e23ce2d1e5b")]
 [assembly: System.Reflection.AssemblyProductAttribute("Marketplace.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Marketplace.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
