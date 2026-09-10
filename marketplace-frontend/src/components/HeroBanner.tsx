@@ -6,18 +6,29 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, ArrowRight, ShoppingBag } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import api from '@/lib/api';
+import type { ProductCategory } from '@/types';
+
+interface HeroSlide {
+    id: number;
+    badge: string;
+    title: string;
+    subtitle: string;
+    description: string;
+    cta: string;
+    link: string;
+    icon: string;
+}
 
 export default function HeroBanner() {
     const { t, i18n } = useTranslation('common');
     const [current, setCurrent] = useState(0);
     const [direction, setDirection] = useState(0);
-    const [slides, setSlides] = useState([]);
+    const [slides, setSlides] = useState<HeroSlide[]>([]);
     const [loading, setLoading] = useState(true);
 
     const lang = i18n.language || 'ar';
 
-    // Fallback if no categories in DB
-    const fallbackSlide = {
+    const fallbackSlide: HeroSlide = {
         id: 0,
         badge: '🛍️ ' + (lang === 'ar' ? 'وجهة التسوق الأولى' : 'Your #1 Shopping Destination'),
         title: lang === 'ar' ? 'اكتشف متعة التسوق في برايم' : 'Discover the Joy of Shopping at Prime',
@@ -33,12 +44,14 @@ export default function HeroBanner() {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const res = await api.get('/api/ProductCategories?onlyActive=true');
-                const top = (res.data || [])
-                    .sort((a, b) => (a.displayOrder ?? 999) - (b.displayOrder ?? 999))
+                const res = await api.get<ProductCategory[]>('/api/ProductCategories?onlyActive=true');
+                const list: ProductCategory[] = res.data || [];
+                const top: ProductCategory[] = list
+                    .sort((a: ProductCategory, b: ProductCategory) =>
+                        (a.displayOrder ?? 999) - (b.displayOrder ?? 999))
                     .slice(0, 4);
 
-                const built = top.map(c => ({
+                const built: HeroSlide[] = top.map((c: ProductCategory) => ({
                     id: c.id,
                     badge: `${c.icon || '🛍️'} ${lang === 'ar' ? 'قسم مميز' : 'Featured Category'}`,
                     title: c.name,
@@ -82,12 +95,12 @@ export default function HeroBanner() {
     };
 
     const slideVariants = {
-        enter: (direction) => ({
+        enter: (direction: number) => ({
             x: direction > 0 ? 1000 : -1000,
             opacity: 0,
         }),
         center: { x: 0, opacity: 1 },
-        exit: (direction) => ({
+        exit: (direction: number) => ({
             x: direction < 0 ? 1000 : -1000,
             opacity: 0,
         }),
@@ -136,7 +149,6 @@ export default function HeroBanner() {
                                 </Link>
                             </div>
 
-                            {/* Big emoji visual */}
                             <div className="hidden md:flex md:w-1/2 justify-center z-10">
                                 <div className="text-[180px] lg:text-[240px] leading-none select-none drop-shadow-lg">
                                     {slide.icon}
