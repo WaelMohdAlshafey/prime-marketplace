@@ -15,6 +15,8 @@ import {
     BarChart3,
     Lightbulb,
     Store,
+    FileText,
+    FolderTree,
     Link as LinkIcon,
 } from 'lucide-react';
 
@@ -41,6 +43,8 @@ export default function AdminSidebar({ onLinkClick }: AdminSidebarProps) {
         { name: 'Orders', href: '/admin/orders', icon: <ShoppingBag className="w-5 h-5" /> },
         { name: 'Suggestions', href: '/admin/suggestions', icon: <Lightbulb className="w-5 h-5" /> },
         { name: 'Stores', href: '/admin/stores', icon: <Store className="w-5 h-5" /> },
+        { name: 'Pages', href: '/admin/pages', icon: <FileText className="w-5 h-5" /> },
+        { name: 'Page Classes', href: '/admin/page-classes', icon: <FolderTree className="w-5 h-5" /> },
         { name: 'Newsletter', href: '/admin/newsletter', icon: <Mail className="w-5 h-5" /> },
         { name: 'Analytics', href: '/admin/analytics', icon: <BarChart3 className="w-5 h-5" /> },
         { name: 'Settings', href: '/admin/settings', icon: <Settings className="w-5 h-5" /> },
@@ -67,8 +71,8 @@ export default function AdminSidebar({ onLinkClick }: AdminSidebarProps) {
                             href={item.href}
                             onClick={onLinkClick}
                             className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${isActive
-                                    ? 'bg-[#0F5C45] text-white shadow-lg shadow-[#0F5C45]/20'
-                                    : 'text-gray-400 hover:text-white hover:bg-white/10'
+                                ? 'bg-[#0F5C45] text-white shadow-lg shadow-[#0F5C45]/20'
+                                : 'text-gray-400 hover:text-white hover:bg-white/10'
                                 }`}
                         >
                             {item.icon}

@@ -75,7 +75,7 @@ builder.Services.AddScoped<IChatService, ChatService>();
 builder.Services.AddScoped<IProductSuggestionService, ProductSuggestionService>();
 builder.Services.AddScoped<IStoreService, StoreService>();
 builder.Services.AddScoped<IGoldenLinkService, GoldenLinkService>();
-
+builder.Services.AddScoped<IPageClassService, PageClassService>();
 // ============================================================
 // 6. Database Context – with Retry & Detailed Logging
 // ============================================================

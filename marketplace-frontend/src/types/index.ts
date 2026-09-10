@@ -78,7 +78,7 @@ export interface Order {
 }
 
 // ============================================================
-// AUTHENTICATION TYPES (✅ Updated with RedirectPath)
+// AUTHENTICATION TYPES
 // ============================================================
 export interface AuthResponse {
     userId: number;
@@ -86,7 +86,7 @@ export interface AuthResponse {
     email: string;
     token: string;
     role: string;
-    redirectPath?: string;   // ✅ NEW
+    redirectPath?: string;
 }
 
 export interface LoginRequest {
@@ -302,4 +302,52 @@ export interface StoreUpdateDto {
     logoUrl?: string;
     description?: string;
     isActive: boolean;
+}
+
+// ============================================================
+// PAGE CLASS TYPES
+// ============================================================
+export interface PageClass {
+    id: number;
+    name: string;
+    slug: string;
+    description?: string;
+    icon?: string;
+    colorClass?: string;
+    displayOrder?: number;
+    isActive: boolean;
+    pageCount: number;
+}
+
+export interface CreatePageClassDto {
+    name: string;
+    slug: string;
+    description?: string;
+    icon?: string;
+    colorClass?: string;
+    displayOrder?: number;
+    isActive: boolean;
+}
+
+export interface UpdatePageClassDto extends CreatePageClassDto { }
+
+// ============================================================
+// PAGE TYPES
+// ============================================================
+export interface Page {
+    id: number;
+    title: string;
+    slug: string;
+    content?: string;
+    metaDescription?: string;
+    metaKeywords?: string;
+    isPublished: boolean;
+    showInFooter: boolean;
+    showInNavbar: boolean;
+    displayOrder?: number;
+    pageClassId?: number | null;
+    pageClassName?: string | null;
+    cssClass?: string | null;
+    createdAt: string;
+    updatedAt?: string;
 }

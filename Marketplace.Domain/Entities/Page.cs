@@ -19,6 +19,11 @@ namespace Marketplace.Domain.Entities
         public int? CreatedByUserId { get; set; }
         public int? UpdatedByUserId { get; set; }
 
+        // ✅ NEW
+        public int? PageClassId { get; set; }
+        public string? CssClass { get; set; }
+        public virtual PageClass? PageClass { get; set; }
+
         public virtual User? CreatedBy { get; set; }
         public virtual User? UpdatedBy { get; set; }
     }

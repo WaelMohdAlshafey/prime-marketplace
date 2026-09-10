@@ -11,6 +11,7 @@ export default function AdminPages() {
     const { user, isLoading } = useAuth();
     const router = useRouter();
     const [pages, setPages] = useState([]);
+    const [pageClasses, setPageClasses] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [editing, setEditing] = useState(null);
@@ -20,12 +21,14 @@ export default function AdminPages() {
         metaDescription: '', metaKeywords: '',
         isPublished: true, showInFooter: false,
         showInNavbar: false, displayOrder: 0,
+        pageClassId: null, cssClass: '',
     });
 
     useEffect(() => {
         if (isLoading) return;
         if (!user || user.role !== 'Admin') { router.push('/'); return; }
         fetchPages();
+        fetchPageClasses();
     }, [user, isLoading, router]);
 
     const fetchPages = async () => {
@@ -36,6 +39,19 @@ export default function AdminPages() {
         finally { setLoading(false); }
     };
 
+    const fetchPageClasses = async () => {
+        try {
+            const res = await api.get('/api/PageClasses?onlyActive=false');
+            setPageClasses(res.data);
+        } catch (err) { console.error('Failed to load page classes:', err); }
+    };
+
+    const getClassName = (classId) => {
+        if (!classId) return null;
+        const c = pageClasses.find(x => x.id === classId);
+        return c ? `${c.icon || '📄'} ${c.name}` : null;
+    };
+
     const openCreate = () => {
         setEditing(null);
         setForm({
@@ -43,6 +59,7 @@ export default function AdminPages() {
             metaDescription: '', metaKeywords: '',
             isPublished: true, showInFooter: false,
             showInNavbar: false, displayOrder: pages.length + 1,
+            pageClassId: null, cssClass: '',
         });
         setShowModal(true);
     };
@@ -59,6 +76,8 @@ export default function AdminPages() {
             showInFooter: page.showInFooter,
             showInNavbar: page.showInNavbar,
             displayOrder: page.displayOrder || 0,
+            pageClassId: page.pageClassId ?? null,
+            cssClass: page.cssClass || '',
         });
         setShowModal(true);
     };
@@ -71,6 +90,7 @@ export default function AdminPages() {
             else await api.post('/api/Pages', form);
             setShowModal(false);
             await fetchPages();
+            await fetchPageClasses();
         } catch (err) {
             alert(err.response?.data?.message || 'Failed to save page.');
         } finally { setSubmitting(false); }
@@ -113,6 +133,7 @@ export default function AdminPages() {
                         <tr>
                             <th className="px-6 py-3 text-xs font-semibold text-gray-600">Title</th>
                             <th className="px-6 py-3 text-xs font-semibold text-gray-600">Slug</th>
+                            <th className="px-6 py-3 text-xs font-semibold text-gray-600">Class</th>
                             <th className="px-6 py-3 text-xs font-semibold text-gray-600">Status</th>
                             <th className="px-6 py-3 text-xs font-semibold text-gray-600">Navbar</th>
                             <th className="px-6 py-3 text-xs font-semibold text-gray-600">Footer</th>
@@ -125,6 +146,15 @@ export default function AdminPages() {
                             <tr key={p.id} className="hover:bg-gray-50">
                                 <td className="px-6 py-4 text-sm">{p.title}</td>
                                 <td className="px-6 py-4 text-sm text-gray-500">/{p.slug}</td>
+                                <td className="px-6 py-4 text-sm">
+                                    {p.pageClassId ? (
+                                        <span className="px-2 py-1 rounded-full text-xs bg-[#0F5C45]/10 text-[#0F5C45]">
+                                            {getClassName(p.pageClassId) || '—'}
+                                        </span>
+                                    ) : (
+                                        <span className="text-gray-400 text-xs">—</span>
+                                    )}
+                                </td>
                                 <td className="px-6 py-4 text-sm">
                                     <button onClick={() => handleTogglePublish(p)}
                                         className={`px-2 py-1 rounded-full text-xs flex items-center gap-1 ${p.isPublished ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
@@ -149,7 +179,7 @@ export default function AdminPages() {
                             </tr>
                         ))}
                         {pages.length === 0 && (
-                            <tr><td colSpan={7} className="px-6 py-8 text-center text-gray-500">No pages yet.</td></tr>
+                            <tr><td colSpan={8} className="px-6 py-8 text-center text-gray-500">No pages yet.</td></tr>
                         )}
                     </tbody>
                 </table>
@@ -181,6 +211,45 @@ export default function AdminPages() {
                                     onChange={e => setForm({ ...form, slug: e.target.value })}
                                     className="w-full px-4 py-2 border rounded-lg" />
                             </div>
+
+                            {/* ✅ Page Class dropdown */}
+                            <div>
+                                <label className="block text-sm font-medium mb-1">Page Class (optional)</label>
+                                <select
+                                    value={form.pageClassId ?? ''}
+                                    onChange={e => setForm({
+                                        ...form,
+                                        pageClassId: e.target.value ? Number(e.target.value) : null
+                                    })}
+                                    className="w-full px-4 py-2 border rounded-lg"
+                                >
+                                    <option value="">— No class —</option>
+                                    {pageClasses.map(c => (
+                                        <option key={c.id} value={c.id}>
+                                            {c.icon || '📄'} {c.name}
+                                        </option>
+                                    ))}
+                                </select>
+                                <p className="text-xs text-gray-400 mt-1">
+                                    Group this page under a class. Manage classes in <strong>Admin → Page Classes</strong>.
+                                </p>
+                            </div>
+
+                            {/* ✅ Extra CSS class */}
+                            <div>
+                                <label className="block text-sm font-medium mb-1">Extra CSS Class (optional)</label>
+                                <input
+                                    type="text"
+                                    value={form.cssClass}
+                                    onChange={e => setForm({ ...form, cssClass: e.target.value })}
+                                    placeholder="my-custom-class"
+                                    className="w-full px-4 py-2 border rounded-lg font-mono text-sm"
+                                />
+                                <p className="text-xs text-gray-400 mt-1">
+                                    Applied to the page wrapper on the public site.
+                                </p>
+                            </div>
+
                             <div>
                                 <label className="block text-sm font-medium mb-1">Content (HTML)</label>
                                 <textarea rows={8} value={form.content}

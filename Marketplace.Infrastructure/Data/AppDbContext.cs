@@ -41,6 +41,7 @@ public class AppDbContext : DbContext
     public DbSet<Store> Stores { get; set; }
     public DbSet<ProductReview> ProductReviews { get; set; }
     public DbSet<GoldenLink> GoldenLinks { get; set; }
+    public DbSet<PageClass> PageClasses { get; set; }
 
     // ✅ NEW: Pages DbSet
     public DbSet<Page> Pages { get; set; }
@@ -231,5 +232,18 @@ public class AppDbContext : DbContext
                 .HasForeignKey(p => p.UpdatedByUserId)
                 .OnDelete(DeleteBehavior.SetNull);
         });
+        modelBuilder.Entity<PageClass>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => e.Slug).IsUnique();
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(150);
+            entity.Property(e => e.Slug).IsRequired().HasMaxLength(150);
+        });
+
+        modelBuilder.Entity<Page>()
+            .HasOne(p => p.PageClass)
+            .WithMany(c => c.Pages)
+            .HasForeignKey(p => p.PageClassId)
+            .OnDelete(DeleteBehavior.SetNull);
     }
 }

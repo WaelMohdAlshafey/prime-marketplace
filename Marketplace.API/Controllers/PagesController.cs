@@ -43,6 +43,8 @@ public class PagesController : ControllerBase
                 p.ShowInFooter,
                 p.ShowInNavbar,
                 p.DisplayOrder,
+                p.PageClassId,
+                p.CssClass,
                 p.CreatedAt,
                 p.UpdatedAt
             })
@@ -71,6 +73,8 @@ public class PagesController : ControllerBase
             page.ShowInFooter,
             page.ShowInNavbar,
             page.DisplayOrder,
+            page.PageClassId,
+            page.CssClass,
             page.CreatedAt,
             page.UpdatedAt
         });
@@ -113,6 +117,8 @@ public class PagesController : ControllerBase
                 p.ShowInFooter,
                 p.ShowInNavbar,
                 p.DisplayOrder,
+                p.PageClassId,
+                p.CssClass,
                 p.CreatedAt,
                 p.UpdatedAt
             })
@@ -151,6 +157,8 @@ public class PagesController : ControllerBase
             ShowInFooter = dto.ShowInFooter,
             ShowInNavbar = dto.ShowInNavbar,
             DisplayOrder = dto.DisplayOrder,
+            PageClassId = dto.PageClassId,
+            CssClass = dto.CssClass,
             CreatedAt = DateTime.UtcNow,
             CreatedByUserId = userId > 0 ? userId : null
         };
@@ -183,6 +191,8 @@ public class PagesController : ControllerBase
         page.ShowInFooter = dto.ShowInFooter;
         page.ShowInNavbar = dto.ShowInNavbar;
         page.DisplayOrder = dto.DisplayOrder;
+        page.PageClassId = dto.PageClassId;
+        page.CssClass = dto.CssClass;
         page.UpdatedAt = DateTime.UtcNow;
         page.UpdatedByUserId = userId > 0 ? userId : null;
 
@@ -214,6 +224,8 @@ public class CreatePageDto
     public bool ShowInFooter { get; set; }
     public bool ShowInNavbar { get; set; }
     public int? DisplayOrder { get; set; }
+    public int? PageClassId { get; set; }
+    public string? CssClass { get; set; }
 }
 
 public class UpdatePageDto
@@ -227,4 +239,6 @@ public class UpdatePageDto
     public bool ShowInFooter { get; set; }
     public bool ShowInNavbar { get; set; }
     public int? DisplayOrder { get; set; }
+    public int? PageClassId { get; set; }
+    public string? CssClass { get; set; }
 }
