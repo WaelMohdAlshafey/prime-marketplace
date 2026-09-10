@@ -35,16 +35,22 @@ const Navbar = () => {
     const [userMenuOpen, setUserMenuOpen] = useState(false);
     const [supportOpen, setSupportOpen] = useState(false);
     const [currencyOpen, setCurrencyOpen] = useState(false);
+    const [mobileSupportOpen, setMobileSupportOpen] = useState(false);
+    const [mobileCurrencyOpen, setMobileCurrencyOpen] = useState(false);
 
     const userMenuRef = useRef(null);
     const supportRef = useRef(null);
     const currencyRef = useRef(null);
+    const mobileSupportRef = useRef(null);
+    const mobileCurrencyRef = useRef(null);
 
     useEffect(() => {
         const handler = (e) => {
             if (userMenuRef.current && !userMenuRef.current.contains(e.target)) setUserMenuOpen(false);
             if (supportRef.current && !supportRef.current.contains(e.target)) setSupportOpen(false);
             if (currencyRef.current && !currencyRef.current.contains(e.target)) setCurrencyOpen(false);
+            if (mobileSupportRef.current && !mobileSupportRef.current.contains(e.target)) setMobileSupportOpen(false);
+            if (mobileCurrencyRef.current && !mobileCurrencyRef.current.contains(e.target)) setMobileCurrencyOpen(false);
         };
         document.addEventListener('mousedown', handler);
         return () => document.removeEventListener('mousedown', handler);
@@ -56,10 +62,10 @@ const Navbar = () => {
 
     const isRTL = typeof document !== 'undefined' && document.documentElement.dir === 'rtl';
 
+    // dropdown positioning — anchored from the right (RTL) or left (LTR)
     const dropdownClasses = `absolute top-full mt-1 bg-white text-gray-800 rounded-lg shadow-lg py-1 z-[9999] min-w-[140px] ${isRTL ? 'right-0' : 'left-0'}`;
 
-    // ✅ BOLD & BRIGHT top-bar link style — clearly visible on the green navbar
-    //    Uses white text + bold + larger size + gold hover
+    // ✅ Desktop top-bar link style
     const topLinkClass = "flex items-center gap-2 px-3 py-2 rounded-lg font-bold text-[15px] text-white hover:text-[#D4A54A] hover:bg-white/15 transition whitespace-nowrap drop-shadow-sm";
 
     if (typeof window === 'undefined' || isLoading) {
@@ -70,14 +76,14 @@ const Navbar = () => {
         <>
             <header className="fixed top-0 left-0 right-0 z-[1000] bg-white shadow-md">
                 <div className="navbar border-b border-border bg-[#0F5C45]">
+
+                    {/* ============================================================
+                        MAIN ROW — hamburger + logo (left), icons (right)
+                        ============================================================ */}
                     <div className="container mx-auto px-3 sm:px-4 flex items-center justify-between gap-2 py-2.5">
 
-                        {/* ============================================
-                            LEFT SIDE — Hamburger + Logo
-                            ============================================ */}
+                        {/* LEFT SIDE */}
                         <div className="flex items-center gap-3 flex-shrink-0">
-
-                            {/* Hamburger — before the logo */}
                             <button
                                 onClick={() => setMenuOpen(true)}
                                 className="p-2 rounded-lg hover:bg-white/15 transition text-white"
@@ -85,27 +91,20 @@ const Navbar = () => {
                             >
                                 <Bars3Icon className="w-7 h-7 sm:w-8 sm:h-8" />
                             </button>
-
-                            {/* Logo */}
                             <Logo />
                         </div>
 
-                        {/* ============================================
-                            RIGHT SIDE — Language, Support, Currency, Track, Cart, User
-                            ============================================ */}
+                        {/* RIGHT SIDE */}
                         <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
 
-                            {/* Language */}
-                            <button onClick={toggleLanguage} className={topLinkClass}>
+                            {/* ---- DESKTOP-ONLY LINKS (hidden on mobile) ---- */}
+                            <button onClick={toggleLanguage} className={`${topLinkClass} hidden md:flex`}>
                                 <GlobeAltIcon className="w-5 h-5" />
-                                <span className="hidden sm:inline">
-                                    {i18n.language === 'ar' ? 'العربية' : 'English'}
-                                </span>
+                                <span>{i18n.language === 'ar' ? 'العربية' : 'English'}</span>
                             </button>
 
                             <span className="text-white/30 hidden md:inline select-none">|</span>
 
-                            {/* Support */}
                             <div className="relative hidden md:block" ref={supportRef}>
                                 <button onClick={() => setSupportOpen(!supportOpen)} className={topLinkClass}>
                                     <LifebuoyIcon className="w-5 h-5" />
@@ -114,10 +113,8 @@ const Navbar = () => {
                                 </button>
                                 <AnimatePresence>
                                     {supportOpen && (
-                                        <motion.div
-                                            initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
-                                            className={dropdownClasses}
-                                        >
+                                        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
+                                            className={dropdownClasses}>
                                             <Link href="/help" className="block px-4 py-2 hover:bg-gray-100 text-sm" onClick={() => setSupportOpen(false)}>{t('help')}</Link>
                                             <Link href="/faq" className="block px-4 py-2 hover:bg-gray-100 text-sm" onClick={() => setSupportOpen(false)}>{t('footer.faq')}</Link>
                                             <Link href="/returns" className="block px-4 py-2 hover:bg-gray-100 text-sm" onClick={() => setSupportOpen(false)}>{t('footer.returns')}</Link>
@@ -129,7 +126,6 @@ const Navbar = () => {
 
                             <span className="text-white/30 hidden md:inline select-none">|</span>
 
-                            {/* Currency */}
                             <div className="relative hidden md:block" ref={currencyRef}>
                                 <button onClick={() => setCurrencyOpen(!currencyOpen)} className={topLinkClass}>
                                     <CurrencyDollarIcon className="w-5 h-5" />
@@ -138,10 +134,8 @@ const Navbar = () => {
                                 </button>
                                 <AnimatePresence>
                                     {currencyOpen && (
-                                        <motion.div
-                                            initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
-                                            className={`${dropdownClasses} min-w-[100px]`}
-                                        >
+                                        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
+                                            className={`${dropdownClasses} min-w-[100px]`}>
                                             <button className="block w-full text-right px-4 py-2 hover:bg-gray-100 text-sm">EGP</button>
                                             <button className="block w-full text-right px-4 py-2 hover:bg-gray-100 text-sm">USD</button>
                                         </motion.div>
@@ -151,13 +145,12 @@ const Navbar = () => {
 
                             <span className="text-white/30 hidden lg:inline select-none">|</span>
 
-                            {/* Track Order */}
                             <Link href="/tracking" className={`${topLinkClass} hidden lg:flex`}>
                                 <TruckIcon className="w-5 h-5" />
                                 <span>{t('trackOrder')}</span>
                             </Link>
 
-                            {/* Wishlist */}
+                            {/* ---- ALWAYS VISIBLE ICONS ---- */}
                             <button className="text-white hover:text-[#D4A54A] transition relative p-2">
                                 <HeartIcon className="w-6 h-6" />
                                 <span className="absolute top-1 right-1 bg-[#D4A54A] text-[#0F5C45] text-[10px] font-bold w-[18px] h-[18px] rounded-full flex items-center justify-center">
@@ -165,7 +158,6 @@ const Navbar = () => {
                                 </span>
                             </button>
 
-                            {/* Cart */}
                             <span ref={cartIconRef} className="relative inline-flex p-2">
                                 <Link href="/cart" className="text-white hover:text-[#D4A54A] transition">
                                     <ShoppingCartIcon className="w-6 h-6" />
@@ -177,16 +169,11 @@ const Navbar = () => {
                                 </Link>
                             </span>
 
-                            {/* User Menu */}
                             <div className="relative" ref={userMenuRef} onClick={(e) => e.stopPropagation()}>
-                                <button
-                                    onClick={() => setUserMenuOpen(!userMenuOpen)}
-                                    className="flex items-center gap-1 p-2 rounded-lg hover:bg-white/15 transition text-white"
-                                >
+                                <button onClick={() => setUserMenuOpen(!userMenuOpen)}
+                                    className="flex items-center gap-1 p-2 rounded-lg hover:bg-white/15 transition text-white">
                                     {user && (
-                                        <span className="text-sm font-semibold truncate max-w-[80px] hidden sm:inline">
-                                            {user.username}
-                                        </span>
+                                        <span className="text-sm font-semibold truncate max-w-[80px] hidden sm:inline">{user.username}</span>
                                     )}
                                     <UserIcon className="w-6 h-6" />
                                     <ChevronDownIcon className="w-4 h-4" />
@@ -194,10 +181,8 @@ const Navbar = () => {
 
                                 <AnimatePresence>
                                     {userMenuOpen && (
-                                        <motion.div
-                                            initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
-                                            className={`${dropdownClasses} min-w-[200px] max-h-[80vh] overflow-y-auto`}
-                                        >
+                                        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
+                                            className={`${dropdownClasses} min-w-[200px] max-h-[80vh] overflow-y-auto`}>
                                             {!user ? (
                                                 <>
                                                     <Link href="/auth/login" className="block px-4 py-2 text-sm hover:bg-primary/10" onClick={() => setUserMenuOpen(false)}>{t('loginTitle')}</Link>
@@ -237,6 +222,87 @@ const Navbar = () => {
                                     )}
                                 </AnimatePresence>
                             </div>
+                        </div>
+                    </div>
+
+                    {/* ============================================================
+                        MOBILE-ONLY SECONDARY STRIP — inside the screen
+                        Contains: Language, Support, Currency, Track Order
+                        ============================================================ */}
+                    <div className="md:hidden border-t border-white/10 bg-[#0F5C45]">
+                        <div className="container mx-auto px-2 py-1.5 flex items-center justify-between gap-1 overflow-x-auto scrollbar-hide">
+
+                            {/* Language */}
+                            <button
+                                onClick={toggleLanguage}
+                                className="flex items-center gap-1 px-2 py-1.5 rounded-md text-[12px] font-bold text-white hover:bg-white/15 transition whitespace-nowrap"
+                            >
+                                <GlobeAltIcon className="w-4 h-4" />
+                                <span>{i18n.language === 'ar' ? 'العربية' : 'English'}</span>
+                            </button>
+
+                            <span className="text-white/20 select-none text-xs">|</span>
+
+                            {/* Support (compact dropdown) */}
+                            <div className="relative" ref={mobileSupportRef}>
+                                <button
+                                    onClick={() => setMobileSupportOpen(!mobileSupportOpen)}
+                                    className="flex items-center gap-1 px-2 py-1.5 rounded-md text-[12px] font-bold text-white hover:bg-white/15 transition whitespace-nowrap"
+                                >
+                                    <LifebuoyIcon className="w-4 h-4" />
+                                    <span>{t('support')}</span>
+                                    <ChevronDownIcon className="w-3 h-3" />
+                                </button>
+                                <AnimatePresence>
+                                    {mobileSupportOpen && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
+                                            className="absolute top-full mt-1 bg-white text-gray-800 rounded-lg shadow-lg py-1 z-[9999] min-w-[140px] right-0"
+                                        >
+                                            <Link href="/help" className="block px-3 py-1.5 hover:bg-gray-100 text-xs" onClick={() => setMobileSupportOpen(false)}>{t('help')}</Link>
+                                            <Link href="/faq" className="block px-3 py-1.5 hover:bg-gray-100 text-xs" onClick={() => setMobileSupportOpen(false)}>{t('footer.faq')}</Link>
+                                            <Link href="/returns" className="block px-3 py-1.5 hover:bg-gray-100 text-xs" onClick={() => setMobileSupportOpen(false)}>{t('footer.returns')}</Link>
+                                            <Link href="/shipping" className="block px-3 py-1.5 hover:bg-gray-100 text-xs" onClick={() => setMobileSupportOpen(false)}>{t('footer.shipping')}</Link>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
+
+                            <span className="text-white/20 select-none text-xs">|</span>
+
+                            {/* Currency (compact dropdown) */}
+                            <div className="relative" ref={mobileCurrencyRef}>
+                                <button
+                                    onClick={() => setMobileCurrencyOpen(!mobileCurrencyOpen)}
+                                    className="flex items-center gap-1 px-2 py-1.5 rounded-md text-[12px] font-bold text-white hover:bg-white/15 transition whitespace-nowrap"
+                                >
+                                    <CurrencyDollarIcon className="w-4 h-4" />
+                                    <span>{t('currency')}</span>
+                                    <ChevronDownIcon className="w-3 h-3" />
+                                </button>
+                                <AnimatePresence>
+                                    {mobileCurrencyOpen && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
+                                            className="absolute top-full mt-1 bg-white text-gray-800 rounded-lg shadow-lg py-1 z-[9999] min-w-[90px] right-0"
+                                        >
+                                            <button className="block w-full text-right px-3 py-1.5 hover:bg-gray-100 text-xs">EGP</button>
+                                            <button className="block w-full text-right px-3 py-1.5 hover:bg-gray-100 text-xs">USD</button>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
+
+                            <span className="text-white/20 select-none text-xs">|</span>
+
+                            {/* Track Order */}
+                            <Link
+                                href="/tracking"
+                                className="flex items-center gap-1 px-2 py-1.5 rounded-md text-[12px] font-bold text-white hover:bg-white/15 transition whitespace-nowrap"
+                            >
+                                <TruckIcon className="w-4 h-4" />
+                                <span>{t('trackOrder')}</span>
+                            </Link>
                         </div>
                     </div>
                 </div>

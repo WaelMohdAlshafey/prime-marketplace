@@ -120,7 +120,7 @@ body {
 }
 
 /* ============================================================
-   SCROLLBAR
+   SCROLLBAR (Global)
    ============================================================ */
 ::-webkit-scrollbar {
     width: 6px;
@@ -140,6 +140,18 @@ body {
         background: var(--color-primary-dark);
     }
 
+/* ============================================================
+   HIDE SCROLLBAR UTILITY
+   Use: className="scrollbar-hide"
+   ============================================================ */
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+
+.scrollbar-hide {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+}
 /* ============================================================
    CONTAINER
    ============================================================ */
