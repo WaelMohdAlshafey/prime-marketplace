@@ -33,23 +33,23 @@ const Navbar = () => {
 
     const [menuOpen, setMenuOpen] = useState(false);
 
-    // Single state for the user menu — renders dropdown on desktop, bottom sheet on mobile
-    const [userMenuOpen, setUserMenuOpen] = useState(false);
-    const userMenuRef = useRef(null);
-
-    // Desktop-only dropdowns for support/currency
+    // Desktop dropdowns
+    const [userOpen, setUserOpen] = useState(false);
     const [supportOpen, setSupportOpen] = useState(false);
     const [currencyOpen, setCurrencyOpen] = useState(false);
-    const supportRef = useRef(null);
-    const currencyRef = useRef(null);
 
-    // Mobile bottom sheets for support/currency
+    // Mobile bottom sheets
+    const [mobileUserOpen, setMobileUserOpen] = useState(false);
     const [mobileSupportOpen, setMobileSupportOpen] = useState(false);
     const [mobileCurrencyOpen, setMobileCurrencyOpen] = useState(false);
 
+    const userRef = useRef(null);
+    const supportRef = useRef(null);
+    const currencyRef = useRef(null);
+
     useEffect(() => {
         const handler = (e) => {
-            if (userMenuRef.current && !userMenuRef.current.contains(e.target)) setUserMenuOpen(false);
+            if (userRef.current && !userRef.current.contains(e.target)) setUserOpen(false);
             if (supportRef.current && !supportRef.current.contains(e.target)) setSupportOpen(false);
             if (currencyRef.current && !currencyRef.current.contains(e.target)) setCurrencyOpen(false);
         };
@@ -61,61 +61,26 @@ const Navbar = () => {
         i18n.changeLanguage(i18n.language === 'ar' ? 'en' : 'ar');
     };
 
-    const isRTL = typeof document !== 'undefined' && document.documentElement.dir === 'rtl';
+    const isMobile = () => typeof window !== 'undefined' && window.innerWidth < 768;
 
+    const handleUserClick = () => {
+        if (isMobile()) setMobileUserOpen(true);
+        else setUserOpen(!userOpen);
+    };
+
+    const handleLogoutAndClose = () => {
+        setUserOpen(false);
+        setMobileUserOpen(false);
+        logout();
+    };
+
+    const isRTL = typeof document !== 'undefined' && document.documentElement.dir === 'rtl';
     const topLinkClass = "flex items-center gap-2 px-3 py-2 rounded-lg font-bold text-[15px] text-white hover:text-[#D4A54A] hover:bg-white/15 transition whitespace-nowrap drop-shadow-sm";
-    const desktopDropdownClass = `absolute top-full mt-1 bg-white text-gray-800 rounded-lg shadow-lg py-1 z-[9999] min-w-[220px] ${isRTL ? 'left-0' : 'right-0'}`;
+    const desktopDropdownClass = `absolute top-full mt-1 bg-white text-gray-800 rounded-lg shadow-lg py-1 z-[9999] min-w-[220px] max-h-[80vh] overflow-y-auto ${isRTL ? 'left-0' : 'right-0'}`;
 
     if (typeof window === 'undefined' || isLoading) {
         return <div className="bg-surface shadow-md py-4 text-center text-text-muted animate-pulse">Loading...</div>;
     }
-
-    // ============================================================
-    // Reusable user menu links (shown in both desktop dropdown and mobile sheet)
-    // ============================================================
-    const UserMenuLinks = ({ onAnyClick }) => (
-        <>
-            {!user ? (
-                <>
-                    <Link href="/auth/login" className="block px-4 py-2.5 hover:bg-primary/10 text-sm" onClick={onAnyClick}>{t('loginTitle')}</Link>
-                    <Link href="/auth/register" className="block px-4 py-2.5 hover:bg-primary/10 text-sm" onClick={onAnyClick}>{t('registerTitle')}</Link>
-                </>
-            ) : (
-                <>
-                    <Link href="/cart" className="block px-4 py-2.5 hover:bg-primary/10 text-sm" onClick={onAnyClick}>🛒 {t('cart')}</Link>
-                    <Link href="/orders" className="block px-4 py-2.5 hover:bg-primary/10 text-sm" onClick={onAnyClick}>📋 {t('orders')}</Link>
-                    <Link href="/suggest" className="block px-4 py-2.5 hover:bg-primary/10 text-sm" onClick={onAnyClick}>💡 Suggest</Link>
-                    <Link href="/chat" className="block px-4 py-2.5 hover:bg-primary/10 text-sm" onClick={onAnyClick}>💬 Chat</Link>
-                    <Link href="/profile" className="block px-4 py-2.5 hover:bg-primary/10 text-sm" onClick={onAnyClick}>👤 {t('profile')}</Link>
-
-                    {/* Vendor + Admin */}
-                    {(user.role === 'Vendor' || user.role === 'Admin') && (
-                        <Link href="/vendor/dashboard" className="block px-4 py-2.5 hover:bg-primary/10 text-sm" onClick={onAnyClick}>📊 {t('dashboard')}</Link>
-                    )}
-                    {(user.role === 'Vendor' || user.role === 'Admin' || user.role === 'Employee') && (
-                        <Link href="/admin/orders" className="block px-4 py-2.5 hover:bg-primary/10 text-sm" onClick={onAnyClick}>📦 Manage Orders</Link>
-                    )}
-                    {user.role === 'Admin' && (
-                        <>
-                            <hr className="my-1 border-border" />
-                            <Link href="/admin" className="block px-4 py-2.5 hover:bg-red-50 text-sm font-semibold text-red-600" onClick={onAnyClick}>⚙️ Admin Panel</Link>
-                            <Link href="/admin/users" className="block px-4 py-2.5 hover:bg-primary/10 text-sm" onClick={onAnyClick}>👥 {t('users')}</Link>
-                            <Link href="/admin/products" className="block px-4 py-2.5 hover:bg-primary/10 text-sm" onClick={onAnyClick}>📦 Products</Link>
-                            <Link href="/admin/pages" className="block px-4 py-2.5 hover:bg-primary/10 text-sm" onClick={onAnyClick}>📄 Pages</Link>
-                            <Link href="/admin/stores" className="block px-4 py-2.5 hover:bg-primary/10 text-sm" onClick={onAnyClick}>🏪 Stores</Link>
-                            <Link href="/admin/golden-links" className="block px-4 py-2.5 hover:bg-primary/10 text-sm" onClick={onAnyClick}>🔗 Golden Links</Link>
-                        </>
-                    )}
-
-                    <hr className="my-1 border-border" />
-                    <button onClick={() => { logout(); onAnyClick(); }}
-                        className="block w-full text-right px-4 py-2.5 text-red-600 hover:bg-red-50 text-sm font-semibold">
-                        {t('logout')}
-                    </button>
-                </>
-            )}
-        </>
-    );
 
     return (
         <>
@@ -125,7 +90,7 @@ const Navbar = () => {
                     {/* MAIN ROW */}
                     <div className="container mx-auto px-3 sm:px-4 flex items-center justify-between gap-2 py-2.5">
 
-                        {/* LEFT — hamburger + logo */}
+                        {/* LEFT */}
                         <div className="flex items-center gap-3 flex-shrink-0">
                             <button onClick={() => setMenuOpen(true)}
                                 className="p-2 rounded-lg hover:bg-white/15 transition text-white" aria-label="Open menu">
@@ -137,15 +102,14 @@ const Navbar = () => {
                         {/* RIGHT */}
                         <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
 
-                            {/* DESKTOP-ONLY: Language */}
+                            {/* DESKTOP Language */}
                             <button onClick={toggleLanguage} className={`${topLinkClass} hidden md:flex`}>
                                 <GlobeAltIcon className="w-5 h-5" />
                                 <span>{i18n.language === 'ar' ? 'العربية' : 'English'}</span>
                             </button>
-
                             <span className="text-white/30 hidden md:inline select-none">|</span>
 
-                            {/* DESKTOP-ONLY: Support */}
+                            {/* DESKTOP Support */}
                             <div className="relative hidden md:block" ref={supportRef}>
                                 <button onClick={() => setSupportOpen(!supportOpen)} className={topLinkClass}>
                                     <LifebuoyIcon className="w-5 h-5" />
@@ -164,10 +128,9 @@ const Navbar = () => {
                                     )}
                                 </AnimatePresence>
                             </div>
-
                             <span className="text-white/30 hidden md:inline select-none">|</span>
 
-                            {/* DESKTOP-ONLY: Currency */}
+                            {/* DESKTOP Currency */}
                             <div className="relative hidden md:block" ref={currencyRef}>
                                 <button onClick={() => setCurrencyOpen(!currencyOpen)} className={topLinkClass}>
                                     <CurrencyDollarIcon className="w-5 h-5" />
@@ -184,10 +147,9 @@ const Navbar = () => {
                                     )}
                                 </AnimatePresence>
                             </div>
-
                             <span className="text-white/30 hidden lg:inline select-none">|</span>
 
-                            {/* DESKTOP-ONLY: Track */}
+                            {/* DESKTOP Track */}
                             <Link href="/tracking" className={`${topLinkClass} hidden lg:flex`}>
                                 <TruckIcon className="w-5 h-5" />
                                 <span>{t('trackOrder')}</span>
@@ -212,35 +174,65 @@ const Navbar = () => {
                                 </Link>
                             </span>
 
-                            {/* USER ICON — single state, renders dropdown on desktop & bottom sheet on mobile */}
-                            <div className="relative" ref={userMenuRef}>
-                                <button
-                                    onClick={() => setUserMenuOpen(!userMenuOpen)}
-                                    className="flex items-center gap-1 p-2 rounded-lg hover:bg-white/15 transition text-white"
-                                >
-                                    {user && (
-                                        <span className="text-sm font-semibold truncate max-w-[100px]">
-                                            {user.username}
-                                        </span>
-                                    )}
+                            {/* USER ICON */}
+                            <div className="relative hidden md:block" ref={userRef}>
+                                <button onClick={handleUserClick}
+                                    className="flex items-center gap-1 p-2 rounded-lg hover:bg-white/15 transition text-white">
+                                    {user && <span className="text-sm font-semibold truncate max-w-[100px]">{user.username}</span>}
                                     <UserIcon className="w-6 h-6" />
                                     <ChevronDownIcon className="w-4 h-4" />
                                 </button>
-
-                                {/* DESKTOP DROPDOWN — hidden on mobile via CSS */}
                                 <AnimatePresence>
-                                    {userMenuOpen && (
-                                        <motion.div
-                                            initial={{ opacity: 0, y: -10 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            exit={{ opacity: 0, y: -10 }}
-                                            className={`${desktopDropdownClass} max-h-[80vh] overflow-y-auto hidden md:block`}
-                                        >
-                                            <UserMenuLinks onAnyClick={() => setUserMenuOpen(false)} />
+                                    {userOpen && (
+                                        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
+                                            className={desktopDropdownClass}>
+                                            {!user ? (
+                                                <>
+                                                    <Link href="/auth/login" className="block px-4 py-2 hover:bg-primary/10 text-sm" onClick={() => setUserOpen(false)}>{t('loginTitle')}</Link>
+                                                    <Link href="/auth/register" className="block px-4 py-2 hover:bg-primary/10 text-sm" onClick={() => setUserOpen(false)}>{t('registerTitle')}</Link>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Link href="/cart" className="block px-4 py-2 hover:bg-primary/10 text-sm" onClick={() => setUserOpen(false)}>🛒 {t('cart')}</Link>
+                                                    <Link href="/orders" className="block px-4 py-2 hover:bg-primary/10 text-sm" onClick={() => setUserOpen(false)}>📋 {t('orders')}</Link>
+                                                    <Link href="/suggest" className="block px-4 py-2 hover:bg-primary/10 text-sm" onClick={() => setUserOpen(false)}>💡 Suggest</Link>
+                                                    <Link href="/chat" className="block px-4 py-2 hover:bg-primary/10 text-sm" onClick={() => setUserOpen(false)}>💬 Chat</Link>
+                                                    <Link href="/profile" className="block px-4 py-2 hover:bg-primary/10 text-sm" onClick={() => setUserOpen(false)}>👤 {t('profile')}</Link>
+                                                    {(user.role === 'Vendor' || user.role === 'Admin') && (
+                                                        <Link href="/vendor/dashboard" className="block px-4 py-2 hover:bg-primary/10 text-sm" onClick={() => setUserOpen(false)}>📊 {t('dashboard')}</Link>
+                                                    )}
+                                                    {(user.role === 'Vendor' || user.role === 'Admin' || user.role === 'Employee') && (
+                                                        <Link href="/admin/orders" className="block px-4 py-2 hover:bg-primary/10 text-sm" onClick={() => setUserOpen(false)}>📦 Manage Orders</Link>
+                                                    )}
+                                                    {user.role === 'Admin' && (
+                                                        <>
+                                                            <hr className="my-1 border-gray-200" />
+                                                            <Link href="/admin" className="block px-4 py-2 hover:bg-red-50 text-sm font-bold text-red-600" onClick={() => setUserOpen(false)}>⚙️ Admin Panel</Link>
+                                                            <Link href="/admin/users" className="block px-4 py-2 hover:bg-primary/10 text-sm" onClick={() => setUserOpen(false)}>👥 {t('users')}</Link>
+                                                            <Link href="/admin/products" className="block px-4 py-2 hover:bg-primary/10 text-sm" onClick={() => setUserOpen(false)}>📦 Products</Link>
+                                                            <Link href="/admin/pages" className="block px-4 py-2 hover:bg-primary/10 text-sm" onClick={() => setUserOpen(false)}>📄 Pages</Link>
+                                                            <Link href="/admin/stores" className="block px-4 py-2 hover:bg-primary/10 text-sm" onClick={() => setUserOpen(false)}>🏪 Stores</Link>
+                                                            <Link href="/admin/golden-links" className="block px-4 py-2 hover:bg-primary/10 text-sm" onClick={() => setUserOpen(false)}>🔗 Golden Links</Link>
+                                                        </>
+                                                    )}
+                                                    <hr className="my-1 border-gray-200" />
+                                                    <button onClick={handleLogoutAndClose}
+                                                        className="block w-full text-right px-4 py-2 text-red-600 hover:bg-red-50 text-sm font-semibold">
+                                                        {t('logout')}
+                                                    </button>
+                                                </>
+                                            )}
                                         </motion.div>
                                     )}
                                 </AnimatePresence>
                             </div>
+
+                            {/* MOBILE USER ICON — opens bottom sheet */}
+                            <button onClick={() => setMobileUserOpen(true)}
+                                className="md:hidden flex items-center gap-1 p-2 rounded-lg hover:bg-white/15 transition text-white">
+                                {user && <span className="text-sm font-semibold">{user.username}</span>}
+                                <UserIcon className="w-6 h-6" />
+                            </button>
                         </div>
                     </div>
 
@@ -272,32 +264,58 @@ const Navbar = () => {
                 </div>
             </header>
 
-            {/* ============================================================
-                MOBILE BOTTOM SHEET — USER MENU (uses same state as desktop dropdown)
-                ============================================================ */}
+            {/* ============ MOBILE USER BOTTOM SHEET ============ */}
             <AnimatePresence>
-                {userMenuOpen && (
+                {mobileUserOpen && (
                     <>
-                        <motion.div
-                            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                             className="fixed inset-0 bg-black/50 z-[9998] md:hidden"
-                            onClick={() => setUserMenuOpen(false)}
-                        />
+                            onClick={() => setMobileUserOpen(false)} />
                         <motion.div
                             initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
                             transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-                            className="fixed bottom-0 left-0 right-0 bg-white rounded-t-2xl z-[9999] md:hidden max-h-[80vh] overflow-y-auto"
-                        >
-                            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 sticky top-0 bg-white rounded-t-2xl">
-                                <h3 className="text-lg font-bold text-gray-900">
-                                    {user?.username || t('loginTitle')}
-                                </h3>
-                                <button onClick={() => setUserMenuOpen(false)} className="p-1 hover:bg-gray-100 rounded-lg">
-                                    <X className="w-5 h-5" />
-                                </button>
+                            className="fixed bottom-0 left-0 right-0 bg-white rounded-t-2xl z-[9999] md:hidden max-h-[80vh] overflow-y-auto">
+                            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+                                <h3 className="text-lg font-bold text-gray-900">{user?.username || t('loginTitle')}</h3>
+                                <button onClick={() => setMobileUserOpen(false)} className="p-1 hover:bg-gray-100 rounded-lg"><X className="w-5 h-5" /></button>
                             </div>
                             <div className="p-2">
-                                <UserMenuLinks onAnyClick={() => setUserMenuOpen(false)} />
+                                {!user ? (
+                                    <>
+                                        <Link href="/auth/login" className="block px-4 py-3 hover:bg-gray-50 rounded-lg text-sm" onClick={() => setMobileUserOpen(false)}>{t('loginTitle')}</Link>
+                                        <Link href="/auth/register" className="block px-4 py-3 hover:bg-gray-50 rounded-lg text-sm" onClick={() => setMobileUserOpen(false)}>{t('registerTitle')}</Link>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Link href="/cart" className="block px-4 py-3 hover:bg-gray-50 rounded-lg text-sm" onClick={() => setMobileUserOpen(false)}>🛒 {t('cart')}</Link>
+                                        <Link href="/orders" className="block px-4 py-3 hover:bg-gray-50 rounded-lg text-sm" onClick={() => setMobileUserOpen(false)}>📋 {t('orders')}</Link>
+                                        <Link href="/suggest" className="block px-4 py-3 hover:bg-gray-50 rounded-lg text-sm" onClick={() => setMobileUserOpen(false)}>💡 Suggest</Link>
+                                        <Link href="/chat" className="block px-4 py-3 hover:bg-gray-50 rounded-lg text-sm" onClick={() => setMobileUserOpen(false)}>💬 Chat</Link>
+                                        <Link href="/profile" className="block px-4 py-3 hover:bg-gray-50 rounded-lg text-sm" onClick={() => setMobileUserOpen(false)}>👤 {t('profile')}</Link>
+                                        {(user.role === 'Vendor' || user.role === 'Admin') && (
+                                            <Link href="/vendor/dashboard" className="block px-4 py-3 hover:bg-gray-50 rounded-lg text-sm" onClick={() => setMobileUserOpen(false)}>📊 {t('dashboard')}</Link>
+                                        )}
+                                        {(user.role === 'Vendor' || user.role === 'Admin' || user.role === 'Employee') && (
+                                            <Link href="/admin/orders" className="block px-4 py-3 hover:bg-gray-50 rounded-lg text-sm" onClick={() => setMobileUserOpen(false)}>📦 Manage Orders</Link>
+                                        )}
+                                        {user.role === 'Admin' && (
+                                            <>
+                                                <hr className="my-2 mx-2" />
+                                                <Link href="/admin" className="block px-4 py-3 hover:bg-red-50 rounded-lg text-sm font-bold text-red-600" onClick={() => setMobileUserOpen(false)}>⚙️ Admin Panel</Link>
+                                                <Link href="/admin/users" className="block px-4 py-3 hover:bg-gray-50 rounded-lg text-sm" onClick={() => setMobileUserOpen(false)}>👥 {t('users')}</Link>
+                                                <Link href="/admin/products" className="block px-4 py-3 hover:bg-gray-50 rounded-lg text-sm" onClick={() => setMobileUserOpen(false)}>📦 Products</Link>
+                                                <Link href="/admin/pages" className="block px-4 py-3 hover:bg-gray-50 rounded-lg text-sm" onClick={() => setMobileUserOpen(false)}>📄 Pages</Link>
+                                                <Link href="/admin/stores" className="block px-4 py-3 hover:bg-gray-50 rounded-lg text-sm" onClick={() => setMobileUserOpen(false)}>🏪 Stores</Link>
+                                                <Link href="/admin/golden-links" className="block px-4 py-3 hover:bg-gray-50 rounded-lg text-sm" onClick={() => setMobileUserOpen(false)}>🔗 Golden Links</Link>
+                                            </>
+                                        )}
+                                        <hr className="my-2 mx-2" />
+                                        <button onClick={handleLogoutAndClose}
+                                            className="block w-full text-right px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg text-sm font-semibold">
+                                            {t('logout')}
+                                        </button>
+                                    </>
+                                )}
                             </div>
                         </motion.div>
                     </>
@@ -311,10 +329,9 @@ const Navbar = () => {
                         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                             className="fixed inset-0 bg-black/50 z-[9998] md:hidden"
                             onClick={() => setMobileSupportOpen(false)} />
-                        <motion.div
-                            initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
+                        <motion.div initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
                             transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-                            className="fixed bottom-0 left-0 right-0 bg-white rounded-t-2xl z-[9999] md:hidden max-h-[80vh] overflow-y-auto">
+                            className="fixed bottom-0 left-0 right-0 bg-white rounded-t-2xl z-[9999] md:hidden">
                             <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
                                 <h3 className="text-lg font-bold">{t('support')}</h3>
                                 <button onClick={() => setMobileSupportOpen(false)} className="p-1 hover:bg-gray-100 rounded-lg"><X className="w-5 h-5" /></button>
@@ -337,8 +354,7 @@ const Navbar = () => {
                         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                             className="fixed inset-0 bg-black/50 z-[9998] md:hidden"
                             onClick={() => setMobileCurrencyOpen(false)} />
-                        <motion.div
-                            initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
+                        <motion.div initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
                             transition={{ type: 'spring', damping: 30, stiffness: 300 }}
                             className="fixed bottom-0 left-0 right-0 bg-white rounded-t-2xl z-[9999] md:hidden">
                             <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
