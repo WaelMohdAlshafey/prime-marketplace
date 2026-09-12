@@ -6,7 +6,7 @@ import { getStoreSettings } from '@/lib/storeApi';
 import { StoreSettings } from '@/types';
 
 export default function About() {
-    const { t } = useTranslation('common');
+    const { t, i18n } = useTranslation('common');
     const [settings, setSettings] = useState<StoreSettings | null>(null);
     const [loading, setLoading] = useState(true);
 
@@ -24,10 +24,14 @@ export default function About() {
         return <div className="text-center py-12">{t('aboutError')}</div>;
     }
 
+    const title = i18n.language === 'ar'
+        ? `🏢 عن ${settings.storeName}`
+        : `🏢 About ${settings.storeName}`;
+
     return (
         <div className="container mx-auto px-4 py-12 max-w-4xl">
             <h1 className="text-4xl font-bold text-gray-800 mb-8 text-center">
-                {t('aboutTitle', { storeName: settings.storeName })}
+                {title}
             </h1>
 
             <div className="bg-white rounded-xl shadow-md p-8 space-y-6">
