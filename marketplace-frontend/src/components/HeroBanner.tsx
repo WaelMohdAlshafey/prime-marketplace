@@ -28,9 +28,9 @@ interface SimplePage {
     showInNavbar?: boolean;
 }
 
-// ✅ Arabic translations for known pages (by lowercase title)
 const pageArabicTitles: Record<string, string> = {
     'about us': 'من نحن',
+    'about': 'من نحن',
     'contact us': 'اتصل بنا',
     'contact': 'اتصل بنا',
     'privacy policy': 'سياسة الخصوصية',
@@ -45,7 +45,6 @@ const pageArabicTitles: Record<string, string> = {
     'shipping': 'الشحن والتوصيل',
 };
 
-// ✅ Arabic translations for categories
 const categoryArabicNames: Record<string, string> = {
     'software': 'برامج',
     'hair care': 'العناية بالشعر',
@@ -76,29 +75,18 @@ const localizeCategoryName = (name: string, lang: string): string => {
 };
 
 export default function HeroBanner() {
-    const { t, i18n } = useTranslation('common');
+    const { i18n } = useTranslation('common');
     const [current, setCurrent] = useState(0);
     const [direction, setDirection] = useState(0);
     const [slides, setSlides] = useState<HeroSlide[]>([]);
     const [loading, setLoading] = useState(true);
 
-    const lang = i18n.language || 'ar';
-
-    const fallbackSlide: HeroSlide = {
-        id: 'fallback',
-        badge: '🛍️ ' + (lang === 'ar' ? 'وجهة التسوق الأولى' : 'Your #1 Shopping Destination'),
-        title: lang === 'ar' ? 'اكتشف متعة التسوق في برايم' : 'Discover the Joy of Shopping at Prime',
-        subtitle: lang === 'ar' ? 'وجهتك الأولى للعديد من المنتجات الأصلية' : 'Your #1 Destination for Authentic Products',
-        description: lang === 'ar'
-            ? 'كل ما تحتاجه في مكان واحد، بأسعار تنافسية وشحن سريع.'
-            : 'Everything you need in one place, with competitive prices and fast shipping.',
-        cta: lang === 'ar' ? 'تسوق الآن' : 'Shop Now',
-        link: '/products',
-        icon: '🛍️',
-    };
+    // ✅ Normalize language — supports en, en-US, ar, ar-EG, etc.
+    const lang = (i18n.language || 'ar').startsWith('ar') ? 'ar' : 'en';
 
     useEffect(() => {
         const fetchAll = async () => {
+            setLoading(true);
             try {
                 const [catRes, pageRes] = await Promise.all([
                     api.get<ProductCategory[]>('/api/ProductCategories?onlyActive=true'),
@@ -116,15 +104,19 @@ export default function HeroBanner() {
 
                 const catSlides: HeroSlide[] = cats.map((c) => {
                     const localizedName = localizeCategoryName(c.name, lang);
+                    const isAr = lang === 'ar';
                     return {
                         id: `cat-${c.id}`,
-                        badge: `${c.icon || '🛍️'} ${lang === 'ar' ? 'قسم مميز' : 'Featured Category'}`,
+                        badge: `${c.icon || '🛍️'} ${isAr ? 'قسم مميز' : 'Featured Category'}`,
                         title: localizedName,
-                        subtitle: c.description || (lang === 'ar' ? 'اكتشف منتجاتنا المميزة' : 'Explore our featured products'),
-                        description: c.description || (lang === 'ar'
+                        // ✅ Always generate the subtitle in the correct language
+                        subtitle: isAr ? 'اكتشف منتجاتنا المميزة' : 'Explore our featured products',
+                        // ✅ Always generate the description in the correct language
+                        //    (ignores the DB description which may be in either language)
+                        description: isAr
                             ? `تصفح أفضل منتجات ${localizedName} من بائعين موثوقين.`
-                            : `Browse the best ${localizedName} products from trusted vendors.`),
-                        cta: lang === 'ar' ? `تسوق ${localizedName}` : `Shop ${localizedName}`,
+                            : `Browse the best ${localizedName} products from trusted vendors.`,
+                        cta: isAr ? `تسوق ${localizedName}` : `Shop ${localizedName}`,
                         link: `/${c.slug}`,
                         icon: c.icon || '🛍️',
                         isPage: false,
@@ -133,15 +125,16 @@ export default function HeroBanner() {
 
                 const pageSlides: HeroSlide[] = pages.map((p) => {
                     const localizedTitle = localizePageTitle(p.title, lang);
+                    const isAr = lang === 'ar';
                     return {
                         id: `page-${p.id}`,
-                        badge: `📄 ${lang === 'ar' ? 'صفحة' : 'Page'}`,
+                        badge: `📄 ${isAr ? 'صفحة' : 'Page'}`,
                         title: localizedTitle,
-                        subtitle: lang === 'ar' ? 'تعرف على المزيد' : 'Learn more',
-                        description: lang === 'ar'
+                        subtitle: isAr ? 'تعرف على المزيد' : 'Learn more',
+                        description: isAr
                             ? `اكتشف صفحة "${localizedTitle}" لمزيد من التفاصيل.`
                             : `Discover the "${localizedTitle}" page for more details.`,
-                        cta: lang === 'ar' ? 'اقرأ المزيد' : 'Read more',
+                        cta: isAr ? 'اقرأ المزيد' : 'Read more',
                         link: `/${p.slug}`,
                         icon: '📄',
                         isPage: true,
@@ -149,12 +142,40 @@ export default function HeroBanner() {
                 });
 
                 const all = [...catSlides, ...pageSlides];
-                setSlides(all.length > 0 ? all : [fallbackSlide]);
+
+                if (all.length > 0) {
+                    setSlides(all);
+                } else {
+                    setSlides([{
+                        id: 'fallback',
+                        badge: lang === 'ar' ? '🛍️ وجهة التسوق الأولى' : '🛍️ Your #1 Shopping Destination',
+                        title: lang === 'ar' ? 'اكتشف متعة التسوق في برايم' : 'Discover the Joy of Shopping at Prime',
+                        subtitle: lang === 'ar' ? 'وجهتك الأولى للعديد من المنتجات الأصلية' : 'Your #1 Destination for Authentic Products',
+                        description: lang === 'ar'
+                            ? 'كل ما تحتاجه في مكان واحد، بأسعار تنافسية وشحن سريع.'
+                            : 'Everything you need in one place, with competitive prices and fast shipping.',
+                        cta: lang === 'ar' ? 'تسوق الآن' : 'Shop Now',
+                        link: '/products',
+                        icon: '🛍️',
+                    }]);
+                }
             } catch (err) {
                 console.error('Hero banner: failed to load data', err);
-                setSlides([fallbackSlide]);
+                setSlides([{
+                    id: 'fallback',
+                    badge: lang === 'ar' ? '🛍️ وجهة التسوق الأولى' : '🛍️ Your #1 Shopping Destination',
+                    title: lang === 'ar' ? 'اكتشف متعة التسوق في برايم' : 'Discover the Joy of Shopping at Prime',
+                    subtitle: lang === 'ar' ? 'وجهتك الأولى للعديد من المنتجات الأصلية' : '#1 Destination for Authentic Products',
+                    description: lang === 'ar'
+                        ? 'كل ما تحتاجه في مكان واحد، بأسعار تنافسية وشحن سريع.'
+                        : 'Everything you need in one place, with competitive prices and fast shipping.',
+                    cta: lang === 'ar' ? 'تسوق الآن' : 'Shop Now',
+                    link: '/products',
+                    icon: '🛍️',
+                }]);
             } finally {
                 setLoading(false);
+                setCurrent(0); // reset carousel to first slide on language change
             }
         };
         fetchAll();
