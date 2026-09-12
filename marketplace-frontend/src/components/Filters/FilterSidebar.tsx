@@ -37,7 +37,6 @@ export default function FilterSidebar({
     const [isMobileOpen, setIsMobileOpen] = useState(false);
     const [openSections, setOpenSections] = useState<Set<string>>(new Set());
 
-    // Keep local state in sync with parent — prevents resets on remount
     useEffect(() => {
         if (initialFilters) {
             setMinPrice(initialFilters.minPrice);
@@ -97,7 +96,8 @@ export default function FilterSidebar({
         filterBtn: isAr ? 'فلتر' : 'Filter',
     };
 
-    const FilterContent = () => (
+    // ✅ Plain render function — NOT a component (no remount = no focus loss)
+    const renderFilterContent = () => (
         <div className="space-y-4">
             {/* Sort */}
             <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
@@ -218,7 +218,7 @@ export default function FilterSidebar({
                     <Filter className="w-5 h-5 text-[#0F5C45]" />
                     <span className="font-bold text-gray-800">{L.filters}</span>
                 </div>
-                <FilterContent />
+                {renderFilterContent()}
             </aside>
 
             {isMobileOpen && (
@@ -234,10 +234,10 @@ export default function FilterSidebar({
                                 <X className="w-5 h-5" />
                             </button>
                         </div>
-                        <FilterContent />
+                        {renderFilterContent()}
                     </div>
                 </div>
             )}
         </>
     );
-}
+}   
