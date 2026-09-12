@@ -376,5 +376,11 @@ export interface CreateProductCategoryDto {
     displayOrder?: number;
     isActive: boolean;
 }
-
+export interface Role {
+    id: number;
+    name: string;
+    description?: string;
+    isSystemRole: boolean;
+    userCount: number;
+}
 export interface UpdateProductCategoryDto extends CreateProductCategoryDto { }

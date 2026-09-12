@@ -1,5 +1,5 @@
 'use client';
-
+import { Shield } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
@@ -38,6 +38,7 @@ export default function AdminSidebar({ onLinkClick }: AdminSidebarProps) {
     };
 
     const navItems = [
+        { name: 'Roles', href: '/admin/roles', icon: <Shield className="w-5 h-5" /> },
         { name: 'Dashboard', href: '/admin', icon: <LayoutDashboard className="w-5 h-5" /> },
         { name: 'Users', href: '/admin/users', icon: <Users className="w-5 h-5" /> },
         { name: 'Products', href: '/admin/products', icon: <Package className="w-5 h-5" /> },

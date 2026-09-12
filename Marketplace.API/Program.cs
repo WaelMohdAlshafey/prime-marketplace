@@ -77,7 +77,8 @@ builder.Services.AddScoped<IStoreService, StoreService>();
 builder.Services.AddScoped<IGoldenLinkService, GoldenLinkService>();
 builder.Services.AddScoped<IPageClassService, PageClassService>();
 builder.Services.AddScoped<IProductCategoryService, ProductCategoryService>();
-builder.Services.AddScoped<INewsletterService, NewsletterService>();   // ← NEW LINE
+builder.Services.AddScoped<INewsletterService, NewsletterService>();
+builder.Services.AddScoped<IRoleService, RoleService>();
 
 // ============================================================
 // 6. Database Context – with Retry & Detailed Logging
@@ -152,16 +153,13 @@ if (app.Environment.IsDevelopment())
 // ============================================================
 app.Use(async (context, next) =>
 {
-    // Log every request for debugging
     Console.WriteLine($"🌐 {context.Request.Method} {context.Request.Path}");
 
-    // Always set these headers for ALL responses
     context.Response.Headers["Access-Control-Allow-Origin"] = "*";
     context.Response.Headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH";
     context.Response.Headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With, Accept, Origin";
     context.Response.Headers["Access-Control-Max-Age"] = "86400";
 
-    // Handle preflight (OPTIONS) immediately
     if (context.Request.Method == "OPTIONS")
     {
         Console.WriteLine("✅ Preflight OPTIONS request handled");
@@ -174,17 +172,17 @@ app.Use(async (context, next) =>
 });
 
 // ============================================================
-// 12. UseRouting – REQUIRED before UseCors and UseAuthorization
+// 12. UseRouting
 // ============================================================
 app.UseRouting();
 
 // ============================================================
-// 13. UseCors (official) – as an extra safety layer
+// 13. UseCors
 // ============================================================
 app.UseCors("AllowAll");
 
 // ============================================================
-// 14. Request Logging Middleware (helps debug)
+// 14. Request Logging Middleware
 // ============================================================
 app.Use(async (context, next) =>
 {
@@ -194,7 +192,7 @@ app.Use(async (context, next) =>
 });
 
 // ============================================================
-// 15. Serve static files (product images, etc.)
+// 15. Static files
 // ============================================================
 app.UseStaticFiles();
 
@@ -229,9 +227,7 @@ app.MapGet("/", () => "Prime Marketplace API is running!");
 app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = DateTime.UtcNow }));
 
 // ============================================================
-// 19. ✅ Database connection check (schema managed via Supabase)
-//     Auto-migration is DISABLED because the schema is
-//     maintained manually through the Supabase SQL Editor.
+// 19. Database connection check (schema managed via Supabase)
 // ============================================================
 using (var scope = app.Services.CreateScope())
 {

@@ -28,6 +28,7 @@ export default function AdminUsersPage() {
     const { user, isLoading } = useAuth();
     const router = useRouter();
     const [users, setUsers] = useState<User[]>([]);
+    const [roles, setRoles] = useState<string[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -68,6 +69,17 @@ export default function AdminUsersPage() {
         }
     };
 
+    const fetchRoles = async () => {
+        try {
+            const response = await api.get('/api/Roles');
+            setRoles(response.data.map((r: { name: string }) => r.name));
+        } catch (err) {
+            console.error('Failed to fetch roles:', err);
+            // Fallback to hardcoded roles if API fails
+            setRoles(['Admin', 'Vendor', 'Employee', 'Customer']);
+        }
+    };
+
     useEffect(() => {
         if (isLoading) return;
         if (!user) {
@@ -79,6 +91,7 @@ export default function AdminUsersPage() {
             return;
         }
         fetchUsers();
+        fetchRoles();
     }, [user, isLoading]);
 
     const handleUpdateRole = async () => {
@@ -238,7 +251,9 @@ export default function AdminUsersPage() {
                                                 ? 'bg-red-100 text-red-800'
                                                 : u.role === 'Vendor'
                                                     ? 'bg-blue-100 text-blue-800'
-                                                    : 'bg-gray-100 text-gray-800'
+                                                    : u.role === 'Employee'
+                                                        ? 'bg-purple-100 text-purple-800'
+                                                        : 'bg-gray-100 text-gray-800'
                                                 }`}
                                         >
                                             {u.role}
@@ -296,9 +311,9 @@ export default function AdminUsersPage() {
                                 onChange={(e) => setNewRole(e.target.value)}
                                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0F5C45]"
                             >
-                                <option value="Admin">Admin</option>
-                                <option value="Vendor">Vendor</option>
-                                <option value="Customer">Customer</option>
+                                {roles.map((r) => (
+                                    <option key={r} value={r}>{r}</option>
+                                ))}
                             </select>
                         </div>
                         <div className="flex gap-3">
@@ -399,9 +414,9 @@ export default function AdminUsersPage() {
                                     onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}
                                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0F5C45]"
                                 >
-                                    <option value="Customer">Customer</option>
-                                    <option value="Vendor">Vendor</option>
-                                    <option value="Admin">Admin</option>
+                                    {roles.map((r) => (
+                                        <option key={r} value={r}>{r}</option>
+                                    ))}
                                 </select>
                             </div>
                         </div>

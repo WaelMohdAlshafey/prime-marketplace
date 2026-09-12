@@ -43,6 +43,8 @@ public class AppDbContext : DbContext
     public DbSet<GoldenLink> GoldenLinks { get; set; }
     public DbSet<PageClass> PageClasses { get; set; }
     public DbSet<ProductCategory> ProductCategories { get; set; }
+    public DbSet<Role> Roles { get; set; }
+
     // ✅ NEW: Pages DbSet
     public DbSet<Page> Pages { get; set; }
 
@@ -253,5 +255,12 @@ public class AppDbContext : DbContext
             entity.Property(e => e.Name).IsRequired().HasMaxLength(150);
             entity.Property(e => e.Slug).IsRequired().HasMaxLength(150);
         });
+        modelBuilder.Entity<Role>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => e.Name).IsUnique();
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
+        });
+
     }
 }
