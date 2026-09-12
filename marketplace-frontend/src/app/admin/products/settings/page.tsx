@@ -1,5 +1,3 @@
-// M:\Marketplace\marketplace-frontend\app\admin\settings\page.tsx
-
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -161,8 +159,8 @@ export default function AdminSettings() {
                     <input
                         type="text"
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                        value={settings.}
-                        onChange={(e) => updateField('', e.target.value)}
+                        value={settings.whatsApp}
+                        onChange={(e) => updateField('whatsApp', e.target.value)}
                     />
                 </div>
 
