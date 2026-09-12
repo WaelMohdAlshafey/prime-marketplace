@@ -28,6 +28,53 @@ interface SimplePage {
     showInNavbar?: boolean;
 }
 
+// ✅ Arabic translations for known pages (by lowercase title)
+const pageArabicTitles: Record<string, string> = {
+    'about us': 'من نحن',
+    'contact us': 'اتصل بنا',
+    'contact': 'اتصل بنا',
+    'privacy policy': 'سياسة الخصوصية',
+    'privacy': 'سياسة الخصوصية',
+    'terms & conditions': 'الشروط والأحكام',
+    'terms and conditions': 'الشروط والأحكام',
+    'terms': 'الشروط والأحكام',
+    'faq': 'الأسئلة الشائعة',
+    'return policy': 'سياسة الإرجاع',
+    'returns': 'سياسة الإرجاع',
+    'shipping & delivery': 'الشحن والتوصيل',
+    'shipping': 'الشحن والتوصيل',
+};
+
+// ✅ Arabic translations for categories
+const categoryArabicNames: Record<string, string> = {
+    'software': 'برامج',
+    'hair care': 'العناية بالشعر',
+    'hair-care': 'العناية بالشعر',
+    'skin care': 'العناية بالبشرة',
+    'skin-care': 'العناية بالبشرة',
+    'perfumes': 'عطور',
+    'accessories': 'إكسسوارات',
+    'electronics': 'إلكترونيات',
+    'supplements': 'مكملات غذائية',
+    'home': 'المنزل',
+    'grocery': 'بقالة',
+    'pharmacy': 'صيدلية',
+    'books': 'كتب',
+    'fashion': 'أزياء',
+};
+
+const localizePageTitle = (title: string, lang: string): string => {
+    if (lang !== 'ar' || !title) return title;
+    const key = title.trim().toLowerCase();
+    return pageArabicTitles[key] || title;
+};
+
+const localizeCategoryName = (name: string, lang: string): string => {
+    if (lang !== 'ar' || !name) return name;
+    const key = name.trim().toLowerCase();
+    return categoryArabicNames[key] || name;
+};
+
 export default function HeroBanner() {
     const { t, i18n } = useTranslation('common');
     const [current, setCurrent] = useState(0);
@@ -58,44 +105,48 @@ export default function HeroBanner() {
                     api.get<SimplePage[]>('/api/Pages'),
                 ]);
 
-                // ✅ ALL active categories by Display Order
                 const cats: ProductCategory[] = (catRes.data || [])
                     .sort((a: ProductCategory, b: ProductCategory) =>
                         (a.displayOrder ?? 999) - (b.displayOrder ?? 999));
 
-                // ✅ ALL navbar pages by Display Order
                 const pages: SimplePage[] = (pageRes.data || [])
                     .filter((p: SimplePage) => p.showInNavbar)
                     .sort((a: SimplePage, b: SimplePage) =>
                         (a.displayOrder ?? 999) - (b.displayOrder ?? 999));
 
-                const catSlides: HeroSlide[] = cats.map((c) => ({
-                    id: `cat-${c.id}`,
-                    badge: `${c.icon || '🛍️'} ${lang === 'ar' ? 'قسم مميز' : 'Featured Category'}`,
-                    title: c.name,
-                    subtitle: c.description || (lang === 'ar' ? 'اكتشف منتجاتنا المميزة' : 'Explore our featured products'),
-                    description: c.description || (lang === 'ar'
-                        ? `تصفح أفضل منتجات ${c.name} من بائعين موثوقين.`
-                        : `Browse the best ${c.name} products from trusted vendors.`),
-                    cta: lang === 'ar' ? `تسوق ${c.name}` : `Shop ${c.name}`,
-                    link: `/${c.slug}`,
-                    icon: c.icon || '🛍️',
-                    isPage: false,
-                }));
+                const catSlides: HeroSlide[] = cats.map((c) => {
+                    const localizedName = localizeCategoryName(c.name, lang);
+                    return {
+                        id: `cat-${c.id}`,
+                        badge: `${c.icon || '🛍️'} ${lang === 'ar' ? 'قسم مميز' : 'Featured Category'}`,
+                        title: localizedName,
+                        subtitle: c.description || (lang === 'ar' ? 'اكتشف منتجاتنا المميزة' : 'Explore our featured products'),
+                        description: c.description || (lang === 'ar'
+                            ? `تصفح أفضل منتجات ${localizedName} من بائعين موثوقين.`
+                            : `Browse the best ${localizedName} products from trusted vendors.`),
+                        cta: lang === 'ar' ? `تسوق ${localizedName}` : `Shop ${localizedName}`,
+                        link: `/${c.slug}`,
+                        icon: c.icon || '🛍️',
+                        isPage: false,
+                    };
+                });
 
-                const pageSlides: HeroSlide[] = pages.map((p) => ({
-                    id: `page-${p.id}`,
-                    badge: `📄 ${lang === 'ar' ? 'صفحة' : 'Page'}`,
-                    title: p.title,
-                    subtitle: lang === 'ar' ? 'تعرف على المزيد' : 'Learn more',
-                    description: lang === 'ar'
-                        ? `اكتشف صفحة "${p.title}" لمزيد من التفاصيل.`
-                        : `Discover the "${p.title}" page for more details.`,
-                    cta: lang === 'ar' ? 'اقرأ المزيد' : 'Read more',
-                    link: `/${p.slug}`,
-                    icon: '📄',
-                    isPage: true,
-                }));
+                const pageSlides: HeroSlide[] = pages.map((p) => {
+                    const localizedTitle = localizePageTitle(p.title, lang);
+                    return {
+                        id: `page-${p.id}`,
+                        badge: `📄 ${lang === 'ar' ? 'صفحة' : 'Page'}`,
+                        title: localizedTitle,
+                        subtitle: lang === 'ar' ? 'تعرف على المزيد' : 'Learn more',
+                        description: lang === 'ar'
+                            ? `اكتشف صفحة "${localizedTitle}" لمزيد من التفاصيل.`
+                            : `Discover the "${localizedTitle}" page for more details.`,
+                        cta: lang === 'ar' ? 'اقرأ المزيد' : 'Read more',
+                        link: `/${p.slug}`,
+                        icon: '📄',
+                        isPage: true,
+                    };
+                });
 
                 const all = [...catSlides, ...pageSlides];
                 setSlides(all.length > 0 ? all : [fallbackSlide]);
