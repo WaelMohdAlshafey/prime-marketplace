@@ -17,6 +17,9 @@ const fallbackIcons = {
     electronics: '📱',
     supplements: '💊',
     home: '🏠',
+    grocery: '🛒',
+    pharmacy: '💊',
+    books: '📚',
 };
 
 export default function CategoryPage({ category }) {
@@ -28,7 +31,7 @@ export default function CategoryPage({ category }) {
     const [error, setError] = useState(null);
     const [filters, setFilters] = useState({});
 
-    const lang = i18n.language || 'en';
+    const lang = (i18n.language || 'ar').startsWith('ar') ? 'ar' : 'en';
     const slug = category.toLowerCase();
 
     // Load category metadata
@@ -56,29 +59,22 @@ export default function CategoryPage({ category }) {
         setError(null);
         try {
             const finalFilters = filterOverrides || filters;
-            const params = new URLSearchParams();
 
-            // Always filter by this page's category
-            if (apiCategoryName) params.append('q', ''); // keep q empty
-            // Add a vendorId=undefined to force filter path
-            params.append('categoryName', apiCategoryName);
-
-            if (finalFilters.minPrice !== undefined) params.append('minPrice', finalFilters.minPrice.toString());
-            if (finalFilters.maxPrice !== undefined) params.append('maxPrice', finalFilters.maxPrice.toString());
-            if (finalFilters.inStock !== undefined) params.append('inStock', finalFilters.inStock.toString());
-            if (finalFilters.rating !== undefined) params.append('rating', finalFilters.rating.toString());
-            if (finalFilters.sortBy) params.append('sortBy', finalFilters.sortBy);
-
-            // If no filter AND no sort, use the simpler category endpoint
-            if (Object.keys(finalFilters).length === 0) {
+            // If no filters → use simple category endpoint
+            if (!finalFilters || Object.keys(finalFilters).length === 0) {
                 const url = `/api/Products/category/${encodeURIComponent(apiCategoryName)}?page=1&pageSize=100`;
                 const response = await api.get(url);
                 setProducts(response.data.items || []);
                 return;
             }
 
-            // Otherwise use filter endpoint, but the backend doesn't support categoryName param yet
-            // So we filter on the client after fetching:
+            // Otherwise use the filter endpoint, then filter client-side by category
+            const params = new URLSearchParams();
+            if (finalFilters.minPrice !== undefined) params.append('minPrice', finalFilters.minPrice.toString());
+            if (finalFilters.maxPrice !== undefined) params.append('maxPrice', finalFilters.maxPrice.toString());
+            if (finalFilters.inStock !== undefined) params.append('inStock', finalFilters.inStock.toString());
+            if (finalFilters.sortBy) params.append('sortBy', finalFilters.sortBy);
+
             const url = `/api/Products/filter?${params.toString()}&page=1&pageSize=100`;
             const response = await api.get(url);
             const items = (response.data.items || []).filter(
@@ -109,7 +105,6 @@ export default function CategoryPage({ category }) {
         fetchProducts({});
     };
 
-    // Show "not found" ONLY when category info finished loading AND category doesn't exist
     if (!infoLoading && categoryInfo === null) {
         return (
             <div className="container mx-auto px-4 py-20 text-center">
@@ -127,6 +122,7 @@ export default function CategoryPage({ category }) {
 
     return (
         <div className="bg-background min-h-screen">
+            {/* Category Hero */}
             <section className="bg-gradient-to-br from-primary-bg to-background py-12 md:py-16">
                 <div className="container mx-auto px-4 text-center">
                     <div className="text-6xl md:text-7xl mb-4 flex justify-center">{icon}</div>
@@ -139,8 +135,10 @@ export default function CategoryPage({ category }) {
 
             <div className="container mx-auto px-4 py-8">
                 <div className="flex flex-col md:flex-row gap-6">
+                    {/* Sidebar — always mounted */}
                     <div className="md:w-72 flex-shrink-0">
                         <FilterSidebar
+                            initialFilters={filters}
                             onApplyFilters={handleApplyFilters}
                             onResetFilters={handleResetFilters}
                         />
@@ -160,14 +158,8 @@ export default function CategoryPage({ category }) {
                         </div>
 
                         {loading ? (
-                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                                {[...Array(6)].map((_, i) => (
-                                    <div key={i} className="bg-white rounded-2xl shadow-soft p-4 animate-pulse">
-                                        <div className="w-full aspect-square bg-gray-200 rounded-xl"></div>
-                                        <div className="h-4 bg-gray-200 rounded mt-3 w-3/4"></div>
-                                        <div className="h-6 bg-gray-200 rounded mt-2 w-1/3"></div>
-                                    </div>
-                                ))}
+                            <div className="flex justify-center items-center min-h-[40vh]">
+                                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0F5C45]"></div>
                             </div>
                         ) : error ? (
                             <div className="text-center py-12 bg-white rounded-2xl shadow-soft">

@@ -7,7 +7,7 @@ import api from '@/lib/api';
 import { Product } from '@/types';
 import ProductCard from '@/components/ProductCard';
 import FilterSidebar from '@/components/Filters/FilterSidebar';
-import { ShoppingBag, Sparkles } from 'lucide-react';
+import { ShoppingBag } from 'lucide-react';
 
 export default function ProductsPage() {
     const { t } = useTranslation('common');
@@ -19,7 +19,6 @@ export default function ProductsPage() {
         minPrice?: number;
         maxPrice?: number;
         inStock?: boolean;
-        rating?: number;
         sortBy?: string;
     }>({});
 
@@ -35,7 +34,6 @@ export default function ProductsPage() {
                 if (finalFilters.minPrice !== undefined) params.append('minPrice', finalFilters.minPrice.toString());
                 if (finalFilters.maxPrice !== undefined) params.append('maxPrice', finalFilters.maxPrice.toString());
                 if (finalFilters.inStock !== undefined) params.append('inStock', finalFilters.inStock.toString());
-                if (finalFilters.rating !== undefined) params.append('rating', finalFilters.rating.toString());
                 if (finalFilters.sortBy) params.append('sortBy', finalFilters.sortBy);
                 url = `/api/Products/filter?${params.toString()}&page=1&pageSize=20`;
             }
@@ -68,14 +66,6 @@ export default function ProductsPage() {
         router.push(`/products/${productId}`);
     };
 
-    if (loading) {
-        return (
-            <div className="flex justify-center items-center min-h-[60vh]">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#4E8C9E]"></div>
-            </div>
-        );
-    }
-
     return (
         <div className="bg-background min-h-screen py-8">
             <div className="container mx-auto px-4">
@@ -88,17 +78,22 @@ export default function ProductsPage() {
                 </div>
 
                 <div className="flex flex-col md:flex-row gap-6">
-                    {/* Sidebar */}
+                    {/* Sidebar — always mounted */}
                     <div className="md:w-72 flex-shrink-0">
                         <FilterSidebar
+                            initialFilters={filters}
                             onApplyFilters={handleApplyFilters}
                             onResetFilters={handleResetFilters}
                         />
                     </div>
 
-                    {/* Products */}
+                    {/* Products — this area swaps during loading */}
                     <div className="flex-1">
-                        {error ? (
+                        {loading ? (
+                            <div className="flex justify-center items-center min-h-[40vh]">
+                                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#4E8C9E]"></div>
+                            </div>
+                        ) : error ? (
                             <div className="text-center py-12 bg-white rounded-2xl shadow-soft">
                                 <p className="text-red-500">{error}</p>
                                 <button
