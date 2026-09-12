@@ -55,7 +55,12 @@ public class ProductsController : ControllerBase
     // ============================================================
     // PUBLIC ENDPOINTS
     // ============================================================
-
+    [HttpGet("featured")]
+    public async Task<IActionResult> GetFeatured([FromQuery] int count = 12)
+    {
+        var result = await _productService.GetFeaturedProductsAsync(count);
+        return Ok(result);
+    }
     [HttpGet]
     public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 20)
     {

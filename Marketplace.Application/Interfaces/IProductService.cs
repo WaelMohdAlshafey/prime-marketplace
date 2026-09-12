@@ -5,7 +5,6 @@ namespace Marketplace.Application.Interfaces;
 
 public interface IProductService
 {
-    // Public endpoints
     Task<PagedResult<ProductDto>> GetProductsAsync(int page, int pageSize);
     Task<PagedResult<ProductDto>> SearchProductsAsync(string searchTerm, int page, int pageSize);
     Task<PagedResult<ProductDto>> GetProductsFilteredAsync(
@@ -20,8 +19,7 @@ public interface IProductService
         string? sortBy = null);
     Task<ProductDto> GetProductByIdAsync(int id);
     Task<PagedResult<ProductDto>> GetProductsByCategoryAsync(string categoryName, int page, int pageSize);
-
-    // Vendor endpoints
+    Task<List<ProductDto>> GetFeaturedProductsAsync(int count = 12);
     Task<PagedResult<ProductDto>> GetVendorProductsAsync(int vendorId, int page, int pageSize);
     Task<ProductDto> CreateProductAsync(Product product, int vendorId);
     Task<ProductDto> UpdateProductAsync(Product product, int vendorId);

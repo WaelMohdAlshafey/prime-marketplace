@@ -24,10 +24,8 @@ public class ProductService : IProductService
         return new ProductDto
         {
             Id = product.Id,
-            // ✅ Use main Name and Description as primary, fallback to bilingual
             Name = !string.IsNullOrEmpty(product.Name) ? product.Name : (product.NameAr ?? product.NameEn ?? string.Empty),
             Description = !string.IsNullOrEmpty(product.Description) ? product.Description : (product.DescriptionAr ?? product.DescriptionEn ?? string.Empty),
-            // Keep bilingual fields for reference
             NameAr = product.NameAr,
             NameEn = product.NameEn,
             DescriptionAr = product.DescriptionAr,
@@ -48,6 +46,7 @@ public class ProductService : IProductService
         _cache.Remove($"Products_Page_1_Size_10");
         _cache.Remove($"Vendor_{vendorId}_Products_Page_1_Size_20");
         _cache.Remove($"Search_all_Page_1_Size_20");
+        _cache.Remove($"Featured_12");
     }
 
     // ============================================================
@@ -182,15 +181,15 @@ public class ProductService : IProductService
     // FILTER PRODUCTS
     // ============================================================
     public async Task<PagedResult<ProductDto>> GetProductsFilteredAsync(
-    string? searchTerm,
-    decimal? minPrice,
-    decimal? maxPrice,
-    int? vendorId,
-    bool? inStock,
-    double? rating,
-    int page,
-    int pageSize,
-    string? sortBy = null)
+        string? searchTerm,
+        decimal? minPrice,
+        decimal? maxPrice,
+        int? vendorId,
+        bool? inStock,
+        double? rating,
+        int page,
+        int pageSize,
+        string? sortBy = null)
     {
         string cacheKey = $"Filter_{searchTerm ?? "all"}_{minPrice}_{maxPrice}_{vendorId}_{inStock}_{rating}_{sortBy ?? "default"}_P{page}_S{pageSize}";
 
@@ -282,6 +281,7 @@ public class ProductService : IProductService
         _cache.Set(cacheKey, result, TimeSpan.FromMinutes(5));
         return result;
     }
+
     // ============================================================
     // GET PRODUCT BY ID
     // ============================================================
@@ -313,6 +313,124 @@ public class ProductService : IProductService
             throw new Exception("Product not found.");
 
         return product;
+    }
+
+    // ============================================================
+    // FEATURED PRODUCTS — Top-Rated + Best-Selling + Newest Filler
+    // ============================================================
+    public async Task<List<ProductDto>> GetFeaturedProductsAsync(int count = 12)
+    {
+        string cacheKey = $"Featured_{count}";
+
+        if (_cache.TryGetValue(cacheKey, out List<ProductDto>? cachedResult) && cachedResult != null)
+        {
+            return cachedResult;
+        }
+
+        // 1) Top-rated products (highest first)
+        var topRated = await (from p in _context.Products
+                              join u in _context.Users on p.VendorId equals u.Id into vg
+                              from u in vg.DefaultIfEmpty()
+                              where p.IsActive && p.Rating != null
+                              orderby p.Rating descending, p.Id descending
+                              select new ProductDto
+                              {
+                                  Id = p.Id,
+                                  Name = !string.IsNullOrEmpty(p.Name) ? p.Name : (p.NameAr ?? p.NameEn ?? string.Empty),
+                                  Description = !string.IsNullOrEmpty(p.Description) ? p.Description : (p.DescriptionAr ?? p.DescriptionEn ?? string.Empty),
+                                  NameAr = p.NameAr,
+                                  NameEn = p.NameEn,
+                                  DescriptionAr = p.DescriptionAr,
+                                  DescriptionEn = p.DescriptionEn,
+                                  Price = p.Price,
+                                  StockQuantity = p.StockQuantity,
+                                  ImageUrl = p.ImageUrl,
+                                  VendorName = u != null ? u.Username : "بائع",
+                                  Rating = p.Rating,
+                                  IsActive = p.IsActive,
+                                  Category = p.Category
+                              })
+                              .Take(count)
+                              .ToListAsync();
+
+        // 2) Best-selling products (from OrderItems)
+        var topSellingIds = await _context.OrderItems
+            .GroupBy(oi => oi.ProductId)
+            .Select(g => new { ProductId = g.Key, Sold = g.Sum(x => x.Quantity) })
+            .OrderByDescending(x => x.Sold)
+            .Take(count)
+            .Select(x => x.ProductId)
+            .ToListAsync();
+
+        var topSelling = await (from p in _context.Products
+                                join u in _context.Users on p.VendorId equals u.Id into vg
+                                from u in vg.DefaultIfEmpty()
+                                where p.IsActive && topSellingIds.Contains(p.Id)
+                                select new ProductDto
+                                {
+                                    Id = p.Id,
+                                    Name = !string.IsNullOrEmpty(p.Name) ? p.Name : (p.NameAr ?? p.NameEn ?? string.Empty),
+                                    Description = !string.IsNullOrEmpty(p.Description) ? p.Description : (p.DescriptionAr ?? p.DescriptionEn ?? string.Empty),
+                                    NameAr = p.NameAr,
+                                    NameEn = p.NameEn,
+                                    DescriptionAr = p.DescriptionAr,
+                                    DescriptionEn = p.DescriptionEn,
+                                    Price = p.Price,
+                                    StockQuantity = p.StockQuantity,
+                                    ImageUrl = p.ImageUrl,
+                                    VendorName = u != null ? u.Username : "بائع",
+                                    Rating = p.Rating,
+                                    IsActive = p.IsActive,
+                                    Category = p.Category
+                                })
+                                .ToListAsync();
+
+        // 3) Merge — top-rated first, then top-selling (deduplicated)
+        var seen = new HashSet<int>();
+        var merged = new List<ProductDto>();
+
+        foreach (var p in topRated)
+            if (seen.Add(p.Id))
+                merged.Add(p);
+
+        foreach (var p in topSelling)
+            if (seen.Add(p.Id))
+                merged.Add(p);
+
+        // 4) Fill remaining slots with newest active products
+        if (merged.Count < count)
+        {
+            var filler = await (from p in _context.Products
+                                join u in _context.Users on p.VendorId equals u.Id into vg
+                                from u in vg.DefaultIfEmpty()
+                                where p.IsActive && !seen.Contains(p.Id)
+                                orderby p.CreatedAt descending
+                                select new ProductDto
+                                {
+                                    Id = p.Id,
+                                    Name = !string.IsNullOrEmpty(p.Name) ? p.Name : (p.NameAr ?? p.NameEn ?? string.Empty),
+                                    Description = !string.IsNullOrEmpty(p.Description) ? p.Description : (p.DescriptionAr ?? p.DescriptionEn ?? string.Empty),
+                                    NameAr = p.NameAr,
+                                    NameEn = p.NameEn,
+                                    DescriptionAr = p.DescriptionAr,
+                                    DescriptionEn = p.DescriptionEn,
+                                    Price = p.Price,
+                                    StockQuantity = p.StockQuantity,
+                                    ImageUrl = p.ImageUrl,
+                                    VendorName = u != null ? u.Username : "بائع",
+                                    Rating = p.Rating,
+                                    IsActive = p.IsActive,
+                                    Category = p.Category
+                                })
+                                .Take(count - merged.Count)
+                                .ToListAsync();
+
+            merged.AddRange(filler);
+        }
+
+        var result = merged.Take(count).ToList();
+        _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10));
+        return result;
     }
 
     // ============================================================
@@ -462,7 +580,7 @@ public class ProductService : IProductService
         existing.NameEn = product.NameEn;
         existing.DescriptionAr = product.DescriptionAr;
         existing.DescriptionEn = product.DescriptionEn;
-        existing.Name = product.Name; // keep main fields
+        existing.Name = product.Name;
         existing.Description = product.Description;
         existing.Price = product.Price;
         existing.CostPrice = product.CostPrice;
