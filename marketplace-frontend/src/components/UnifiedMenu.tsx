@@ -7,9 +7,49 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
 import api from '@/lib/api';
+import { useAuth } from '@/context/AuthContext';
+
+// ✅ Arabic translations for the seeded categories
+const categoryArabicNames = {
+    'software': 'برامج',
+    'hair care': 'العناية بالشعر',
+    'hair-care': 'العناية بالشعر',
+    'skin care': 'العناية بالبشرة',
+    'skin-care': 'العناية بالبشرة',
+    'perfumes': 'عطور',
+    'accessories': 'إكسسوارات',
+    'electronics': 'إلكترونيات',
+    'supplements': 'مكملات غذائية',
+    'home': 'المنزل',
+    'grocery': 'بقالة',
+    'pharmacy': 'صيدلية',
+    'books': 'كتب',
+    'book': 'كتب',
+    'fashion': 'أزياء',
+};
+
+// ✅ Arabic translations for Prime-owned stores (by name)
+const storeArabicNames = {
+    'grocery online': 'بقالة أونلاين',
+    'pharmacy online': 'صيدلية أونلاين',
+    'library online': 'مكتبة أونلاين',
+};
+
+const getLocalizedName = (name, lang) => {
+    if (lang !== 'ar' || !name) return name;
+    const key = name.trim().toLowerCase();
+    return categoryArabicNames[key] || name;
+};
+
+const getLocalizedStoreName = (name, lang) => {
+    if (lang !== 'ar' || !name) return name;
+    const key = name.trim().toLowerCase();
+    return storeArabicNames[key] || name;
+};
 
 export default function UnifiedMenu({ isOpen, onClose }) {
     const { i18n } = useTranslation('common');
+    const { user } = useAuth();
     const [categories, setCategories] = useState([]);
     const [navPages, setNavPages] = useState([]);
     const [stores, setStores] = useState([]);
@@ -69,13 +109,21 @@ export default function UnifiedMenu({ isOpen, onClose }) {
                         transition={{ type: 'spring', damping: 28, stiffness: 220 }}
                         className={`fixed top-0 bottom-0 w-full sm:w-[440px] max-w-[92vw] bg-white z-[2001] overflow-y-auto shadow-2xl ${panelPositionClass}`}
                     >
+                        {/* Header with username */}
                         <div className="sticky top-0 bg-[#0F5C45] text-white px-5 py-4 flex items-center justify-between z-10 shadow-md">
-                            <h2 className="text-xl font-bold">
-                                {lang === 'ar' ? 'القائمة الرئيسية' : 'Main Menu'}
-                            </h2>
+                            <div className="flex items-baseline gap-2 min-w-0">
+                                <h2 className="text-xl font-bold whitespace-nowrap">
+                                    {lang === 'ar' ? 'القائمة الرئيسية' : 'Main Menu'}
+                                </h2>
+                                {user?.username && (
+                                    <span className="text-sm font-normal text-white/70 truncate">
+                                        ({user.username})
+                                    </span>
+                                )}
+                            </div>
                             <button
                                 onClick={onClose}
-                                className="p-2 hover:bg-white/10 rounded-lg transition"
+                                className="p-2 hover:bg-white/10 rounded-lg transition flex-shrink-0"
                                 aria-label="Close"
                             >
                                 <X className="w-6 h-6" />
@@ -96,7 +144,7 @@ export default function UnifiedMenu({ isOpen, onClose }) {
                                 </MenuLink>
                             </Section>
 
-                            {/* 2. Categories — DYNAMIC */}
+                            {/* 2. Categories — dynamic + translated */}
                             <Section title={lang === 'ar' ? 'تسوق حسب القسم' : 'Shop by Category'}>
                                 {categories.map(cat => (
                                     <MenuLink key={cat.id} href={`/${cat.slug}`} onClick={onClose} isRTL={isRTL}>
@@ -104,7 +152,7 @@ export default function UnifiedMenu({ isOpen, onClose }) {
                                             <span className="w-7 h-7 flex items-center justify-center text-lg">
                                                 {cat.icon || '📦'}
                                             </span>
-                                            <span>{cat.name}</span>
+                                            <span>{getLocalizedName(cat.name, lang)}</span>
                                         </span>
                                     </MenuLink>
                                 ))}
@@ -115,12 +163,12 @@ export default function UnifiedMenu({ isOpen, onClose }) {
                                 )}
                             </Section>
 
-                            {/* 3. Stores */}
+                            {/* 3. Stores — with Arabic names for Prime stores */}
                             {stores.length > 0 && (
                                 <Section title={lang === 'ar' ? 'المتاجر' : 'Stores'}>
                                     {stores.map(s => (
                                         <MenuLink key={s.id} href={`/stores/${s.id}`} onClick={onClose} isRTL={isRTL}>
-                                            {s.name}
+                                            {getLocalizedStoreName(s.name, lang)}
                                         </MenuLink>
                                     ))}
                                 </Section>
