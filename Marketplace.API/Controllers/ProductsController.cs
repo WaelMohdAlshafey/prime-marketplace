@@ -28,6 +28,30 @@ public class ProductsController : ControllerBase
         return int.Parse(claim!.Value);
     }
 
+    private string GetUserRole()
+    {
+        return User.FindFirst(ClaimTypes.Role)?.Value ?? "";
+    }
+
+    // ✅ Resolve which vendor should own the product being created.
+    // Employees always target the "prime" vendor.
+    // Admin / Vendor use their own ID.
+    private async Task<int> GetEffectiveVendorIdAsync()
+    {
+        if (GetUserRole() == "Employee")
+        {
+            var prime = await _context.Users
+                .FirstOrDefaultAsync(u => u.Username == "prime" && u.Role == "Vendor");
+
+            if (prime == null)
+                throw new Exception("Prime vendor user not found. Please create a user with username 'prime' and role 'Vendor'.");
+
+            return prime.Id;
+        }
+
+        return GetUserId();
+    }
+
     // ============================================================
     // PUBLIC ENDPOINTS
     // ============================================================
@@ -90,7 +114,7 @@ public class ProductsController : ControllerBase
     }
 
     // ============================================================
-    // RATING ENDPOINTS (NEW)
+    // RATING ENDPOINTS
     // ============================================================
 
     [HttpPost("{id}/rate")]
@@ -130,7 +154,6 @@ public class ProductsController : ControllerBase
 
         await _context.SaveChangesAsync();
 
-        // Recalculate average rating
         var avg = await _context.ProductReviews
             .Where(r => r.ProductId == id)
             .AverageAsync(r => (double)r.Rating);
@@ -163,7 +186,7 @@ public class ProductsController : ControllerBase
     }
 
     // ============================================================
-    // ADMIN / VENDOR ENDPOINTS (unchanged, keep your existing code)
+    // ADMIN / VENDOR / EMPLOYEE ENDPOINTS
     // ============================================================
 
     [HttpGet("admin/all")]
@@ -208,30 +231,39 @@ public class ProductsController : ControllerBase
     }
 
     [HttpGet("vendors/products")]
-    [Authorize(Roles = "Vendor,Admin")]
+    [Authorize(Roles = "Vendor,Admin,Employee")]
     public async Task<IActionResult> GetMyProducts([FromQuery] int page = 1, [FromQuery] int pageSize = 20)
     {
-        var vendorIdClaim = User.FindFirst("VendorId") ?? User.FindFirst(ClaimTypes.NameIdentifier);
-        if (vendorIdClaim == null)
-            return Unauthorized();
+        int vendorId;
+        try
+        {
+            vendorId = await GetEffectiveVendorIdAsync();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
 
-        var vendorId = int.Parse(vendorIdClaim.Value);
         var result = await _productService.GetVendorProductsAsync(vendorId, page, pageSize);
         return Ok(result);
     }
 
     [HttpPost]
-    [Authorize(Roles = "Vendor,Admin")]
+    [Authorize(Roles = "Vendor,Admin,Employee")]
     public async Task<IActionResult> Create([FromForm] ProductCreateDto productDto, IFormFile? image)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        var vendorIdClaim = User.FindFirst("VendorId") ?? User.FindFirst(ClaimTypes.NameIdentifier);
-        if (vendorIdClaim == null)
-            return Unauthorized();
-
-        var vendorId = int.Parse(vendorIdClaim.Value);
+        int vendorId;
+        try
+        {
+            vendorId = await GetEffectiveVendorIdAsync();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
 
         string? imageUrl = null;
         if (image != null && image.Length > 0)
@@ -273,28 +305,37 @@ public class ProductsController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    [Authorize(Roles = "Vendor,Admin")]
+    [Authorize(Roles = "Vendor,Admin,Employee")]
     public async Task<IActionResult> Update(int id, [FromForm] ProductUpdateDto productDto, IFormFile? image)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        var isAdmin = User.IsInRole("Admin");
+        var role = GetUserRole();
         int vendorId;
 
-        if (isAdmin)
+        var existingProduct = await _context.Products.FindAsync(id);
+        if (existingProduct == null)
+            return NotFound(new { message = "Product not found." });
+
+        if (role == "Admin" || role == "Employee")
         {
-            var existingProduct = await _context.Products.FindAsync(id);
-            if (existingProduct == null)
-                return NotFound(new { message = "Product not found." });
+            // Admin: can edit any product. Employee: can only edit the Prime vendor's products.
+            if (role == "Employee")
+            {
+                var prime = await _context.Users
+                    .FirstOrDefaultAsync(u => u.Username == "prime" && u.Role == "Vendor");
+                if (prime == null || existingProduct.VendorId != prime.Id)
+                    return NotFound(new { message = "Product not found or you don't have permission." });
+            }
             vendorId = existingProduct.VendorId;
         }
         else
         {
-            var vendorIdClaim = User.FindFirst("VendorId") ?? User.FindFirst(ClaimTypes.NameIdentifier);
-            if (vendorIdClaim == null)
-                return Unauthorized();
-            vendorId = int.Parse(vendorIdClaim.Value);
+            // Vendor: only their own products
+            vendorId = GetUserId();
+            if (existingProduct.VendorId != vendorId)
+                return NotFound(new { message = "Product not found or you don't have permission." });
         }
 
         string? newImageUrl = null;
@@ -343,14 +384,33 @@ public class ProductsController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    [Authorize(Roles = "Vendor,Admin")]
+    [Authorize(Roles = "Vendor,Admin,Employee")]
     public async Task<IActionResult> Delete(int id)
     {
-        var vendorIdClaim = User.FindFirst("VendorId") ?? User.FindFirst(ClaimTypes.NameIdentifier);
-        if (vendorIdClaim == null)
-            return Unauthorized();
+        var role = GetUserRole();
+        int vendorId;
 
-        var vendorId = int.Parse(vendorIdClaim.Value);
+        var existingProduct = await _context.Products.FindAsync(id);
+        if (existingProduct == null)
+            return NotFound(new { message = "Product not found or you don't have permission." });
+
+        if (role == "Admin" || role == "Employee")
+        {
+            if (role == "Employee")
+            {
+                var prime = await _context.Users
+                    .FirstOrDefaultAsync(u => u.Username == "prime" && u.Role == "Vendor");
+                if (prime == null || existingProduct.VendorId != prime.Id)
+                    return NotFound(new { message = "Product not found or you don't have permission." });
+            }
+            vendorId = existingProduct.VendorId;
+        }
+        else
+        {
+            vendorId = GetUserId();
+            if (existingProduct.VendorId != vendorId)
+                return NotFound(new { message = "Product not found or you don't have permission." });
+        }
 
         var result = await _productService.DeleteProductAsync(id, vendorId);
         if (!result)

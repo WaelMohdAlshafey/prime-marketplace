@@ -1,19 +1,51 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '@/context/AuthContext';
 
 export default function HelpPage() {
     const { t, i18n } = useTranslation('common');
+    const { user, isLoading } = useAuth();
     const [activeTab, setActiveTab] = useState('customer');
     const lang = i18n.language || 'ar';
 
-    const tabs = [
+    // Determine which tabs the current user is allowed to see
+    const getAllowedTabIds = () => {
+        if (!user) return ['customer'];
+        const role = user.role;
+        if (role === 'Admin') return ['customer', 'vendor', 'employee', 'admin'];
+        if (role === 'Vendor') return ['vendor'];
+        if (role === 'Employee') return ['employee'];
+        return ['customer']; // Customer / Client
+    };
+
+    // Default tab = the user's own role section
+    const getDefaultTab = () => {
+        if (!user) return 'customer';
+        const role = user.role;
+        if (role === 'Admin') return 'admin';
+        if (role === 'Vendor') return 'vendor';
+        if (role === 'Employee') return 'employee';
+        return 'customer';
+    };
+
+    // Set the initial tab once the user is loaded
+    useEffect(() => {
+        if (!isLoading) {
+            setActiveTab(getDefaultTab());
+        }
+    }, [user, isLoading]);
+
+    const allTabs = [
         { id: 'customer', label: t('helpCustomer'), icon: '👤' },
         { id: 'vendor', label: t('helpVendor'), icon: '🏪' },
         { id: 'employee', label: t('helpEmployee'), icon: '👔' },
         { id: 'admin', label: t('helpAdmin'), icon: '⚙️' },
     ];
+
+    const allowedIds = getAllowedTabIds();
+    const tabs = allTabs.filter((tab) => allowedIds.includes(tab.id));
 
     const content: Record<string, { title: string; sections: { title: string; steps: string[] }[] }> = {
         customer: {
@@ -152,11 +184,25 @@ export default function HelpPage() {
                     title: lang === 'ar' ? '⚙️ إعدادات الموقع (المظهر والشركة)' : '⚙️ Site Settings (Theme & Company)',
                     steps: lang === 'ar'
                         ? ['اذهب إلى "Admin → Settings" لتكوين المتجر.', 'تحت "معلومات أساسية": تحديث اسم المتجر، العنوان، المالكين، جهات الاتصال.', 'اختر قالباً (قياسي، بسيط، ملون، أزرق) لتغيير المظهر بالكامل.', 'تحت "تخصيص المظهر": تغيير الألوان الفردية يدوياً (أساسي، ثانوي، خلفية، نصوص، شريط التنقل، التذييل).', 'تحت "متقدم": إضافة CSS مخصص أو HTML مخصص.', 'انقر "حفظ الإعدادات" لتطبيق التغييرات.']
-                        : ['Go to "Admin → Settings" to configure your store.', 'Under "معلومات أساسية": update store name, address, owners, contacts.', 'Choose a template (standard, simple, colored, blue) to change the entire look.', 'Under "تخصيص المظهر": manually override individual colors.', 'Under "متقدم": add custom CSS or custom HTML.', 'Click "حفظ الإعدادات" to apply changes.']
+                        : ['Go to "Admin → Settings" to configure your store.', 'Under "Basic Info": update store name, address, owners, contacts.', 'Choose a template (standard, simple, colored, blue) to change the entire look.', 'Under "Theme": manually override individual colors.', 'Under "Advanced": add custom CSS or custom HTML.', 'Click "Save Settings" to apply changes.']
+                },
+                {
+                    title: lang === 'ar' ? '🛡️ إدارة الأدوار' : '🛡️ Role Management',
+                    steps: lang === 'ar'
+                        ? ['اذهب إلى "Admin → Roles" لمشاهدة جميع الأدوار.', 'الأدوار النظامية (Admin, Vendor, Employee, Customer) لا يمكن حذفها.', 'يمكنك إضافة أدوار مخصصة جديدة عبر "Add Role".', 'الأدوار المخصصة تحصل تلقائياً على صلاحيات مستوى العميل.']
+                        : ['Go to "Admin → Roles" to see all roles.', 'System roles (Admin, Vendor, Employee, Customer) cannot be deleted.', 'Add new custom roles via "Add Role".', 'Custom roles automatically get Customer-level permissions.']
                 },
             ]
         }
     };
+
+    if (isLoading) {
+        return (
+            <div className="flex justify-center items-center min-h-[60vh]">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+            </div>
+        );
+    }
 
     return (
         <div className="container mx-auto px-4 py-12 max-w-4xl">
@@ -164,21 +210,31 @@ export default function HelpPage() {
                 {t('helpTitle')}
             </h1>
 
-            <div className="flex flex-wrap gap-2 mb-6 border-b border-border pb-3">
-                {tabs.map((tab) => (
-                    <button
-                        key={tab.id}
-                        onClick={() => setActiveTab(tab.id)}
-                        className={`px-5 py-2 rounded-full font-semibold transition ${activeTab === tab.id
+            {/* Tabs — only the ones the user is allowed to see */}
+            {tabs.length > 1 ? (
+                <div className="flex flex-wrap gap-2 mb-6 border-b border-border pb-3">
+                    {tabs.map((tab) => (
+                        <button
+                            key={tab.id}
+                            onClick={() => setActiveTab(tab.id)}
+                            className={`px-5 py-2 rounded-full font-semibold transition ${activeTab === tab.id
                                 ? 'bg-primary text-white shadow-md'
                                 : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
-                            }`}
-                    >
-                        {tab.label}
-                    </button>
-                ))}
-            </div>
+                                }`}
+                        >
+                            {tab.label}
+                        </button>
+                    ))}
+                </div>
+            ) : (
+                <div className="mb-6 border-b border-border pb-3">
+                    <span className="inline-block px-5 py-2 rounded-full bg-primary text-white font-semibold shadow-md">
+                        {tabs[0]?.label}
+                    </span>
+                </div>
+            )}
 
+            {/* Content for the active tab */}
             <div className="bg-white rounded-xl shadow-soft p-6">
                 <h2 className="text-2xl font-bold text-text mb-4">
                     {content[activeTab]?.title || 'Loading...'}
