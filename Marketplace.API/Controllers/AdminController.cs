@@ -127,6 +127,79 @@ public class AdminController : ControllerBase
         }
     }
 
+    [HttpGet("analytics")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> GetAnalytics()
+    {
+        try
+        {
+            // ✅ Top Selling Products (from OrderItems)
+            var topSelling = await (from oi in _context.OrderItems
+                                    join o in _context.Orders on oi.OrderId equals o.Id
+                                    where o.CurrentStatus == "Paid"
+                                       || o.CurrentStatus == "Shipped"
+                                       || o.CurrentStatus == "Delivered"
+                                       || o.CurrentStatus == "In Transit"
+                                       || o.CurrentStatus == "Out for Delivery"
+                                    group oi by oi.ProductName into g
+                                    orderby g.Sum(x => x.Quantity) descending
+                                    select new
+                                    {
+                                        productName = g.Key,
+                                        soldCount = g.Sum(x => x.Quantity)
+                                    })
+                                    .Take(10)
+                                    .ToListAsync();
+
+            // ✅ Revenue by Category
+            var revenueByCategory = await (from oi in _context.OrderItems
+                                           join p in _context.Products on oi.ProductId equals p.Id
+                                           join o in _context.Orders on oi.OrderId equals o.Id
+                                           where o.CurrentStatus == "Paid"
+                                              || o.CurrentStatus == "Shipped"
+                                              || o.CurrentStatus == "Delivered"
+                                              || o.CurrentStatus == "In Transit"
+                                              || o.CurrentStatus == "Out for Delivery"
+                                           group new { oi, p } by (p.Category ?? "Uncategorized") into g
+                                           orderby g.Sum(x => x.oi.UnitPrice * x.oi.Quantity) descending
+                                           select new
+                                           {
+                                               category = g.Key,
+                                               revenue = g.Sum(x => x.oi.UnitPrice * x.oi.Quantity)
+                                           })
+                                           .ToListAsync();
+
+            // ✅ New Users Growth (last 12 months)
+            var twelveMonthsAgo = DateTime.UtcNow.AddMonths(-12);
+            var usersGrowth = await _context.Users
+                .Where(u => u.CreatedAt >= twelveMonthsAgo)
+                .GroupBy(u => new { u.CreatedAt.Year, u.CreatedAt.Month })
+                .Select(g => new
+                {
+                    year = g.Key.Year,
+                    month = g.Key.Month,
+                    newUsers = g.Count()
+                })
+                .OrderBy(x => x.year).ThenBy(x => x.month)
+                .ToListAsync();
+
+            return Ok(new
+            {
+                topSelling,
+                revenueByCategory,
+                usersGrowth
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new
+            {
+                message = "Failed to load analytics.",
+                error = ex.Message,
+                stackTrace = ex.StackTrace
+            });
+        }
+    }
     [HttpGet("orders")]
     public async Task<IActionResult> GetOrders()
     {

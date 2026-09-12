@@ -10,14 +10,19 @@ import {
     Mail,
     Clock,
     LayoutDashboard,
+    TrendingUp,
+    PieChart as PieIcon,
+    UserPlus,
 } from 'lucide-react';
-import { Line } from 'react-chartjs-2';
+import { Line, Bar, Doughnut } from 'react-chartjs-2';
 import {
     Chart as ChartJS,
     CategoryScale,
     LinearScale,
     PointElement,
     LineElement,
+    BarElement,
+    ArcElement,
     Title,
     Tooltip,
     Legend,
@@ -28,6 +33,8 @@ ChartJS.register(
     LinearScale,
     PointElement,
     LineElement,
+    BarElement,
+    ArcElement,
     Title,
     Tooltip,
     Legend
@@ -52,24 +59,35 @@ interface DashboardStats {
     monthlyRevenue: Array<{ year: number; month: number; total: number }>;
 }
 
+interface AnalyticsData {
+    topSelling: Array<{ productName: string; soldCount: number }>;
+    revenueByCategory: Array<{ category: string; revenue: number }>;
+    usersGrowth: Array<{ year: number; month: number; newUsers: number }>;
+}
+
 export default function AdminDashboard() {
     const [stats, setStats] = useState<DashboardStats | null>(null);
+    const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        const fetchStats = async () => {
+        const fetchData = async () => {
             try {
-                const response = await api.get('/api/Admin/dashboard');
-                setStats(response.data);
-                setLoading(false);
+                const [statsRes, analyticsRes] = await Promise.all([
+                    api.get('/api/Admin/dashboard'),
+                    api.get('/api/Admin/analytics'),
+                ]);
+                setStats(statsRes.data);
+                setAnalytics(analyticsRes.data);
             } catch (err) {
-                console.error('Failed to fetch dashboard stats:', err);
+                console.error('Failed to fetch dashboard data:', err);
                 setError('Failed to load dashboard data.');
+            } finally {
                 setLoading(false);
             }
         };
-        fetchStats();
+        fetchData();
     }, []);
 
     if (loading) {
@@ -89,15 +107,14 @@ export default function AdminDashboard() {
         );
     }
 
-    const chartData = {
-        labels: stats.monthlyRevenue.map((item) =>
-            `${item.month}/${item.year}`
-        ),
+    // --- Monthly Revenue ---
+    const revenueChartData = {
+        labels: stats.monthlyRevenue.map((item) => `${item.month}/${item.year}`),
         datasets: [
             {
                 label: 'Revenue (£)',
                 data: stats.monthlyRevenue.map((item) => item.total),
-                borderColor: 'var(--color-primary, #0F5C45)',
+                borderColor: '#0F5C45',
                 backgroundColor: 'rgba(15, 92, 69, 0.1)',
                 fill: true,
                 tension: 0.4,
@@ -105,62 +122,67 @@ export default function AdminDashboard() {
         ],
     };
 
-    const chartOptions = {
+    // --- Top Selling Products ---
+    const topSellingData = {
+        labels: analytics?.topSelling.map((x) => x.productName) || [],
+        datasets: [
+            {
+                label: 'Units Sold',
+                data: analytics?.topSelling.map((x) => x.soldCount) || [],
+                backgroundColor: 'rgba(15, 92, 69, 0.7)',
+                borderColor: '#0F5C45',
+                borderWidth: 2,
+            },
+        ],
+    };
+
+    // --- Revenue by Category ---
+    const palette = [
+        '#0F5C45', '#D4A54A', '#3B82F6', '#EF4444', '#8B5CF6',
+        '#F59E0B', '#10B981', '#EC4899', '#6366F1', '#14B8A6',
+    ];
+    const categoryData = {
+        labels: analytics?.revenueByCategory.map((x) => x.category) || [],
+        datasets: [
+            {
+                label: 'Revenue (£)',
+                data: analytics?.revenueByCategory.map((x) => x.revenue) || [],
+                backgroundColor: palette,
+                borderWidth: 1,
+            },
+        ],
+    };
+
+    // --- Users Growth ---
+    const usersGrowthData = {
+        labels: analytics?.usersGrowth.map((x) => `${x.month}/${x.year}`) || [],
+        datasets: [
+            {
+                label: 'New Users',
+                data: analytics?.usersGrowth.map((x) => x.newUsers) || [],
+                borderColor: '#3B82F6',
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                fill: true,
+                tension: 0.4,
+            },
+        ],
+    };
+
+    const baseChartOptions = {
         responsive: true,
+        maintainAspectRatio: false,
         plugins: {
-            legend: {
-                position: 'top' as const,
-            },
-            title: {
-                display: true,
-                text: 'Monthly Revenue (Last 12 Months)',
-            },
+            legend: { position: 'top' as const },
         },
     };
 
     const statCards = [
-        {
-            title: 'Total Users',
-            value: stats.totalUsers,
-            icon: Users,
-            bgColor: 'bg-blue-50',
-            textColor: 'text-blue-600',
-        },
-        {
-            title: 'Products',
-            value: stats.totalProducts,
-            icon: Package,
-            bgColor: 'bg-green-50',
-            textColor: 'text-green-600',
-        },
-        {
-            title: 'Orders',
-            value: stats.totalOrders,
-            icon: ShoppingBag,
-            bgColor: 'bg-purple-50',
-            textColor: 'text-purple-600',
-        },
-        {
-            title: 'Revenue',
-            value: `£${stats.totalRevenue.toFixed(2)}`,
-            icon: DollarSign,
-            bgColor: 'bg-amber-50',
-            textColor: 'text-amber-600',
-        },
-        {
-            title: 'Subscribers',
-            value: stats.totalSubscribers,
-            icon: Mail,
-            bgColor: 'bg-rose-50',
-            textColor: 'text-rose-600',
-        },
-        {
-            title: 'Pending Orders',
-            value: stats.pendingOrders,
-            icon: Clock,
-            bgColor: 'bg-red-50',
-            textColor: 'text-red-600',
-        },
+        { title: 'Total Users', value: stats.totalUsers, icon: Users, bgColor: 'bg-blue-50', textColor: 'text-blue-600' },
+        { title: 'Products', value: stats.totalProducts, icon: Package, bgColor: 'bg-green-50', textColor: 'text-green-600' },
+        { title: 'Orders', value: stats.totalOrders, icon: ShoppingBag, bgColor: 'bg-purple-50', textColor: 'text-purple-600' },
+        { title: 'Revenue', value: `£${stats.totalRevenue.toFixed(2)}`, icon: DollarSign, bgColor: 'bg-amber-50', textColor: 'text-amber-600' },
+        { title: 'Subscribers', value: stats.totalSubscribers, icon: Mail, bgColor: 'bg-rose-50', textColor: 'text-rose-600' },
+        { title: 'Pending Orders', value: stats.pendingOrders, icon: Clock, bgColor: 'bg-red-50', textColor: 'text-red-600' },
     ];
 
     return (
@@ -196,14 +218,66 @@ export default function AdminDashboard() {
                 })}
             </div>
 
-            {/* Chart */}
+            {/* Monthly Revenue */}
             <div className="bg-card-bg rounded-2xl shadow-soft p-4 md:p-6 mb-6 md:mb-8 border border-card-border">
+                <h2 className="text-lg md:text-xl font-bold text-text mb-4 flex items-center gap-2">
+                    <TrendingUp className="w-5 h-5 text-primary" />
+                    Monthly Revenue (Last 12 Months)
+                </h2>
                 {stats.monthlyRevenue.length > 0 ? (
                     <div className="h-64 md:h-80">
-                        <Line data={chartData} options={chartOptions} />
+                        <Line data={revenueChartData} options={baseChartOptions} />
                     </div>
                 ) : (
                     <p className="text-center text-text-muted py-8">No revenue data available yet.</p>
+                )}
+            </div>
+
+            {/* Two Charts Side-by-Side */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
+                {/* Top Selling Products */}
+                <div className="bg-card-bg rounded-2xl shadow-soft p-4 md:p-6 border border-card-border">
+                    <h2 className="text-lg font-bold text-text mb-4 flex items-center gap-2">
+                        <ShoppingBag className="w-5 h-5 text-primary" />
+                        Top Selling Products
+                    </h2>
+                    {analytics?.topSelling && analytics.topSelling.length > 0 ? (
+                        <div className="h-64 md:h-80">
+                            <Bar data={topSellingData} options={baseChartOptions} />
+                        </div>
+                    ) : (
+                        <p className="text-center text-text-muted py-8">No sales data yet.</p>
+                    )}
+                </div>
+
+                {/* Revenue by Category */}
+                <div className="bg-card-bg rounded-2xl shadow-soft p-4 md:p-6 border border-card-border">
+                    <h2 className="text-lg font-bold text-text mb-4 flex items-center gap-2">
+                        <PieIcon className="w-5 h-5 text-primary" />
+                        Revenue by Category
+                    </h2>
+                    {analytics?.revenueByCategory && analytics.revenueByCategory.length > 0 ? (
+                        <div className="h-64 md:h-80">
+                            <Doughnut data={categoryData} options={baseChartOptions} />
+                        </div>
+                    ) : (
+                        <p className="text-center text-text-muted py-8">No category data yet.</p>
+                    )}
+                </div>
+            </div>
+
+            {/* Users Growth */}
+            <div className="bg-card-bg rounded-2xl shadow-soft p-4 md:p-6 mb-6 md:mb-8 border border-card-border">
+                <h2 className="text-lg md:text-xl font-bold text-text mb-4 flex items-center gap-2">
+                    <UserPlus className="w-5 h-5 text-primary" />
+                    New Users Growth (Last 12 Months)
+                </h2>
+                {analytics?.usersGrowth && analytics.usersGrowth.length > 0 ? (
+                    <div className="h-64 md:h-80">
+                        <Line data={usersGrowthData} options={baseChartOptions} />
+                    </div>
+                ) : (
+                    <p className="text-center text-text-muted py-8">No user growth data yet.</p>
                 )}
             </div>
 
