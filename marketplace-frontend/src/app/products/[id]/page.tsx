@@ -7,13 +7,19 @@ import api from '@/lib/api';
 import { Product } from '@/types';
 import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
-import { ShoppingBag, Package, ArrowLeft } from 'lucide-react';
+import { ShoppingBag, Package, ArrowLeft, Star } from 'lucide-react';
 import { getImageUrl } from '@/lib/getImageUrl';
 
-// ============================================================
-// CURRENCY SYMBOL
-// ============================================================
 const CURRENCY = '£';
+
+interface Review {
+    id: number;
+    userId: number;
+    userName: string;
+    rating: number;
+    review?: string;
+    createdAt: string;
+}
 
 export default function ProductDetail() {
     const { id } = useParams();
@@ -21,9 +27,16 @@ export default function ProductDetail() {
     const { user } = useAuth();
     const { addToCart } = useCart();
     const [product, setProduct] = useState<Product | null>(null);
+    const [reviews, setReviews] = useState<Review[]>([]);
     const [loading, setLoading] = useState(true);
     const [quantity, setQuantity] = useState(1);
     const [adding, setAdding] = useState(false);
+
+    // Rating form
+    const [userRating, setUserRating] = useState(0);
+    const [userReview, setUserReview] = useState('');
+    const [submitting, setSubmitting] = useState(false);
+    const [ratingMessage, setRatingMessage] = useState('');
 
     const fetchProduct = async () => {
         try {
@@ -36,9 +49,19 @@ export default function ProductDetail() {
         }
     };
 
+    const fetchReviews = async () => {
+        try {
+            const response = await api.get<Review[]>(`/api/Products/${id}/reviews`);
+            setReviews(response.data || []);
+        } catch (error) {
+            console.warn('Failed to fetch reviews:', error);
+        }
+    };
+
     useEffect(() => {
         if (id) {
             fetchProduct();
+            fetchReviews();
         }
     }, [id]);
 
@@ -47,7 +70,6 @@ export default function ProductDetail() {
             router.push('/auth/login');
             return;
         }
-
         setAdding(true);
         try {
             await addToCart(Number(id), quantity);
@@ -59,6 +81,57 @@ export default function ProductDetail() {
             setAdding(false);
         }
     };
+
+    const handleSubmitRating = async () => {
+        if (!user) {
+            setRatingMessage('Please login to rate this product.');
+            return;
+        }
+        if (userRating < 1 || userRating > 5) {
+            setRatingMessage('Please select a rating (1-5 stars).');
+            return;
+        }
+        setSubmitting(true);
+        setRatingMessage('');
+        try {
+            await api.post(`/api/Products/${id}/rate`, {
+                rating: userRating,
+                review: userReview || null,
+            });
+            setRatingMessage('✅ Rating submitted successfully!');
+            await fetchProduct();
+            await fetchReviews();
+            setUserRating(0);
+            setUserReview('');
+        } catch (error: unknown) {
+            let message = 'Failed to submit rating.';
+            if (error && typeof error === 'object' && 'response' in error) {
+                const e = error as { response?: { data?: { message?: string } } };
+                if (e.response?.data?.message) message = e.response.data.message;
+            }
+            setRatingMessage(`❌ ${message}`);
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+    const renderStars = (rating: number, interactive = false) => (
+        <div className="flex gap-1">
+            {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                    key={star}
+                    type="button"
+                    onClick={() => interactive && setUserRating(star)}
+                    disabled={!interactive || submitting}
+                    className={`transition ${interactive ? 'cursor-pointer hover:scale-110' : 'cursor-default'}`}
+                >
+                    <Star
+                        className={`w-5 h-5 ${star <= rating ? 'fill-[#FFB400] text-[#FFB400]' : 'fill-gray-300 text-gray-300'}`}
+                    />
+                </button>
+            ))}
+        </div>
+    );
 
     if (loading) {
         return (
@@ -84,7 +157,6 @@ export default function ProductDetail() {
 
     return (
         <div className="container mx-auto px-4 py-12 max-w-4xl">
-            {/* Back button */}
             <button
                 onClick={() => router.back()}
                 className="flex items-center gap-2 text-gray-500 hover:text-[#0F5C45] transition mb-6"
@@ -115,13 +187,23 @@ export default function ProductDetail() {
                         )}
                     </div>
 
-                    {/* Product Info */}
                     <h1 className="text-2xl md:text-3xl font-bold text-gray-800">{product.name}</h1>
+
+                    {product.rating ? (
+                        <div className="flex items-center gap-2 mt-2">
+                            {renderStars(Math.round(product.rating))}
+                            <span className="text-sm text-gray-500">
+                                ({reviews.length} {reviews.length === 1 ? 'review' : 'reviews'})
+                            </span>
+                        </div>
+                    ) : (
+                        <p className="text-sm text-gray-400 mt-2">No ratings yet</p>
+                    )}
+
                     <p className="text-gray-600 mt-3 text-base md:text-lg leading-relaxed">
                         {product.description}
                     </p>
 
-                    {/* Price & Stock */}
                     <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-t border-gray-100 pt-6">
                         <div>
                             <span className="text-3xl md:text-4xl font-bold text-[#0F5C45]">
@@ -135,7 +217,6 @@ export default function ProductDetail() {
                         </div>
                     </div>
 
-                    {/* Quantity & Add to Cart */}
                     <div className="mt-8 flex flex-wrap items-center gap-4">
                         {product.stockQuantity > 0 && (
                             <div className="flex items-center gap-2 bg-gray-50 rounded-xl p-1 border border-gray-200">
@@ -163,10 +244,10 @@ export default function ProductDetail() {
                             onClick={handleAddToCart}
                             disabled={adding || product.stockQuantity === 0}
                             className={`flex-1 md:flex-none px-8 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${product.stockQuantity === 0
-                                    ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                                    : adding
-                                        ? 'bg-[#0F5C45]/70 text-white cursor-wait'
-                                        : 'bg-gradient-to-r from-[#0F5C45] to-[#1A7A5C] text-white hover:shadow-lg hover:shadow-[#0F5C45]/20 hover:scale-105'
+                                ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                                : adding
+                                    ? 'bg-[#0F5C45]/70 text-white cursor-wait'
+                                    : 'bg-gradient-to-r from-[#0F5C45] to-[#1A7A5C] text-white hover:shadow-lg hover:shadow-[#0F5C45]/20 hover:scale-105'
                                 }`}
                         >
                             <ShoppingBag className="w-5 h-5" />
@@ -178,7 +259,6 @@ export default function ProductDetail() {
                         </button>
                     </div>
 
-                    {/* Vendor info if available */}
                     {product.vendorName && (
                         <div className="mt-6 pt-6 border-t border-gray-100">
                             <p className="text-sm text-gray-500">
@@ -187,6 +267,77 @@ export default function ProductDetail() {
                         </div>
                     )}
                 </div>
+            </div>
+
+            {/* ============================================================
+                REVIEWS SECTION
+                ============================================================ */}
+            <div className="mt-8 bg-white rounded-2xl shadow-soft p-6 md:p-8">
+                <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-4">
+                    Reviews ({reviews.length})
+                </h2>
+
+                {/* Rate this product */}
+                <div className="bg-gray-50 rounded-xl p-4 md:p-6 mb-6">
+                    <h3 className="font-semibold text-gray-800 mb-3">Rate this product</h3>
+                    {user ? (
+                        <>
+                            <div className="flex items-center gap-4 mb-3">
+                                {renderStars(userRating, true)}
+                                <span className="text-sm text-gray-500">
+                                    {userRating > 0 ? `${userRating} stars` : 'Select rating'}
+                                </span>
+                            </div>
+                            <textarea
+                                placeholder="Write a review (optional)"
+                                value={userReview}
+                                onChange={(e) => setUserReview(e.target.value)}
+                                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0F5C45] focus:border-transparent"
+                                rows={3}
+                            />
+                            <button
+                                onClick={handleSubmitRating}
+                                disabled={submitting || userRating === 0}
+                                className="mt-3 px-6 py-2 bg-[#0F5C45] text-white rounded-lg hover:bg-[#0A4735] transition disabled:opacity-50"
+                            >
+                                {submitting ? 'Submitting...' : 'Submit Rating'}
+                            </button>
+                            {ratingMessage && (
+                                <p className={`mt-2 text-sm ${ratingMessage.startsWith('✅') ? 'text-green-600' : 'text-red-600'}`}>
+                                    {ratingMessage}
+                                </p>
+                            )}
+                        </>
+                    ) : (
+                        <p className="text-gray-500">
+                            Please <a href="/auth/login" className="text-[#0F5C45] hover:underline">login</a> to rate this product.
+                        </p>
+                    )}
+                </div>
+
+                {/* Reviews list */}
+                {reviews.length === 0 ? (
+                    <p className="text-gray-500 text-center py-6">No reviews yet. Be the first!</p>
+                ) : (
+                    <div className="space-y-4">
+                        {reviews.map((review) => (
+                            <div key={review.id} className="border-b border-gray-100 pb-4 last:border-0">
+                                <div className="flex items-center justify-between mb-1">
+                                    <span className="font-medium text-gray-800">{review.userName}</span>
+                                    <div className="flex items-center gap-1">
+                                        {renderStars(review.rating)}
+                                    </div>
+                                </div>
+                                {review.review && (
+                                    <p className="text-gray-600 mt-1">{review.review}</p>
+                                )}
+                                <p className="text-xs text-gray-400 mt-1">
+                                    {new Date(review.createdAt).toLocaleDateString()}
+                                </p>
+                            </div>
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
     );
