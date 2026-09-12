@@ -116,7 +116,7 @@ export interface StoreSettings {
     mobileNumbers: string[];
     emails: string[];
     landline: string;
-    whatsapp: string;
+    whatsApp: string;
     template: string;
     primaryColor?: string;
     primaryLight?: string;

@@ -102,7 +102,7 @@
     "madeWith": "صنع بحب"
   },
 
-  "aboutTitle": "🏢 عن {storeName}",
+  "aboutTitle": "🏢 عن {{storeName}}",
   "aboutOwners": "👤 المالكين",
   "aboutMobileNumbers": "📱 أرقام المحافظ الإلكترونية",
   "aboutEmails": "📧 البريد الإلكتروني",
@@ -112,7 +112,7 @@
   "aboutLoading": "جاري تحميل معلومات الشركة...",
   "aboutError": "تعذر تحميل معلومات الشركة.",
 
-  "contactTitle": "📞 اتصل بـ {storeName}",
+  "contactTitle": "📞 اتصل بـ {{storeName}}",
   "contactLoading": "جاري تحميل معلومات الاتصال...",
   "contactError": "تعذر تحميل معلومات الاتصال.",
   "contactCustomerService": "📌 خدمة العملاء متاحة من 9 صباحاً حتى 9 مساءً، 7 أيام في الأسبوع.",

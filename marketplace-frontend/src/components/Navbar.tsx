@@ -82,7 +82,7 @@ const Navbar = () => {
                     {user.role === 'Admin' && (
                         <>
                             <div className="border-t border-gray-100 my-1" />
-                            <Link href="/admin" className="block px-5 py-3 hover:bg-red-50 text-sm font-bold text-red-600" onClick={closeUser}>⚙️ {isAr ? 'لوحة التحكم' : 'Admin Panel'}</Link>
+                                <Link href="/admin" className="block px-5 py-3 hover:bg-red-50 text-sm font-bold text-red-600" onClick={closeUser}>⚙️ {isAr ? 'لوحة الإدارة' : 'Admin Panel'}</Link>
                             <Link href="/admin/users" className="block px-5 py-3 hover:bg-[#0F5C45]/10 text-sm" onClick={closeUser}>👥 {t('users')}</Link>
                             <Link href="/admin/products" className="block px-5 py-3 hover:bg-[#0F5C45]/10 text-sm" onClick={closeUser}>📦 {isAr ? 'المنتجات' : 'Products'}</Link>
                             <Link href="/admin/pages" className="block px-5 py-3 hover:bg-[#0F5C45]/10 text-sm" onClick={closeUser}>📄 {isAr ? 'الصفحات' : 'Pages'}</Link>

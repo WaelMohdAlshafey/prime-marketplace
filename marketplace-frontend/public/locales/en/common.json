@@ -102,7 +102,7 @@
     "madeWith": "Made with"
   },
 
-  "aboutTitle": "🏢 About {storeName}",
+  "aboutTitle": "🏢 About {{storeName}}",
   "aboutOwners": "👤 Owners",
   "aboutMobileNumbers": "📱 Mobile Wallet Numbers",
   "aboutEmails": "📧 Emails",
@@ -112,7 +112,7 @@
   "aboutLoading": "Loading company information...",
   "aboutError": "Unable to load company information.",
 
-  "contactTitle": "📞 Contact {storeName}",
+  "contactTitle": "📞 Contact {{storeName}}",
   "contactLoading": "Loading contact info...",
   "contactError": "Unable to load contact information.",
   "contactCustomerService": "📌 Our customer service is available from 9 AM to 9 PM, 7 days a week.",

@@ -47,7 +47,7 @@ export default function Footer() {
     };
 
     // Extract contact info safely
-    const whatsapp = settings?.whatsapp || '';
+    const whatsapp = settings?.whatsApp || '';
     const landline = settings?.landline || '';
     const emailContact = settings?.emails?.[0] || '';
     const address = settings?.address || '';
