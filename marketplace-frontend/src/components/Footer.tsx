@@ -16,7 +16,6 @@ export default function Footer() {
     const [settings, setSettings] = useState(null);
     const lang = i18n.language || 'ar';
 
-    // Fetch store settings + dynamic footer pages (from admin Pages)
     const [footerPages, setFooterPages] = useState([]);
 
     useEffect(() => {
@@ -46,8 +45,7 @@ export default function Footer() {
         }
     };
 
-    // Extract contact info safely
-    const whatsapp = settings?. || '';
+    const whatsapp = settings?.whatsApp || '';
     const landline = settings?.landline || '';
     const emailContact = settings?.emails?.[0] || '';
     const address = settings?.address || '';
@@ -58,7 +56,6 @@ export default function Footer() {
             <div className="container mx-auto px-4">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
 
-                    {/* 1. Brand + Newsletter */}
                     <div className="md:col-span-2">
                         <h4 className="font-bold text-footer-heading text-lg mb-4 flex items-center gap-2">
                             <ShoppingBag className="w-5 h-5" />
@@ -102,7 +99,6 @@ export default function Footer() {
                         </form>
                     </div>
 
-                    {/* 2. Contact + Dynamic footer pages (from Admin Pages) */}
                     <div>
                         <h4 className="font-bold text-footer-heading text-base mb-4">
                             {lang === 'ar' ? 'تواصل معنا' : 'Contact Us'}
@@ -135,7 +131,6 @@ export default function Footer() {
                             )}
                         </ul>
 
-                        {/* Dynamic footer pages from admin Pages manager */}
                         {footerPages.length > 0 && (
                             <div className="mt-6">
                                 <h4 className="font-bold text-footer-heading text-base mb-3">
@@ -155,7 +150,6 @@ export default function Footer() {
                     </div>
                 </div>
 
-                {/* Copyright */}
                 <div className="border-t border-white/10 mt-10 pt-5 text-center text-footer-text text-sm">
                     <p>
                         © {new Date().getFullYear()} {settings?.storeName || 'Prime'}.{' '}

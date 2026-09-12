@@ -134,7 +134,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
                     mobileNumbers: [],
                     emails: [],
                     landline: '',
-                    whatsapp: '',
+                    whatsApp: '',
                     template: 'nemocare',
                     primaryColor: '#4E8C9E',
                     primaryDark: '#2F5A6B',

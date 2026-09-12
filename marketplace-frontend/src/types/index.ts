@@ -116,7 +116,7 @@ export interface StoreSettings {
     mobileNumbers: string[];
     emails: string[];
     landline: string;
-    : string;
+    whatsApp: string;      // ✅ FIXED — was just ": string;"
     template: string;
     primaryColor?: string;
     primaryLight?: string;
@@ -351,6 +351,10 @@ export interface Page {
     createdAt: string;
     updatedAt?: string;
 }
+
+// ============================================================
+// PRODUCT CATEGORY TYPES
+// ============================================================
 export interface ProductCategory {
     id: number;
     name: string;
