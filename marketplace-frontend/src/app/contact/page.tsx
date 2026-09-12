@@ -44,7 +44,7 @@ export default function Contact() {
                     </div>
                     <div className="bg-green-50 p-4 rounded-lg border border-green-200">
                         <h3 className="text-lg font-semibold text-green-700 mb-2">{t('aboutWhatsapp')}</h3>
-                        <p className="text-gray-600 font-mono text-lg">{settings.whatsApp}</p>
+                        <p className="text-gray-600 font-mono text-lg">{settings.}</p>
                     </div>
                 </div>
 
