@@ -99,17 +99,18 @@ public class ProductsController : ControllerBase
 
     [HttpGet("filter")]
     public async Task<IActionResult> GetFiltered(
-        [FromQuery] string? q,
-        [FromQuery] decimal? minPrice,
-        [FromQuery] decimal? maxPrice,
-        [FromQuery] int? vendorId,
-        [FromQuery] bool? inStock,
-        [FromQuery] double? rating,
-        [FromQuery] int page = 1,
-        [FromQuery] int pageSize = 20)
+    [FromQuery] string? q,
+    [FromQuery] decimal? minPrice,
+    [FromQuery] decimal? maxPrice,
+    [FromQuery] int? vendorId,
+    [FromQuery] bool? inStock,
+    [FromQuery] double? rating,
+    [FromQuery] string? sortBy = null,
+    [FromQuery] int page = 1,
+    [FromQuery] int pageSize = 20)
     {
         var result = await _productService.GetProductsFilteredAsync(
-            q, minPrice, maxPrice, vendorId, inStock, rating, page, pageSize);
+            q, minPrice, maxPrice, vendorId, inStock, rating, page, pageSize, sortBy);
         return Ok(result);
     }
 

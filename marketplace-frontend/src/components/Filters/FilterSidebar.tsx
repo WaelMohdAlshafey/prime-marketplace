@@ -10,6 +10,7 @@ interface FilterSidebarProps {
         maxPrice?: number;
         inStock?: boolean;
         rating?: number;
+        sortBy?: string;
     }) => void;
     onResetFilters: () => void;
 }
@@ -22,23 +23,26 @@ export default function FilterSidebar({
     const [maxPrice, setMaxPrice] = useState<number | undefined>(undefined);
     const [inStock, setInStock] = useState<boolean | undefined>(undefined);
     const [rating, setRating] = useState<number | undefined>(undefined);
+    const [sortBy, setSortBy] = useState<string>('default');
     const [isMobileOpen, setIsMobileOpen] = useState(false);
 
-    // ✅ Start with ALL sections collapsed
     const [openSections, setOpenSections] = useState<Set<string>>(new Set());
 
     const toggleSection = (title: string) => {
         const newSet = new Set(openSections);
-        if (newSet.has(title)) {
-            newSet.delete(title);
-        } else {
-            newSet.add(title);
-        }
+        if (newSet.has(title)) newSet.delete(title);
+        else newSet.add(title);
         setOpenSections(newSet);
     };
 
     const handleApply = () => {
-        onApplyFilters({ minPrice, maxPrice, inStock, rating });
+        onApplyFilters({
+            minPrice,
+            maxPrice,
+            inStock,
+            rating,
+            sortBy: sortBy === 'default' ? undefined : sortBy,
+        });
         if (window.innerWidth < 768) setIsMobileOpen(false);
     };
 
@@ -47,25 +51,43 @@ export default function FilterSidebar({
         setMaxPrice(undefined);
         setInStock(undefined);
         setRating(undefined);
+        setSortBy('default');
         onResetFilters();
     };
 
     const FilterContent = () => (
         <>
+            {/* Sort */}
+            <div className="filter-section">
+                <button onClick={() => toggleSection('الترتيب')} className="filter-header">
+                    <span>الترتيب</span>
+                    {openSections.has('الترتيب') ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                </button>
+                {openSections.has('الترتيب') && (
+                    <div className="filter-content">
+                        <select
+                            value={sortBy}
+                            onChange={(e) => setSortBy(e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                        >
+                            <option value="default">الافتراضي</option>
+                            <option value="newest">الأحدث</option>
+                            <option value="price_asc">السعر: من الأقل للأعلى</option>
+                            <option value="price_desc">السعر: من الأعلى للأقل</option>
+                            <option value="rating">الأعلى تقييماً</option>
+                            <option value="name_asc">الاسم: أ - ي</option>
+                            <option value="name_desc">الاسم: ي - أ</option>
+                        </select>
+                    </div>
+                )}
+            </div>
+
             {/* Price Range */}
             <div className="filter-section">
-                <button
-                    onClick={() => toggleSection('نطاق السعر')}
-                    className="filter-header"
-                >
+                <button onClick={() => toggleSection('نطاق السعر')} className="filter-header">
                     <span>نطاق السعر</span>
-                    {openSections.has('نطاق السعر') ? (
-                        <ChevronUp className="w-5 h-5" />
-                    ) : (
-                        <ChevronDown className="w-5 h-5" />
-                    )}
+                    {openSections.has('نطاق السعر') ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
                 </button>
-
                 {openSections.has('نطاق السعر') && (
                     <div className="filter-content">
                         <div className="price-inputs">
@@ -73,9 +95,7 @@ export default function FilterSidebar({
                                 type="number"
                                 placeholder="الحد الأدنى"
                                 value={minPrice ?? ''}
-                                onChange={(e) =>
-                                    setMinPrice(e.target.value ? Number(e.target.value) : undefined)
-                                }
+                                onChange={(e) => setMinPrice(e.target.value ? Number(e.target.value) : undefined)}
                                 min="0"
                                 step="1"
                             />
@@ -84,9 +104,7 @@ export default function FilterSidebar({
                                 type="number"
                                 placeholder="الحد الأقصى"
                                 value={maxPrice ?? ''}
-                                onChange={(e) =>
-                                    setMaxPrice(e.target.value ? Number(e.target.value) : undefined)
-                                }
+                                onChange={(e) => setMaxPrice(e.target.value ? Number(e.target.value) : undefined)}
                                 min="0"
                                 step="1"
                             />
@@ -97,18 +115,10 @@ export default function FilterSidebar({
 
             {/* Rating */}
             <div className="filter-section">
-                <button
-                    onClick={() => toggleSection('التقييم')}
-                    className="filter-header"
-                >
+                <button onClick={() => toggleSection('التقييم')} className="filter-header">
                     <span>التقييم</span>
-                    {openSections.has('التقييم') ? (
-                        <ChevronUp className="w-5 h-5" />
-                    ) : (
-                        <ChevronDown className="w-5 h-5" />
-                    )}
+                    {openSections.has('التقييم') ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
                 </button>
-
                 {openSections.has('التقييم') && (
                     <div className="filter-content space-y-2">
                         {[5, 4, 3, 2, 1].map((stars) => (
@@ -141,18 +151,10 @@ export default function FilterSidebar({
 
             {/* Availability */}
             <div className="filter-section">
-                <button
-                    onClick={() => toggleSection('التوفر')}
-                    className="filter-header"
-                >
+                <button onClick={() => toggleSection('التوفر')} className="filter-header">
                     <span>التوفر</span>
-                    {openSections.has('التوفر') ? (
-                        <ChevronUp className="w-5 h-5" />
-                    ) : (
-                        <ChevronDown className="w-5 h-5" />
-                    )}
+                    {openSections.has('التوفر') ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
                 </button>
-
                 {openSections.has('التوفر') && (
                     <div className="filter-content">
                         <label>
@@ -167,19 +169,13 @@ export default function FilterSidebar({
                 )}
             </div>
 
-            {/* Apply Buttons */}
-            <button onClick={handleApply} className="filter-apply-btn">
-                تطبيق الفلاتر
-            </button>
-            <button onClick={handleReset} className="filter-reset-btn">
-                إعادة تعيين
-            </button>
+            <button onClick={handleApply} className="filter-apply-btn">تطبيق الفلاتر</button>
+            <button onClick={handleReset} className="filter-reset-btn">إعادة تعيين</button>
         </>
     );
 
     return (
         <>
-            {/* Mobile Toggle */}
             <button
                 onClick={() => setIsMobileOpen(true)}
                 className="md:hidden fixed bottom-6 left-6 z-40 bg-[#0A6C44] text-white p-4 rounded-full shadow-lg hover:bg-[#06452A] transition flex items-center gap-2"
@@ -188,7 +184,6 @@ export default function FilterSidebar({
                 <span className="text-sm font-medium">فلتر</span>
             </button>
 
-            {/* Desktop Sidebar */}
             <aside className="sidebar hidden md:block">
                 <div className="sidebar-title">
                     <Filter className="w-5 h-5 text-[#0A6C44]" />
@@ -197,13 +192,9 @@ export default function FilterSidebar({
                 <FilterContent />
             </aside>
 
-            {/* Mobile Overlay */}
             {isMobileOpen && (
                 <div className="fixed inset-0 z-50 md:hidden">
-                    <div
-                        className="fixed inset-0 bg-black/50"
-                        onClick={() => setIsMobileOpen(false)}
-                    />
+                    <div className="fixed inset-0 bg-black/50" onClick={() => setIsMobileOpen(false)} />
                     <div className="fixed inset-y-0 left-0 w-80 bg-white shadow-xl p-6 overflow-y-auto">
                         <div className="flex justify-between items-center mb-6">
                             <button

@@ -56,21 +56,35 @@ export default function CategoryPage({ category }) {
         setError(null);
         try {
             const finalFilters = filterOverrides || filters;
-            let url = '';
+            const params = new URLSearchParams();
 
-            if (Object.keys(finalFilters).length > 0) {
-                const params = new URLSearchParams();
-                if (finalFilters.minPrice !== undefined) params.append('minPrice', finalFilters.minPrice.toString());
-                if (finalFilters.maxPrice !== undefined) params.append('maxPrice', finalFilters.maxPrice.toString());
-                if (finalFilters.inStock !== undefined) params.append('inStock', finalFilters.inStock.toString());
-                if (finalFilters.rating !== undefined) params.append('rating', finalFilters.rating.toString());
-                url = `/api/Products/filter?${params.toString()}&page=1&pageSize=100`;
-            } else {
-                url = `/api/Products/category/${encodeURIComponent(apiCategoryName)}?page=1&pageSize=100`;
+            // Always filter by this page's category
+            if (apiCategoryName) params.append('q', ''); // keep q empty
+            // Add a vendorId=undefined to force filter path
+            params.append('categoryName', apiCategoryName);
+
+            if (finalFilters.minPrice !== undefined) params.append('minPrice', finalFilters.minPrice.toString());
+            if (finalFilters.maxPrice !== undefined) params.append('maxPrice', finalFilters.maxPrice.toString());
+            if (finalFilters.inStock !== undefined) params.append('inStock', finalFilters.inStock.toString());
+            if (finalFilters.rating !== undefined) params.append('rating', finalFilters.rating.toString());
+            if (finalFilters.sortBy) params.append('sortBy', finalFilters.sortBy);
+
+            // If no filter AND no sort, use the simpler category endpoint
+            if (Object.keys(finalFilters).length === 0) {
+                const url = `/api/Products/category/${encodeURIComponent(apiCategoryName)}?page=1&pageSize=100`;
+                const response = await api.get(url);
+                setProducts(response.data.items || []);
+                return;
             }
 
+            // Otherwise use filter endpoint, but the backend doesn't support categoryName param yet
+            // So we filter on the client after fetching:
+            const url = `/api/Products/filter?${params.toString()}&page=1&pageSize=100`;
             const response = await api.get(url);
-            setProducts(response.data.items || []);
+            const items = (response.data.items || []).filter(
+                (p) => p.category === apiCategoryName
+            );
+            setProducts(items);
         } catch (err) {
             console.error('❌ Failed to fetch products:', err);
             setError('فشل تحميل المنتجات، حاول مرة أخرى.');

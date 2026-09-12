@@ -182,16 +182,17 @@ public class ProductService : IProductService
     // FILTER PRODUCTS
     // ============================================================
     public async Task<PagedResult<ProductDto>> GetProductsFilteredAsync(
-        string? searchTerm,
-        decimal? minPrice,
-        decimal? maxPrice,
-        int? vendorId,
-        bool? inStock,
-        double? rating,
-        int page,
-        int pageSize)
+    string? searchTerm,
+    decimal? minPrice,
+    decimal? maxPrice,
+    int? vendorId,
+    bool? inStock,
+    double? rating,
+    int page,
+    int pageSize,
+    string? sortBy = null)
     {
-        string cacheKey = $"Filter_{searchTerm ?? "all"}_{minPrice}_{maxPrice}_{vendorId}_{inStock}_{rating}_P{page}_S{pageSize}";
+        string cacheKey = $"Filter_{searchTerm ?? "all"}_{minPrice}_{maxPrice}_{vendorId}_{inStock}_{rating}_{sortBy ?? "default"}_P{page}_S{pageSize}";
 
         if (_cache.TryGetValue(cacheKey, out PagedResult<ProductDto>? cachedResult) && cachedResult != null)
         {
@@ -234,10 +235,21 @@ public class ProductService : IProductService
         if (rating.HasValue && rating.Value > 0)
             query = query.Where(x => x.p.Rating >= rating.Value);
 
+        // ✅ SORTING
+        query = sortBy switch
+        {
+            "price_asc" => query.OrderBy(x => x.p.Price),
+            "price_desc" => query.OrderByDescending(x => x.p.Price),
+            "rating" => query.OrderByDescending(x => x.p.Rating ?? 0),
+            "newest" => query.OrderByDescending(x => x.p.CreatedAt),
+            "name_asc" => query.OrderBy(x => x.p.Name),
+            "name_desc" => query.OrderByDescending(x => x.p.Name),
+            _ => query.OrderBy(x => x.p.Id)
+        };
+
         var totalCount = await query.CountAsync();
 
         var products = await query
-            .OrderBy(x => x.p.Id)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .Select(x => new ProductDto
@@ -270,7 +282,6 @@ public class ProductService : IProductService
         _cache.Set(cacheKey, result, TimeSpan.FromMinutes(5));
         return result;
     }
-
     // ============================================================
     // GET PRODUCT BY ID
     // ============================================================

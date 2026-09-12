@@ -20,6 +20,7 @@ export default function ProductsPage() {
         maxPrice?: number;
         inStock?: boolean;
         rating?: number;
+        sortBy?: string;
     }>({});
 
     const fetchProducts = async (filterOverrides?: typeof filters) => {
@@ -35,6 +36,7 @@ export default function ProductsPage() {
                 if (finalFilters.maxPrice !== undefined) params.append('maxPrice', finalFilters.maxPrice.toString());
                 if (finalFilters.inStock !== undefined) params.append('inStock', finalFilters.inStock.toString());
                 if (finalFilters.rating !== undefined) params.append('rating', finalFilters.rating.toString());
+                if (finalFilters.sortBy) params.append('sortBy', finalFilters.sortBy);
                 url = `/api/Products/filter?${params.toString()}&page=1&pageSize=20`;
             }
 

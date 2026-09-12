@@ -16,7 +16,8 @@ public interface IProductService
         bool? inStock,
         double? rating,
         int page,
-        int pageSize);
+        int pageSize,
+        string? sortBy = null);
     Task<ProductDto> GetProductByIdAsync(int id);
     Task<PagedResult<ProductDto>> GetProductsByCategoryAsync(string categoryName, int page, int pageSize);
 
