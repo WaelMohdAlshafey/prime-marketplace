@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import api from '@/lib/api';
 import {
     Users,
@@ -10,7 +9,6 @@ import {
     DollarSign,
     Mail,
     Clock,
-    TrendingUp,
     LayoutDashboard,
 } from 'lucide-react';
 import { Line } from 'react-chartjs-2';
@@ -55,7 +53,6 @@ interface DashboardStats {
 }
 
 export default function AdminDashboard() {
-    const { t } = useTranslation('common');
     const [stats, setStats] = useState<DashboardStats | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);

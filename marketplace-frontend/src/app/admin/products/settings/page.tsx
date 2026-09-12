@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import { getStoreSettings, updateStoreSettings } from '@/lib/storeApi';
-import { StoreSettings, Owner } from '@/types';
+import { StoreSettings } from '@/types';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 
-export default function AdminSettings() {
+export default function ProductSettings() {
     const { user, isLoading } = useAuth();
     const router = useRouter();
     const [settings, setSettings] = useState<StoreSettings | null>(null);
@@ -164,7 +164,6 @@ export default function AdminSettings() {
                     />
                 </div>
 
-                {/* ✅ Template Selector */}
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Template</label>
                     <select
