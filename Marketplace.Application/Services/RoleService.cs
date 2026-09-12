@@ -60,7 +60,7 @@ public class RoleService : IRoleService
         return await GetByIdAsync(r.Id);
     }
 
-    public async Task<RoleDto> UpdateAsync(int id, UpdateRoleDto dto)
+    public async Task<RoleDto> UpdateAsync(int id, UpdateRoleDefinitionDto dto)
     {
         var r = await _context.Roles.FindAsync(id);
         if (r == null) throw new Exception("Role not found.");

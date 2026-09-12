@@ -8,13 +8,12 @@ public class RoleDto
     public bool IsSystemRole { get; set; }
     public int UserCount { get; set; }
 }
-
-public class CreateRoleDto
+             
+public class UpdateRoleDefinitionDto
 {
     public string Name { get; set; } = string.Empty;
     public string? Description { get; set; }
 }
-
 public class UpdateRoleDto
 {
     public string Name { get; set; } = string.Empty;

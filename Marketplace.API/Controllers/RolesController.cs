@@ -32,7 +32,7 @@ public class RolesController : ControllerBase
 
     [HttpPut("{id}")]
     [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> Update(int id, [FromBody] UpdateRoleDto dto)
+    public async Task<IActionResult> Update(int id, [FromBody] UpdateRoleDefinitionDto dto)
     {
         try { return Ok(await _service.UpdateAsync(id, dto)); }
         catch (Exception ex) { return BadRequest(new { message = ex.Message }); }
